@@ -1,0 +1,7 @@
+pnpm-lock.yaml
+node_modules
+dist
+dist-worker
+.next
+coverage
+**/prisma/migrations
