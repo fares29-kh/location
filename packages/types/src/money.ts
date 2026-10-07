@@ -60,3 +60,22 @@ export function dinarsToMillimes(dinars: number): number {
   }
   return Math.round(dinars * MILLIMES_PER_DINAR);
 }
+
+const DINAR_INPUT_PATTERN = /^\d+(?:\.\d{1,3})?$/;
+
+/**
+ * Lit un montant saisi en dinars (« 85 », « 85,5 », « 1 250.750 ») et le renvoie en millimes.
+ * Renvoie `null` si la saisie n'est pas un montant positif à 3 décimales au plus.
+ */
+export function parseDinars(input: string): number | null {
+  const normalized = input.replace(/[\s\u00A0\u202F]/g, '').replace(',', '.');
+  if (!DINAR_INPUT_PATTERN.test(normalized)) {
+    return null;
+  }
+  return dinarsToMillimes(Number(normalized));
+}
+
+/** Valeur d'un champ de saisie en dinars à partir de millimes (« 85.5 » pour 85 500). */
+export function millimesToDinarInput(millimes: number): string {
+  return String(millimes / MILLIMES_PER_DINAR);
+}

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { dinarsToMillimes, formatMillimes } from './money';
+import { dinarsToMillimes, formatMillimes, millimesToDinarInput, parseDinars } from './money';
 
 const NNBSP = '\u202F';
 const NBSP = '\u00A0';
@@ -44,5 +44,26 @@ describe('dinarsToMillimes', () => {
 
   it('refuse les valeurs non finies', () => {
     expect(() => dinarsToMillimes(Number.POSITIVE_INFINITY)).toThrow(RangeError);
+  });
+});
+
+describe('parseDinars', () => {
+  it('accepte la virgule, le point et les espaces de groupement', () => {
+    expect(parseDinars('85')).toBe(85_000);
+    expect(parseDinars('85,5')).toBe(85_500);
+    expect(parseDinars('1 250.750')).toBe(1_250_750);
+    expect(parseDinars(' 0.001 ')).toBe(1);
+  });
+
+  it('refuse les saisies invalides', () => {
+    expect(parseDinars('')).toBeNull();
+    expect(parseDinars('-5')).toBeNull();
+    expect(parseDinars('12.3456')).toBeNull();
+    expect(parseDinars('abc')).toBeNull();
+  });
+
+  it('fait l’aller-retour avec millimesToDinarInput', () => {
+    expect(millimesToDinarInput(85_500)).toBe('85.5');
+    expect(parseDinars(millimesToDinarInput(120_000))).toBe(120_000);
   });
 });
