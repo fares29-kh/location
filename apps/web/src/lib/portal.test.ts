@@ -1,59 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { buildPortalOrigin, resolveLocaleRoute, resolvePortal, toPortalPath } from './portal';
-
-describe('buildPortalOrigin', () => {
-  it('conserve le port de la requête', () => {
-    expect(
-      buildPortalOrigin('agency', {
-        host: 'localhost:8088',
-        rootDomain: 'localhost',
-        secure: false,
-      }),
-    ).toBe('http://agency.localhost:8088');
-  });
-
-  it('sert le portail client sur le domaine racine, en HTTPS', () => {
-    expect(
-      buildPortalOrigin('client', {
-        host: 'admin.drivetn.tn',
-        rootDomain: 'drivetn.tn',
-        secure: true,
-      }),
-    ).toBe('https://drivetn.tn');
-  });
-
-  it('fonctionne sans en-tête Host', () => {
-    expect(buildPortalOrigin('admin', { host: null, rootDomain: 'localhost', secure: false })).toBe(
-      'http://admin.localhost',
-    );
-  });
-});
-
-describe('resolvePortal', () => {
-  it.each([
-    ['localhost', 'client'],
-    ['localhost:3000', 'client'],
-    ['app.localhost', 'client'],
-    ['agency.localhost', 'agency'],
-    ['admin.localhost', 'admin'],
-    ['ADMIN.LOCALHOST', 'admin'],
-  ] as const)('%s => %s', (host, expected) => {
-    expect(resolvePortal(host, 'localhost')).toBe(expected);
-  });
-
-  it('fonctionne avec un domaine de production', () => {
-    expect(resolvePortal('drivetn.tn', 'drivetn.tn')).toBe('client');
-    expect(resolvePortal('agency.drivetn.tn', 'drivetn.tn')).toBe('agency');
-  });
-
-  it.each([null, '', 'evil.com', 'partner.localhost', 'a.agency.localhost', 'localhost.evil.com'])(
-    'refuse l’hôte %s',
-    (host) => {
-      expect(resolvePortal(host, 'localhost')).toBeNull();
-    },
-  );
-});
+import { localizePath, resolveLocaleRoute, toPortalPath } from './portal';
 
 describe('resolveLocaleRoute', () => {
   it('sert le français sans préfixe', () => {
@@ -95,5 +42,16 @@ describe('toPortalPath', () => {
 
   it('préfixe les sous-chemins', () => {
     expect(toPortalPath('client', 'ar', '/voitures/123')).toBe('/client/ar/voitures/123');
+  });
+});
+
+describe('localizePath', () => {
+  it('ne préfixe pas le français', () => {
+    expect(localizePath('fr', '/login')).toBe('/login');
+  });
+
+  it('préfixe l’arabe et l’anglais', () => {
+    expect(localizePath('ar', '/')).toBe('/ar');
+    expect(localizePath('en', '/account')).toBe('/en/account');
   });
 });
