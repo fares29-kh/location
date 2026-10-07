@@ -29,6 +29,9 @@ describe('isProtectedPath', () => {
     expect(isProtectedPath('client', '/account')).toBe(true);
     expect(isProtectedPath('client', '/account/bookings')).toBe(true);
     expect(isProtectedPath('client', '/accounting')).toBe(false);
+    expect(isProtectedPath('client', '/bookings')).toBe(true);
+    expect(isProtectedPath('client', '/search')).toBe(false);
+    expect(isProtectedPath('client', '/agencies')).toBe(false);
   });
 });
 

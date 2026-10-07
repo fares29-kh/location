@@ -77,8 +77,17 @@
         "pickupDate": "Pick-up",
         "returnDate": "Return",
         "submit": "Search",
-        "soonTitle": "Search is coming very soon",
-        "soonText": "We are putting the finishing touches to agency offer comparison. Check back soon!"
+        "quickDates": "Quick durations",
+        "presets": {
+          "weekend": "This weekend",
+          "threeDays": "3 days",
+          "oneWeek": "1 week",
+          "twoWeeks": "2 weeks"
+        },
+        "duration": "{from} – {to} · {count, plural, one {# day} other {# days}}",
+        "datesOptional": "Dates are optional: compare first, decide later.",
+        "chooseReturn": "Now pick a return date.",
+        "clear": "Clear"
       },
       "places": {
         "tunisCarthage": "Tunis-Carthage Airport",
@@ -158,11 +167,190 @@
         "title": "Are you a car rental agency?",
         "text": "List your fleet, receive bookings and track your payments from a single workspace.",
         "action": "Discover the agency workspace"
+      },
+      "categories": {
+        "eyebrow": "Categories",
+        "title": "A car for every trip",
+        "text": "From budget city cars to family SUVs, pick the model that suits your stay.",
+        "seats": "Up to {count} seats",
+        "bags": "{count, plural, one {# bag} other {# bags}}",
+        "examples": "E.g. {models}",
+        "explore": "See offers",
+        "all": "See all cars",
+        "from": "From",
+        "perDay": "/ day",
+        "priceNote": "Indicative starting prices, shown as a preview."
+      }
+    },
+    "catalog": {
+      "categories": {
+        "city": "City car",
+        "compact": "Compact",
+        "sedan": "Sedan",
+        "suv": "SUV",
+        "family": "Family",
+        "premium": "Premium"
+      },
+      "hints": {
+        "city": "Economical and easy to park, ideal in town.",
+        "compact": "Versatile and comfortable, in town and on the road.",
+        "sedan": "Large boot and comfort for long journeys.",
+        "suv": "High driving position, at ease on every road.",
+        "family": "Up to 7 seats for trips with family or friends.",
+        "premium": "Top-of-the-range comfort for business travel."
+      },
+      "transmission": {
+        "MANUAL": "Manual",
+        "AUTOMATIC": "Automatic"
+      },
+      "fuel": {
+        "PETROL": "Petrol",
+        "DIESEL": "Diesel",
+        "HYBRID": "Hybrid"
+      }
+    },
+    "search": {
+      "metaTitle": "Search for a car",
+      "eyebrow": "Search",
+      "title": "Find the perfect car for your stay",
+      "subtitle": "Compare offers from local agencies, filter by what matters to you and book without a credit card.",
+      "form": {
+        "stations": "Train stations",
+        "ports": "Ports"
+      },
+      "previewTitle": "Search preview",
+      "previewText": "The offers below are examples: our partner agencies are currently listing their fleets. Booking will open very soon.",
+      "results": "{count, plural, one {# offer available} other {# offers available}}",
+      "summary": {
+        "anywhere": "All of Tunisia",
+        "anyDates": "Flexible dates",
+        "dates": "{from} – {to} · {count, plural, one {# day} other {# days}}"
+      },
+      "sort": {
+        "label": "Sort offers",
+        "recommended": "Recommended",
+        "priceAsc": "Price: low to high",
+        "priceDesc": "Price: high to low",
+        "rating": "Top rated"
+      },
+      "filters": {
+        "title": "Filters",
+        "description": "Narrow down the offers to match your needs.",
+        "reset": "Reset",
+        "show": "Show {count, plural, one {# offer} other {# offers}}",
+        "quickLabel": "Filter by category",
+        "category": "Category",
+        "transmission": "Transmission",
+        "allTransmissions": "All",
+        "maxPrice": "Maximum price per day",
+        "anyPrice": "No limit",
+        "upTo": "Up to",
+        "mileage": "Mileage",
+        "unlimitedMileage": "Unlimited mileage only"
+      },
+      "empty": {
+        "title": "No offer matches your filters",
+        "text": "Broaden your criteria to discover more cars.",
+        "action": "Reset filters"
+      },
+      "offer": {
+        "preview": "Example",
+        "orSimilar": "or similar",
+        "rating": "{value} out of 5",
+        "reviews": "{count} reviews",
+        "seats": "{count} seats",
+        "bags": "{count, plural, one {# bag} other {# bags}}",
+        "unlimitedMileage": "Unlimited mileage",
+        "limitedMileage": "Limited mileage",
+        "verifiedAgency": "Verified agency",
+        "perDay": "/ day",
+        "total": "Total for {count, plural, one {# day} other {# days}}:",
+        "deposit": "Deposit:",
+        "book": "Book",
+        "bookSoonTitle": "Booking available soon",
+        "bookSoonText": "You will be able to book as soon as partner agencies have listed their fleets. No online payment will ever be requested."
+      }
+    },
+    "agencies": {
+      "metaTitle": "Rental agencies",
+      "eyebrow": "Agency network",
+      "title": "Verified local agencies, all over Tunisia",
+      "subtitle": "Find our pick-up points at the country’s airports, cities, train stations and ports, and rent from vetted Tunisian companies.",
+      "findCar": "Find a car",
+      "stats": {
+        "governorates": "Governorates",
+        "airports": "Airports served",
+        "pickupPoints": "Pick-up points"
+      },
+      "network": {
+        "eyebrow": "Where to find us",
+        "title": "Pick-up points by governorate",
+        "text": "Choose a location to see the available cars straight away.",
+        "filterLabel": "Search for a governorate or a city",
+        "filterPlaceholder": "E.g. Sousse, Djerba, Tabarka…",
+        "points": "{count, plural, one {# pick-up point} other {# pick-up points}}",
+        "soon": "Pick-up points coming soon.",
+        "searchIn": "See available cars: {name}",
+        "noResults": "No results for “{query}”",
+        "unavailableTitle": "Network temporarily unavailable",
+        "unavailableText": "We could not load the list of locations. Please try again in a few moments."
+      },
+      "charter": {
+        "eyebrow": "Our charter",
+        "title": "What we check at every agency",
+        "text": "Every rental company is vetted before appearing on DriveTN, then monitored throughout its activity.",
+        "licenseTitle": "Valid licences",
+        "licenseText": "Trade register, tax ID and authorisation to operate as a car rental company.",
+        "fleetTitle": "Insured fleet",
+        "fleetText": "Insured vehicles, up-to-date roadworthiness tests and regular servicing.",
+        "pricesTitle": "Transparent prices",
+        "pricesText": "Prices shown including tax, with deposit and conditions stated before booking.",
+        "reviewsTitle": "Verified reviews",
+        "reviewsText": "Only customers who actually rented can rate the agency."
+      }
+    },
+    "bookings": {
+      "metaTitle": "My bookings",
+      "eyebrow": "My space",
+      "title": "My bookings",
+      "subtitle": "Hello {name}, find your requests, ongoing rentals and history here.",
+      "newBooking": "New booking",
+      "tabs": {
+        "label": "Booking categories",
+        "upcoming": "Upcoming",
+        "active": "Ongoing",
+        "past": "Past"
+      },
+      "empty": {
+        "upcomingTitle": "No upcoming bookings",
+        "upcomingText": "Find a car and send your request: the agency confirms it quickly.",
+        "activeTitle": "No ongoing rental",
+        "activeText": "Your rental will appear here as soon as you collect the car at the agency.",
+        "pastTitle": "No history yet",
+        "pastText": "Your completed, cancelled or expired rentals will be kept here.",
+        "action": "Search for a car"
+      },
+      "journey": {
+        "title": "Your booking journey",
+        "description": "You are notified of each step by SMS or WhatsApp.",
+        "PENDING": "The agency is reviewing your request.",
+        "CONFIRMED": "Your car is reserved, see you at the agency.",
+        "PICKED_UP": "Have a good trip! You have collected the car.",
+        "COMPLETED": "Car returned, rental closed."
+      },
+      "checklist": {
+        "title": "On pick-up day",
+        "description": "To show the agency when you collect the car.",
+        "identity": "ID card or passport",
+        "license": "Valid driving licence",
+        "deposit": "Deposit, using the methods the agency accepts",
+        "payment": "Rental payment directly at the agency"
       }
     },
     "footer": {
       "about": "DriveTN connects individuals, tourists and Tunisians living abroad with local car rental agencies.",
       "explore": "Explore",
+      "support": "Support",
       "company": "DriveTN",
       "howItWorks": "How it works",
       "becomePartner": "Become a partner agency",
@@ -189,13 +377,580 @@
       "customers": "Customers",
       "payments": "Payments received",
       "reviews": "Reviews",
-      "settings": "Settings"
+      "settings": "Settings",
+      "pendingCount": "{count, plural, one {# pending request} other {# pending requests}}",
+      "unansweredCount": "{count, plural, one {# unanswered review} other {# unanswered reviews}}"
     },
-    "home": {
-      "title": "Welcome to your agency area",
-      "subtitle": "Manage your fleet, bookings and payments in one place.",
-      "emptyTitle": "Your dashboard is coming soon",
-      "emptyText": "Booking and revenue statistics will appear here once your agency is live."
+    "common": {
+      "call": "Call",
+      "whatsapp": "WhatsApp",
+      "clearSearch": "Clear search",
+      "loading": "Loading…",
+      "loadErrorTitle": "Couldn’t load the data",
+      "loadErrorText": "Check your connection and try again.",
+      "notFoundTitle": "Not found",
+      "notFoundText": "It may have been deleted, or the link is incorrect.",
+      "pagination": {
+        "label": "Pagination",
+        "previous": "Previous page",
+        "next": "Next page",
+        "page": "Page {page}",
+        "range": "{from}–{to} of {total}"
+      }
+    },
+    "demo": {
+      "badge": "Demo data",
+      "tooltip": "The portal shows sample data until the API is connected. Your changes are kept until you reload the page."
+    },
+    "notifications": {
+      "label": "Notifications",
+      "labelWithCount": "Notifications ({count, plural, one {# new request} other {# new requests}})",
+      "title": "Requests to handle",
+      "empty": "No pending requests: you’re all caught up.",
+      "newRequest": "New request from {name}",
+      "viewAll": "View all requests"
+    },
+    "validation": {
+      "REQUIRED": "This field is required.",
+      "TOO_LONG": "This text is too long.",
+      "INVALID_TUNISIAN_PHONE": "Invalid Tunisian number (8 digits).",
+      "INVALID_EMAIL": "Invalid email address.",
+      "INVALID_PLATE": "Invalid plate number (e.g. 245 TU 1234).",
+      "PLATE_ALREADY_USED": "This plate number is already used in your fleet.",
+      "OUT_OF_RANGE": "Value outside the allowed range.",
+      "INVALID_AMOUNT": "Invalid amount (e.g. 120 or 120.500).",
+      "PAYMENT_METHOD_REQUIRED": "Select at least one payment method.",
+      "generic": "Invalid value."
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "subtitle": "Today’s activity at a glance.",
+      "openPlanning": "Schedule",
+      "openBookings": "Bookings",
+      "quickLinks": "Shortcuts",
+      "kpis": {
+        "revenue": "Revenue this month",
+        "bookings": "Bookings this month",
+        "occupancy": "30-day occupancy",
+        "outstanding": "Outstanding balance",
+        "versusLastMonth": "{value} vs the same period last month",
+        "noComparison": "No comparison available",
+        "onRentNow": "{count, plural, one {# vehicle on rent} other {# vehicles on rent}}",
+        "outstandingHint": "Balances of ongoing and completed rentals",
+        "allCollected": "Everything collected"
+      },
+      "pending": {
+        "title": "Pending requests",
+        "subtitle": "Reply quickly: customers without an answer often book elsewhere.",
+        "viewAll": "View all",
+        "emptyTitle": "No pending requests",
+        "emptyText": "New booking requests will appear here.",
+        "received": "Received {time}"
+      },
+      "today": {
+        "title": "Today",
+        "departures": "Pick-ups",
+        "returns": "Returns",
+        "noDepartures": "No pick-ups scheduled today.",
+        "noReturns": "No returns scheduled today."
+      },
+      "revenue": {
+        "title": "Revenue",
+        "subtitle": "Completed rentals over the last 6 months",
+        "total": "6-month total",
+        "barLabel": "{month}: {amount}",
+        "unit": "Amounts in Tunisian dinars, deposits excluded."
+      },
+      "fleet": {
+        "title": "Fleet",
+        "subtitle": "{count, plural, one {# vehicle} other {# vehicles}}",
+        "available": "Available",
+        "onRent": "On rent",
+        "maintenance": "In maintenance",
+        "inactive": "Out of service",
+        "rating": "Average rating",
+        "ratingLabel": "{value} out of 5",
+        "reviewsCount": "{count, plural, one {# review} other {# reviews}}",
+        "manage": "Manage fleet"
+      },
+      "shortcuts": {
+        "fleet": {
+          "title": "Fleet",
+          "text": "Rates, availability and maintenance"
+        },
+        "payments": {
+          "title": "Payments",
+          "text": "Payments received and deposits"
+        },
+        "settings": {
+          "title": "Settings",
+          "text": "Agency profile and rental terms"
+        }
+      }
+    },
+    "bookings": {
+      "title": "Bookings",
+      "subtitle": "Track every request, from receipt to vehicle return.",
+      "searchLabel": "Search bookings",
+      "searchPlaceholder": "Name, phone, reference or plate",
+      "sortLabel": "Sort bookings",
+      "sorts": {
+        "pickup_desc": "Pick-up: latest first",
+        "pickup_asc": "Pick-up: earliest first",
+        "created_desc": "Most recent requests"
+      },
+      "filterLabel": "Filter by status",
+      "filters": {
+        "all": "All",
+        "pending": "Pending",
+        "confirmed": "Confirmed",
+        "ongoing": "Ongoing",
+        "completed": "Completed",
+        "cancelled": "Cancelled or rejected"
+      },
+      "columns": {
+        "customer": "Customer",
+        "vehicle": "Vehicle",
+        "dates": "Dates",
+        "amount": "Amount",
+        "status": "Status",
+        "open": "Open"
+      },
+      "days": "{count, plural, one {# day} other {# days}}",
+      "emptyTitle": "No bookings yet",
+      "emptyText": "Your customers’ requests will appear here.",
+      "emptyFilteredTitle": "No results",
+      "emptyFilteredText": "No booking matches these criteria.",
+      "clearFilters": "Reset filters",
+      "actions": {
+        "labels": {
+          "CONFIRM": "Confirm",
+          "REJECT": "Reject",
+          "PICK_UP": "Hand over keys",
+          "RETURN": "Record return",
+          "COMPLETE": "Close",
+          "NO_SHOW": "No-show",
+          "CANCEL": "Cancel booking"
+        },
+        "success": {
+          "CONFIRM": "Booking {reference} confirmed.",
+          "REJECT": "Request {reference} rejected.",
+          "PICK_UP": "Pick-up recorded for {reference}.",
+          "RETURN": "Return recorded for {reference}.",
+          "COMPLETE": "Booking {reference} closed.",
+          "NO_SHOW": "No-show recorded for {reference}.",
+          "CANCEL": "Booking {reference} cancelled."
+        },
+        "confirmTitle": {
+          "CONFIRM": "Confirm booking {reference}?",
+          "REJECT": "Reject request {reference}?",
+          "PICK_UP": "Hand over the vehicle for {reference}?",
+          "RETURN": "Record the return for {reference}?",
+          "COMPLETE": "Close booking {reference}?",
+          "NO_SHOW": "Report a no-show for {reference}?",
+          "CANCEL": "Cancel booking {reference}?"
+        },
+        "confirmText": {
+          "CONFIRM": "The vehicle will be blocked for these dates.",
+          "REJECT": "The customer will see the reason for the rejection.",
+          "PICK_UP": "Check the licence, the vehicle’s condition and the deposit before handing over the keys.",
+          "RETURN": "Check fuel, mileage and the vehicle’s condition.",
+          "COMPLETE": "The booking will be archived. Make sure everything is paid and the deposit returned.",
+          "NO_SHOW": "The vehicle will be released. This cannot be undone.",
+          "CANCEL": "The vehicle will be released and the customer notified. This cannot be undone."
+        },
+        "error": "The action couldn’t be completed. Please try again.",
+        "keep": "Go back",
+        "more": "More actions",
+        "quickReasons": "Common reasons",
+        "reasonLabel": "Reason",
+        "reasonHint": "Visible to the customer.",
+        "reasonRequired": "Please give a reason.",
+        "rejectReasons": {
+          "unavailable": "Vehicle unavailable on these dates",
+          "dates": "Pick-up or return times not possible",
+          "conditions": "Rental requirements not met"
+        }
+      }
+    },
+    "bookingDetail": {
+      "fallbackTitle": "Booking",
+      "subtitle": "{vehicle} · requested {created}",
+      "copyReference": "Copy reference",
+      "referenceCopied": "Reference copied",
+      "pendingTitle": "Request awaiting your answer",
+      "pendingText": "Received {since}. Confirm or reject quickly so you don’t lose the customer.",
+      "depositReminderTitle": "Deposit to return",
+      "depositReminderText": "A deposit of {amount} is still held. Return it before closing the booking.",
+      "trip": "Trip",
+      "duration": "{count, plural, one {# day} other {# days}}",
+      "pickup": "Pick-up",
+      "return": "Return",
+      "customerNote": "Customer message",
+      "vehicle": "Vehicle",
+      "payments": "Payments",
+      "paymentsHint": "Paid on site and recorded by the agency.",
+      "paidOf": "{paid} received of {total}",
+      "balance": "Balance due",
+      "depositHeld": "Deposit held",
+      "depositPlanned": "Expected deposit",
+      "noPayments": "No payment recorded yet.",
+      "customer": "Customer",
+      "whatsappMessage": "Hello {name}, this is your rental agency about booking {reference} (pick-up on {date}).",
+      "email": "Email",
+      "city": "City",
+      "openCustomer": "View customer profile",
+      "price": "Price",
+      "dailyRateTimesDays": "{rate} × {count, plural, one {# day} other {# days}}",
+      "longRentalDiscount": "Long rental discount",
+      "total": "Total",
+      "payAtAgency": "Paid at the agency: no online payment.",
+      "history": "History",
+      "requestReceived": "Request received"
+    },
+    "payments": {
+      "recordAction": "Record a payment",
+      "recordTitle": "Record a payment",
+      "recordDescription": "Booking {reference}",
+      "recordSubmit": "Record",
+      "recorded": "Payment recorded.",
+      "recordError": "The payment couldn’t be recorded.",
+      "currency": "TND",
+      "amountHint": "Balance due: {balance}",
+      "notePlaceholder": "E.g. receipt number, transfer reference…",
+      "fields": {
+        "kind": "Transaction type",
+        "amount": "Amount",
+        "method": "Payment method",
+        "note": "Note (optional)"
+      },
+      "kinds": {
+        "RENTAL": "Payment",
+        "REFUND": "Refund",
+        "DEPOSIT_HELD": "Deposit received",
+        "DEPOSIT_RETURNED": "Deposit returned"
+      },
+      "kindHints": {
+        "RENTAL": "Advance or balance of the rental",
+        "REFUND": "Money given back to the customer",
+        "DEPOSIT_HELD": "Guarantee kept during the rental",
+        "DEPOSIT_RETURNED": "Guarantee returned at drop-off"
+      },
+      "page": {
+        "title": "Payments received",
+        "subtitle": "Every payment received at the agency, deposits included.",
+        "offlineTitle": "On-site payments only",
+        "offlineText": "DriveTN never charges online: record every amount received or returned here (cash, card terminal, transfer…) to keep an accurate till.",
+        "kpis": {
+          "collected": "Collected",
+          "refunded": "Refunded",
+          "outstanding": "Outstanding balance",
+          "deposits": "Deposits held",
+          "thisMonth": "This month",
+          "outstandingHint": "Confirmed or ongoing rentals",
+          "depositsHint": "To be returned to customers"
+        },
+        "journal": "Transaction log",
+        "kindFilter": "Filter by type",
+        "methodFilter": "Filter by payment method",
+        "allKinds": "All types",
+        "allMethods": "All methods",
+        "columns": {
+          "date": "Date",
+          "booking": "Booking",
+          "kind": "Type",
+          "method": "Method",
+          "amount": "Amount"
+        },
+        "emptyTitle": "No payments recorded",
+        "emptyText": "Payments recorded on bookings will appear here.",
+        "emptyFilteredTitle": "No results",
+        "emptyFilteredText": "No transaction matches these filters.",
+        "clearFilters": "Reset filters",
+        "byMethod": {
+          "title": "By payment method",
+          "description": "Collected this month",
+          "empty": "Nothing collected this month."
+        },
+        "recordHint": "To record a payment, open the booking from <link>ongoing rentals</link>."
+      }
+    },
+    "planning": {
+      "title": "Schedule",
+      "subtitle": "Fleet availability and bookings, vehicle by vehicle.",
+      "previous": "Previous period",
+      "next": "Next period",
+      "today": "Today",
+      "spanLabel": "Displayed period",
+      "span": "{count, plural, one {# day} other {# days}}",
+      "legend": "Legend",
+      "now": "Now",
+      "vehicle": "Vehicle",
+      "fillRate": "{value} booked",
+      "maintenance": "In maintenance",
+      "barLabel": "{name}, {status}, {dates}",
+      "scrollHint": "Scroll horizontally to see the whole period."
+    },
+    "fleet": {
+      "title": "Fleet",
+      "subtitle": "Your vehicles, their rates and availability.",
+      "summary": "{count, plural, one {# vehicle} other {# vehicles}} · {occupancy} occupancy · {revenue} over 30 days",
+      "add": "Add a vehicle",
+      "searchLabel": "Search vehicles",
+      "searchPlaceholder": "Make, model or plate",
+      "filterLabel": "Filter by availability",
+      "filterAll": "All",
+      "availability": {
+        "ACTIVE": "Available",
+        "ON_RENT": "On rent",
+        "MAINTENANCE": "In maintenance",
+        "INACTIVE": "Out of service"
+      },
+      "categories": {
+        "ECONOMY": "Economy",
+        "COMPACT": "Compact",
+        "SEDAN": "Sedan",
+        "SUV": "SUV",
+        "MINIVAN": "Minivan",
+        "LUXURY": "Premium"
+      },
+      "transmissions": {
+        "MANUAL": "Manual",
+        "AUTOMATIC": "Automatic"
+      },
+      "fuels": {
+        "PETROL": "Petrol",
+        "DIESEL": "Diesel",
+        "HYBRID": "Hybrid",
+        "ELECTRIC": "Electric"
+      },
+      "seats": "{count, plural, one {# seat} other {# seats}}",
+      "airConditioning": "Air conditioning",
+      "perDay": "/ day",
+      "deposit": "Deposit {amount}",
+      "unlimitedMileage": "Unlimited mileage",
+      "mileagePerDay": "{km} km / day",
+      "occupancy30d": "30-day occupancy",
+      "currentBooking": "On rent:",
+      "nextBooking": "Next:",
+      "until": "until {date}",
+      "noUpcoming": "No upcoming bookings",
+      "unavailableHint": "Not available for rent",
+      "edit": "Edit",
+      "moreActions": "More actions for {name}",
+      "viewPlanning": "View schedule",
+      "statusMenu": {
+        "title": "Availability",
+        "options": {
+          "ACTIVE": "Available for rent",
+          "MAINTENANCE": "In maintenance",
+          "INACTIVE": "Out of service"
+        },
+        "success": {
+          "ACTIVE": "The vehicle is available for rent again.",
+          "MAINTENANCE": "Vehicle moved to maintenance.",
+          "INACTIVE": "Vehicle withdrawn from rental."
+        },
+        "error": "The status couldn’t be changed.",
+        "onRentHint": "The status can be changed once the vehicle is returned."
+      },
+      "emptyTitle": "No vehicles in your fleet",
+      "emptyText": "Add your first vehicle to start receiving bookings.",
+      "emptyFilteredTitle": "No vehicles found",
+      "emptyFilteredText": "No vehicle matches these criteria.",
+      "clearFilters": "Reset filters",
+      "form": {
+        "createTitle": "New vehicle",
+        "editTitle": "Edit vehicle",
+        "description": "Customers see this information on your profile.",
+        "sections": {
+          "identity": "Identification",
+          "specs": "Specifications",
+          "pricing": "Rates and terms"
+        },
+        "brand": "Make",
+        "model": "Model",
+        "year": "Year",
+        "plate": "Plate number",
+        "plateHint": "Tunisian format, e.g. 245 TU 1234.",
+        "category": "Category",
+        "fuel": "Fuel",
+        "transmission": "Gearbox",
+        "seats": "Seats",
+        "airConditioning": "Air conditioning",
+        "airConditioningHint": "Highly sought after in summer.",
+        "dailyRate": "Daily rate",
+        "perDaySuffix": "TND / day",
+        "deposit": "Deposit",
+        "depositHint": "Enter 0 if no deposit is required.",
+        "currency": "TND",
+        "unlimitedMileage": "Unlimited mileage",
+        "unlimitedMileageHint": "Otherwise, set a daily limit.",
+        "mileageLimit": "Mileage limit",
+        "kmPerDaySuffix": "km / day",
+        "cancel": "Cancel",
+        "submitCreate": "Add vehicle",
+        "submitEdit": "Save",
+        "created": "Vehicle added to your fleet.",
+        "updated": "Vehicle updated.",
+        "saveError": "The vehicle couldn’t be saved."
+      }
+    },
+    "customers": {
+      "title": "Customers",
+      "subtitle": "People who have booked with you.",
+      "summary": "{count, plural, one {# customer} other {# customers}}",
+      "searchLabel": "Search customers",
+      "searchPlaceholder": "Name, phone, email or city",
+      "clearSearch": "Clear search",
+      "columns": {
+        "customer": "Customer",
+        "city": "City",
+        "bookings": "Bookings",
+        "spent": "Total spent",
+        "lastBooking": "Last booking",
+        "contact": "Contact"
+      },
+      "bookingsCount": "{count, plural, one {# booking} other {# bookings}}",
+      "badges": {
+        "loyal": "Loyal",
+        "new": "New"
+      },
+      "emptyTitle": "No customers yet",
+      "emptyText": "Your customers will appear here after their first booking.",
+      "emptyFilteredTitle": "No customers found",
+      "emptyFilteredText": "Check the spelling or try the phone number.",
+      "detail": {
+        "title": "Customer profile",
+        "description": "Contact details and rental history.",
+        "whatsappMessage": "Hello {name}, this is your rental agency.",
+        "bookings": "Bookings",
+        "completed": "Completed",
+        "spent": "Total spent",
+        "since": "Customer since",
+        "noEmail": "No email provided",
+        "activeBookings": "{count, plural, one {# ongoing or upcoming booking} other {# ongoing or upcoming bookings}}",
+        "history": "Booking history",
+        "noBookings": "No bookings."
+      }
+    },
+    "reviews": {
+      "title": "Customer reviews",
+      "subtitle": "Reply to reviews: your answers are public and reassure future customers.",
+      "ratingLabel": "{rating} out of 5",
+      "reviewsCount": "{count, plural, one {# review} other {# reviews}}",
+      "distributionLabel": "Rating breakdown",
+      "starsCount": "{stars, plural, one {# star} other {# stars}}: {count}",
+      "responseRate": "Response rate",
+      "awaitingReply": "Awaiting reply",
+      "filterLabel": "Filter reviews",
+      "filters": {
+        "all": "All",
+        "unanswered": "Unanswered",
+        "positive": "Positive (4-5)",
+        "critical": "Critical (1-3)"
+      },
+      "noReply": "This review is waiting for your reply.",
+      "replyAction": "Reply",
+      "yourReply": "Your reply",
+      "editReply": "Edit reply",
+      "emptyTitle": "No reviews yet",
+      "emptyText": "Customers can rate their rental once the vehicle is returned.",
+      "emptyFilteredTitle": "No reviews in this category",
+      "emptyFilteredText": "Try another filter.",
+      "reply": {
+        "label": "Your public reply",
+        "placeholder": "Thank the customer, respond to their comments…",
+        "hint": "Visible to everyone on your agency profile",
+        "required": "Write a reply before publishing.",
+        "tooLong": "{max} characters maximum.",
+        "cancel": "Cancel",
+        "submit": "Publish reply",
+        "update": "Update",
+        "success": "Reply published.",
+        "error": "The reply couldn’t be published.",
+        "templates": {
+          "thanks": {
+            "label": "Thank",
+            "text": "Thank you {name} for your trust and kind feedback! The whole team is delighted your rental went well."
+          },
+          "welcomeBack": {
+            "label": "Invite back",
+            "text": "Thank you {name}! It was a pleasure to have you. We look forward to seeing you on your next trip."
+          },
+          "apology": {
+            "label": "Apologise",
+            "text": "Hello {name}, thank you for your feedback. We’re sorry your experience fell short and we’re taking your comments on board."
+          },
+          "contact": {
+            "label": "Offer to talk",
+            "text": "Hello {name}, we’re sorry for the inconvenience. Please contact us directly so we can find a solution together."
+          }
+        }
+      }
+    },
+    "settings": {
+      "title": "Settings",
+      "subtitle": "Your agency profile and rental terms.",
+      "tabs": {
+        "profile": "Agency profile",
+        "conditions": "Rental terms"
+      },
+      "unsaved": "Unsaved changes",
+      "discard": "Discard",
+      "save": "Save",
+      "previewHint": "Preview of your profile as customers see it.",
+      "profile": {
+        "identityTitle": "About",
+        "identityText": "The name and description shown on your public profile.",
+        "name": "Agency name",
+        "description": "Description",
+        "descriptionHint": "{count} / {max} characters",
+        "descriptionPlaceholder": "Your story and strengths: airport delivery, recent vehicles, service in Arabic, French and English…",
+        "contactTitle": "Contact details",
+        "contactText": "Customers reach you by phone or WhatsApp.",
+        "phone": "Phone",
+        "whatsapp": "WhatsApp",
+        "sameAsPhone": "Use the same number",
+        "email": "Email",
+        "emailHint": "Optional.",
+        "addressTitle": "Address",
+        "addressText": "Your main pick-up location.",
+        "address": "Address",
+        "governorate": "Governorate",
+        "governoratePlaceholder": "Select",
+        "saved": "Agency profile saved.",
+        "saveError": "The profile couldn’t be saved."
+      },
+      "conditions": {
+        "driverTitle": "Driver",
+        "driverText": "Requirements checked when handing over the keys.",
+        "minDriverAge": "Minimum age",
+        "minLicenseYears": "Years holding a licence",
+        "years": "{count, plural, one {# year} other {# years}}",
+        "noMinimum": "No minimum",
+        "bookingTitle": "Booking and cancellation",
+        "bookingText": "Flexible terms bring in more requests.",
+        "freeCancellation": "Free cancellation",
+        "freeCancellationHint": "How long before pick-up customers can cancel free of charge.",
+        "hoursBefore": "Up to {count, plural, one {# hour} other {# hours}} before pick-up",
+        "noFreeCancellation": "No free cancellation",
+        "instantConfirmation": "Instant confirmation",
+        "instantConfirmationHint": "Requests are accepted automatically when the vehicle is free.",
+        "paymentTitle": "Accepted payment methods",
+        "paymentText": "Paid on site at the agency. Shown on your profile.",
+        "saved": "Rental terms saved.",
+        "saveError": "The rental terms couldn’t be saved."
+      },
+      "preview": {
+        "title": "Customer view",
+        "namePlaceholder": "Your agency name",
+        "freeCancellation": "Free cancellation up to {count, plural, one {# hour} other {# hours}} before",
+        "instant": "Instant confirmation",
+        "onRequest": "Confirmed by the agency",
+        "payOnSite": "Pay on site",
+        "driver": "Driver: {age} years or older, {years, plural, one {# year} other {# years}} with a licence."
+      }
     }
   },
   "admin": {
@@ -209,13 +964,552 @@
       "billing": "Billing",
       "reviews": "Review moderation",
       "settings": "Settings",
-      "audit": "Audit log"
+      "audit": "Audit log",
+      "pendingAgencies": "{count, plural, one {# agency to review} other {# agencies to review}}",
+      "flaggedReviews": "{count, plural, one {# flagged review} other {# flagged reviews}}",
+      "overdueInvoices": "{count, plural, one {# overdue invoice} other {# overdue invoices}}"
     },
-    "home": {
-      "title": "Platform administration",
-      "subtitle": "Oversee agencies, users and DriveTN activity.",
-      "emptyTitle": "Metrics are coming soon",
-      "emptyText": "Agency, booking and billing monitoring will be available in the next phases."
+    "notifications": {
+      "label": "Tasks",
+      "labelWithCount": "Tasks ({count, plural, one {# item to handle} other {# items to handle}})",
+      "title": "To handle",
+      "empty": "Nothing to handle: the platform is up to date.",
+      "pendingAgencies": {
+        "title": "{count, plural, one {# agency to review} other {# agencies to review}}",
+        "text": "Check their documents before going live."
+      },
+      "flaggedReviews": {
+        "title": "{count, plural, one {# flagged review} other {# flagged reviews}}",
+        "text": "Customers or agencies reported content."
+      },
+      "overdueInvoices": {
+        "title": "{count, plural, one {# overdue invoice} other {# overdue invoices}}",
+        "text": "Send a reminder to the agencies concerned."
+      }
+    },
+    "common": {
+      "you": "You",
+      "system": "System",
+      "cancel": "Cancel",
+      "quickReasons": "Common reasons",
+      "reasonLabel": "Reason",
+      "reasonHint": "Shared with the person concerned and kept in the audit log.",
+      "reasonRequired": "Please enter a reason.",
+      "userRoles": {
+        "CUSTOMER": "Customer",
+        "AGENCY_OWNER": "Agency owner",
+        "AGENCY_STAFF": "Agency staff",
+        "ADMIN": "Administrator"
+      },
+      "adminRoles": {
+        "SUPER_ADMIN": "Super administrator",
+        "SUPPORT": "Support",
+        "FINANCE": "Finance"
+      }
+    },
+    "status": {
+      "agency": {
+        "PENDING_REVIEW": "To review",
+        "ACTIVE": "Active",
+        "SUSPENDED": "Suspended",
+        "REJECTED": "Rejected"
+      },
+      "user": {
+        "PENDING_VERIFICATION": "Unverified",
+        "ACTIVE": "Active",
+        "SUSPENDED": "Suspended"
+      },
+      "invoice": {
+        "ISSUED": "Issued",
+        "PAID": "Paid",
+        "OVERDUE": "Overdue"
+      },
+      "review": {
+        "PUBLISHED": "Published",
+        "FLAGGED": "Flagged",
+        "HIDDEN": "Hidden"
+      }
+    },
+    "plans": {
+      "STARTER": "Essential",
+      "PRO": "Pro",
+      "BUSINESS": "Business"
+    },
+    "dashboard": {
+      "title": "Platform overview",
+      "subtitle": "Agency, customer and billing activity across DriveTN.",
+      "openAudit": "Audit log",
+      "openAgencies": "Agencies",
+      "kpis": {
+        "gmv": "Rental volume this month",
+        "bookings": "Bookings this month",
+        "agencies": "Active agencies",
+        "customers": "Registered customers",
+        "noComparison": "No comparison available",
+        "versusLastMonth": "{value} vs the same period last month",
+        "newThisMonth": "{count, plural, one {+# this month} other {+# this month}}"
+      },
+      "pending": {
+        "title": "Agencies to review",
+        "subtitle": "Oldest applications first.",
+        "viewAll": "Review all",
+        "emptyTitle": "No pending agency",
+        "emptyText": "All sign-up applications have been handled.",
+        "missingDocuments": "{count, plural, one {# missing document} other {# missing documents}}",
+        "documentsComplete": "Complete file"
+      },
+      "billing": {
+        "title": "Billing",
+        "subtitle": "Partner agency subscriptions.",
+        "mrr": "Monthly recurring revenue",
+        "mrrHint": "Active subscriptions, excluding tax",
+        "outstanding": "Outstanding",
+        "overdue": "Late payments",
+        "overdueCount": "{count, plural, one {# invoice} other {# invoices}}",
+        "upToDate": "Up to date",
+        "open": "Open billing"
+      },
+      "gmv": {
+        "title": "Rental volume",
+        "subtitle": "Value of rentals started over the last 6 months.",
+        "total": "6-month total",
+        "barLabel": "{month}: {amount}, {count, plural, one {# rental} other {# rentals}}",
+        "unit": "Amounts in Tunisian dinars, all agencies combined."
+      },
+      "status": {
+        "title": "Bookings this month",
+        "subtitle": "{count, plural, one {# booking} other {# bookings}} starting this month.",
+        "open": "Oversee bookings"
+      },
+      "top": {
+        "title": "Most active agencies",
+        "subtitle": "Ranked by rental volume this month.",
+        "empty": "No rentals this month yet.",
+        "bookings": "{count, plural, one {# rental} other {# rentals}}"
+      },
+      "activity": {
+        "title": "Recent activity",
+        "subtitle": "Team decisions and operations.",
+        "viewAll": "Full log",
+        "empty": "No recent activity."
+      }
+    },
+    "agencies": {
+      "title": "Partner agencies",
+      "subtitle": "Review sign-ups and monitor the agencies on the platform.",
+      "summary": "{count, plural, one {# agency} other {# agencies}} · {pending, plural, one {# to review} other {# to review}}",
+      "searchLabel": "Search for an agency",
+      "searchPlaceholder": "Name, city, owner, phone or tax ID",
+      "filterLabel": "Filter by status",
+      "filters": {
+        "all": "All",
+        "pending": "To review",
+        "active": "Active",
+        "suspended": "Suspended",
+        "rejected": "Rejected"
+      },
+      "missingDocuments": "{count, plural, one {# missing document} other {# missing documents}}",
+      "submitted": "Submitted {time}",
+      "vehiclesCount": "{count, plural, one {# vehicle} other {# vehicles}}",
+      "columns": {
+        "agency": "Agency",
+        "owner": "Owner",
+        "status": "Status",
+        "plan": "Plan",
+        "fleet": "Fleet",
+        "gmv": "Volume this month",
+        "rating": "Rating",
+        "open": "Open profile"
+      },
+      "emptyTitle": "No registered agency",
+      "emptyText": "Agencies will appear here as soon as they sign up.",
+      "emptyFilteredTitle": "No matching agency",
+      "emptyFilteredText": "Change the search or the status filter.",
+      "clearFilters": "Reset filters",
+      "decisions": {
+        "labels": {
+          "APPROVE": "Approve agency",
+          "REJECT": "Reject",
+          "SUSPEND": "Suspend",
+          "REACTIVATE": "Reactivate"
+        },
+        "success": {
+          "APPROVE": "{name} is approved and visible to customers.",
+          "REJECT": "{name}’s application was rejected.",
+          "SUSPEND": "{name} is suspended.",
+          "REACTIVATE": "{name} is active again."
+        },
+        "error": "The decision could not be saved. Please try again.",
+        "confirmTitle": {
+          "APPROVE": "Approve {name}?",
+          "REJECT": "Reject {name}’s application?",
+          "SUSPEND": "Suspend {name}?",
+          "REACTIVATE": "Reactivate {name}?"
+        },
+        "confirmText": {
+          "APPROVE": "The agency will be able to publish its vehicles and receive bookings.",
+          "REJECT": "The owner will be told the reason and can submit a new application.",
+          "SUSPEND": "Its vehicles will be removed from search results and new bookings blocked.",
+          "REACTIVATE": "The agency will regain access to its workspace and its visibility to customers."
+        },
+        "quickReasons": {
+          "REJECT": {
+            "documents": "Unreadable or incomplete documents",
+            "taxId": "Tax ID does not match",
+            "duplicate": "Agency already registered"
+          },
+          "SUSPEND": {
+            "complaints": "Repeated customer complaints",
+            "insurance": "Fleet insurance expired",
+            "unpaid": "Unpaid subscription invoices"
+          }
+        }
+      },
+      "detail": {
+        "title": "Agency profile",
+        "description": "Application, subscription and activity of the agency.",
+        "contact": "Contact details",
+        "owner": "owner",
+        "noEmail": "No email address",
+        "taxId": "Tax ID",
+        "subscription": "Subscription",
+        "plan": "Plan",
+        "monthlyFee": "Monthly fee excl. tax",
+        "vehicles": "Vehicles",
+        "commissionDefault": "Commission (default)",
+        "commissionCustom": "Commission (custom)",
+        "gmvMonth": "Volume this month",
+        "bookings": "Bookings",
+        "rating": "Average rating",
+        "ratingLabel": "Average rating: {value} out of 5",
+        "reviews": "Published reviews",
+        "recentBookings": "Latest bookings",
+        "noBookings": "No bookings yet.",
+        "invoices": "Latest invoices",
+        "noInvoices": "No invoice issued.",
+        "since": "Registered on {date}",
+        "decidedAt": "last decision on {date}",
+        "reasonTitle": "Reason shared with the agency",
+        "tabs": {
+          "overview": "Application",
+          "activity": "Activity",
+          "history": "History"
+        },
+        "noHistory": "No decision recorded."
+      },
+      "documents": {
+        "title": "Supporting documents",
+        "missing": "Missing",
+        "TRADE_REGISTER": "National business register extract",
+        "TAX_ID": "Tax identification card",
+        "INSURANCE": "Fleet insurance certificate",
+        "MANAGER_ID": "Owner’s national ID card"
+      }
+    },
+    "users": {
+      "title": "Users",
+      "subtitle": "Customer accounts, agency teams and administrators.",
+      "summary": "{count, plural, one {# account} other {# accounts}}",
+      "searchLabel": "Search for an account",
+      "searchPlaceholder": "Name, phone, email or agency",
+      "filterLabel": "Filter by account type",
+      "filters": {
+        "all": "All",
+        "customers": "Customers",
+        "agency": "Agencies",
+        "admins": "Administrators",
+        "suspended": "Suspended"
+      },
+      "bookingsCount": "{count, plural, one {# booking} other {# bookings}}",
+      "columns": {
+        "user": "User",
+        "role": "Role",
+        "context": "Affiliation",
+        "status": "Status",
+        "createdAt": "Signed up",
+        "lastLogin": "Last sign-in",
+        "open": "Open profile"
+      },
+      "emptyTitle": "No account found",
+      "emptyText": "Change the search or the filter.",
+      "clearFilters": "Reset filters",
+      "actions": {
+        "adminManaged": "Administrator accounts are managed from access management.",
+        "labels": {
+          "SUSPEND": "Suspend account",
+          "REACTIVATE": "Reactivate account"
+        },
+        "success": {
+          "SUSPEND": "{name}’s account is suspended.",
+          "REACTIVATE": "{name}’s account is reactivated."
+        },
+        "error": "The account status could not be changed. Please try again.",
+        "confirmTitle": "Suspend {name}’s account?",
+        "confirmText": "They will be signed out and unable to sign in until the account is reactivated.",
+        "quickReasons": {
+          "fraud": "Suspected fraud or identity theft",
+          "abuse": "Reported abusive behaviour",
+          "request": "Requested by the account holder"
+        }
+      },
+      "detail": {
+        "title": "User profile",
+        "description": "Account information and recent activity.",
+        "reasonTitle": "Suspension reason",
+        "since": "Signed up on",
+        "lastLogin": "Last sign-in",
+        "never": "Never",
+        "bookings": "Bookings",
+        "noEmail": "No email address",
+        "adminScope": {
+          "SUPER_ADMIN": "Full access, including platform settings",
+          "SUPPORT": "Agencies, accounts and review moderation",
+          "FINANCE": "Billing and payments"
+        },
+        "activity": "Recent activity",
+        "noActivity": "No recorded activity."
+      }
+    },
+    "bookings": {
+      "title": "Bookings",
+      "subtitle": "Oversight of bookings across all agencies.",
+      "summary": "{count, plural, one {# booking} other {# bookings}} on the platform",
+      "stale": "No response",
+      "staleTitle": "{count, plural, one {# request is awaiting a response} other {# requests are awaiting a response}}",
+      "staleText": "Unanswered for more than {hours} h, they will expire automatically. Contact the agencies concerned.",
+      "showPending": "View requests",
+      "searchLabel": "Search for a booking",
+      "searchPlaceholder": "Reference, customer, phone, agency or plate",
+      "filterLabel": "Filter by status",
+      "filters": {
+        "all": "All",
+        "pending": "Pending",
+        "active": "Confirmed and ongoing",
+        "completed": "Completed",
+        "cancelled": "Cancelled"
+      },
+      "columns": {
+        "reference": "Reference",
+        "customer": "Customer",
+        "agency": "Agency and vehicle",
+        "dates": "Dates",
+        "total": "Amount",
+        "status": "Status"
+      },
+      "emptyTitle": "No booking found",
+      "emptyText": "Change the search or the status filter.",
+      "clearFilters": "Reset filters"
+    },
+    "billing": {
+      "title": "Billing",
+      "subtitle": "Agency subscriptions, invoices (VAT and fiscal stamp included) and payments.",
+      "invoicesTitle": "Invoices",
+      "searchLabel": "Search for an invoice",
+      "searchPlaceholder": "Invoice number or agency",
+      "filterLabel": "Filter by status",
+      "filters": {
+        "all": "All",
+        "issued": "Issued",
+        "overdue": "Overdue",
+        "paid": "Paid"
+      },
+      "columns": {
+        "number": "Invoice",
+        "agency": "Agency",
+        "period": "Period",
+        "total": "Amount incl. tax",
+        "dueAt": "Due date",
+        "status": "Status"
+      },
+      "reminded": "Reminder sent",
+      "emptyTitle": "No invoice found",
+      "emptyText": "Change the search or the status filter.",
+      "clearFilters": "Reset filters",
+      "overview": {
+        "mrr": "Monthly recurring revenue",
+        "mrrHint": "Active agency subscriptions, excl. tax",
+        "collected": "Collected this month",
+        "collectedHint": "Paid invoices, incl. tax",
+        "outstanding": "Outstanding",
+        "outstandingHint": "Unpaid issued invoices, incl. tax",
+        "overdue": "Overdue",
+        "overdueHint": "Past due date: a reminder is recommended",
+        "noOverdue": "No late payments"
+      },
+      "plans": {
+        "title": "Subscription plans",
+        "subtitle": "Active agencies by plan.",
+        "agencies": "{count, plural, one {# agency} other {# agencies}}",
+        "perMonth": "excl. tax / month",
+        "unlimited": "Unlimited vehicles",
+        "vehicleLimit": "Up to {count, plural, one {# vehicle} other {# vehicles}}"
+      },
+      "invoice": {
+        "description": "{agency} · {period} subscription",
+        "issuedAt": "Issued on",
+        "dueAt": "Due date",
+        "paidAt": "Paid on",
+        "subscription": "Subscription",
+        "commission": "Booking commission",
+        "subtotal": "Total excl. tax",
+        "vat": "VAT ({rate})",
+        "fiscalStamp": "Fiscal stamp",
+        "total": "Total incl. tax",
+        "method": "Payment method",
+        "markPaid": "Record payment",
+        "paidSuccess": "Payment of invoice {number} recorded.",
+        "error": "The operation failed. Please try again.",
+        "noReminder": "No reminder sent.",
+        "remindedAt": "Last reminder {date}.",
+        "sendReminder": "Send a reminder",
+        "reminderSuccess": "Reminder sent to {name}.",
+        "print": "Print"
+      }
+    },
+    "reviews": {
+      "title": "Review moderation",
+      "subtitle": "Handle flagged reviews according to the publishing guidelines.",
+      "filterLabel": "Filter reviews",
+      "filters": {
+        "flagged": "Flagged",
+        "published": "Published",
+        "hidden": "Hidden",
+        "all": "All"
+      },
+      "about": "on",
+      "ratingLabel": "Rating: {value} out of 5",
+      "agencyReply": "Agency reply:",
+      "reportsCount": "{count, plural, one {# report} other {# reports}}",
+      "reasons": {
+        "OFFENSIVE": "Offensive language",
+        "SPAM": "Advertising or spam",
+        "PERSONAL_DATA": "Personal data",
+        "OFF_TOPIC": "Off topic"
+      },
+      "hiddenBecause": "Hidden: {reason}",
+      "emptyFlaggedTitle": "No review to moderate",
+      "emptyFlaggedText": "All reports have been handled.",
+      "emptyTitle": "No reviews",
+      "emptyText": "No review matches this filter.",
+      "actions": {
+        "success": {
+          "PUBLISH": "The review is published and its reports are closed.",
+          "HIDE": "The review is hidden."
+        },
+        "error": "The moderation could not be saved. Please try again.",
+        "keep": "Keep review",
+        "restore": "Republish",
+        "hide": "Hide review",
+        "hideTitle": "Hide this review?",
+        "hideText": "The review will no longer appear on the agency’s page. Its author will be told the reason.",
+        "quickReasons": {
+          "insults": "Insulting or defamatory language",
+          "personalData": "Contains personal data",
+          "advertising": "Advertising or external link"
+        }
+      }
+    },
+    "settings": {
+      "title": "Platform settings",
+      "subtitle": "Taxes, business rules and support contact.",
+      "saved": "Settings saved.",
+      "saveError": "The settings could not be saved. Please try again.",
+      "readOnlyTitle": "Read only",
+      "readOnlyText": "Only a super administrator can change platform settings.",
+      "currency": "TND",
+      "unsaved": "Unsaved changes",
+      "discard": "Discard",
+      "save": "Save",
+      "tax": {
+        "title": "Taxes",
+        "text": "Applied to agency subscription invoices.",
+        "vat": "VAT rate",
+        "vatHint": "Current statutory rate: 19%.",
+        "stamp": "Fiscal stamp",
+        "stampHint": "Added to every invoice (currently 1 TND)."
+      },
+      "business": {
+        "title": "Business rules",
+        "text": "Default values for all agencies.",
+        "commission": "Default commission",
+        "commissionHint": "On completed rentals. 0% = disabled.",
+        "expiry": "Request expiry",
+        "expiryHint": "A request the agency hasn’t answered expires after this delay.",
+        "hours": "{count, plural, one {# hour} other {# hours}}"
+      },
+      "support": {
+        "title": "Customer support",
+        "text": "Contact details shown to customers and agencies.",
+        "phone": "Support phone",
+        "email": "Support email"
+      },
+      "preview": {
+        "title": "Invoice preview",
+        "subtitle": "Monthly subscription",
+        "invalid": "Fix the rates to show the preview.",
+        "subtotal": "Total excl. tax",
+        "vat": "VAT ({rate})",
+        "fiscalStamp": "Fiscal stamp",
+        "total": "Total incl. tax"
+      }
+    },
+    "audit": {
+      "title": "Audit log",
+      "subtitle": "History of sign-ins, sign-ups and administration decisions.",
+      "immutable": "Tamper-proof log",
+      "searchLabel": "Search the log",
+      "searchPlaceholder": "Author, item, detail or IP address",
+      "filterLabel": "Filter by category",
+      "categories": {
+        "all": "All",
+        "auth": "Sign-ins",
+        "agency": "Agencies",
+        "user": "Accounts",
+        "invoice": "Billing",
+        "review": "Reviews",
+        "settings": "Settings"
+      },
+      "columns": {
+        "date": "Date",
+        "action": "Action",
+        "actor": "Author",
+        "target": "Item",
+        "ip": "IP address"
+      },
+      "emptyTitle": "No entry found",
+      "emptyText": "Change the search or the category.",
+      "clearFilters": "Reset filters",
+      "actions": {
+        "auth": {
+          "login": "Sign-in",
+          "login_failed": "Failed sign-in",
+          "signup": "Sign-up",
+          "password_reset": "Password reset",
+          "password_changed": "Password changed"
+        },
+        "agency": {
+          "approved": "Agency approved",
+          "rejected": "Agency rejected",
+          "suspended": "Agency suspended",
+          "reactivated": "Agency reactivated"
+        },
+        "user": {
+          "suspended": "Account suspended",
+          "reactivated": "Account reactivated"
+        },
+        "invoice": {
+          "issued": "Invoice issued",
+          "paid": "Invoice paid",
+          "reminder_sent": "Payment reminder"
+        },
+        "review": {
+          "published": "Review published",
+          "hidden": "Review hidden"
+        },
+        "settings": {
+          "updated": "Settings changed"
+        }
+      }
     }
   },
   "status": {
@@ -437,7 +1731,21 @@
       "sendCode": "Get a code",
       "forgotPassword": "Forgot your password?",
       "noAccount": "No account yet?",
-      "signupLink": "Create an account"
+      "signupLink": "Create an account",
+      "demo": {
+        "title": "Test accounts",
+        "description": "Demo environment: use these credentials to explore the portal.",
+        "role": "Role",
+        "email": "Email:",
+        "password": "Password:",
+        "use": "Use",
+        "useLabel": "Fill in the form with the {email} account",
+        "roles": {
+          "client": "Customer",
+          "agency": "Agency manager",
+          "admin": "Super administrator"
+        }
+      }
     },
     "signup": {
       "title": {

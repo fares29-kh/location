@@ -7,7 +7,7 @@ const AUTH_PAGES: Record<Portal, readonly string[]> = {
   admin: ['/login', '/forgot-password', '/auth/handoff'],
 };
 
-const CLIENT_PROTECTED_PREFIXES = ['/account'];
+const CLIENT_PROTECTED_PREFIXES = ['/account', '/bookings'];
 
 function matchesPrefix(pathname: string, prefix: string): boolean {
   return pathname === prefix || pathname.startsWith(`${prefix}/`);

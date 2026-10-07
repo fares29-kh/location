@@ -11,6 +11,7 @@ import { getServerEnv } from '@/env';
 import { getPortalUser } from '@/lib/auth/session';
 import { type LocaleParams, resolveLocale } from '@/lib/locale-params';
 import { buildPortalMetadata, buildPortalViewport } from '@/lib/metadata';
+import { getPortalOrigin } from '@/lib/portal-origin';
 
 export const viewport = buildPortalViewport('client');
 
@@ -33,7 +34,7 @@ export default async function ClientLayout({
         <main id={MAIN_CONTENT_ID} className="flex-1">
           {children}
         </main>
-        <ClientFooter />
+        <ClientFooter agencyUrl={await getPortalOrigin('agency')} />
       </div>
       <MobileBottomNav />
     </RootDocument>

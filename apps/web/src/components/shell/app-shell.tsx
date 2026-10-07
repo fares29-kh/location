@@ -24,6 +24,7 @@ import { LocaleSwitcher } from '@/components/locale-switcher';
 import { MAIN_CONTENT_ID } from '@/components/skip-link';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { Link, usePathname } from '@/i18n/navigation';
+import { persistSidebarCollapsed } from '@/lib/sidebar-preference';
 
 export interface ShellNavItem {
   id: string;
@@ -31,6 +32,10 @@ export interface ShellNavItem {
   icon: LucideIcon;
   /** `null` : module livré dans une phase ultérieure (affiché « Bientôt »). */
   href: string | null;
+  /** Compteur d'éléments à traiter (masqué s'il vaut 0). */
+  count?: number;
+  /** Libellé accessible du compteur (ex. « 3 demandes en attente »). */
+  countLabel?: string;
 }
 
 export interface ShellNavSection {
@@ -44,7 +49,26 @@ export interface AppShellProps {
   user: CurrentUser;
   portalLabel: string;
   sections: ShellNavSection[];
+  /** État initial de la barre latérale, lu côté serveur dans le cookie de préférence. */
+  defaultCollapsed?: boolean;
+  /** Actions propres au portail, affichées dans la barre supérieure (notifications…). */
+  topbarActions?: ReactNode;
   children: ReactNode;
+}
+
+function NavBadge({ item, comingSoonLabel }: { item: ShellNavItem; comingSoonLabel: string }) {
+  if (item.href === null) {
+    return <Badge className="px-2">{comingSoonLabel}</Badge>;
+  }
+  if (item.count === undefined || item.count === 0) {
+    return undefined;
+  }
+  return (
+    <Badge tone="warning" className="min-w-6 justify-center px-1.5 tabular-nums">
+      <span aria-hidden="true">{item.count > 99 ? '99+' : item.count}</span>
+      <span className="sr-only">{item.countLabel ?? item.count}</span>
+    </Badge>
+  );
 }
 
 function ShellNavigation({
@@ -69,9 +93,7 @@ function ShellNavigation({
               label={item.label}
               disabled={item.href === null}
               active={item.href !== null && isActivePath(pathname, item.href)}
-              badge={
-                item.href === null ? <Badge className="px-2">{t('comingSoon')}</Badge> : undefined
-              }
+              badge={<NavBadge item={item} comingSoonLabel={t('comingSoon')} />}
             >
               {item.href !== null && <Link href={item.href} onClick={onNavigate} />}
             </SidebarItem>
@@ -83,10 +105,18 @@ function ShellNavigation({
 }
 
 /** Mise en page des espaces agence et admin : barre latérale repliable, menu mobile, barre supérieure. */
-export function AppShell({ portal, user, portalLabel, sections, children }: AppShellProps) {
+export function AppShell({
+  portal,
+  user,
+  portalLabel,
+  sections,
+  defaultCollapsed = false,
+  topbarActions,
+  children,
+}: AppShellProps) {
   const t = useTranslations('common');
   const tShell = useTranslations('shell');
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(defaultCollapsed);
   const [mobileOpen, setMobileOpen] = useState(false);
   const CollapseIcon = collapsed ? PanelLeftOpen : PanelLeftClose;
 
@@ -108,7 +138,8 @@ export function AppShell({ portal, user, portalLabel, sections, children }: AppS
             className="w-full justify-start group-data-[collapsed=true]/sidebar:justify-center"
             aria-expanded={!collapsed}
             onClick={() => {
-              setCollapsed((value) => !value);
+              setCollapsed(!collapsed);
+              persistSidebarCollapsed(portal, !collapsed);
             }}
           >
             <CollapseIcon className="rtl:-scale-x-100" aria-hidden="true" />
@@ -160,13 +191,14 @@ export function AppShell({ portal, user, portalLabel, sections, children }: AppS
           </TopbarSection>
           <TopbarSpacer />
           <TopbarSection>
+            {topbarActions}
             <LocaleSwitcher />
             <ThemeToggle />
             <UserMenu user={user} portal={portal} className="ms-2" />
           </TopbarSection>
         </Topbar>
         <main id={MAIN_CONTENT_ID} className="flex-1 p-4 sm:p-6 lg:p-8">
-          {children}
+          <div className="mx-auto w-full max-w-7xl">{children}</div>
         </main>
       </div>
     </div>

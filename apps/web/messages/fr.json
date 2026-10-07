@@ -77,8 +77,17 @@
         "pickupDate": "Départ",
         "returnDate": "Retour",
         "submit": "Rechercher",
-        "soonTitle": "La recherche arrive très bientôt",
-        "soonText": "Nous finalisons la comparaison des offres des agences. Revenez très vite !"
+        "quickDates": "Durées rapides",
+        "presets": {
+          "weekend": "Ce week-end",
+          "threeDays": "3 jours",
+          "oneWeek": "1 semaine",
+          "twoWeeks": "2 semaines"
+        },
+        "duration": "{from} – {to} · {count, plural, one {# jour} other {# jours}}",
+        "datesOptional": "Dates facultatives : comparez d’abord, précisez plus tard.",
+        "chooseReturn": "Choisissez maintenant la date de retour.",
+        "clear": "Effacer"
       },
       "places": {
         "tunisCarthage": "Aéroport Tunis-Carthage",
@@ -158,11 +167,190 @@
         "title": "Vous êtes une agence de location ?",
         "text": "Publiez votre flotte, recevez des réservations et suivez vos encaissements depuis un seul espace.",
         "action": "Découvrir l’espace agence"
+      },
+      "categories": {
+        "eyebrow": "Catégories",
+        "title": "Une voiture pour chaque voyage",
+        "text": "De la citadine économique au SUV familial, choisissez le modèle adapté à votre séjour.",
+        "seats": "Jusqu’à {count} places",
+        "bags": "{count, plural, one {# bagage} other {# bagages}}",
+        "examples": "Ex. : {models}",
+        "explore": "Voir les offres",
+        "all": "Voir toutes les voitures",
+        "from": "Dès",
+        "perDay": "/ jour",
+        "priceNote": "Prix de départ indicatifs, donnés à titre d’aperçu."
+      }
+    },
+    "catalog": {
+      "categories": {
+        "city": "Citadine",
+        "compact": "Compacte",
+        "sedan": "Berline",
+        "suv": "SUV",
+        "family": "Familiale",
+        "premium": "Premium"
+      },
+      "hints": {
+        "city": "Économique et facile à garer, idéale en ville.",
+        "compact": "Polyvalente et confortable, en ville comme sur la route.",
+        "sedan": "Grand coffre et confort pour les longs trajets.",
+        "suv": "Position de conduite haute, à l’aise sur toutes les routes.",
+        "family": "Jusqu’à 7 places pour voyager en famille ou entre amis.",
+        "premium": "Confort haut de gamme pour vos déplacements d’affaires."
+      },
+      "transmission": {
+        "MANUAL": "Manuelle",
+        "AUTOMATIC": "Automatique"
+      },
+      "fuel": {
+        "PETROL": "Essence",
+        "DIESEL": "Diesel",
+        "HYBRID": "Hybride"
+      }
+    },
+    "search": {
+      "metaTitle": "Rechercher une voiture",
+      "eyebrow": "Recherche",
+      "title": "Trouvez la voiture idéale pour votre séjour",
+      "subtitle": "Comparez les offres des agences locales, filtrez selon vos besoins et réservez sans carte bancaire.",
+      "form": {
+        "stations": "Gares",
+        "ports": "Ports"
+      },
+      "previewTitle": "Aperçu de la recherche",
+      "previewText": "Les offres ci-dessous sont des exemples : nos agences partenaires publient actuellement leur flotte. La réservation ouvrira très prochainement.",
+      "results": "{count, plural, one {# offre disponible} other {# offres disponibles}}",
+      "summary": {
+        "anywhere": "Toute la Tunisie",
+        "anyDates": "Dates flexibles",
+        "dates": "{from} – {to} · {count, plural, one {# jour} other {# jours}}"
+      },
+      "sort": {
+        "label": "Trier les offres",
+        "recommended": "Recommandées",
+        "priceAsc": "Prix croissant",
+        "priceDesc": "Prix décroissant",
+        "rating": "Mieux notées"
+      },
+      "filters": {
+        "title": "Filtres",
+        "description": "Affinez les offres selon vos besoins.",
+        "reset": "Réinitialiser",
+        "show": "Voir {count, plural, one {# offre} other {# offres}}",
+        "quickLabel": "Filtrer par catégorie",
+        "category": "Catégorie",
+        "transmission": "Boîte de vitesses",
+        "allTransmissions": "Toutes",
+        "maxPrice": "Prix maximum par jour",
+        "anyPrice": "Sans limite",
+        "upTo": "Jusqu’à",
+        "mileage": "Kilométrage",
+        "unlimitedMileage": "Kilométrage illimité uniquement"
+      },
+      "empty": {
+        "title": "Aucune offre ne correspond à vos filtres",
+        "text": "Élargissez vos critères pour découvrir plus de voitures.",
+        "action": "Réinitialiser les filtres"
+      },
+      "offer": {
+        "preview": "Exemple",
+        "orSimilar": "ou similaire",
+        "rating": "{value} sur 5",
+        "reviews": "{count} avis",
+        "seats": "{count} places",
+        "bags": "{count, plural, one {# bagage} other {# bagages}}",
+        "unlimitedMileage": "Kilométrage illimité",
+        "limitedMileage": "Kilométrage limité",
+        "verifiedAgency": "Agence vérifiée",
+        "perDay": "/ jour",
+        "total": "Total pour {count, plural, one {# jour} other {# jours}} :",
+        "deposit": "Caution :",
+        "book": "Réserver",
+        "bookSoonTitle": "Réservation bientôt disponible",
+        "bookSoonText": "Vous pourrez réserver dès que les agences partenaires auront publié leur flotte. Aucun paiement en ligne ne vous sera demandé."
+      }
+    },
+    "agencies": {
+      "metaTitle": "Agences de location",
+      "eyebrow": "Réseau d’agences",
+      "title": "Des agences locales vérifiées, partout en Tunisie",
+      "subtitle": "Retrouvez nos points de retrait dans les aéroports, les villes, les gares et les ports du pays, et louez auprès de loueurs tunisiens contrôlés.",
+      "findCar": "Trouver une voiture",
+      "stats": {
+        "governorates": "Gouvernorats",
+        "airports": "Aéroports desservis",
+        "pickupPoints": "Points de retrait"
+      },
+      "network": {
+        "eyebrow": "Où nous trouver",
+        "title": "Points de retrait par gouvernorat",
+        "text": "Choisissez un lieu pour voir directement les voitures disponibles.",
+        "filterLabel": "Rechercher un gouvernorat ou une ville",
+        "filterPlaceholder": "Ex. Sousse, Djerba, Tabarka…",
+        "points": "{count, plural, one {# point de retrait} other {# points de retrait}}",
+        "soon": "Points de retrait bientôt disponibles.",
+        "searchIn": "Voir les voitures disponibles : {name}",
+        "noResults": "Aucun résultat pour « {query} »",
+        "unavailableTitle": "Réseau momentanément indisponible",
+        "unavailableText": "Nous n’avons pas pu charger la liste des lieux. Réessayez dans quelques instants."
+      },
+      "charter": {
+        "eyebrow": "Notre charte",
+        "title": "Ce que nous vérifions chez chaque agence",
+        "text": "Chaque loueur est contrôlé avant d’apparaître sur DriveTN, puis suivi tout au long de son activité.",
+        "licenseTitle": "Agréments en règle",
+        "licenseText": "Registre de commerce, matricule fiscal et autorisation d’exercer la location de voitures.",
+        "fleetTitle": "Flotte assurée",
+        "fleetText": "Véhicules assurés, visite technique à jour et entretien régulier.",
+        "pricesTitle": "Prix transparents",
+        "pricesText": "Tarifs affichés TTC, caution et conditions annoncées avant la réservation.",
+        "reviewsTitle": "Avis vérifiés",
+        "reviewsText": "Seuls les clients ayant réellement loué peuvent noter l’agence."
+      }
+    },
+    "bookings": {
+      "metaTitle": "Mes réservations",
+      "eyebrow": "Mon espace",
+      "title": "Mes réservations",
+      "subtitle": "Bonjour {name}, retrouvez ici vos demandes, vos locations en cours et votre historique.",
+      "newBooking": "Nouvelle réservation",
+      "tabs": {
+        "label": "Catégories de réservations",
+        "upcoming": "À venir",
+        "active": "En cours",
+        "past": "Passées"
+      },
+      "empty": {
+        "upcomingTitle": "Aucune réservation à venir",
+        "upcomingText": "Trouvez une voiture et envoyez votre demande : l’agence la confirme rapidement.",
+        "activeTitle": "Aucune location en cours",
+        "activeText": "Votre location apparaîtra ici dès la prise du véhicule à l’agence.",
+        "pastTitle": "Aucun historique pour le moment",
+        "pastText": "Vos locations terminées, annulées ou expirées seront conservées ici.",
+        "action": "Rechercher une voiture"
+      },
+      "journey": {
+        "title": "Le parcours de votre réservation",
+        "description": "Chaque étape vous est notifiée par SMS ou WhatsApp.",
+        "PENDING": "L’agence étudie votre demande.",
+        "CONFIRMED": "Votre voiture est réservée, rendez-vous à l’agence.",
+        "PICKED_UP": "Bonne route ! Vous avez récupéré la voiture.",
+        "COMPLETED": "Véhicule rendu, location clôturée."
+      },
+      "checklist": {
+        "title": "Le jour du départ",
+        "description": "À présenter à l’agence lors de la prise du véhicule.",
+        "identity": "Carte d’identité ou passeport",
+        "license": "Permis de conduire en cours de validité",
+        "deposit": "Caution, selon les modes acceptés par l’agence",
+        "payment": "Règlement de la location directement à l’agence"
       }
     },
     "footer": {
       "about": "DriveTN met en relation particuliers, touristes et Tunisiens résidant à l’étranger avec des agences de location locales.",
       "explore": "Découvrir",
+      "support": "Assistance",
       "company": "DriveTN",
       "howItWorks": "Comment ça marche",
       "becomePartner": "Devenir agence partenaire",
@@ -189,13 +377,580 @@
       "customers": "Clients",
       "payments": "Encaissements",
       "reviews": "Avis",
-      "settings": "Paramètres"
+      "settings": "Paramètres",
+      "pendingCount": "{count, plural, one {# demande en attente} other {# demandes en attente}}",
+      "unansweredCount": "{count, plural, one {# avis sans réponse} other {# avis sans réponse}}"
     },
-    "home": {
-      "title": "Bienvenue dans votre espace agence",
-      "subtitle": "Gérez votre flotte, vos réservations et vos encaissements au même endroit.",
-      "emptyTitle": "Votre tableau de bord arrive bientôt",
-      "emptyText": "Les statistiques de réservations et de revenus apparaîtront ici dès l’ouverture de votre agence."
+    "common": {
+      "call": "Appeler",
+      "whatsapp": "WhatsApp",
+      "clearSearch": "Effacer la recherche",
+      "loading": "Chargement…",
+      "loadErrorTitle": "Impossible de charger les données",
+      "loadErrorText": "Vérifiez votre connexion puis réessayez.",
+      "notFoundTitle": "Élément introuvable",
+      "notFoundText": "Il a peut-être été supprimé, ou le lien est incorrect.",
+      "pagination": {
+        "label": "Pagination",
+        "previous": "Page précédente",
+        "next": "Page suivante",
+        "page": "Page {page}",
+        "range": "{from}–{to} sur {total}"
+      }
+    },
+    "demo": {
+      "badge": "Données de démo",
+      "tooltip": "Le portail affiche des données fictives en attendant le branchement de l’API. Vos modifications sont conservées jusqu’au rechargement de la page."
+    },
+    "notifications": {
+      "label": "Notifications",
+      "labelWithCount": "Notifications ({count, plural, one {# nouvelle demande} other {# nouvelles demandes}})",
+      "title": "Demandes à traiter",
+      "empty": "Aucune demande en attente : tout est à jour.",
+      "newRequest": "Nouvelle demande de {name}",
+      "viewAll": "Voir toutes les demandes"
+    },
+    "validation": {
+      "REQUIRED": "Ce champ est obligatoire.",
+      "TOO_LONG": "Ce texte est trop long.",
+      "INVALID_TUNISIAN_PHONE": "Numéro tunisien invalide (8 chiffres).",
+      "INVALID_EMAIL": "Adresse e-mail invalide.",
+      "INVALID_PLATE": "Immatriculation invalide (ex. 245 TU 1234).",
+      "PLATE_ALREADY_USED": "Cette immatriculation est déjà utilisée dans votre flotte.",
+      "OUT_OF_RANGE": "Valeur hors des limites autorisées.",
+      "INVALID_AMOUNT": "Montant invalide (ex. 120 ou 120,500).",
+      "PAYMENT_METHOD_REQUIRED": "Sélectionnez au moins un mode de paiement.",
+      "generic": "Valeur invalide."
+    },
+    "dashboard": {
+      "title": "Tableau de bord",
+      "subtitle": "Votre activité du jour en un coup d’œil.",
+      "openPlanning": "Planning",
+      "openBookings": "Réservations",
+      "quickLinks": "Raccourcis",
+      "kpis": {
+        "revenue": "Chiffre d’affaires du mois",
+        "bookings": "Réservations du mois",
+        "occupancy": "Occupation sur 30 jours",
+        "outstanding": "Reste à encaisser",
+        "versusLastMonth": "{value} vs la même période le mois dernier",
+        "noComparison": "Pas de comparaison disponible",
+        "onRentNow": "{count, plural, one {# véhicule en location} other {# véhicules en location}}",
+        "outstandingHint": "Soldes des locations en cours et terminées",
+        "allCollected": "Tout est encaissé"
+      },
+      "pending": {
+        "title": "Demandes en attente",
+        "subtitle": "Répondez vite : un client sans réponse réserve souvent ailleurs.",
+        "viewAll": "Tout voir",
+        "emptyTitle": "Aucune demande en attente",
+        "emptyText": "Les nouvelles demandes de réservation apparaîtront ici.",
+        "received": "Reçue {time}"
+      },
+      "today": {
+        "title": "Aujourd’hui",
+        "departures": "Départs",
+        "returns": "Retours",
+        "noDepartures": "Aucun départ prévu aujourd’hui.",
+        "noReturns": "Aucun retour prévu aujourd’hui."
+      },
+      "revenue": {
+        "title": "Chiffre d’affaires",
+        "subtitle": "Locations terminées sur les 6 derniers mois",
+        "total": "Total sur 6 mois",
+        "barLabel": "{month} : {amount}",
+        "unit": "Montants en dinars tunisiens, hors cautions."
+      },
+      "fleet": {
+        "title": "Flotte",
+        "subtitle": "{count, plural, one {# véhicule} other {# véhicules}}",
+        "available": "Disponibles",
+        "onRent": "En location",
+        "maintenance": "En entretien",
+        "inactive": "Hors service",
+        "rating": "Note moyenne",
+        "ratingLabel": "{value} sur 5",
+        "reviewsCount": "{count, plural, one {# avis} other {# avis}}",
+        "manage": "Gérer la flotte"
+      },
+      "shortcuts": {
+        "fleet": {
+          "title": "Flotte",
+          "text": "Tarifs, disponibilités et entretien"
+        },
+        "payments": {
+          "title": "Encaissements",
+          "text": "Paiements reçus et cautions"
+        },
+        "settings": {
+          "title": "Paramètres",
+          "text": "Fiche agence et conditions de location"
+        }
+      }
+    },
+    "bookings": {
+      "title": "Réservations",
+      "subtitle": "Suivez chaque demande, de la réception au retour du véhicule.",
+      "searchLabel": "Rechercher une réservation",
+      "searchPlaceholder": "Nom, téléphone, référence ou immatriculation",
+      "sortLabel": "Trier les réservations",
+      "sorts": {
+        "pickup_desc": "Départ : plus récent d’abord",
+        "pickup_asc": "Départ : plus ancien d’abord",
+        "created_desc": "Dernières demandes reçues"
+      },
+      "filterLabel": "Filtrer par statut",
+      "filters": {
+        "all": "Toutes",
+        "pending": "En attente",
+        "confirmed": "Confirmées",
+        "ongoing": "En cours",
+        "completed": "Terminées",
+        "cancelled": "Annulées ou refusées"
+      },
+      "columns": {
+        "customer": "Client",
+        "vehicle": "Véhicule",
+        "dates": "Dates",
+        "amount": "Montant",
+        "status": "Statut",
+        "open": "Ouvrir"
+      },
+      "days": "{count, plural, one {# jour} other {# jours}}",
+      "emptyTitle": "Aucune réservation pour l’instant",
+      "emptyText": "Les demandes de vos clients apparaîtront ici.",
+      "emptyFilteredTitle": "Aucun résultat",
+      "emptyFilteredText": "Aucune réservation ne correspond à ces critères.",
+      "clearFilters": "Réinitialiser les filtres",
+      "actions": {
+        "labels": {
+          "CONFIRM": "Confirmer",
+          "REJECT": "Refuser",
+          "PICK_UP": "Remettre les clés",
+          "RETURN": "Enregistrer le retour",
+          "COMPLETE": "Clôturer",
+          "NO_SHOW": "Client absent",
+          "CANCEL": "Annuler la réservation"
+        },
+        "success": {
+          "CONFIRM": "Réservation {reference} confirmée.",
+          "REJECT": "Demande {reference} refusée.",
+          "PICK_UP": "Départ de {reference} enregistré.",
+          "RETURN": "Retour de {reference} enregistré.",
+          "COMPLETE": "Réservation {reference} clôturée.",
+          "NO_SHOW": "Absence du client enregistrée pour {reference}.",
+          "CANCEL": "Réservation {reference} annulée."
+        },
+        "confirmTitle": {
+          "CONFIRM": "Confirmer la réservation {reference} ?",
+          "REJECT": "Refuser la demande {reference} ?",
+          "PICK_UP": "Remettre le véhicule pour {reference} ?",
+          "RETURN": "Enregistrer le retour de {reference} ?",
+          "COMPLETE": "Clôturer la réservation {reference} ?",
+          "NO_SHOW": "Signaler l’absence du client pour {reference} ?",
+          "CANCEL": "Annuler la réservation {reference} ?"
+        },
+        "confirmText": {
+          "CONFIRM": "Le véhicule sera bloqué sur ces dates.",
+          "REJECT": "Le client verra le motif du refus.",
+          "PICK_UP": "Vérifiez le permis, l’état du véhicule et la caution avant de remettre les clés.",
+          "RETURN": "Contrôlez le carburant, le kilométrage et l’état du véhicule.",
+          "COMPLETE": "La réservation sera archivée. Vérifiez que tout est encaissé et la caution restituée.",
+          "NO_SHOW": "Le véhicule sera libéré. Cette action est définitive.",
+          "CANCEL": "Le véhicule sera libéré et le client informé. Cette action est définitive."
+        },
+        "error": "L’action n’a pas pu être effectuée. Réessayez.",
+        "keep": "Retour",
+        "more": "Plus d’actions",
+        "quickReasons": "Motifs fréquents",
+        "reasonLabel": "Motif",
+        "reasonHint": "Visible par le client.",
+        "reasonRequired": "Indiquez un motif.",
+        "rejectReasons": {
+          "unavailable": "Véhicule indisponible sur ces dates",
+          "dates": "Horaires de départ ou de retour impossibles",
+          "conditions": "Conditions de location non remplies"
+        }
+      }
+    },
+    "bookingDetail": {
+      "fallbackTitle": "Réservation",
+      "subtitle": "{vehicle} · demande reçue {created}",
+      "copyReference": "Copier la référence",
+      "referenceCopied": "Référence copiée",
+      "pendingTitle": "Demande en attente de réponse",
+      "pendingText": "Reçue {since}. Confirmez ou refusez rapidement pour ne pas perdre le client.",
+      "depositReminderTitle": "Caution à restituer",
+      "depositReminderText": "Une caution de {amount} est encore détenue. Restituez-la avant de clôturer.",
+      "trip": "Trajet",
+      "duration": "{count, plural, one {# jour} other {# jours}}",
+      "pickup": "Départ",
+      "return": "Retour",
+      "customerNote": "Message du client",
+      "vehicle": "Véhicule",
+      "payments": "Paiements",
+      "paymentsHint": "Encaissements sur place, enregistrés par l’agence.",
+      "paidOf": "{paid} reçus sur {total}",
+      "balance": "Reste à payer",
+      "depositHeld": "Caution détenue",
+      "depositPlanned": "Caution prévue",
+      "noPayments": "Aucun paiement enregistré pour l’instant.",
+      "customer": "Client",
+      "whatsappMessage": "Bonjour {name}, ici votre agence de location au sujet de la réservation {reference} (départ le {date}).",
+      "email": "E-mail",
+      "city": "Ville",
+      "openCustomer": "Voir la fiche client",
+      "price": "Prix",
+      "dailyRateTimesDays": "{rate} × {count, plural, one {# jour} other {# jours}}",
+      "longRentalDiscount": "Remise longue durée",
+      "total": "Total",
+      "payAtAgency": "Réglé à l’agence : aucun paiement en ligne.",
+      "history": "Historique",
+      "requestReceived": "Demande reçue"
+    },
+    "payments": {
+      "recordAction": "Enregistrer un paiement",
+      "recordTitle": "Enregistrer un paiement",
+      "recordDescription": "Réservation {reference}",
+      "recordSubmit": "Enregistrer",
+      "recorded": "Paiement enregistré.",
+      "recordError": "Le paiement n’a pas pu être enregistré.",
+      "currency": "DT",
+      "amountHint": "Reste à payer : {balance}",
+      "notePlaceholder": "Ex. n° de reçu, référence du virement…",
+      "fields": {
+        "kind": "Type d’opération",
+        "amount": "Montant",
+        "method": "Mode de paiement",
+        "note": "Note (facultatif)"
+      },
+      "kinds": {
+        "RENTAL": "Paiement",
+        "REFUND": "Remboursement",
+        "DEPOSIT_HELD": "Caution reçue",
+        "DEPOSIT_RETURNED": "Caution restituée"
+      },
+      "kindHints": {
+        "RENTAL": "Avance ou solde de la location",
+        "REFUND": "Somme rendue au client",
+        "DEPOSIT_HELD": "Garantie conservée pendant la location",
+        "DEPOSIT_RETURNED": "Garantie rendue au retour"
+      },
+      "page": {
+        "title": "Encaissements",
+        "subtitle": "Tous les paiements reçus à l’agence, cautions comprises.",
+        "offlineTitle": "Paiements sur place uniquement",
+        "offlineText": "DriveTN ne prélève rien en ligne : enregistrez ici chaque somme reçue ou rendue (espèces, TPE, virement…) pour garder une caisse juste.",
+        "kpis": {
+          "collected": "Encaissé",
+          "refunded": "Remboursé",
+          "outstanding": "Reste à encaisser",
+          "deposits": "Cautions détenues",
+          "thisMonth": "Ce mois-ci",
+          "outstandingHint": "Locations confirmées ou en cours",
+          "depositsHint": "À restituer aux clients"
+        },
+        "journal": "Journal des opérations",
+        "kindFilter": "Filtrer par type",
+        "methodFilter": "Filtrer par mode de paiement",
+        "allKinds": "Tous les types",
+        "allMethods": "Tous les modes",
+        "columns": {
+          "date": "Date",
+          "booking": "Réservation",
+          "kind": "Type",
+          "method": "Mode",
+          "amount": "Montant"
+        },
+        "emptyTitle": "Aucun paiement enregistré",
+        "emptyText": "Les paiements saisis sur les réservations apparaîtront ici.",
+        "emptyFilteredTitle": "Aucun résultat",
+        "emptyFilteredText": "Aucune opération ne correspond à ces filtres.",
+        "clearFilters": "Réinitialiser les filtres",
+        "byMethod": {
+          "title": "Par mode de paiement",
+          "description": "Encaissements du mois",
+          "empty": "Aucun encaissement ce mois-ci."
+        },
+        "recordHint": "Pour saisir un paiement, ouvrez la réservation concernée depuis <link>les locations en cours</link>."
+      }
+    },
+    "planning": {
+      "title": "Planning",
+      "subtitle": "Disponibilités de la flotte et réservations, véhicule par véhicule.",
+      "previous": "Période précédente",
+      "next": "Période suivante",
+      "today": "Aujourd’hui",
+      "spanLabel": "Durée affichée",
+      "span": "{count, plural, one {# jour} other {# jours}}",
+      "legend": "Légende",
+      "now": "Maintenant",
+      "vehicle": "Véhicule",
+      "fillRate": "{value} réservé",
+      "maintenance": "En entretien",
+      "barLabel": "{name}, {status}, {dates}",
+      "scrollHint": "Faites défiler horizontalement pour voir toute la période."
+    },
+    "fleet": {
+      "title": "Flotte",
+      "subtitle": "Vos véhicules, leurs tarifs et leur disponibilité.",
+      "summary": "{count, plural, one {# véhicule} other {# véhicules}} · {occupancy} d’occupation · {revenue} sur 30 jours",
+      "add": "Ajouter un véhicule",
+      "searchLabel": "Rechercher un véhicule",
+      "searchPlaceholder": "Marque, modèle ou immatriculation",
+      "filterLabel": "Filtrer par disponibilité",
+      "filterAll": "Tous",
+      "availability": {
+        "ACTIVE": "Disponible",
+        "ON_RENT": "En location",
+        "MAINTENANCE": "En entretien",
+        "INACTIVE": "Hors service"
+      },
+      "categories": {
+        "ECONOMY": "Économique",
+        "COMPACT": "Compacte",
+        "SEDAN": "Berline",
+        "SUV": "SUV",
+        "MINIVAN": "Monospace",
+        "LUXURY": "Premium"
+      },
+      "transmissions": {
+        "MANUAL": "Manuelle",
+        "AUTOMATIC": "Automatique"
+      },
+      "fuels": {
+        "PETROL": "Essence",
+        "DIESEL": "Diesel",
+        "HYBRID": "Hybride",
+        "ELECTRIC": "Électrique"
+      },
+      "seats": "{count, plural, one {# place} other {# places}}",
+      "airConditioning": "Climatisation",
+      "perDay": "/ jour",
+      "deposit": "Caution {amount}",
+      "unlimitedMileage": "Kilométrage illimité",
+      "mileagePerDay": "{km} km / jour",
+      "occupancy30d": "Occupation sur 30 jours",
+      "currentBooking": "En location :",
+      "nextBooking": "Prochaine :",
+      "until": "jusqu’au {date}",
+      "noUpcoming": "Aucune réservation à venir",
+      "unavailableHint": "Non proposé à la location",
+      "edit": "Modifier",
+      "moreActions": "Plus d’actions pour {name}",
+      "viewPlanning": "Voir le planning",
+      "statusMenu": {
+        "title": "Disponibilité",
+        "options": {
+          "ACTIVE": "Disponible à la location",
+          "MAINTENANCE": "En entretien",
+          "INACTIVE": "Hors service"
+        },
+        "success": {
+          "ACTIVE": "Le véhicule est de nouveau proposé à la location.",
+          "MAINTENANCE": "Véhicule passé en entretien.",
+          "INACTIVE": "Véhicule retiré de la location."
+        },
+        "error": "Le statut n’a pas pu être modifié.",
+        "onRentHint": "Statut modifiable après le retour du véhicule."
+      },
+      "emptyTitle": "Aucun véhicule dans votre flotte",
+      "emptyText": "Ajoutez votre premier véhicule pour recevoir des réservations.",
+      "emptyFilteredTitle": "Aucun véhicule trouvé",
+      "emptyFilteredText": "Aucun véhicule ne correspond à ces critères.",
+      "clearFilters": "Réinitialiser les filtres",
+      "form": {
+        "createTitle": "Nouveau véhicule",
+        "editTitle": "Modifier le véhicule",
+        "description": "Ces informations sont visibles par les clients sur votre fiche.",
+        "sections": {
+          "identity": "Identification",
+          "specs": "Caractéristiques",
+          "pricing": "Tarifs et conditions"
+        },
+        "brand": "Marque",
+        "model": "Modèle",
+        "year": "Année",
+        "plate": "Immatriculation",
+        "plateHint": "Format tunisien, ex. 245 TU 1234.",
+        "category": "Catégorie",
+        "fuel": "Carburant",
+        "transmission": "Boîte de vitesses",
+        "seats": "Nombre de places",
+        "airConditioning": "Climatisation",
+        "airConditioningHint": "Équipement très recherché en été.",
+        "dailyRate": "Tarif journalier",
+        "perDaySuffix": "DT / j",
+        "deposit": "Caution",
+        "depositHint": "Indiquez 0 si aucune caution n’est demandée.",
+        "currency": "DT",
+        "unlimitedMileage": "Kilométrage illimité",
+        "unlimitedMileageHint": "Sinon, fixez un plafond quotidien.",
+        "mileageLimit": "Plafond kilométrique",
+        "kmPerDaySuffix": "km / j",
+        "cancel": "Annuler",
+        "submitCreate": "Ajouter le véhicule",
+        "submitEdit": "Enregistrer",
+        "created": "Véhicule ajouté à votre flotte.",
+        "updated": "Véhicule mis à jour.",
+        "saveError": "Le véhicule n’a pas pu être enregistré."
+      }
+    },
+    "customers": {
+      "title": "Clients",
+      "subtitle": "Les personnes qui ont réservé chez vous.",
+      "summary": "{count, plural, one {# client} other {# clients}}",
+      "searchLabel": "Rechercher un client",
+      "searchPlaceholder": "Nom, téléphone, e-mail ou ville",
+      "clearSearch": "Effacer la recherche",
+      "columns": {
+        "customer": "Client",
+        "city": "Ville",
+        "bookings": "Réservations",
+        "spent": "Total dépensé",
+        "lastBooking": "Dernière réservation",
+        "contact": "Contact"
+      },
+      "bookingsCount": "{count, plural, one {# réservation} other {# réservations}}",
+      "badges": {
+        "loyal": "Fidèle",
+        "new": "Nouveau"
+      },
+      "emptyTitle": "Aucun client pour l’instant",
+      "emptyText": "Vos clients apparaîtront ici après leur première réservation.",
+      "emptyFilteredTitle": "Aucun client trouvé",
+      "emptyFilteredText": "Vérifiez l’orthographe ou essayez avec le numéro de téléphone.",
+      "detail": {
+        "title": "Fiche client",
+        "description": "Coordonnées et historique des locations.",
+        "whatsappMessage": "Bonjour {name}, ici votre agence de location.",
+        "bookings": "Réservations",
+        "completed": "Terminées",
+        "spent": "Total dépensé",
+        "since": "Client depuis",
+        "noEmail": "Pas d’e-mail renseigné",
+        "activeBookings": "{count, plural, one {# réservation en cours ou à venir} other {# réservations en cours ou à venir}}",
+        "history": "Historique des réservations",
+        "noBookings": "Aucune réservation."
+      }
+    },
+    "reviews": {
+      "title": "Avis clients",
+      "subtitle": "Répondez aux avis : vos réponses sont publiques et rassurent les futurs clients.",
+      "ratingLabel": "{rating} sur 5",
+      "reviewsCount": "{count, plural, one {# avis} other {# avis}}",
+      "distributionLabel": "Répartition des notes",
+      "starsCount": "{stars, plural, one {# étoile} other {# étoiles}} : {count}",
+      "responseRate": "Taux de réponse",
+      "awaitingReply": "En attente de réponse",
+      "filterLabel": "Filtrer les avis",
+      "filters": {
+        "all": "Tous",
+        "unanswered": "Sans réponse",
+        "positive": "Positifs (4-5)",
+        "critical": "Critiques (1-3)"
+      },
+      "noReply": "Cet avis attend votre réponse.",
+      "replyAction": "Répondre",
+      "yourReply": "Votre réponse",
+      "editReply": "Modifier la réponse",
+      "emptyTitle": "Aucun avis pour l’instant",
+      "emptyText": "Les clients peuvent noter leur location une fois le véhicule rendu.",
+      "emptyFilteredTitle": "Aucun avis dans cette catégorie",
+      "emptyFilteredText": "Essayez un autre filtre.",
+      "reply": {
+        "label": "Votre réponse publique",
+        "placeholder": "Remerciez le client, répondez à ses remarques…",
+        "hint": "Visible par tous sur votre fiche agence",
+        "required": "Écrivez une réponse avant de publier.",
+        "tooLong": "{max} caractères maximum.",
+        "cancel": "Annuler",
+        "submit": "Publier la réponse",
+        "update": "Mettre à jour",
+        "success": "Réponse publiée.",
+        "error": "La réponse n’a pas pu être publiée.",
+        "templates": {
+          "thanks": {
+            "label": "Remercier",
+            "text": "Merci {name} pour votre confiance et ce retour positif ! Toute l’équipe est ravie que la location se soit bien passée."
+          },
+          "welcomeBack": {
+            "label": "Inviter à revenir",
+            "text": "Merci {name} ! Ce fut un plaisir de vous accueillir. Au plaisir de vous revoir lors de votre prochain séjour."
+          },
+          "apology": {
+            "label": "S’excuser",
+            "text": "Bonjour {name}, merci pour votre retour. Nous sommes désolés que votre expérience n’ait pas été à la hauteur et nous prenons vos remarques en compte."
+          },
+          "contact": {
+            "label": "Proposer d’échanger",
+            "text": "Bonjour {name}, nous regrettons ce désagrément. N’hésitez pas à nous contacter directement afin que nous trouvions une solution ensemble."
+          }
+        }
+      }
+    },
+    "settings": {
+      "title": "Paramètres",
+      "subtitle": "Votre fiche agence et vos conditions de location.",
+      "tabs": {
+        "profile": "Fiche agence",
+        "conditions": "Conditions de location"
+      },
+      "unsaved": "Modifications non enregistrées",
+      "discard": "Annuler",
+      "save": "Enregistrer",
+      "previewHint": "Aperçu de votre fiche telle qu’elle apparaît aux clients.",
+      "profile": {
+        "identityTitle": "Présentation",
+        "identityText": "Le nom et la description affichés sur votre fiche publique.",
+        "name": "Nom de l’agence",
+        "description": "Description",
+        "descriptionHint": "{count} / {max} caractères",
+        "descriptionPlaceholder": "Votre histoire, vos points forts : livraison à l’aéroport, véhicules récents, accueil en arabe, français et anglais…",
+        "contactTitle": "Coordonnées",
+        "contactText": "Les clients vous contactent par téléphone ou WhatsApp.",
+        "phone": "Téléphone",
+        "whatsapp": "WhatsApp",
+        "sameAsPhone": "Utiliser le même numéro",
+        "email": "E-mail",
+        "emailHint": "Facultatif.",
+        "addressTitle": "Adresse",
+        "addressText": "Le lieu de prise en charge principal.",
+        "address": "Adresse",
+        "governorate": "Gouvernorat",
+        "governoratePlaceholder": "Choisir",
+        "saved": "Fiche agence enregistrée.",
+        "saveError": "La fiche n’a pas pu être enregistrée."
+      },
+      "conditions": {
+        "driverTitle": "Conducteur",
+        "driverText": "Exigences vérifiées à la remise des clés.",
+        "minDriverAge": "Âge minimum",
+        "minLicenseYears": "Ancienneté du permis",
+        "years": "{count, plural, one {# an} other {# ans}}",
+        "noMinimum": "Pas de minimum",
+        "bookingTitle": "Réservation et annulation",
+        "bookingText": "Des conditions souples augmentent le nombre de demandes.",
+        "freeCancellation": "Annulation gratuite",
+        "freeCancellationHint": "Délai avant le départ pendant lequel le client peut annuler sans frais.",
+        "hoursBefore": "Jusqu’à {count, plural, one {# heure} other {# heures}} avant le départ",
+        "noFreeCancellation": "Pas d’annulation gratuite",
+        "instantConfirmation": "Confirmation instantanée",
+        "instantConfirmationHint": "Les demandes sont acceptées automatiquement si le véhicule est libre.",
+        "paymentTitle": "Modes de paiement acceptés",
+        "paymentText": "Réglés sur place, à l’agence. Affichés sur votre fiche.",
+        "saved": "Conditions de location enregistrées.",
+        "saveError": "Les conditions n’ont pas pu être enregistrées."
+      },
+      "preview": {
+        "title": "Vue client",
+        "namePlaceholder": "Nom de votre agence",
+        "freeCancellation": "Annulation gratuite jusqu’à {count, plural, one {# heure} other {# heures}} avant",
+        "instant": "Confirmation immédiate",
+        "onRequest": "Confirmation par l’agence",
+        "payOnSite": "Paiement sur place",
+        "driver": "Conducteur : {age} ans minimum, {years, plural, one {# an} other {# ans}} de permis."
+      }
     }
   },
   "admin": {
@@ -209,13 +964,552 @@
       "billing": "Facturation",
       "reviews": "Modération des avis",
       "settings": "Paramètres",
-      "audit": "Journal d’audit"
+      "audit": "Journal d’audit",
+      "pendingAgencies": "{count, plural, one {# agence à valider} other {# agences à valider}}",
+      "flaggedReviews": "{count, plural, one {# avis signalé} other {# avis signalés}}",
+      "overdueInvoices": "{count, plural, one {# facture en retard} other {# factures en retard}}"
     },
-    "home": {
-      "title": "Administration de la plateforme",
-      "subtitle": "Supervisez les agences, les utilisateurs et l’activité de DriveTN.",
-      "emptyTitle": "Les indicateurs arrivent bientôt",
-      "emptyText": "Le suivi des agences, des réservations et de la facturation sera disponible dans les prochaines étapes."
+    "notifications": {
+      "label": "Tâches",
+      "labelWithCount": "Tâches ({count, plural, one {# élément à traiter} other {# éléments à traiter}})",
+      "title": "À traiter",
+      "empty": "Rien à traiter : la plateforme est à jour.",
+      "pendingAgencies": {
+        "title": "{count, plural, one {# agence à valider} other {# agences à valider}}",
+        "text": "Vérifiez les pièces avant la mise en ligne."
+      },
+      "flaggedReviews": {
+        "title": "{count, plural, one {# avis signalé} other {# avis signalés}}",
+        "text": "Des clients ou agences ont signalé un contenu."
+      },
+      "overdueInvoices": {
+        "title": "{count, plural, one {# facture en retard} other {# factures en retard}}",
+        "text": "Relancez les agences concernées."
+      }
+    },
+    "common": {
+      "you": "Vous",
+      "system": "Système",
+      "cancel": "Annuler",
+      "quickReasons": "Motifs fréquents",
+      "reasonLabel": "Motif",
+      "reasonHint": "Communiqué à l’intéressé et conservé dans le journal d’audit.",
+      "reasonRequired": "Indiquez un motif.",
+      "userRoles": {
+        "CUSTOMER": "Client",
+        "AGENCY_OWNER": "Gérant d’agence",
+        "AGENCY_STAFF": "Équipe agence",
+        "ADMIN": "Administrateur"
+      },
+      "adminRoles": {
+        "SUPER_ADMIN": "Super administrateur",
+        "SUPPORT": "Support",
+        "FINANCE": "Finance"
+      }
+    },
+    "status": {
+      "agency": {
+        "PENDING_REVIEW": "À valider",
+        "ACTIVE": "Active",
+        "SUSPENDED": "Suspendue",
+        "REJECTED": "Refusée"
+      },
+      "user": {
+        "PENDING_VERIFICATION": "Non vérifié",
+        "ACTIVE": "Actif",
+        "SUSPENDED": "Suspendu"
+      },
+      "invoice": {
+        "ISSUED": "Émise",
+        "PAID": "Payée",
+        "OVERDUE": "En retard"
+      },
+      "review": {
+        "PUBLISHED": "Publié",
+        "FLAGGED": "Signalé",
+        "HIDDEN": "Masqué"
+      }
+    },
+    "plans": {
+      "STARTER": "Essentiel",
+      "PRO": "Pro",
+      "BUSINESS": "Business"
+    },
+    "dashboard": {
+      "title": "Vue d’ensemble de la plateforme",
+      "subtitle": "Activité des agences, des clients et de la facturation DriveTN.",
+      "openAudit": "Journal d’audit",
+      "openAgencies": "Agences",
+      "kpis": {
+        "gmv": "Volume de location du mois",
+        "bookings": "Réservations du mois",
+        "agencies": "Agences actives",
+        "customers": "Clients inscrits",
+        "noComparison": "Pas de comparaison disponible",
+        "versusLastMonth": "{value} vs la même période le mois dernier",
+        "newThisMonth": "{count, plural, one {+# ce mois-ci} other {+# ce mois-ci}}"
+      },
+      "pending": {
+        "title": "Agences à valider",
+        "subtitle": "Les plus anciennes demandes en premier.",
+        "viewAll": "Tout examiner",
+        "emptyTitle": "Aucune agence en attente",
+        "emptyText": "Toutes les demandes d’inscription ont été traitées.",
+        "missingDocuments": "{count, plural, one {# pièce manquante} other {# pièces manquantes}}",
+        "documentsComplete": "Dossier complet"
+      },
+      "billing": {
+        "title": "Facturation",
+        "subtitle": "Abonnements des agences partenaires.",
+        "mrr": "Revenu mensuel récurrent",
+        "mrrHint": "Abonnements actifs, hors taxes",
+        "outstanding": "Encours à encaisser",
+        "overdue": "Retards de paiement",
+        "overdueCount": "{count, plural, one {# facture} other {# factures}}",
+        "upToDate": "À jour",
+        "open": "Ouvrir la facturation"
+      },
+      "gmv": {
+        "title": "Volume de location",
+        "subtitle": "Montant des locations démarrées sur les 6 derniers mois.",
+        "total": "Total 6 mois",
+        "barLabel": "{month} : {amount}, {count, plural, one {# location} other {# locations}}",
+        "unit": "Montants en dinars tunisiens, toutes agences confondues."
+      },
+      "status": {
+        "title": "Réservations du mois",
+        "subtitle": "{count, plural, one {# réservation} other {# réservations}} au départ ce mois-ci.",
+        "open": "Superviser les réservations"
+      },
+      "top": {
+        "title": "Agences les plus actives",
+        "subtitle": "Classement par volume de location ce mois-ci.",
+        "empty": "Aucune location ce mois-ci pour le moment.",
+        "bookings": "{count, plural, one {# location} other {# locations}}"
+      },
+      "activity": {
+        "title": "Activité récente",
+        "subtitle": "Décisions et opérations de l’équipe.",
+        "viewAll": "Journal complet",
+        "empty": "Aucune activité récente."
+      }
+    },
+    "agencies": {
+      "title": "Agences partenaires",
+      "subtitle": "Validez les inscriptions et suivez les agences de la plateforme.",
+      "summary": "{count, plural, one {# agence} other {# agences}} · {pending, plural, one {# à valider} other {# à valider}}",
+      "searchLabel": "Rechercher une agence",
+      "searchPlaceholder": "Nom, ville, gérant, téléphone ou matricule fiscal",
+      "filterLabel": "Filtrer par statut",
+      "filters": {
+        "all": "Toutes",
+        "pending": "À valider",
+        "active": "Actives",
+        "suspended": "Suspendues",
+        "rejected": "Refusées"
+      },
+      "missingDocuments": "{count, plural, one {# pièce manquante} other {# pièces manquantes}}",
+      "submitted": "Déposée {time}",
+      "vehiclesCount": "{count, plural, one {# véhicule} other {# véhicules}}",
+      "columns": {
+        "agency": "Agence",
+        "owner": "Gérant",
+        "status": "Statut",
+        "plan": "Formule",
+        "fleet": "Flotte",
+        "gmv": "Volume du mois",
+        "rating": "Note",
+        "open": "Ouvrir la fiche"
+      },
+      "emptyTitle": "Aucune agence inscrite",
+      "emptyText": "Les agences apparaîtront ici dès leur inscription.",
+      "emptyFilteredTitle": "Aucune agence ne correspond",
+      "emptyFilteredText": "Modifiez la recherche ou le filtre de statut.",
+      "clearFilters": "Réinitialiser les filtres",
+      "decisions": {
+        "labels": {
+          "APPROVE": "Valider l’agence",
+          "REJECT": "Refuser",
+          "SUSPEND": "Suspendre",
+          "REACTIVATE": "Réactiver"
+        },
+        "success": {
+          "APPROVE": "{name} est validée et visible des clients.",
+          "REJECT": "L’inscription de {name} est refusée.",
+          "SUSPEND": "{name} est suspendue.",
+          "REACTIVATE": "{name} est de nouveau active."
+        },
+        "error": "La décision n’a pas pu être enregistrée. Réessayez.",
+        "confirmTitle": {
+          "APPROVE": "Valider {name} ?",
+          "REJECT": "Refuser l’inscription de {name} ?",
+          "SUSPEND": "Suspendre {name} ?",
+          "REACTIVATE": "Réactiver {name} ?"
+        },
+        "confirmText": {
+          "APPROVE": "L’agence pourra publier ses véhicules et recevoir des réservations.",
+          "REJECT": "Le gérant sera informé du motif et pourra déposer un nouveau dossier.",
+          "SUSPEND": "Ses véhicules seront retirés des résultats et les nouvelles réservations bloquées.",
+          "REACTIVATE": "L’agence retrouvera l’accès à son espace et sa visibilité auprès des clients."
+        },
+        "quickReasons": {
+          "REJECT": {
+            "documents": "Pièces illisibles ou incomplètes",
+            "taxId": "Matricule fiscal non concordant",
+            "duplicate": "Agence déjà inscrite"
+          },
+          "SUSPEND": {
+            "complaints": "Réclamations clients répétées",
+            "insurance": "Assurance flotte expirée",
+            "unpaid": "Factures d’abonnement impayées"
+          }
+        }
+      },
+      "detail": {
+        "title": "Fiche agence",
+        "description": "Dossier, abonnement et activité de l’agence.",
+        "contact": "Coordonnées",
+        "owner": "gérant",
+        "noEmail": "Aucune adresse e-mail",
+        "taxId": "Matricule fiscal",
+        "subscription": "Abonnement",
+        "plan": "Formule",
+        "monthlyFee": "Mensualité HT",
+        "vehicles": "Véhicules",
+        "commissionDefault": "Commission (par défaut)",
+        "commissionCustom": "Commission (spécifique)",
+        "gmvMonth": "Volume du mois",
+        "bookings": "Réservations",
+        "rating": "Note moyenne",
+        "ratingLabel": "Note moyenne : {value} sur 5",
+        "reviews": "Avis publiés",
+        "recentBookings": "Dernières réservations",
+        "noBookings": "Aucune réservation pour le moment.",
+        "invoices": "Dernières factures",
+        "noInvoices": "Aucune facture émise.",
+        "since": "Inscrite le {date}",
+        "decidedAt": "dernière décision le {date}",
+        "reasonTitle": "Motif communiqué à l’agence",
+        "tabs": {
+          "overview": "Dossier",
+          "activity": "Activité",
+          "history": "Historique"
+        },
+        "noHistory": "Aucune décision enregistrée."
+      },
+      "documents": {
+        "title": "Pièces justificatives",
+        "missing": "Manquante",
+        "TRADE_REGISTER": "Extrait du registre national des entreprises",
+        "TAX_ID": "Carte d’identification fiscale",
+        "INSURANCE": "Attestation d’assurance flotte",
+        "MANAGER_ID": "CIN du gérant"
+      }
+    },
+    "users": {
+      "title": "Utilisateurs",
+      "subtitle": "Comptes clients, équipes d’agence et administrateurs.",
+      "summary": "{count, plural, one {# compte} other {# comptes}}",
+      "searchLabel": "Rechercher un compte",
+      "searchPlaceholder": "Nom, téléphone, e-mail ou agence",
+      "filterLabel": "Filtrer par type de compte",
+      "filters": {
+        "all": "Tous",
+        "customers": "Clients",
+        "agency": "Agences",
+        "admins": "Administrateurs",
+        "suspended": "Suspendus"
+      },
+      "bookingsCount": "{count, plural, one {# réservation} other {# réservations}}",
+      "columns": {
+        "user": "Utilisateur",
+        "role": "Rôle",
+        "context": "Rattachement",
+        "status": "Statut",
+        "createdAt": "Inscription",
+        "lastLogin": "Dernière connexion",
+        "open": "Ouvrir la fiche"
+      },
+      "emptyTitle": "Aucun compte trouvé",
+      "emptyText": "Modifiez la recherche ou le filtre.",
+      "clearFilters": "Réinitialiser les filtres",
+      "actions": {
+        "adminManaged": "Les comptes administrateurs se gèrent depuis la gestion des accès.",
+        "labels": {
+          "SUSPEND": "Suspendre le compte",
+          "REACTIVATE": "Réactiver le compte"
+        },
+        "success": {
+          "SUSPEND": "Le compte de {name} est suspendu.",
+          "REACTIVATE": "Le compte de {name} est réactivé."
+        },
+        "error": "Le statut du compte n’a pas pu être modifié. Réessayez.",
+        "confirmTitle": "Suspendre le compte de {name} ?",
+        "confirmText": "La personne sera déconnectée et ne pourra plus se connecter jusqu’à la réactivation.",
+        "quickReasons": {
+          "fraud": "Suspicion de fraude ou d’usurpation d’identité",
+          "abuse": "Comportement abusif signalé",
+          "request": "Demande de la personne concernée"
+        }
+      },
+      "detail": {
+        "title": "Fiche utilisateur",
+        "description": "Informations du compte et activité récente.",
+        "reasonTitle": "Motif de la suspension",
+        "since": "Inscrit le",
+        "lastLogin": "Dernière connexion",
+        "never": "Jamais",
+        "bookings": "Réservations",
+        "noEmail": "Aucune adresse e-mail",
+        "adminScope": {
+          "SUPER_ADMIN": "Accès complet, y compris les paramètres de la plateforme",
+          "SUPPORT": "Agences, comptes et modération des avis",
+          "FINANCE": "Facturation et encaissements"
+        },
+        "activity": "Activité récente",
+        "noActivity": "Aucune activité enregistrée."
+      }
+    },
+    "bookings": {
+      "title": "Réservations",
+      "subtitle": "Supervision des réservations de toutes les agences.",
+      "summary": "{count, plural, one {# réservation} other {# réservations}} sur la plateforme",
+      "stale": "Sans réponse",
+      "staleTitle": "{count, plural, one {# demande attend une réponse} other {# demandes attendent une réponse}}",
+      "staleText": "Sans réponse depuis plus de {hours} h, elles expireront automatiquement. Contactez les agences concernées.",
+      "showPending": "Voir les demandes",
+      "searchLabel": "Rechercher une réservation",
+      "searchPlaceholder": "Référence, client, téléphone, agence ou immatriculation",
+      "filterLabel": "Filtrer par statut",
+      "filters": {
+        "all": "Toutes",
+        "pending": "En attente",
+        "active": "Confirmées et en cours",
+        "completed": "Terminées",
+        "cancelled": "Annulées"
+      },
+      "columns": {
+        "reference": "Référence",
+        "customer": "Client",
+        "agency": "Agence et véhicule",
+        "dates": "Dates",
+        "total": "Montant",
+        "status": "Statut"
+      },
+      "emptyTitle": "Aucune réservation trouvée",
+      "emptyText": "Modifiez la recherche ou le filtre de statut.",
+      "clearFilters": "Réinitialiser les filtres"
+    },
+    "billing": {
+      "title": "Facturation",
+      "subtitle": "Abonnements des agences, factures (TVA et timbre fiscal inclus) et encaissements.",
+      "invoicesTitle": "Factures",
+      "searchLabel": "Rechercher une facture",
+      "searchPlaceholder": "Numéro de facture ou agence",
+      "filterLabel": "Filtrer par statut",
+      "filters": {
+        "all": "Toutes",
+        "issued": "Émises",
+        "overdue": "En retard",
+        "paid": "Payées"
+      },
+      "columns": {
+        "number": "Facture",
+        "agency": "Agence",
+        "period": "Période",
+        "total": "Montant TTC",
+        "dueAt": "Échéance",
+        "status": "Statut"
+      },
+      "reminded": "Relance envoyée",
+      "emptyTitle": "Aucune facture trouvée",
+      "emptyText": "Modifiez la recherche ou le filtre de statut.",
+      "clearFilters": "Réinitialiser les filtres",
+      "overview": {
+        "mrr": "Revenu mensuel récurrent",
+        "mrrHint": "Abonnements des agences actives, HT",
+        "collected": "Encaissé ce mois-ci",
+        "collectedHint": "Factures réglées, TTC",
+        "outstanding": "Encours",
+        "outstandingHint": "Factures émises non réglées, TTC",
+        "overdue": "En retard",
+        "overdueHint": "Échéance dépassée : relance conseillée",
+        "noOverdue": "Aucun retard de paiement"
+      },
+      "plans": {
+        "title": "Formules d’abonnement",
+        "subtitle": "Répartition des agences actives par formule.",
+        "agencies": "{count, plural, one {# agence} other {# agences}}",
+        "perMonth": "HT / mois",
+        "unlimited": "Véhicules illimités",
+        "vehicleLimit": "Jusqu’à {count, plural, one {# véhicule} other {# véhicules}}"
+      },
+      "invoice": {
+        "description": "{agency} · abonnement de {period}",
+        "issuedAt": "Émise le",
+        "dueAt": "Échéance",
+        "paidAt": "Réglée le",
+        "subscription": "Abonnement",
+        "commission": "Commission sur réservations",
+        "subtotal": "Total HT",
+        "vat": "TVA ({rate})",
+        "fiscalStamp": "Timbre fiscal",
+        "total": "Total TTC",
+        "method": "Mode de règlement",
+        "markPaid": "Enregistrer le règlement",
+        "paidSuccess": "Règlement de la facture {number} enregistré.",
+        "error": "L’opération a échoué. Réessayez.",
+        "noReminder": "Aucune relance envoyée.",
+        "remindedAt": "Dernière relance {date}.",
+        "sendReminder": "Envoyer une relance",
+        "reminderSuccess": "Relance envoyée à {name}.",
+        "print": "Imprimer"
+      }
+    },
+    "reviews": {
+      "title": "Modération des avis",
+      "subtitle": "Traitez les avis signalés selon la charte de publication.",
+      "filterLabel": "Filtrer les avis",
+      "filters": {
+        "flagged": "Signalés",
+        "published": "Publiés",
+        "hidden": "Masqués",
+        "all": "Tous"
+      },
+      "about": "sur",
+      "ratingLabel": "Note : {value} sur 5",
+      "agencyReply": "Réponse de l’agence :",
+      "reportsCount": "{count, plural, one {# signalement} other {# signalements}}",
+      "reasons": {
+        "OFFENSIVE": "Propos injurieux",
+        "SPAM": "Publicité ou spam",
+        "PERSONAL_DATA": "Données personnelles",
+        "OFF_TOPIC": "Hors sujet"
+      },
+      "hiddenBecause": "Masqué : {reason}",
+      "emptyFlaggedTitle": "Aucun avis à modérer",
+      "emptyFlaggedText": "Tous les signalements ont été traités.",
+      "emptyTitle": "Aucun avis",
+      "emptyText": "Aucun avis ne correspond à ce filtre.",
+      "actions": {
+        "success": {
+          "PUBLISH": "L’avis est publié et ses signalements sont clos.",
+          "HIDE": "L’avis est masqué."
+        },
+        "error": "La modération n’a pas pu être enregistrée. Réessayez.",
+        "keep": "Conserver l’avis",
+        "restore": "Republier",
+        "hide": "Masquer l’avis",
+        "hideTitle": "Masquer cet avis ?",
+        "hideText": "L’avis ne sera plus visible sur la fiche de l’agence. Son auteur sera informé du motif.",
+        "quickReasons": {
+          "insults": "Propos injurieux ou diffamatoires",
+          "personalData": "Contient des données personnelles",
+          "advertising": "Publicité ou lien externe"
+        }
+      }
+    },
+    "settings": {
+      "title": "Paramètres de la plateforme",
+      "subtitle": "Fiscalité, règles commerciales et contact du support.",
+      "saved": "Paramètres enregistrés.",
+      "saveError": "Les paramètres n’ont pas pu être enregistrés. Réessayez.",
+      "readOnlyTitle": "Lecture seule",
+      "readOnlyText": "Seul un super administrateur peut modifier les paramètres de la plateforme.",
+      "currency": "DT",
+      "unsaved": "Modifications non enregistrées",
+      "discard": "Annuler",
+      "save": "Enregistrer",
+      "tax": {
+        "title": "Fiscalité",
+        "text": "Appliquée aux factures d’abonnement des agences.",
+        "vat": "Taux de TVA",
+        "vatHint": "Taux légal en vigueur : 19 %.",
+        "stamp": "Timbre fiscal",
+        "stampHint": "Ajouté à chaque facture (1 DT actuellement)."
+      },
+      "business": {
+        "title": "Règles commerciales",
+        "text": "Valeurs par défaut pour toutes les agences.",
+        "commission": "Commission par défaut",
+        "commissionHint": "Sur les locations terminées. 0 % = désactivée.",
+        "expiry": "Expiration des demandes",
+        "expiryHint": "Une demande sans réponse de l’agence expire après ce délai.",
+        "hours": "{count, plural, one {# heure} other {# heures}}"
+      },
+      "support": {
+        "title": "Support client",
+        "text": "Coordonnées affichées aux clients et aux agences.",
+        "phone": "Téléphone du support",
+        "email": "E-mail du support"
+      },
+      "preview": {
+        "title": "Aperçu d’une facture",
+        "subtitle": "Abonnement mensuel",
+        "invalid": "Corrigez les taux pour afficher l’aperçu.",
+        "subtotal": "Total HT",
+        "vat": "TVA ({rate})",
+        "fiscalStamp": "Timbre fiscal",
+        "total": "Total TTC"
+      }
+    },
+    "audit": {
+      "title": "Journal d’audit",
+      "subtitle": "Historique des connexions, inscriptions et décisions de l’administration.",
+      "immutable": "Journal non modifiable",
+      "searchLabel": "Rechercher dans le journal",
+      "searchPlaceholder": "Auteur, élément concerné, détail ou adresse IP",
+      "filterLabel": "Filtrer par catégorie",
+      "categories": {
+        "all": "Tout",
+        "auth": "Connexions",
+        "agency": "Agences",
+        "user": "Comptes",
+        "invoice": "Facturation",
+        "review": "Avis",
+        "settings": "Paramètres"
+      },
+      "columns": {
+        "date": "Date",
+        "action": "Action",
+        "actor": "Auteur",
+        "target": "Élément concerné",
+        "ip": "Adresse IP"
+      },
+      "emptyTitle": "Aucune entrée trouvée",
+      "emptyText": "Modifiez la recherche ou la catégorie.",
+      "clearFilters": "Réinitialiser les filtres",
+      "actions": {
+        "auth": {
+          "login": "Connexion",
+          "login_failed": "Échec de connexion",
+          "signup": "Inscription",
+          "password_reset": "Mot de passe réinitialisé",
+          "password_changed": "Mot de passe modifié"
+        },
+        "agency": {
+          "approved": "Agence validée",
+          "rejected": "Agence refusée",
+          "suspended": "Agence suspendue",
+          "reactivated": "Agence réactivée"
+        },
+        "user": {
+          "suspended": "Compte suspendu",
+          "reactivated": "Compte réactivé"
+        },
+        "invoice": {
+          "issued": "Facture émise",
+          "paid": "Facture réglée",
+          "reminder_sent": "Relance de paiement"
+        },
+        "review": {
+          "published": "Avis publié",
+          "hidden": "Avis masqué"
+        },
+        "settings": {
+          "updated": "Paramètres modifiés"
+        }
+      }
     }
   },
   "status": {
@@ -437,7 +1731,21 @@
       "sendCode": "Recevoir un code",
       "forgotPassword": "Mot de passe oublié ?",
       "noAccount": "Pas encore de compte ?",
-      "signupLink": "Créer un compte"
+      "signupLink": "Créer un compte",
+      "demo": {
+        "title": "Comptes de test",
+        "description": "Environnement de démonstration : utilisez ces identifiants pour explorer le portail.",
+        "role": "Rôle",
+        "email": "E-mail :",
+        "password": "Mot de passe :",
+        "use": "Utiliser",
+        "useLabel": "Remplir le formulaire avec le compte {email}",
+        "roles": {
+          "client": "Client",
+          "agency": "Gérant d’agence",
+          "admin": "Super administrateur"
+        }
+      }
     },
     "signup": {
       "title": {

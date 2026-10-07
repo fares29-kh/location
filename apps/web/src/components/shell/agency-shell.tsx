@@ -1,5 +1,6 @@
 'use client';
 
+import type { CurrentUser } from '@drivetn/types';
 import {
   CalendarCheck,
   CalendarDays,
@@ -11,24 +12,32 @@ import {
   Star,
   Users,
 } from 'lucide-react';
-import type { CurrentUser } from '@drivetn/types';
 import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 
+import { DemoDataBadge } from '@/components/agency/demo-data-badge';
+import { NotificationsMenu } from '@/components/agency/notifications-menu';
 import { AppShell, type ShellNavSection } from '@/components/shell/app-shell';
+import { AGENCY_DEMO_MODE } from '@/lib/agency/api';
+import { useNavCounts } from '@/lib/agency/queries';
 
 export function AgencyShell({
   user,
   designEnabled,
+  sidebarCollapsed,
   children,
 }: {
   user: CurrentUser;
   designEnabled: boolean;
+  sidebarCollapsed: boolean;
   children: ReactNode;
 }) {
   const t = useTranslations('agency.nav');
   const tCommon = useTranslations('common');
   const tShell = useTranslations('shell');
+  const { data: counts } = useNavCounts();
+  const pending = counts?.pendingBookings ?? 0;
+  const unanswered = counts?.unansweredReviews ?? 0;
 
   const sections: ShellNavSection[] = [
     {
@@ -36,19 +45,33 @@ export function AgencyShell({
       title: t('operations'),
       items: [
         { id: 'dashboard', label: t('dashboard'), icon: LayoutDashboard, href: '/' },
-        { id: 'bookings', label: t('bookings'), icon: CalendarCheck, href: null },
-        { id: 'calendar', label: t('calendar'), icon: CalendarDays, href: null },
-        { id: 'payments', label: t('payments'), icon: HandCoins, href: null },
+        {
+          id: 'bookings',
+          label: t('bookings'),
+          icon: CalendarCheck,
+          href: '/bookings',
+          count: pending,
+          countLabel: t('pendingCount', { count: pending }),
+        },
+        { id: 'calendar', label: t('calendar'), icon: CalendarDays, href: '/calendar' },
+        { id: 'payments', label: t('payments'), icon: HandCoins, href: '/payments' },
       ],
     },
     {
       id: 'management',
       title: t('management'),
       items: [
-        { id: 'fleet', label: t('fleet'), icon: CarFront, href: null },
-        { id: 'customers', label: t('customers'), icon: Users, href: null },
-        { id: 'reviews', label: t('reviews'), icon: Star, href: null },
-        { id: 'settings', label: t('settings'), icon: Settings, href: null },
+        { id: 'fleet', label: t('fleet'), icon: CarFront, href: '/fleet' },
+        { id: 'customers', label: t('customers'), icon: Users, href: '/customers' },
+        {
+          id: 'reviews',
+          label: t('reviews'),
+          icon: Star,
+          href: '/reviews',
+          count: unanswered,
+          countLabel: t('unansweredCount', { count: unanswered }),
+        },
+        { id: 'settings', label: t('settings'), icon: Settings, href: '/settings' },
         ...(designEnabled
           ? [{ id: 'design', label: tShell('designSystem'), icon: Palette, href: '/design' }]
           : []),
@@ -62,6 +85,13 @@ export function AgencyShell({
       user={user}
       portalLabel={tCommon('portals.agency')}
       sections={sections}
+      defaultCollapsed={sidebarCollapsed}
+      topbarActions={
+        <>
+          {AGENCY_DEMO_MODE && <DemoDataBadge />}
+          <NotificationsMenu />
+        </>
+      }
     >
       {children}
     </AppShell>

@@ -77,8 +77,17 @@
         "pickupDate": "الانطلاق",
         "returnDate": "الإرجاع",
         "submit": "بحث",
-        "soonTitle": "البحث متاح قريبًا جدًا",
-        "soonText": "نحن بصدد إتمام مقارنة عروض الوكالات. عد إلينا قريبًا!"
+        "quickDates": "مدد سريعة",
+        "presets": {
+          "weekend": "نهاية هذا الأسبوع",
+          "threeDays": "3 أيام",
+          "oneWeek": "أسبوع",
+          "twoWeeks": "أسبوعان"
+        },
+        "duration": "{from} – {to} · {count, plural, zero {# يوم} one {يوم واحد} two {يومان} few {# أيام} many {# يومًا} other {# يوم}}",
+        "datesOptional": "التواريخ اختيارية: قارن أولًا وحدّدها لاحقًا.",
+        "chooseReturn": "اختر الآن تاريخ الإرجاع.",
+        "clear": "مسح"
       },
       "places": {
         "tunisCarthage": "مطار تونس قرطاج",
@@ -158,11 +167,190 @@
         "title": "هل أنت وكالة كراء سيارات؟",
         "text": "انشر أسطولك، استقبل الحجوزات وتابع مداخيلك من فضاء واحد.",
         "action": "اكتشف فضاء الوكالة"
+      },
+      "categories": {
+        "eyebrow": "الأصناف",
+        "title": "سيارة لكل رحلة",
+        "text": "من سيارة المدينة الاقتصادية إلى سيارة الدفع الرباعي العائلية، اختر الطراز المناسب لإقامتك.",
+        "seats": "حتى {count} مقاعد",
+        "bags": "{count, plural, zero {دون حقائب} one {حقيبة واحدة} two {حقيبتان} few {# حقائب} many {# حقيبة} other {# حقيبة}}",
+        "examples": "مثال: {models}",
+        "explore": "عرض العروض",
+        "all": "عرض كل السيارات",
+        "from": "ابتداءً من",
+        "perDay": "/ اليوم",
+        "priceNote": "أسعار انطلاق تقريبية، معروضة للاطلاع فقط."
+      }
+    },
+    "catalog": {
+      "categories": {
+        "city": "سيارة مدينة",
+        "compact": "مدمجة",
+        "sedan": "سيدان",
+        "suv": "دفع رباعي",
+        "family": "عائلية",
+        "premium": "فاخرة"
+      },
+      "hints": {
+        "city": "اقتصادية وسهلة الركن، مثالية داخل المدينة.",
+        "compact": "متعددة الاستعمالات ومريحة، في المدينة وعلى الطريق.",
+        "sedan": "صندوق واسع وراحة للرحلات الطويلة.",
+        "suv": "وضعية قيادة مرتفعة، مريحة على كل الطرقات.",
+        "family": "حتى 7 مقاعد للسفر مع العائلة أو الأصدقاء.",
+        "premium": "راحة راقية لتنقلاتك المهنية."
+      },
+      "transmission": {
+        "MANUAL": "يدوية",
+        "AUTOMATIC": "أوتوماتيكية"
+      },
+      "fuel": {
+        "PETROL": "بنزين",
+        "DIESEL": "ديزل",
+        "HYBRID": "هجينة"
+      }
+    },
+    "search": {
+      "metaTitle": "ابحث عن سيارة",
+      "eyebrow": "البحث",
+      "title": "اعثر على السيارة المثالية لإقامتك",
+      "subtitle": "قارن بين عروض الوكالات المحلية، صفِّ النتائج حسب احتياجاتك واحجز دون بطاقة بنكية.",
+      "form": {
+        "stations": "محطات القطار",
+        "ports": "الموانئ"
+      },
+      "previewTitle": "معاينة البحث",
+      "previewText": "العروض التالية أمثلة توضيحية: وكالاتنا الشريكة بصدد نشر أساطيلها. سيُفتح الحجز قريبًا جدًا.",
+      "results": "{count, plural, zero {لا توجد عروض متاحة} one {عرض واحد متاح} two {عرضان متاحان} few {# عروض متاحة} many {# عرضًا متاحًا} other {# عرض متاح}}",
+      "summary": {
+        "anywhere": "كامل تونس",
+        "anyDates": "تواريخ مرنة",
+        "dates": "{from} – {to} · {count, plural, zero {# يوم} one {يوم واحد} two {يومان} few {# أيام} many {# يومًا} other {# يوم}}"
+      },
+      "sort": {
+        "label": "ترتيب العروض",
+        "recommended": "الموصى بها",
+        "priceAsc": "السعر تصاعديًا",
+        "priceDesc": "السعر تنازليًا",
+        "rating": "الأعلى تقييمًا"
+      },
+      "filters": {
+        "title": "التصفية",
+        "description": "حدّد العروض حسب احتياجاتك.",
+        "reset": "إعادة الضبط",
+        "show": "إظهار {count, plural, zero {النتائج} one {عرض واحد} two {عرضين} few {# عروض} many {# عرضًا} other {# عرض}}",
+        "quickLabel": "التصفية حسب الصنف",
+        "category": "الصنف",
+        "transmission": "علبة السرعات",
+        "allTransmissions": "الكل",
+        "maxPrice": "السعر الأقصى لليوم",
+        "anyPrice": "دون حد",
+        "upTo": "حتى",
+        "mileage": "المسافة المقطوعة",
+        "unlimitedMileage": "مسافة غير محدودة فقط"
+      },
+      "empty": {
+        "title": "لا يوجد عرض يطابق اختياراتك",
+        "text": "وسّع معايير البحث لاكتشاف المزيد من السيارات.",
+        "action": "إعادة ضبط التصفية"
+      },
+      "offer": {
+        "preview": "مثال",
+        "orSimilar": "أو ما يماثلها",
+        "rating": "{value} من 5",
+        "reviews": "{count} تقييم",
+        "seats": "{count} مقاعد",
+        "bags": "{count, plural, zero {دون حقائب} one {حقيبة واحدة} two {حقيبتان} few {# حقائب} many {# حقيبة} other {# حقيبة}}",
+        "unlimitedMileage": "مسافة غير محدودة",
+        "limitedMileage": "مسافة محدودة",
+        "verifiedAgency": "وكالة موثوقة",
+        "perDay": "/ اليوم",
+        "total": "المجموع لمدة {count, plural, zero {# يوم} one {يوم واحد} two {يومين} few {# أيام} many {# يومًا} other {# يوم}}:",
+        "deposit": "الضمان:",
+        "book": "احجز",
+        "bookSoonTitle": "الحجز متاح قريبًا",
+        "bookSoonText": "ستتمكن من الحجز بمجرد أن تنشر الوكالات الشريكة أساطيلها. لن يُطلب منك أي دفع عبر الإنترنت."
+      }
+    },
+    "agencies": {
+      "metaTitle": "وكالات الكراء",
+      "eyebrow": "شبكة الوكالات",
+      "title": "وكالات محلية موثوقة في كامل تونس",
+      "subtitle": "اعثر على نقاط الاستلام في مطارات البلاد ومدنها ومحطات القطار والموانئ، واكترِ من وكالات تونسية مراقبة.",
+      "findCar": "اعثر على سيارة",
+      "stats": {
+        "governorates": "ولاية",
+        "airports": "مطارات مخدومة",
+        "pickupPoints": "نقاط الاستلام"
+      },
+      "network": {
+        "eyebrow": "أين تجدنا",
+        "title": "نقاط الاستلام حسب الولاية",
+        "text": "اختر مكانًا لعرض السيارات المتاحة مباشرة.",
+        "filterLabel": "ابحث عن ولاية أو مدينة",
+        "filterPlaceholder": "مثال: سوسة، جربة، طبرقة…",
+        "points": "{count, plural, zero {لا توجد نقاط استلام} one {نقطة استلام واحدة} two {نقطتا استلام} few {# نقاط استلام} many {# نقطة استلام} other {# نقطة استلام}}",
+        "soon": "نقاط الاستلام متاحة قريبًا.",
+        "searchIn": "عرض السيارات المتاحة: {name}",
+        "noResults": "لا توجد نتائج لـ «{query}»",
+        "unavailableTitle": "الشبكة غير متاحة مؤقتًا",
+        "unavailableText": "تعذّر تحميل قائمة الأماكن. أعد المحاولة بعد لحظات."
+      },
+      "charter": {
+        "eyebrow": "ميثاقنا",
+        "title": "ما نتحقق منه لدى كل وكالة",
+        "text": "تخضع كل وكالة للمراقبة قبل ظهورها على DriveTN، ثم تتم متابعتها طوال نشاطها.",
+        "licenseTitle": "تراخيص قانونية",
+        "licenseText": "السجل التجاري والمعرّف الجبائي ورخصة ممارسة نشاط كراء السيارات.",
+        "fleetTitle": "أسطول مؤمَّن",
+        "fleetText": "سيارات مؤمَّنة، فحص فني محيَّن وصيانة منتظمة.",
+        "pricesTitle": "أسعار شفافة",
+        "pricesText": "أسعار معروضة بكل الأداءات، مع الضمان والشروط المعلنة قبل الحجز.",
+        "reviewsTitle": "تقييمات موثوقة",
+        "reviewsText": "لا يمكن تقييم الوكالة إلا للحرفاء الذين اكتروا فعلًا."
+      }
+    },
+    "bookings": {
+      "metaTitle": "حجوزاتي",
+      "eyebrow": "فضائي",
+      "title": "حجوزاتي",
+      "subtitle": "مرحبًا {name}، تجد هنا طلباتك وعمليات الكراء الجارية وسجلّك.",
+      "newBooking": "حجز جديد",
+      "tabs": {
+        "label": "أصناف الحجوزات",
+        "upcoming": "القادمة",
+        "active": "الجارية",
+        "past": "السابقة"
+      },
+      "empty": {
+        "upcomingTitle": "لا توجد حجوزات قادمة",
+        "upcomingText": "اعثر على سيارة وأرسل طلبك: تؤكده الوكالة بسرعة.",
+        "activeTitle": "لا يوجد كراء جارٍ",
+        "activeText": "سيظهر الكراء هنا بمجرد استلام السيارة من الوكالة.",
+        "pastTitle": "لا يوجد سجل حاليًا",
+        "pastText": "ستُحفظ هنا عمليات الكراء المنتهية أو الملغاة أو منتهية الصلاحية.",
+        "action": "ابحث عن سيارة"
+      },
+      "journey": {
+        "title": "مراحل حجزك",
+        "description": "نُعلمك بكل مرحلة عبر الرسائل القصيرة أو واتساب.",
+        "PENDING": "الوكالة بصدد دراسة طلبك.",
+        "CONFIRMED": "سيارتك محجوزة، موعدنا في الوكالة.",
+        "PICKED_UP": "طريق السلامة! لقد استلمت السيارة.",
+        "COMPLETED": "تم إرجاع السيارة وإغلاق الكراء."
+      },
+      "checklist": {
+        "title": "يوم الانطلاق",
+        "description": "يُقدَّم للوكالة عند استلام السيارة.",
+        "identity": "بطاقة التعريف أو جواز السفر",
+        "license": "رخصة سياقة سارية المفعول",
+        "deposit": "مبلغ الضمان حسب الطرق التي تقبلها الوكالة",
+        "payment": "خلاص الكراء مباشرة في الوكالة"
       }
     },
     "footer": {
       "about": "تربط DriveTN الأفراد والسياح والتونسيين المقيمين بالخارج بوكالات كراء السيارات المحلية.",
       "explore": "اكتشف",
+      "support": "الدعم",
       "company": "DriveTN",
       "howItWorks": "كيف تعمل المنصة",
       "becomePartner": "انضم كوكالة شريكة",
@@ -189,13 +377,580 @@
       "customers": "الحرفاء",
       "payments": "المقبوضات",
       "reviews": "التقييمات",
-      "settings": "الإعدادات"
+      "settings": "الإعدادات",
+      "pendingCount": "{count, plural, one {طلب واحد في الانتظار} two {طلبان في الانتظار} few {# طلبات في الانتظار} other {# طلبًا في الانتظار}}",
+      "unansweredCount": "{count, plural, one {تقييم واحد دون رد} two {تقييمان دون رد} few {# تقييمات دون رد} other {# تقييمًا دون رد}}"
     },
-    "home": {
-      "title": "مرحبًا بك في فضاء الوكالة",
-      "subtitle": "تصرّف في أسطولك وحجوزاتك ومقبوضاتك من مكان واحد.",
-      "emptyTitle": "لوحة القيادة قريبًا",
-      "emptyText": "ستظهر هنا إحصائيات الحجوزات والمداخيل فور تفعيل وكالتك."
+    "common": {
+      "call": "اتصال",
+      "whatsapp": "واتساب",
+      "clearSearch": "مسح البحث",
+      "loading": "جارٍ التحميل…",
+      "loadErrorTitle": "تعذّر تحميل البيانات",
+      "loadErrorText": "تحقّق من اتصالك ثم أعد المحاولة.",
+      "notFoundTitle": "العنصر غير موجود",
+      "notFoundText": "ربما تم حذفه، أو أن الرابط غير صحيح.",
+      "pagination": {
+        "label": "ترقيم الصفحات",
+        "previous": "الصفحة السابقة",
+        "next": "الصفحة التالية",
+        "page": "الصفحة {page}",
+        "range": "{from}–{to} من {total}"
+      }
+    },
+    "demo": {
+      "badge": "بيانات تجريبية",
+      "tooltip": "تعرض البوابة بيانات تجريبية في انتظار ربطها بالواجهة البرمجية. تُحفظ تعديلاتك إلى حين إعادة تحميل الصفحة."
+    },
+    "notifications": {
+      "label": "الإشعارات",
+      "labelWithCount": "الإشعارات ({count, plural, one {طلب جديد واحد} two {طلبان جديدان} few {# طلبات جديدة} other {# طلبًا جديدًا}})",
+      "title": "طلبات بانتظار المعالجة",
+      "empty": "لا توجد طلبات في الانتظار: كل شيء محيَّن.",
+      "newRequest": "طلب جديد من {name}",
+      "viewAll": "عرض كل الطلبات"
+    },
+    "validation": {
+      "REQUIRED": "هذا الحقل إجباري.",
+      "TOO_LONG": "هذا النص طويل جدًا.",
+      "INVALID_TUNISIAN_PHONE": "رقم تونسي غير صالح (8 أرقام).",
+      "INVALID_EMAIL": "بريد إلكتروني غير صالح.",
+      "INVALID_PLATE": "رقم تسجيل غير صالح (مثال: 245 TU 1234).",
+      "PLATE_ALREADY_USED": "رقم التسجيل هذا مستعمل في أسطولك.",
+      "OUT_OF_RANGE": "القيمة خارج الحدود المسموح بها.",
+      "INVALID_AMOUNT": "مبلغ غير صالح (مثال: 120 أو 120.500).",
+      "PAYMENT_METHOD_REQUIRED": "اختر طريقة دفع واحدة على الأقل.",
+      "generic": "قيمة غير صالحة."
+    },
+    "dashboard": {
+      "title": "لوحة القيادة",
+      "subtitle": "نشاط اليوم في لمحة.",
+      "openPlanning": "الجدول الزمني",
+      "openBookings": "الحجوزات",
+      "quickLinks": "اختصارات",
+      "kpis": {
+        "revenue": "رقم معاملات الشهر",
+        "bookings": "حجوزات الشهر",
+        "occupancy": "نسبة الإشغال على 30 يومًا",
+        "outstanding": "المبالغ المتبقية للقبض",
+        "versusLastMonth": "{value} مقارنة بالفترة نفسها من الشهر الماضي",
+        "noComparison": "لا تتوفر مقارنة",
+        "onRentNow": "{count, plural, zero {لا توجد سيارة مؤجّرة} one {سيارة واحدة مؤجّرة} two {سيارتان مؤجّرتان} few {# سيارات مؤجّرة} other {# سيارة مؤجّرة}}",
+        "outstandingHint": "أرصدة الكراءات الجارية والمنتهية",
+        "allCollected": "تم قبض كل المبالغ"
+      },
+      "pending": {
+        "title": "طلبات في الانتظار",
+        "subtitle": "ردّ بسرعة: الحريف الذي لا يتلقى ردًا يحجز غالبًا في مكان آخر.",
+        "viewAll": "عرض الكل",
+        "emptyTitle": "لا توجد طلبات في الانتظار",
+        "emptyText": "ستظهر هنا طلبات الحجز الجديدة.",
+        "received": "وصل {time}"
+      },
+      "today": {
+        "title": "اليوم",
+        "departures": "الانطلاقات",
+        "returns": "الإرجاعات",
+        "noDepartures": "لا توجد انطلاقات مبرمجة اليوم.",
+        "noReturns": "لا توجد إرجاعات مبرمجة اليوم."
+      },
+      "revenue": {
+        "title": "رقم المعاملات",
+        "subtitle": "الكراءات المنتهية خلال الأشهر الستة الأخيرة",
+        "total": "مجموع 6 أشهر",
+        "barLabel": "{month}: {amount}",
+        "unit": "المبالغ بالدينار التونسي، دون احتساب الضمانات."
+      },
+      "fleet": {
+        "title": "الأسطول",
+        "subtitle": "{count, plural, one {سيارة واحدة} two {سيارتان} few {# سيارات} other {# سيارة}}",
+        "available": "متاحة",
+        "onRent": "مؤجّرة",
+        "maintenance": "في الصيانة",
+        "inactive": "خارج الخدمة",
+        "rating": "متوسط التقييم",
+        "ratingLabel": "{value} من 5",
+        "reviewsCount": "{count, plural, one {تقييم واحد} two {تقييمان} few {# تقييمات} other {# تقييمًا}}",
+        "manage": "إدارة الأسطول"
+      },
+      "shortcuts": {
+        "fleet": {
+          "title": "الأسطول",
+          "text": "الأسعار والتوفر والصيانة"
+        },
+        "payments": {
+          "title": "المقبوضات",
+          "text": "المدفوعات المقبوضة والضمانات"
+        },
+        "settings": {
+          "title": "الإعدادات",
+          "text": "بطاقة الوكالة وشروط الكراء"
+        }
+      }
+    },
+    "bookings": {
+      "title": "الحجوزات",
+      "subtitle": "تابع كل طلب، من استلامه إلى إرجاع السيارة.",
+      "searchLabel": "البحث عن حجز",
+      "searchPlaceholder": "الاسم أو الهاتف أو المرجع أو رقم التسجيل",
+      "sortLabel": "ترتيب الحجوزات",
+      "sorts": {
+        "pickup_desc": "الانطلاق: الأحدث أولًا",
+        "pickup_asc": "الانطلاق: الأقدم أولًا",
+        "created_desc": "آخر الطلبات الواردة"
+      },
+      "filterLabel": "تصفية حسب الحالة",
+      "filters": {
+        "all": "الكل",
+        "pending": "في الانتظار",
+        "confirmed": "مؤكَّدة",
+        "ongoing": "جارية",
+        "completed": "منتهية",
+        "cancelled": "ملغاة أو مرفوضة"
+      },
+      "columns": {
+        "customer": "الحريف",
+        "vehicle": "السيارة",
+        "dates": "التواريخ",
+        "amount": "المبلغ",
+        "status": "الحالة",
+        "open": "فتح"
+      },
+      "days": "{count, plural, one {يوم واحد} two {يومان} few {# أيام} other {# يومًا}}",
+      "emptyTitle": "لا توجد حجوزات حاليًا",
+      "emptyText": "ستظهر هنا طلبات حرفائك.",
+      "emptyFilteredTitle": "لا توجد نتائج",
+      "emptyFilteredText": "لا يوجد حجز يطابق هذه المعايير.",
+      "clearFilters": "إعادة ضبط المرشحات",
+      "actions": {
+        "labels": {
+          "CONFIRM": "تأكيد",
+          "REJECT": "رفض",
+          "PICK_UP": "تسليم المفاتيح",
+          "RETURN": "تسجيل الإرجاع",
+          "COMPLETE": "إغلاق",
+          "NO_SHOW": "الحريف لم يحضر",
+          "CANCEL": "إلغاء الحجز"
+        },
+        "success": {
+          "CONFIRM": "تم تأكيد الحجز {reference}.",
+          "REJECT": "تم رفض الطلب {reference}.",
+          "PICK_UP": "تم تسجيل انطلاق {reference}.",
+          "RETURN": "تم تسجيل إرجاع {reference}.",
+          "COMPLETE": "تم إغلاق الحجز {reference}.",
+          "NO_SHOW": "تم تسجيل غياب الحريف للحجز {reference}.",
+          "CANCEL": "تم إلغاء الحجز {reference}."
+        },
+        "confirmTitle": {
+          "CONFIRM": "تأكيد الحجز {reference}؟",
+          "REJECT": "رفض الطلب {reference}؟",
+          "PICK_UP": "تسليم السيارة للحجز {reference}؟",
+          "RETURN": "تسجيل إرجاع الحجز {reference}؟",
+          "COMPLETE": "إغلاق الحجز {reference}؟",
+          "NO_SHOW": "الإبلاغ عن غياب الحريف للحجز {reference}؟",
+          "CANCEL": "إلغاء الحجز {reference}؟"
+        },
+        "confirmText": {
+          "CONFIRM": "ستُحجز السيارة في هذه التواريخ.",
+          "REJECT": "سيطّلع الحريف على سبب الرفض.",
+          "PICK_UP": "تحقّق من رخصة السياقة وحالة السيارة والضمان قبل تسليم المفاتيح.",
+          "RETURN": "راقب الوقود وعدد الكيلومترات وحالة السيارة.",
+          "COMPLETE": "سيُؤرشف الحجز. تأكّد من قبض كل المبالغ وإرجاع الضمان.",
+          "NO_SHOW": "ستُحرَّر السيارة. لا يمكن التراجع عن هذا الإجراء.",
+          "CANCEL": "ستُحرَّر السيارة ويُعلَم الحريف. لا يمكن التراجع عن هذا الإجراء."
+        },
+        "error": "تعذّر تنفيذ الإجراء. أعد المحاولة.",
+        "keep": "رجوع",
+        "more": "إجراءات أخرى",
+        "quickReasons": "أسباب متكررة",
+        "reasonLabel": "السبب",
+        "reasonHint": "يطّلع عليه الحريف.",
+        "reasonRequired": "يرجى ذكر السبب.",
+        "rejectReasons": {
+          "unavailable": "السيارة غير متاحة في هذه التواريخ",
+          "dates": "توقيت الانطلاق أو الإرجاع غير ممكن",
+          "conditions": "شروط الكراء غير مستوفاة"
+        }
+      }
+    },
+    "bookingDetail": {
+      "fallbackTitle": "حجز",
+      "subtitle": "{vehicle} · طلب وارد {created}",
+      "copyReference": "نسخ المرجع",
+      "referenceCopied": "تم نسخ المرجع",
+      "pendingTitle": "طلب بانتظار ردّك",
+      "pendingText": "وصل {since}. أكّد أو ارفض بسرعة حتى لا تخسر الحريف.",
+      "depositReminderTitle": "ضمان يجب إرجاعه",
+      "depositReminderText": "لا يزال ضمان بقيمة {amount} محتجزًا. أرجعه قبل إغلاق الحجز.",
+      "trip": "الرحلة",
+      "duration": "{count, plural, one {يوم واحد} two {يومان} few {# أيام} other {# يومًا}}",
+      "pickup": "الانطلاق",
+      "return": "الإرجاع",
+      "customerNote": "رسالة الحريف",
+      "vehicle": "السيارة",
+      "payments": "المدفوعات",
+      "paymentsHint": "مدفوعات في عين المكان تسجّلها الوكالة.",
+      "paidOf": "تم قبض {paid} من {total}",
+      "balance": "المتبقي للدفع",
+      "depositHeld": "الضمان المحتجز",
+      "depositPlanned": "الضمان المطلوب",
+      "noPayments": "لم يُسجَّل أي دفع بعد.",
+      "customer": "الحريف",
+      "whatsappMessage": "مرحبًا {name}، معك وكالة الكراء بخصوص الحجز {reference} (الانطلاق يوم {date}).",
+      "email": "البريد الإلكتروني",
+      "city": "المدينة",
+      "openCustomer": "عرض بطاقة الحريف",
+      "price": "السعر",
+      "dailyRateTimesDays": "{rate} × {count, plural, one {يوم واحد} two {يومان} few {# أيام} other {# يومًا}}",
+      "longRentalDiscount": "تخفيض الكراء الطويل",
+      "total": "المجموع",
+      "payAtAgency": "يُدفع في الوكالة: لا دفع عبر الإنترنت.",
+      "history": "السجل",
+      "requestReceived": "تم استلام الطلب"
+    },
+    "payments": {
+      "recordAction": "تسجيل دفعة",
+      "recordTitle": "تسجيل دفعة",
+      "recordDescription": "الحجز {reference}",
+      "recordSubmit": "تسجيل",
+      "recorded": "تم تسجيل الدفعة.",
+      "recordError": "تعذّر تسجيل الدفعة.",
+      "currency": "د.ت",
+      "amountHint": "المتبقي للدفع: {balance}",
+      "notePlaceholder": "مثال: رقم الوصل، مرجع التحويل…",
+      "fields": {
+        "kind": "نوع العملية",
+        "amount": "المبلغ",
+        "method": "طريقة الدفع",
+        "note": "ملاحظة (اختيارية)"
+      },
+      "kinds": {
+        "RENTAL": "دفعة",
+        "REFUND": "استرجاع",
+        "DEPOSIT_HELD": "ضمان مقبوض",
+        "DEPOSIT_RETURNED": "ضمان مُرجَع"
+      },
+      "kindHints": {
+        "RENTAL": "تسبقة أو باقي ثمن الكراء",
+        "REFUND": "مبلغ مُرجَع للحريف",
+        "DEPOSIT_HELD": "ضمان محتجز طوال مدة الكراء",
+        "DEPOSIT_RETURNED": "ضمان مُرجَع عند الإرجاع"
+      },
+      "page": {
+        "title": "المقبوضات",
+        "subtitle": "كل المدفوعات المقبوضة في الوكالة، بما في ذلك الضمانات.",
+        "offlineTitle": "الدفع في عين المكان فقط",
+        "offlineText": "لا تقتطع DriveTN أي مبلغ عبر الإنترنت: سجّل هنا كل مبلغ مقبوض أو مُرجَع (نقدًا، بالبطاقة، بالتحويل…) للحفاظ على صندوق دقيق.",
+        "kpis": {
+          "collected": "المقبوض",
+          "refunded": "المُسترجَع",
+          "outstanding": "المتبقي للقبض",
+          "deposits": "الضمانات المحتجزة",
+          "thisMonth": "هذا الشهر",
+          "outstandingHint": "كراءات مؤكَّدة أو جارية",
+          "depositsHint": "يجب إرجاعها للحرفاء"
+        },
+        "journal": "سجل العمليات",
+        "kindFilter": "تصفية حسب النوع",
+        "methodFilter": "تصفية حسب طريقة الدفع",
+        "allKinds": "كل الأنواع",
+        "allMethods": "كل الطرق",
+        "columns": {
+          "date": "التاريخ",
+          "booking": "الحجز",
+          "kind": "النوع",
+          "method": "الطريقة",
+          "amount": "المبلغ"
+        },
+        "emptyTitle": "لا توجد مدفوعات مسجّلة",
+        "emptyText": "ستظهر هنا المدفوعات المسجّلة في الحجوزات.",
+        "emptyFilteredTitle": "لا توجد نتائج",
+        "emptyFilteredText": "لا توجد عملية تطابق هذه المرشحات.",
+        "clearFilters": "إعادة ضبط المرشحات",
+        "byMethod": {
+          "title": "حسب طريقة الدفع",
+          "description": "مقبوضات الشهر",
+          "empty": "لا توجد مقبوضات هذا الشهر."
+        },
+        "recordHint": "لتسجيل دفعة، افتح الحجز المعني من <link>الكراءات الجارية</link>."
+      }
+    },
+    "planning": {
+      "title": "الجدول الزمني",
+      "subtitle": "توفر الأسطول والحجوزات، سيارة بسيارة.",
+      "previous": "الفترة السابقة",
+      "next": "الفترة التالية",
+      "today": "اليوم",
+      "spanLabel": "المدة المعروضة",
+      "span": "{count, plural, one {يوم واحد} two {يومان} few {# أيام} other {# يومًا}}",
+      "legend": "مفتاح الألوان",
+      "now": "الآن",
+      "vehicle": "السيارة",
+      "fillRate": "{value} محجوز",
+      "maintenance": "في الصيانة",
+      "barLabel": "{name}، {status}، {dates}",
+      "scrollHint": "مرّر أفقيًا لرؤية الفترة كاملة."
+    },
+    "fleet": {
+      "title": "الأسطول",
+      "subtitle": "سياراتك وأسعارها وتوفرها.",
+      "summary": "{count, plural, one {سيارة واحدة} two {سيارتان} few {# سيارات} other {# سيارة}} · إشغال {occupancy} · {revenue} خلال 30 يومًا",
+      "add": "إضافة سيارة",
+      "searchLabel": "البحث عن سيارة",
+      "searchPlaceholder": "العلامة أو الطراز أو رقم التسجيل",
+      "filterLabel": "تصفية حسب التوفر",
+      "filterAll": "الكل",
+      "availability": {
+        "ACTIVE": "متاحة",
+        "ON_RENT": "مؤجّرة",
+        "MAINTENANCE": "في الصيانة",
+        "INACTIVE": "خارج الخدمة"
+      },
+      "categories": {
+        "ECONOMY": "اقتصادية",
+        "COMPACT": "صغيرة",
+        "SEDAN": "سيدان",
+        "SUV": "رباعية الدفع",
+        "MINIVAN": "عائلية",
+        "LUXURY": "فاخرة"
+      },
+      "transmissions": {
+        "MANUAL": "يدوية",
+        "AUTOMATIC": "أوتوماتيكية"
+      },
+      "fuels": {
+        "PETROL": "بنزين",
+        "DIESEL": "ديزل",
+        "HYBRID": "هجينة",
+        "ELECTRIC": "كهربائية"
+      },
+      "seats": "{count, plural, one {مقعد واحد} two {مقعدان} few {# مقاعد} other {# مقعدًا}}",
+      "airConditioning": "مكيّف",
+      "perDay": "/ يوم",
+      "deposit": "الضمان {amount}",
+      "unlimitedMileage": "كيلومترات غير محدودة",
+      "mileagePerDay": "{km} كم / يوم",
+      "occupancy30d": "الإشغال على 30 يومًا",
+      "currentBooking": "مؤجّرة:",
+      "nextBooking": "الحجز القادم:",
+      "until": "حتى {date}",
+      "noUpcoming": "لا توجد حجوزات قادمة",
+      "unavailableHint": "غير معروضة للكراء",
+      "edit": "تعديل",
+      "moreActions": "إجراءات أخرى لـ {name}",
+      "viewPlanning": "عرض الجدول الزمني",
+      "statusMenu": {
+        "title": "التوفر",
+        "options": {
+          "ACTIVE": "متاحة للكراء",
+          "MAINTENANCE": "في الصيانة",
+          "INACTIVE": "خارج الخدمة"
+        },
+        "success": {
+          "ACTIVE": "السيارة معروضة للكراء من جديد.",
+          "MAINTENANCE": "تم تحويل السيارة إلى الصيانة.",
+          "INACTIVE": "تم سحب السيارة من الكراء."
+        },
+        "error": "تعذّر تغيير الحالة.",
+        "onRentHint": "يمكن تغيير الحالة بعد إرجاع السيارة."
+      },
+      "emptyTitle": "لا توجد سيارات في أسطولك",
+      "emptyText": "أضف سيارتك الأولى لتبدأ في تلقي الحجوزات.",
+      "emptyFilteredTitle": "لم يتم العثور على سيارات",
+      "emptyFilteredText": "لا توجد سيارة تطابق هذه المعايير.",
+      "clearFilters": "إعادة ضبط المرشحات",
+      "form": {
+        "createTitle": "سيارة جديدة",
+        "editTitle": "تعديل السيارة",
+        "description": "تظهر هذه المعلومات للحرفاء في بطاقتك.",
+        "sections": {
+          "identity": "التعريف",
+          "specs": "المواصفات",
+          "pricing": "الأسعار والشروط"
+        },
+        "brand": "العلامة",
+        "model": "الطراز",
+        "year": "السنة",
+        "plate": "رقم التسجيل",
+        "plateHint": "الصيغة التونسية، مثال: 245 TU 1234.",
+        "category": "الصنف",
+        "fuel": "الوقود",
+        "transmission": "علبة السرعات",
+        "seats": "عدد المقاعد",
+        "airConditioning": "مكيّف",
+        "airConditioningHint": "تجهيز مطلوب جدًا في الصيف.",
+        "dailyRate": "السعر اليومي",
+        "perDaySuffix": "د.ت / يوم",
+        "deposit": "الضمان",
+        "depositHint": "أدخل 0 إذا لم يكن هناك ضمان.",
+        "currency": "د.ت",
+        "unlimitedMileage": "كيلومترات غير محدودة",
+        "unlimitedMileageHint": "وإلا، حدّد سقفًا يوميًا.",
+        "mileageLimit": "سقف الكيلومترات",
+        "kmPerDaySuffix": "كم / يوم",
+        "cancel": "إلغاء",
+        "submitCreate": "إضافة السيارة",
+        "submitEdit": "حفظ",
+        "created": "تمت إضافة السيارة إلى أسطولك.",
+        "updated": "تم تحديث السيارة.",
+        "saveError": "تعذّر حفظ السيارة."
+      }
+    },
+    "customers": {
+      "title": "الحرفاء",
+      "subtitle": "الأشخاص الذين حجزوا لديك.",
+      "summary": "{count, plural, one {حريف واحد} two {حريفان} few {# حرفاء} other {# حريفًا}}",
+      "searchLabel": "البحث عن حريف",
+      "searchPlaceholder": "الاسم أو الهاتف أو البريد أو المدينة",
+      "clearSearch": "مسح البحث",
+      "columns": {
+        "customer": "الحريف",
+        "city": "المدينة",
+        "bookings": "الحجوزات",
+        "spent": "مجموع الإنفاق",
+        "lastBooking": "آخر حجز",
+        "contact": "التواصل"
+      },
+      "bookingsCount": "{count, plural, one {حجز واحد} two {حجزان} few {# حجوزات} other {# حجزًا}}",
+      "badges": {
+        "loyal": "وفيّ",
+        "new": "جديد"
+      },
+      "emptyTitle": "لا يوجد حرفاء حاليًا",
+      "emptyText": "سيظهر حرفاؤك هنا بعد أول حجز لهم.",
+      "emptyFilteredTitle": "لم يتم العثور على حريف",
+      "emptyFilteredText": "تحقّق من الكتابة أو جرّب رقم الهاتف.",
+      "detail": {
+        "title": "بطاقة الحريف",
+        "description": "بيانات الاتصال وسجل الكراءات.",
+        "whatsappMessage": "مرحبًا {name}، معك وكالة الكراء.",
+        "bookings": "الحجوزات",
+        "completed": "المنتهية",
+        "spent": "مجموع الإنفاق",
+        "since": "حريف منذ",
+        "noEmail": "لا يوجد بريد إلكتروني",
+        "activeBookings": "{count, plural, one {حجز واحد جارٍ أو قادم} two {حجزان جاريان أو قادمان} few {# حجوزات جارية أو قادمة} other {# حجزًا جاريًا أو قادمًا}}",
+        "history": "سجل الحجوزات",
+        "noBookings": "لا توجد حجوزات."
+      }
+    },
+    "reviews": {
+      "title": "تقييمات الحرفاء",
+      "subtitle": "ردّ على التقييمات: ردودك علنية وتطمئن الحرفاء القادمين.",
+      "ratingLabel": "{rating} من 5",
+      "reviewsCount": "{count, plural, one {تقييم واحد} two {تقييمان} few {# تقييمات} other {# تقييمًا}}",
+      "distributionLabel": "توزيع التقييمات",
+      "starsCount": "{stars, plural, one {نجمة واحدة} two {نجمتان} few {# نجوم} other {# نجمة}}: {count}",
+      "responseRate": "نسبة الرد",
+      "awaitingReply": "بانتظار الرد",
+      "filterLabel": "تصفية التقييمات",
+      "filters": {
+        "all": "الكل",
+        "unanswered": "دون رد",
+        "positive": "إيجابية (4-5)",
+        "critical": "سلبية (1-3)"
+      },
+      "noReply": "هذا التقييم بانتظار ردّك.",
+      "replyAction": "ردّ",
+      "yourReply": "ردّك",
+      "editReply": "تعديل الرد",
+      "emptyTitle": "لا توجد تقييمات حاليًا",
+      "emptyText": "يمكن للحرفاء تقييم الكراء بعد إرجاع السيارة.",
+      "emptyFilteredTitle": "لا توجد تقييمات في هذا الصنف",
+      "emptyFilteredText": "جرّب مرشحًا آخر.",
+      "reply": {
+        "label": "ردّك العلني",
+        "placeholder": "اشكر الحريف وأجب عن ملاحظاته…",
+        "hint": "يظهر للجميع في بطاقة وكالتك",
+        "required": "اكتب ردًا قبل النشر.",
+        "tooLong": "{max} حرف كحد أقصى.",
+        "cancel": "إلغاء",
+        "submit": "نشر الرد",
+        "update": "تحديث",
+        "success": "تم نشر الرد.",
+        "error": "تعذّر نشر الرد.",
+        "templates": {
+          "thanks": {
+            "label": "شكر",
+            "text": "شكرًا {name} على ثقتك وعلى هذا التقييم الإيجابي! يسعد فريقنا أن الكراء مرّ في أفضل الظروف."
+          },
+          "welcomeBack": {
+            "label": "دعوة للعودة",
+            "text": "شكرًا {name}! كان من دواعي سرورنا استقبالك، ونتطلع إلى رؤيتك في رحلتك القادمة."
+          },
+          "apology": {
+            "label": "اعتذار",
+            "text": "مرحبًا {name}، شكرًا على ملاحظاتك. نأسف لأن تجربتك لم تكن في المستوى، وسنأخذ ملاحظاتك بعين الاعتبار."
+          },
+          "contact": {
+            "label": "اقتراح التواصل",
+            "text": "مرحبًا {name}، نعتذر عن هذا الإزعاج. لا تتردد في التواصل معنا مباشرة لنجد حلًا معًا."
+          }
+        }
+      }
+    },
+    "settings": {
+      "title": "الإعدادات",
+      "subtitle": "بطاقة وكالتك وشروط الكراء.",
+      "tabs": {
+        "profile": "بطاقة الوكالة",
+        "conditions": "شروط الكراء"
+      },
+      "unsaved": "تعديلات غير محفوظة",
+      "discard": "تجاهل",
+      "save": "حفظ",
+      "previewHint": "معاينة بطاقتك كما تظهر للحرفاء.",
+      "profile": {
+        "identityTitle": "التقديم",
+        "identityText": "الاسم والوصف المعروضان في بطاقتك العلنية.",
+        "name": "اسم الوكالة",
+        "description": "الوصف",
+        "descriptionHint": "{count} / {max} حرف",
+        "descriptionPlaceholder": "قصتك ونقاط قوتك: التوصيل إلى المطار، سيارات حديثة، استقبال بالعربية والفرنسية والإنجليزية…",
+        "contactTitle": "بيانات الاتصال",
+        "contactText": "يتواصل معك الحرفاء عبر الهاتف أو واتساب.",
+        "phone": "الهاتف",
+        "whatsapp": "واتساب",
+        "sameAsPhone": "استعمال نفس الرقم",
+        "email": "البريد الإلكتروني",
+        "emailHint": "اختياري.",
+        "addressTitle": "العنوان",
+        "addressText": "مكان الاستلام الرئيسي.",
+        "address": "العنوان",
+        "governorate": "الولاية",
+        "governoratePlaceholder": "اختر",
+        "saved": "تم حفظ بطاقة الوكالة.",
+        "saveError": "تعذّر حفظ البطاقة."
+      },
+      "conditions": {
+        "driverTitle": "السائق",
+        "driverText": "شروط يتم التحقق منها عند تسليم المفاتيح.",
+        "minDriverAge": "السن الأدنى",
+        "minLicenseYears": "أقدمية رخصة السياقة",
+        "years": "{count, plural, one {سنة واحدة} two {سنتان} few {# سنوات} other {# سنة}}",
+        "noMinimum": "دون حد أدنى",
+        "bookingTitle": "الحجز والإلغاء",
+        "bookingText": "الشروط المرنة تزيد عدد الطلبات.",
+        "freeCancellation": "الإلغاء المجاني",
+        "freeCancellationHint": "المدة قبل الانطلاق التي يمكن خلالها للحريف الإلغاء دون مصاريف.",
+        "hoursBefore": "حتى {count, plural, one {ساعة واحدة} two {ساعتين} few {# ساعات} other {# ساعة}} قبل الانطلاق",
+        "noFreeCancellation": "دون إلغاء مجاني",
+        "instantConfirmation": "تأكيد فوري",
+        "instantConfirmationHint": "تُقبل الطلبات آليًا إذا كانت السيارة متاحة.",
+        "paymentTitle": "طرق الدفع المقبولة",
+        "paymentText": "الدفع في عين المكان بالوكالة. تُعرض في بطاقتك.",
+        "saved": "تم حفظ شروط الكراء.",
+        "saveError": "تعذّر حفظ الشروط."
+      },
+      "preview": {
+        "title": "ما يراه الحريف",
+        "namePlaceholder": "اسم وكالتك",
+        "freeCancellation": "إلغاء مجاني حتى {count, plural, one {ساعة واحدة} two {ساعتين} few {# ساعات} other {# ساعة}} قبل الانطلاق",
+        "instant": "تأكيد فوري",
+        "onRequest": "تأكيد من الوكالة",
+        "payOnSite": "الدفع في عين المكان",
+        "driver": "السائق: {age} سنة على الأقل، و{years, plural, one {سنة واحدة} two {سنتان} few {# سنوات} other {# سنة}} من رخصة السياقة."
+      }
     }
   },
   "admin": {
@@ -209,13 +964,552 @@
       "billing": "الفوترة",
       "reviews": "مراقبة التقييمات",
       "settings": "الإعدادات",
-      "audit": "سجل العمليات"
+      "audit": "سجل العمليات",
+      "pendingAgencies": "{count, plural, one {# وكالة بانتظار المصادقة} two {# وكالتان بانتظار المصادقة} few {# وكالات بانتظار المصادقة} other {# وكالة بانتظار المصادقة}}",
+      "flaggedReviews": "{count, plural, one {# تقييم مُبلَّغ عنه} few {# تقييمات مُبلَّغ عنها} other {# تقييمًا مُبلَّغًا عنه}}",
+      "overdueInvoices": "{count, plural, one {# فاتورة متأخرة} few {# فواتير متأخرة} other {# فاتورة متأخرة}}"
     },
-    "home": {
-      "title": "إدارة المنصة",
-      "subtitle": "تابع الوكالات والمستخدمين ونشاط DriveTN.",
-      "emptyTitle": "المؤشرات قريبًا",
-      "emptyText": "ستتوفر متابعة الوكالات والحجوزات والفوترة في المراحل القادمة."
+    "notifications": {
+      "label": "المهام",
+      "labelWithCount": "المهام ({count, plural, one {# عنصر للمعالجة} few {# عناصر للمعالجة} other {# عنصرًا للمعالجة}})",
+      "title": "للمعالجة",
+      "empty": "لا شيء للمعالجة: المنصة محدّثة.",
+      "pendingAgencies": {
+        "title": "{count, plural, one {# وكالة بانتظار المصادقة} few {# وكالات بانتظار المصادقة} other {# وكالة بانتظار المصادقة}}",
+        "text": "تحقّق من الوثائق قبل النشر."
+      },
+      "flaggedReviews": {
+        "title": "{count, plural, one {# تقييم مُبلَّغ عنه} few {# تقييمات مُبلَّغ عنها} other {# تقييمًا مُبلَّغًا عنه}}",
+        "text": "أبلغ حرفاء أو وكالات عن محتوى."
+      },
+      "overdueInvoices": {
+        "title": "{count, plural, one {# فاتورة متأخرة} few {# فواتير متأخرة} other {# فاتورة متأخرة}}",
+        "text": "ذكّر الوكالات المعنية بالدفع."
+      }
+    },
+    "common": {
+      "you": "أنت",
+      "system": "النظام",
+      "cancel": "إلغاء",
+      "quickReasons": "أسباب متكررة",
+      "reasonLabel": "السبب",
+      "reasonHint": "يُبلَّغ إلى المعني بالأمر ويُحفظ في سجل العمليات.",
+      "reasonRequired": "يرجى ذكر السبب.",
+      "userRoles": {
+        "CUSTOMER": "حريف",
+        "AGENCY_OWNER": "مسيّر وكالة",
+        "AGENCY_STAFF": "فريق الوكالة",
+        "ADMIN": "مشرف"
+      },
+      "adminRoles": {
+        "SUPER_ADMIN": "مشرف عام",
+        "SUPPORT": "الدعم",
+        "FINANCE": "المالية"
+      }
+    },
+    "status": {
+      "agency": {
+        "PENDING_REVIEW": "بانتظار المصادقة",
+        "ACTIVE": "نشطة",
+        "SUSPENDED": "معلّقة",
+        "REJECTED": "مرفوضة"
+      },
+      "user": {
+        "PENDING_VERIFICATION": "غير مؤكَّد",
+        "ACTIVE": "نشط",
+        "SUSPENDED": "معلّق"
+      },
+      "invoice": {
+        "ISSUED": "صادرة",
+        "PAID": "مدفوعة",
+        "OVERDUE": "متأخرة"
+      },
+      "review": {
+        "PUBLISHED": "منشور",
+        "FLAGGED": "مُبلَّغ عنه",
+        "HIDDEN": "مخفي"
+      }
+    },
+    "plans": {
+      "STARTER": "أساسي",
+      "PRO": "احترافي",
+      "BUSINESS": "أعمال"
+    },
+    "dashboard": {
+      "title": "نظرة عامة على المنصة",
+      "subtitle": "نشاط الوكالات والحرفاء والفوترة في DriveTN.",
+      "openAudit": "سجل العمليات",
+      "openAgencies": "الوكالات",
+      "kpis": {
+        "gmv": "حجم الكراء هذا الشهر",
+        "bookings": "حجوزات الشهر",
+        "agencies": "الوكالات النشطة",
+        "customers": "الحرفاء المسجّلون",
+        "noComparison": "لا تتوفر مقارنة",
+        "versusLastMonth": "{value} مقارنة بالفترة نفسها من الشهر الماضي",
+        "newThisMonth": "{count, plural, one {+# هذا الشهر} other {+# هذا الشهر}}"
+      },
+      "pending": {
+        "title": "وكالات بانتظار المصادقة",
+        "subtitle": "الطلبات الأقدم أولًا.",
+        "viewAll": "مراجعة الكل",
+        "emptyTitle": "لا توجد وكالات في الانتظار",
+        "emptyText": "تمت معالجة جميع طلبات التسجيل.",
+        "missingDocuments": "{count, plural, one {# وثيقة ناقصة} few {# وثائق ناقصة} other {# وثيقة ناقصة}}",
+        "documentsComplete": "ملف مكتمل"
+      },
+      "billing": {
+        "title": "الفوترة",
+        "subtitle": "اشتراكات الوكالات الشريكة.",
+        "mrr": "الإيراد الشهري المتكرر",
+        "mrrHint": "الاشتراكات النشطة، دون احتساب الأداءات",
+        "outstanding": "المبالغ المستحقة",
+        "overdue": "تأخر الدفع",
+        "overdueCount": "{count, plural, one {# فاتورة} few {# فواتير} other {# فاتورة}}",
+        "upToDate": "محدّث",
+        "open": "فتح الفوترة"
+      },
+      "gmv": {
+        "title": "حجم الكراء",
+        "subtitle": "قيمة عمليات الكراء التي انطلقت خلال الأشهر الستة الأخيرة.",
+        "total": "مجموع 6 أشهر",
+        "barLabel": "{month}: {amount}، {count, plural, one {# عملية كراء} few {# عمليات كراء} other {# عملية كراء}}",
+        "unit": "المبالغ بالدينار التونسي، لكل الوكالات."
+      },
+      "status": {
+        "title": "حجوزات الشهر",
+        "subtitle": "{count, plural, one {# حجز} few {# حجوزات} other {# حجزًا}} تنطلق هذا الشهر.",
+        "open": "متابعة الحجوزات"
+      },
+      "top": {
+        "title": "الوكالات الأكثر نشاطًا",
+        "subtitle": "الترتيب حسب حجم الكراء هذا الشهر.",
+        "empty": "لا توجد عمليات كراء هذا الشهر بعد.",
+        "bookings": "{count, plural, one {# عملية كراء} few {# عمليات كراء} other {# عملية كراء}}"
+      },
+      "activity": {
+        "title": "النشاط الأخير",
+        "subtitle": "قرارات الفريق وعملياته.",
+        "viewAll": "السجل الكامل",
+        "empty": "لا يوجد نشاط حديث."
+      }
+    },
+    "agencies": {
+      "title": "الوكالات الشريكة",
+      "subtitle": "صادِق على التسجيلات وتابع وكالات المنصة.",
+      "summary": "{count, plural, one {# وكالة} few {# وكالات} other {# وكالة}} · {pending, plural, one {# بانتظار المصادقة} other {# بانتظار المصادقة}}",
+      "searchLabel": "البحث عن وكالة",
+      "searchPlaceholder": "الاسم، المدينة، المسيّر، الهاتف أو المعرّف الجبائي",
+      "filterLabel": "التصفية حسب الحالة",
+      "filters": {
+        "all": "الكل",
+        "pending": "بانتظار المصادقة",
+        "active": "نشطة",
+        "suspended": "معلّقة",
+        "rejected": "مرفوضة"
+      },
+      "missingDocuments": "{count, plural, one {# وثيقة ناقصة} few {# وثائق ناقصة} other {# وثيقة ناقصة}}",
+      "submitted": "أُودعت {time}",
+      "vehiclesCount": "{count, plural, one {# سيارة} few {# سيارات} other {# سيارة}}",
+      "columns": {
+        "agency": "الوكالة",
+        "owner": "المسيّر",
+        "status": "الحالة",
+        "plan": "الباقة",
+        "fleet": "الأسطول",
+        "gmv": "حجم الشهر",
+        "rating": "التقييم",
+        "open": "فتح الملف"
+      },
+      "emptyTitle": "لا توجد وكالات مسجّلة",
+      "emptyText": "ستظهر الوكالات هنا فور تسجيلها.",
+      "emptyFilteredTitle": "لا توجد وكالة مطابقة",
+      "emptyFilteredText": "غيّر البحث أو تصفية الحالة.",
+      "clearFilters": "إعادة ضبط التصفية",
+      "decisions": {
+        "labels": {
+          "APPROVE": "المصادقة على الوكالة",
+          "REJECT": "رفض",
+          "SUSPEND": "تعليق",
+          "REACTIVATE": "إعادة التفعيل"
+        },
+        "success": {
+          "APPROVE": "تمت المصادقة على {name} وأصبحت ظاهرة للحرفاء.",
+          "REJECT": "تم رفض تسجيل {name}.",
+          "SUSPEND": "تم تعليق {name}.",
+          "REACTIVATE": "عادت {name} نشطة."
+        },
+        "error": "تعذّر حفظ القرار. حاول مجددًا.",
+        "confirmTitle": {
+          "APPROVE": "المصادقة على {name}؟",
+          "REJECT": "رفض تسجيل {name}؟",
+          "SUSPEND": "تعليق {name}؟",
+          "REACTIVATE": "إعادة تفعيل {name}؟"
+        },
+        "confirmText": {
+          "APPROVE": "ستتمكن الوكالة من نشر سياراتها وتلقي الحجوزات.",
+          "REJECT": "سيُعلَم المسيّر بالسبب ويمكنه إيداع ملف جديد.",
+          "SUSPEND": "ستُسحب سياراتها من نتائج البحث وتُمنع الحجوزات الجديدة.",
+          "REACTIVATE": "ستستعيد الوكالة الوصول إلى فضائها وظهورها لدى الحرفاء."
+        },
+        "quickReasons": {
+          "REJECT": {
+            "documents": "وثائق غير مقروءة أو ناقصة",
+            "taxId": "المعرّف الجبائي غير مطابق",
+            "duplicate": "الوكالة مسجّلة مسبقًا"
+          },
+          "SUSPEND": {
+            "complaints": "شكايات متكررة من الحرفاء",
+            "insurance": "انتهاء صلاحية تأمين الأسطول",
+            "unpaid": "فواتير اشتراك غير مدفوعة"
+          }
+        }
+      },
+      "detail": {
+        "title": "ملف الوكالة",
+        "description": "ملف الوكالة واشتراكها ونشاطها.",
+        "contact": "بيانات الاتصال",
+        "owner": "المسيّر",
+        "noEmail": "لا يوجد بريد إلكتروني",
+        "taxId": "المعرّف الجبائي",
+        "subscription": "الاشتراك",
+        "plan": "الباقة",
+        "monthlyFee": "القسط الشهري دون أداءات",
+        "vehicles": "السيارات",
+        "commissionDefault": "العمولة (افتراضية)",
+        "commissionCustom": "العمولة (خاصة)",
+        "gmvMonth": "حجم الشهر",
+        "bookings": "الحجوزات",
+        "rating": "متوسط التقييم",
+        "ratingLabel": "متوسط التقييم: {value} من 5",
+        "reviews": "التقييمات المنشورة",
+        "recentBookings": "آخر الحجوزات",
+        "noBookings": "لا توجد حجوزات بعد.",
+        "invoices": "آخر الفواتير",
+        "noInvoices": "لم تصدر أي فاتورة.",
+        "since": "مسجّلة منذ {date}",
+        "decidedAt": "آخر قرار في {date}",
+        "reasonTitle": "السبب المُبلَّغ إلى الوكالة",
+        "tabs": {
+          "overview": "الملف",
+          "activity": "النشاط",
+          "history": "السجل"
+        },
+        "noHistory": "لا توجد قرارات مسجّلة."
+      },
+      "documents": {
+        "title": "الوثائق الثبوتية",
+        "missing": "ناقصة",
+        "TRADE_REGISTER": "مضمون من السجل الوطني للمؤسسات",
+        "TAX_ID": "بطاقة التعريف الجبائية",
+        "INSURANCE": "شهادة تأمين الأسطول",
+        "MANAGER_ID": "بطاقة تعريف المسيّر"
+      }
+    },
+    "users": {
+      "title": "المستخدمون",
+      "subtitle": "حسابات الحرفاء وفرق الوكالات والمشرفين.",
+      "summary": "{count, plural, one {# حساب} few {# حسابات} other {# حسابًا}}",
+      "searchLabel": "البحث عن حساب",
+      "searchPlaceholder": "الاسم، الهاتف، البريد الإلكتروني أو الوكالة",
+      "filterLabel": "التصفية حسب نوع الحساب",
+      "filters": {
+        "all": "الكل",
+        "customers": "الحرفاء",
+        "agency": "الوكالات",
+        "admins": "المشرفون",
+        "suspended": "المعلّقون"
+      },
+      "bookingsCount": "{count, plural, one {# حجز} few {# حجوزات} other {# حجزًا}}",
+      "columns": {
+        "user": "المستخدم",
+        "role": "الدور",
+        "context": "الانتماء",
+        "status": "الحالة",
+        "createdAt": "التسجيل",
+        "lastLogin": "آخر دخول",
+        "open": "فتح الملف"
+      },
+      "emptyTitle": "لم يُعثر على أي حساب",
+      "emptyText": "غيّر البحث أو التصفية.",
+      "clearFilters": "إعادة ضبط التصفية",
+      "actions": {
+        "adminManaged": "تُدار حسابات المشرفين من إدارة الصلاحيات.",
+        "labels": {
+          "SUSPEND": "تعليق الحساب",
+          "REACTIVATE": "إعادة تفعيل الحساب"
+        },
+        "success": {
+          "SUSPEND": "تم تعليق حساب {name}.",
+          "REACTIVATE": "تمت إعادة تفعيل حساب {name}."
+        },
+        "error": "تعذّر تغيير حالة الحساب. حاول مجددًا.",
+        "confirmTitle": "تعليق حساب {name}؟",
+        "confirmText": "سيتم تسجيل خروج الشخص ولن يتمكن من الدخول حتى إعادة التفعيل.",
+        "quickReasons": {
+          "fraud": "اشتباه في تحيّل أو انتحال هوية",
+          "abuse": "سلوك مسيء تم الإبلاغ عنه",
+          "request": "بطلب من صاحب الحساب"
+        }
+      },
+      "detail": {
+        "title": "ملف المستخدم",
+        "description": "معلومات الحساب والنشاط الأخير.",
+        "reasonTitle": "سبب التعليق",
+        "since": "تاريخ التسجيل",
+        "lastLogin": "آخر دخول",
+        "never": "أبدًا",
+        "bookings": "الحجوزات",
+        "noEmail": "لا يوجد بريد إلكتروني",
+        "adminScope": {
+          "SUPER_ADMIN": "صلاحيات كاملة بما فيها إعدادات المنصة",
+          "SUPPORT": "الوكالات والحسابات والإشراف على التقييمات",
+          "FINANCE": "الفوترة والتحصيل"
+        },
+        "activity": "النشاط الأخير",
+        "noActivity": "لا يوجد نشاط مسجّل."
+      }
+    },
+    "bookings": {
+      "title": "الحجوزات",
+      "subtitle": "متابعة حجوزات جميع الوكالات.",
+      "summary": "{count, plural, one {# حجز} few {# حجوزات} other {# حجزًا}} على المنصة",
+      "stale": "دون رد",
+      "staleTitle": "{count, plural, one {# طلب ينتظر الرد} few {# طلبات تنتظر الرد} other {# طلبًا ينتظر الرد}}",
+      "staleText": "دون رد منذ أكثر من {hours} ساعة، وستنتهي صلاحيتها تلقائيًا. تواصل مع الوكالات المعنية.",
+      "showPending": "عرض الطلبات",
+      "searchLabel": "البحث عن حجز",
+      "searchPlaceholder": "المرجع، الحريف، الهاتف، الوكالة أو رقم التسجيل",
+      "filterLabel": "التصفية حسب الحالة",
+      "filters": {
+        "all": "الكل",
+        "pending": "في الانتظار",
+        "active": "مؤكدة وجارية",
+        "completed": "منتهية",
+        "cancelled": "ملغاة"
+      },
+      "columns": {
+        "reference": "المرجع",
+        "customer": "الحريف",
+        "agency": "الوكالة والسيارة",
+        "dates": "التواريخ",
+        "total": "المبلغ",
+        "status": "الحالة"
+      },
+      "emptyTitle": "لم يُعثر على أي حجز",
+      "emptyText": "غيّر البحث أو تصفية الحالة.",
+      "clearFilters": "إعادة ضبط التصفية"
+    },
+    "billing": {
+      "title": "الفوترة",
+      "subtitle": "اشتراكات الوكالات والفواتير (بما فيها الأداء على القيمة المضافة والطابع الجبائي) والتحصيل.",
+      "invoicesTitle": "الفواتير",
+      "searchLabel": "البحث عن فاتورة",
+      "searchPlaceholder": "رقم الفاتورة أو الوكالة",
+      "filterLabel": "التصفية حسب الحالة",
+      "filters": {
+        "all": "الكل",
+        "issued": "صادرة",
+        "overdue": "متأخرة",
+        "paid": "مدفوعة"
+      },
+      "columns": {
+        "number": "الفاتورة",
+        "agency": "الوكالة",
+        "period": "الفترة",
+        "total": "المبلغ بكل الأداءات",
+        "dueAt": "تاريخ الاستحقاق",
+        "status": "الحالة"
+      },
+      "reminded": "تم إرسال تذكير",
+      "emptyTitle": "لم يُعثر على أي فاتورة",
+      "emptyText": "غيّر البحث أو تصفية الحالة.",
+      "clearFilters": "إعادة ضبط التصفية",
+      "overview": {
+        "mrr": "الإيراد الشهري المتكرر",
+        "mrrHint": "اشتراكات الوكالات النشطة دون أداءات",
+        "collected": "المحصَّل هذا الشهر",
+        "collectedHint": "الفواتير المدفوعة بكل الأداءات",
+        "outstanding": "المبالغ المستحقة",
+        "outstandingHint": "فواتير صادرة غير مدفوعة بكل الأداءات",
+        "overdue": "متأخرة",
+        "overdueHint": "تجاوز تاريخ الاستحقاق: يُنصح بالتذكير",
+        "noOverdue": "لا يوجد تأخر في الدفع"
+      },
+      "plans": {
+        "title": "باقات الاشتراك",
+        "subtitle": "توزيع الوكالات النشطة حسب الباقة.",
+        "agencies": "{count, plural, one {# وكالة} few {# وكالات} other {# وكالة}}",
+        "perMonth": "دون أداءات / شهريًا",
+        "unlimited": "عدد غير محدود من السيارات",
+        "vehicleLimit": "حتى {count, plural, one {# سيارة} few {# سيارات} other {# سيارة}}"
+      },
+      "invoice": {
+        "description": "{agency} · اشتراك {period}",
+        "issuedAt": "تاريخ الإصدار",
+        "dueAt": "تاريخ الاستحقاق",
+        "paidAt": "تاريخ الدفع",
+        "subscription": "الاشتراك",
+        "commission": "عمولة الحجوزات",
+        "subtotal": "المجموع دون أداءات",
+        "vat": "الأداء على القيمة المضافة ({rate})",
+        "fiscalStamp": "الطابع الجبائي",
+        "total": "المجموع بكل الأداءات",
+        "method": "طريقة الدفع",
+        "markPaid": "تسجيل الدفع",
+        "paidSuccess": "تم تسجيل دفع الفاتورة {number}.",
+        "error": "فشلت العملية. حاول مجددًا.",
+        "noReminder": "لم يُرسل أي تذكير.",
+        "remindedAt": "آخر تذكير {date}.",
+        "sendReminder": "إرسال تذكير",
+        "reminderSuccess": "تم إرسال تذكير إلى {name}.",
+        "print": "طباعة"
+      }
+    },
+    "reviews": {
+      "title": "الإشراف على التقييمات",
+      "subtitle": "عالج التقييمات المُبلَّغ عنها وفق ميثاق النشر.",
+      "filterLabel": "تصفية التقييمات",
+      "filters": {
+        "flagged": "مُبلَّغ عنها",
+        "published": "منشورة",
+        "hidden": "مخفية",
+        "all": "الكل"
+      },
+      "about": "حول",
+      "ratingLabel": "التقييم: {value} من 5",
+      "agencyReply": "رد الوكالة:",
+      "reportsCount": "{count, plural, one {# بلاغ} few {# بلاغات} other {# بلاغًا}}",
+      "reasons": {
+        "OFFENSIVE": "عبارات مسيئة",
+        "SPAM": "إشهار أو رسائل مزعجة",
+        "PERSONAL_DATA": "معطيات شخصية",
+        "OFF_TOPIC": "خارج الموضوع"
+      },
+      "hiddenBecause": "مخفي: {reason}",
+      "emptyFlaggedTitle": "لا توجد تقييمات للإشراف",
+      "emptyFlaggedText": "تمت معالجة جميع البلاغات.",
+      "emptyTitle": "لا توجد تقييمات",
+      "emptyText": "لا يوجد تقييم يطابق هذه التصفية.",
+      "actions": {
+        "success": {
+          "PUBLISH": "تم نشر التقييم وغلق بلاغاته.",
+          "HIDE": "تم إخفاء التقييم."
+        },
+        "error": "تعذّر حفظ قرار الإشراف. حاول مجددًا.",
+        "keep": "الإبقاء على التقييم",
+        "restore": "إعادة النشر",
+        "hide": "إخفاء التقييم",
+        "hideTitle": "إخفاء هذا التقييم؟",
+        "hideText": "لن يظهر التقييم بعد الآن في صفحة الوكالة، وسيُعلَم صاحبه بالسبب.",
+        "quickReasons": {
+          "insults": "عبارات مسيئة أو تشهيرية",
+          "personalData": "يتضمن معطيات شخصية",
+          "advertising": "إشهار أو رابط خارجي"
+        }
+      }
+    },
+    "settings": {
+      "title": "إعدادات المنصة",
+      "subtitle": "الجباية والقواعد التجارية وبيانات الدعم.",
+      "saved": "تم حفظ الإعدادات.",
+      "saveError": "تعذّر حفظ الإعدادات. حاول مجددًا.",
+      "readOnlyTitle": "للاطلاع فقط",
+      "readOnlyText": "يمكن للمشرف العام فقط تعديل إعدادات المنصة.",
+      "currency": "د.ت",
+      "unsaved": "تغييرات غير محفوظة",
+      "discard": "إلغاء",
+      "save": "حفظ",
+      "tax": {
+        "title": "الجباية",
+        "text": "تُطبَّق على فواتير اشتراك الوكالات.",
+        "vat": "نسبة الأداء على القيمة المضافة",
+        "vatHint": "النسبة القانونية الحالية: 19 %.",
+        "stamp": "الطابع الجبائي",
+        "stampHint": "يُضاف إلى كل فاتورة (1 د.ت حاليًا)."
+      },
+      "business": {
+        "title": "القواعد التجارية",
+        "text": "قيم افتراضية لكل الوكالات.",
+        "commission": "العمولة الافتراضية",
+        "commissionHint": "على عمليات الكراء المنتهية. 0 % = معطّلة.",
+        "expiry": "انتهاء صلاحية الطلبات",
+        "expiryHint": "ينتهي الطلب الذي لم ترد عليه الوكالة بعد هذه المدة.",
+        "hours": "{count, plural, one {# ساعة} two {# ساعتان} few {# ساعات} other {# ساعة}}"
+      },
+      "support": {
+        "title": "دعم الحرفاء",
+        "text": "بيانات الاتصال المعروضة للحرفاء والوكالات.",
+        "phone": "هاتف الدعم",
+        "email": "بريد الدعم الإلكتروني"
+      },
+      "preview": {
+        "title": "معاينة فاتورة",
+        "subtitle": "اشتراك شهري",
+        "invalid": "صحّح النسب لعرض المعاينة.",
+        "subtotal": "المجموع دون أداءات",
+        "vat": "الأداء على القيمة المضافة ({rate})",
+        "fiscalStamp": "الطابع الجبائي",
+        "total": "المجموع بكل الأداءات"
+      }
+    },
+    "audit": {
+      "title": "سجل العمليات",
+      "subtitle": "تاريخ عمليات الدخول والتسجيل وقرارات الإدارة.",
+      "immutable": "سجل غير قابل للتعديل",
+      "searchLabel": "البحث في السجل",
+      "searchPlaceholder": "المنفّذ، العنصر المعني، التفاصيل أو عنوان IP",
+      "filterLabel": "التصفية حسب الفئة",
+      "categories": {
+        "all": "الكل",
+        "auth": "الدخول",
+        "agency": "الوكالات",
+        "user": "الحسابات",
+        "invoice": "الفوترة",
+        "review": "التقييمات",
+        "settings": "الإعدادات"
+      },
+      "columns": {
+        "date": "التاريخ",
+        "action": "العملية",
+        "actor": "المنفّذ",
+        "target": "العنصر المعني",
+        "ip": "عنوان IP"
+      },
+      "emptyTitle": "لم يُعثر على أي عملية",
+      "emptyText": "غيّر البحث أو الفئة.",
+      "clearFilters": "إعادة ضبط التصفية",
+      "actions": {
+        "auth": {
+          "login": "تسجيل دخول",
+          "login_failed": "فشل تسجيل الدخول",
+          "signup": "تسجيل حساب",
+          "password_reset": "إعادة تعيين كلمة المرور",
+          "password_changed": "تغيير كلمة المرور"
+        },
+        "agency": {
+          "approved": "مصادقة على وكالة",
+          "rejected": "رفض وكالة",
+          "suspended": "تعليق وكالة",
+          "reactivated": "إعادة تفعيل وكالة"
+        },
+        "user": {
+          "suspended": "تعليق حساب",
+          "reactivated": "إعادة تفعيل حساب"
+        },
+        "invoice": {
+          "issued": "إصدار فاتورة",
+          "paid": "دفع فاتورة",
+          "reminder_sent": "تذكير بالدفع"
+        },
+        "review": {
+          "published": "نشر تقييم",
+          "hidden": "إخفاء تقييم"
+        },
+        "settings": {
+          "updated": "تعديل الإعدادات"
+        }
+      }
     }
   },
   "status": {
@@ -437,7 +1731,21 @@
       "sendCode": "استلام رمز",
       "forgotPassword": "نسيت كلمة المرور؟",
       "noAccount": "ليس لديك حساب؟",
-      "signupLink": "إنشاء حساب"
+      "signupLink": "إنشاء حساب",
+      "demo": {
+        "title": "حسابات تجريبية",
+        "description": "بيئة تجريبية: استعمل هذه البيانات لاستكشاف البوابة.",
+        "role": "الدور",
+        "email": "البريد الإلكتروني:",
+        "password": "كلمة المرور:",
+        "use": "استعمال",
+        "useLabel": "ملء الاستمارة بحساب {email}",
+        "roles": {
+          "client": "حريف",
+          "agency": "مسيّر وكالة",
+          "admin": "مشرف عام"
+        }
+      }
     },
     "signup": {
       "title": {
