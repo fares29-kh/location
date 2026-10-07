@@ -1,0 +1,33 @@
+{
+  "name": "drivetn",
+  "version": "0.1.0",
+  "private": true,
+  "description": "DriveTN - plateforme SaaS multi-tenant de location de voitures pour le marché tunisien",
+  "packageManager": "pnpm@9.15.9",
+  "engines": {
+    "node": ">=20.17",
+    "pnpm": ">=9.15"
+  },
+  "scripts": {
+    "prepare": "node .husky/install.mjs",
+    "codegen": "pnpm --filter @drivetn/types build && pnpm --filter @drivetn/api prisma:generate",
+    "build": "pnpm codegen && pnpm -r --filter \"./apps/*\" build",
+    "lint": "eslint . --max-warnings=0",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test",
+    "check": "pnpm codegen && pnpm lint && pnpm format:check && pnpm typecheck && pnpm test"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
+    "@drivetn/config": "workspace:*",
+    "eslint": "^9.39.5",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.4.0",
+    "prettier": "^3.9.9",
+    "typescript": "~5.9.3"
+  }
+}
