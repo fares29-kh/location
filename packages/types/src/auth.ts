@@ -28,6 +28,14 @@ export type OtpChannel = z.infer<typeof otpChannelSchema>;
 
 export const OTP_LENGTH = 6;
 
+/** Cookie httpOnly de l'access token (JWT court). */
+export const ACCESS_TOKEN_COOKIE = 'drivetn_at';
+/**
+ * Cookie httpOnly du refresh token opaque. Chemin `/` : le middleware Next.js doit le voir
+ * sur les pages pour renouveler une session expirée avant le rendu serveur.
+ */
+export const REFRESH_TOKEN_COOKIE = 'drivetn_rt';
+
 const ROLE_PORTALS: Record<UserRole, Portal> = {
   CUSTOMER: 'client',
   AGENCY_OWNER: 'agency',
