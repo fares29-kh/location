@@ -204,6 +204,25 @@ const preset = {
       minHeight: { touch: '2.75rem' },
       minWidth: { touch: '2.75rem' },
       transitionDuration: { DEFAULT: '200ms' },
+      keyframes: {
+        'accordion-down': {
+          from: { height: '0' },
+          to: { height: 'var(--radix-accordion-content-height)' },
+        },
+        'accordion-up': {
+          from: { height: 'var(--radix-accordion-content-height)' },
+          to: { height: '0' },
+        },
+        float: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-10px)' },
+        },
+      },
+      animation: {
+        'accordion-down': 'accordion-down 0.25s ease-out',
+        'accordion-up': 'accordion-up 0.2s ease-out',
+        float: 'float 7s ease-in-out infinite',
+      },
     },
   },
   plugins: [animate, tokensPlugin],
