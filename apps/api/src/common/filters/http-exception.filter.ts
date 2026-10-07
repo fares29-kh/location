@@ -1,4 +1,4 @@
-import type { ErrorCode, ErrorResponse } from '@drivetn/types';
+import { type ErrorCode, errorCodeSchema, type ErrorResponse } from '@drivetn/types';
 import {
   type ArgumentsHost,
   Catch,
@@ -43,7 +43,11 @@ export function normalizeException(exception: unknown): NormalizedError {
     return { status, body: { code, message: payload } };
   }
 
-  const { message, details } = payload as { message?: unknown; details?: unknown };
+  const {
+    message,
+    details,
+    code: payloadCode,
+  } = payload as { message?: unknown; details?: unknown; code?: unknown };
   // Les messages multiples (validation) sont exposés dans `details`.
   if (Array.isArray(message)) {
     return {
@@ -52,10 +56,15 @@ export function normalizeException(exception: unknown): NormalizedError {
     };
   }
 
+  const parsedCode = errorCodeSchema.safeParse(payloadCode);
+  const finalCode = parsedCode.success ? parsedCode.data : code;
   const text = typeof message === 'string' && message.length > 0 ? message : exception.message;
   return {
     status,
-    body: details === undefined ? { code, message: text } : { code, message: text, details },
+    body:
+      details === undefined
+        ? { code: finalCode, message: text }
+        : { code: finalCode, message: text, details },
   };
 }
 

@@ -1,8 +1,10 @@
 import { VersioningType } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 
+import { ACCESS_TOKEN_COOKIE } from './common/auth/auth.constants';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import type { Env } from './config/env';
 
@@ -14,6 +16,7 @@ export function configureApp(app: NestExpressApplication, config: Env): void {
   app.set('trust proxy', 1);
   // La redirection HTTPS est assurée par Traefik : forcer l'upgrade casserait Swagger en HTTP local.
   app.use(helmet({ contentSecurityPolicy: { directives: { upgradeInsecureRequests: null } } }));
+  app.use(cookieParser());
   if (config.CORS_ORIGINS.length > 0) {
     app.enableCors({ origin: config.CORS_ORIGINS, credentials: true });
   }
@@ -27,9 +30,13 @@ export function configureApp(app: NestExpressApplication, config: Env): void {
       new DocumentBuilder()
         .setTitle(`${config.APP_NAME} API`)
         .setDescription(
-          `API REST de ${config.APP_NAME}. Aucun paiement en ligne : les paiements sont déclaratifs.`,
+          `API REST de ${config.APP_NAME}. Aucun paiement en ligne : les paiements sont déclaratifs.\n\n` +
+            `Authentification par cookies httpOnly (access token \`${ACCESS_TOKEN_COOKIE}\`, ` +
+            'refresh token rotatif). Les requêtes qui modifient des données doivent provenir ' +
+            "d'un portail (en-tête Origin).",
         )
         .setVersion('1.0')
+        .addCookieAuth(ACCESS_TOKEN_COOKIE)
         .build(),
     );
     SwaggerModule.setup(SWAGGER_PATH, app, document, { jsonDocumentUrl: `${SWAGGER_PATH}/json` });

@@ -1,6 +1,7 @@
 import { BadRequestException, HttpException, HttpStatus, NotFoundException } from '@nestjs/common';
 import { describe, expect, it } from 'vitest';
 
+import { AppException } from '../errors/app.exception';
 import { normalizeException } from './http-exception.filter';
 
 describe('normalizeException', () => {
@@ -46,6 +47,21 @@ describe('normalizeException', () => {
       code: 'TOO_MANY_REQUESTS',
       message: 'Trop de requêtes',
     });
+  });
+
+  it('conserve le code métier d’une AppException', () => {
+    const exception = new AppException(HttpStatus.BAD_REQUEST, 'OTP_INVALID', 'Code incorrect', {
+      attemptsLeft: 2,
+    });
+    expect(normalizeException(exception)).toEqual({
+      status: 400,
+      body: { code: 'OTP_INVALID', message: 'Code incorrect', details: { attemptsLeft: 2 } },
+    });
+  });
+
+  it('ignore un code inconnu dans la réponse', () => {
+    const exception = new HttpException({ code: 'OOPS', message: 'x' }, HttpStatus.CONFLICT);
+    expect(normalizeException(exception).body.code).toBe('CONFLICT');
   });
 
   it('utilise un code générique pour un statut non répertorié', () => {

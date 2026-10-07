@@ -9,11 +9,18 @@ x-api-environment: &api-environment
   NODE_ENV: production
   PORT: '4000'
   APP_NAME: ${APP_NAME:-DriveTN}
+  APP_DOMAIN: ${APP_DOMAIN:-localhost}
   APP_TIMEZONE: ${APP_TIMEZONE:-Africa/Tunis}
   DATABASE_URL: postgresql://${POSTGRES_USER:-drivetn}:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD manquant (copiez .env.example vers .env)}@postgres:5432/${POSTGRES_DB:-drivetn}?schema=public
   REDIS_URL: redis://:${REDIS_PASSWORD:?REDIS_PASSWORD manquant (copiez .env.example vers .env)}@redis:6379
   CORS_ORIGINS: ${CORS_ORIGINS:-}
   SWAGGER_ENABLED: ${SWAGGER_ENABLED:-true}
+  JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:?JWT_ACCESS_SECRET manquant (copiez .env.example vers .env)}
+  OTP_HASH_SECRET: ${OTP_HASH_SECRET:?OTP_HASH_SECRET manquant (copiez .env.example vers .env)}
+  ACCESS_TOKEN_TTL_SECONDS: ${ACCESS_TOKEN_TTL_SECONDS:-900}
+  REFRESH_TOKEN_TTL_DAYS: ${REFRESH_TOKEN_TTL_DAYS:-30}
+  COOKIE_SECURE: ${COOKIE_SECURE:-false}
+  MESSAGING_PROVIDER: ${MESSAGING_PROVIDER:-console}
 
 x-api-build: &api-build
   context: .
@@ -152,6 +159,7 @@ services:
       <<: *api-environment
       RUN_MIGRATIONS: 'true'
       SEED_ON_START: ${SEED_ON_START:-true}
+      SEED_DEMO_ACCOUNTS: ${SEED_DEMO_ACCOUNTS:-false}
     depends_on:
       postgres:
         condition: service_healthy

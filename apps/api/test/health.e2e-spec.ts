@@ -16,6 +16,8 @@ const config = parseEnv({
   DATABASE_URL: 'postgresql://test:test@localhost:5432/test',
   REDIS_URL: 'redis://localhost:6379',
   SWAGGER_ENABLED: 'true',
+  JWT_ACCESS_SECRET: 'jwt-secret-de-test-suffisamment-long',
+  OTP_HASH_SECRET: 'otp-secret-de-test-suffisamment-long',
 });
 
 const prisma = { $queryRaw: vi.fn() };
