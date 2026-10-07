@@ -21,3 +21,177 @@ model PlatformSetting {
 
   @@map("platform_settings")
 }
+
+// --- Comptes et sessions -----------------------------------------------------
+
+enum UserRole {
+  CUSTOMER
+  AGENCY_OWNER
+  AGENCY_STAFF
+  ADMIN
+}
+
+enum AdminRole {
+  SUPER_ADMIN
+  SUPPORT
+  FINANCE
+}
+
+enum UserStatus {
+  PENDING_VERIFICATION
+  ACTIVE
+  SUSPENDED
+}
+
+enum Locale {
+  fr
+  ar
+  en
+}
+
+model User {
+  id              String     @id @default(cuid())
+  role            UserRole
+  /// Renseigné uniquement pour le rôle ADMIN.
+  adminRole       AdminRole? @map("admin_role")
+  status          UserStatus @default(PENDING_VERIFICATION)
+  firstName       String     @map("first_name")
+  lastName        String     @map("last_name")
+  /// Format E.164 : +216XXXXXXXX.
+  phone           String     @unique
+  phoneVerifiedAt DateTime?  @map("phone_verified_at")
+  /// Toujours en minuscules.
+  email           String?    @unique
+  emailVerifiedAt DateTime?  @map("email_verified_at")
+  passwordHash    String?    @map("password_hash")
+  locale          Locale     @default(fr)
+  lastLoginAt     DateTime?  @map("last_login_at")
+  createdAt       DateTime   @default(now()) @map("created_at")
+  updatedAt       DateTime   @updatedAt @map("updated_at")
+  deletedAt       DateTime?  @map("deleted_at")
+
+  refreshTokens RefreshToken[]
+  auditLogs     AuditLog[]
+
+  @@index([role, status])
+  @@map("users")
+}
+
+/// Refresh token opaque, stocké haché (SHA-256). Une « famille » regroupe les rotations
+/// successives d'une même session : la réutilisation d'un jeton révoqué révoque la famille.
+model RefreshToken {
+  id           String    @id @default(cuid())
+  userId       String    @map("user_id")
+  tokenHash    String    @unique @map("token_hash")
+  familyId     String    @map("family_id")
+  expiresAt    DateTime  @map("expires_at")
+  revokedAt    DateTime? @map("revoked_at")
+  replacedById String?   @map("replaced_by_id")
+  userAgent    String?   @map("user_agent")
+  ip           String?
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([familyId])
+  @@map("refresh_tokens")
+}
+
+enum OtpPurpose {
+  SIGNUP
+  LOGIN
+  PASSWORD_RESET
+}
+
+enum OtpChannel {
+  SMS
+  WHATSAPP
+}
+
+/// Code à usage unique envoyé par SMS ou WhatsApp, stocké haché (HMAC-SHA-256).
+model OtpCode {
+  id         String     @id @default(cuid())
+  /// Format E.164.
+  phone      String
+  purpose    OtpPurpose
+  channel    OtpChannel
+  codeHash   String     @map("code_hash")
+  attempts   Int        @default(0)
+  expiresAt  DateTime   @map("expires_at")
+  consumedAt DateTime?  @map("consumed_at")
+  createdAt  DateTime   @default(now()) @map("created_at")
+  updatedAt  DateTime   @updatedAt @map("updated_at")
+
+  @@index([phone, purpose, createdAt])
+  @@map("otp_codes")
+}
+
+// --- Géographie --------------------------------------------------------------
+
+model Governorate {
+  /// Code officiel à 2 chiffres (ex. « 11 » pour Tunis).
+  code      String   @id
+  slug      String   @unique
+  nameFr    String   @map("name_fr")
+  nameAr    String   @map("name_ar")
+  nameEn    String   @map("name_en")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  locations Location[]
+
+  @@map("governorates")
+}
+
+enum LocationType {
+  AIRPORT
+  CITY
+  TRAIN_STATION
+  PORT
+}
+
+/// Lieu de prise en charge ou de retour (aéroport, ville, gare, port).
+model Location {
+  id              String       @id @default(cuid())
+  slug            String       @unique
+  type            LocationType
+  governorateCode String       @map("governorate_code")
+  iataCode        String?      @map("iata_code")
+  nameFr          String       @map("name_fr")
+  nameAr          String       @map("name_ar")
+  nameEn          String       @map("name_en")
+  latitude        Float
+  longitude       Float
+  isActive        Boolean      @default(true) @map("is_active")
+  createdAt       DateTime     @default(now()) @map("created_at")
+  updatedAt       DateTime     @updatedAt @map("updated_at")
+
+  governorate Governorate @relation(fields: [governorateCode], references: [code])
+
+  @@index([governorateCode])
+  @@index([type, isActive])
+  @@map("locations")
+}
+
+// --- Audit -------------------------------------------------------------------
+
+/// Journal immuable des actions sensibles : ajout seul, jamais modifié ni supprimé.
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    String?  @map("actor_id")
+  action     String
+  entityType String?  @map("entity_type")
+  entityId   String?  @map("entity_id")
+  metadata   Json?
+  ip         String?
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  actor User? @relation(fields: [actorId], references: [id], onDelete: Restrict)
+
+  @@index([actorId, createdAt])
+  @@index([entityType, entityId])
+  @@index([action, createdAt])
+  @@map("audit_logs")
+}
