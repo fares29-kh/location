@@ -2,10 +2,20 @@ import { type NextRequest, NextResponse } from 'next/server';
 
 import { getServerEnv } from './env';
 import { LOCALE_HEADER } from './i18n/locale-header';
-import { resolveLocaleRoute, resolvePortal, toPortalPath } from './lib/portal';
+import { resolveMiddlewareSession } from './lib/auth/middleware-session';
+import { isProtectedPath } from './lib/auth/routes';
+import { localizePath, resolveLocaleRoute, resolvePortal, toPortalPath } from './lib/portal';
 
-export function middleware(request: NextRequest): NextResponse {
-  const portal = resolvePortal(request.headers.get('host'), getServerEnv().APP_DOMAIN);
+function withCookies(response: NextResponse, setCookies: string[]): NextResponse {
+  for (const cookie of setCookies) {
+    response.headers.append('Set-Cookie', cookie);
+  }
+  return response;
+}
+
+export async function middleware(request: NextRequest): Promise<NextResponse> {
+  const env = getServerEnv();
+  const portal = resolvePortal(request.headers.get('host'), env.APP_DOMAIN);
   if (portal === null) {
     return new NextResponse('Portail inconnu', { status: 404 });
   }
@@ -17,10 +27,26 @@ export function middleware(request: NextRequest): NextResponse {
     return NextResponse.redirect(url, 308);
   }
 
+  const session = await resolveMiddlewareSession(request, env.API_INTERNAL_URL);
+
+  if (!session.authenticated && isProtectedPath(portal, route.pathname)) {
+    const login = request.nextUrl.clone();
+    login.pathname = localizePath(route.locale, '/login');
+    login.search = '';
+    login.searchParams.set('next', `${request.nextUrl.pathname}${request.nextUrl.search}`);
+    return NextResponse.redirect(login);
+  }
+
   url.pathname = toPortalPath(portal, route.locale, route.pathname);
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set(LOCALE_HEADER, route.locale);
-  return NextResponse.rewrite(url, { request: { headers: requestHeaders } });
+  if (session.cookieHeader !== null) {
+    requestHeaders.set('cookie', session.cookieHeader);
+  }
+  return withCookies(
+    NextResponse.rewrite(url, { request: { headers: requestHeaders } }),
+    session.setCookies,
+  );
 }
 
 export const config = {
