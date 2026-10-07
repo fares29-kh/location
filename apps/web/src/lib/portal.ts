@@ -53,6 +53,29 @@ export function resolveLocaleRoute(pathname: string): LocaleRoute {
   return { type: 'rewrite', locale: DEFAULT_LOCALE, pathname };
 }
 
+const PORTAL_SUBDOMAINS: Record<Portal, string | null> = {
+  client: null,
+  agency: 'agency',
+  admin: 'admin',
+};
+
+/**
+ * Origine publique d'un portail, construite à partir de la requête courante
+ * pour conserver le protocole et le port (ex. `http://agency.localhost:8088`).
+ */
+export function buildPortalOrigin(
+  portal: Portal,
+  { host, rootDomain, secure }: { host: string | null; rootDomain: string; secure: boolean },
+): string {
+  const port = host?.split(':')[1];
+  const subdomain = PORTAL_SUBDOMAINS[portal];
+  const hostname = subdomain === null ? rootDomain : `${subdomain}.${rootDomain}`;
+  const protocol = secure ? 'https' : 'http';
+  return port === undefined || port === ''
+    ? `${protocol}://${hostname}`
+    : `${protocol}://${hostname}:${port}`;
+}
+
 /** Chemin interne (segments App Router `/{portail}/{langue}/...`) d'une URL publique. */
 export function toPortalPath(portal: Portal, locale: Locale, pathname: string): string {
   return pathname === '/' ? `/${portal}/${locale}` : `/${portal}/${locale}${pathname}`;

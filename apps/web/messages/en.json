@@ -66,17 +66,98 @@
     },
     "home": {
       "eyebrow": "Car rental in Tunisia",
-      "title": "The right car at the right price, anywhere in Tunisia",
+      "title": "The right car at the right price, <highlight>anywhere in Tunisia</highlight>",
       "subtitle": "Compare local agencies, book without a credit card and pay on site when you pick up the car.",
-      "searchCta": "Search for a car",
-      "agencyCta": "Are you an agency?",
+      "search": {
+        "label": "Search for a car",
+        "location": "Pick-up location",
+        "locationPlaceholder": "City or airport",
+        "airports": "Airports",
+        "cities": "Cities",
+        "pickupDate": "Pick-up",
+        "returnDate": "Return",
+        "submit": "Search",
+        "soonTitle": "Search is coming very soon",
+        "soonText": "We are putting the finishing touches to agency offer comparison. Check back soon!"
+      },
+      "places": {
+        "tunisCarthage": "Tunis-Carthage Airport",
+        "enfidha": "Enfidha-Hammamet Airport",
+        "monastir": "Monastir Airport",
+        "djerba": "Djerba-Zarzis Airport",
+        "sfaxAirport": "Sfax-Thyna Airport",
+        "tozeur": "Tozeur-Nefta Airport",
+        "tabarka": "Tabarka Airport",
+        "gafsa": "Gafsa Airport",
+        "tunis": "Tunis",
+        "sousse": "Sousse",
+        "hammamet": "Hammamet",
+        "sfax": "Sfax",
+        "bizerte": "Bizerte"
+      },
+      "trust": {
+        "noCard": "No credit card",
+        "payAtAgency": "Pay at the agency",
+        "whatsapp": "Agencies reachable on WhatsApp"
+      },
+      "preview": {
+        "label": "Preview of a DriveTN booking",
+        "tag": "Preview",
+        "category": "Air-conditioned city car",
+        "specs": "Manual · 5 seats · Air conditioning",
+        "duration": "3 days · pick-up at 10:00",
+        "total": "Estimated total",
+        "payAtAgency": "Pay at the agency",
+        "confirmedTitle": "Booking confirmed",
+        "confirmedText": "by the agency, in 12 minutes",
+        "whatsappTitle": "Message from the agency",
+        "whatsappText": "Your car is waiting for you at the terminal."
+      },
+      "howItWorks": {
+        "eyebrow": "How it works",
+        "title": "Book in 3 steps, pay on site",
+        "step": "Step {step}",
+        "searchTitle": "Search and compare",
+        "searchText": "Pick your location and dates, then compare offers from local agencies.",
+        "bookTitle": "Book without paying",
+        "bookText": "Send your request in a few clicks and the agency confirms it quickly.",
+        "payTitle": "Pay at the agency",
+        "payText": "Pay when you collect the car: cash, card terminal, cheque or bank transfer."
+      },
       "features": {
+        "eyebrow": "Why DriveTN",
+        "title": "Renting a car, simple and trustworthy",
         "noPaymentTitle": "Zero online payment",
-        "noPaymentText": "No credit card required. Pay the agency in cash, by card terminal, cheque or bank transfer.",
+        "noPaymentText": "No credit card required. Pay the agency directly, with the payment method of your choice.",
+        "paymentMethods": "Payment methods accepted on site",
         "localTitle": "Verified local agencies",
-        "localText": "Vetted Tunisian rental companies in all 24 governorates and at every airport.",
+        "localText": "Vetted Tunisian rental companies in all 24 governorates and at the airports.",
         "contactTitle": "Direct contact",
-        "contactText": "Talk to the agency on WhatsApp or by phone before and during your rental."
+        "contactText": "Talk to the agency on WhatsApp or by phone, before and during your rental.",
+        "languagesTitle": "Designed for everyone",
+        "languagesText": "Tourists, Tunisians living abroad or locals: DriveTN speaks your language."
+      },
+      "airports": {
+        "eyebrow": "All over Tunisia",
+        "title": "Pick up your car as soon as you land",
+        "text": "Agencies at the country’s main airports, from Tunis-Carthage to Djerba."
+      },
+      "faq": {
+        "eyebrow": "FAQ",
+        "title": "Everything to know before you rent",
+        "paymentQuestion": "Do I have to pay online?",
+        "paymentAnswer": "No. DriveTN never collects any payment: you pay the agency directly when you pick up the car.",
+        "documentsQuestion": "Which documents do I need?",
+        "documentsAnswer": "Your ID card or passport and a valid driving licence. Each agency states its own conditions (minimum age, years of driving).",
+        "depositQuestion": "How does the deposit work?",
+        "depositAnswer": "The agency asks for a deposit at pick-up, using the methods it accepts, and returns it when you bring the car back.",
+        "contactQuestion": "How do I reach the agency?",
+        "contactAnswer": "As soon as your booking is sent, you can contact the agency by phone or WhatsApp."
+      },
+      "agencyCta": {
+        "title": "Are you a car rental agency?",
+        "text": "List your fleet, receive bookings and track your payments from a single workspace.",
+        "action": "Discover the agency workspace"
       }
     },
     "footer": {

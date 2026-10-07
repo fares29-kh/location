@@ -17,6 +17,10 @@ function placeholders(message: string): string[] {
   return [...message.matchAll(/\{(\w+)/g)].map((match) => match[1] ?? '').sort();
 }
 
+function richTags(message: string): string[] {
+  return [...message.matchAll(/<(\w+)>/g)].map((match) => match[1] ?? '').sort();
+}
+
 function messageAt(messages: unknown, path: string): string {
   const value = path
     .split('.')
@@ -46,6 +50,12 @@ describe.each([
   it('conserve les mêmes variables d’interpolation', () => {
     for (const key of frKeys) {
       expect(placeholders(messageAt(messages, key)), key).toEqual(placeholders(messageAt(fr, key)));
+    }
+  });
+
+  it('conserve les mêmes balises de mise en forme', () => {
+    for (const key of frKeys) {
+      expect(richTags(messageAt(messages, key)), key).toEqual(richTags(messageAt(fr, key)));
     }
   });
 

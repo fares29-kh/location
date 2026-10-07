@@ -66,17 +66,98 @@
     },
     "home": {
       "eyebrow": "Location de voitures en Tunisie",
-      "title": "La bonne voiture, au bon prix, partout en Tunisie",
+      "title": "La bonne voiture, au bon prix, <highlight>partout en Tunisie</highlight>",
       "subtitle": "Comparez les agences locales, réservez sans carte bancaire et payez sur place au moment de la prise du véhicule.",
-      "searchCta": "Rechercher une voiture",
-      "agencyCta": "Vous êtes une agence ?",
+      "search": {
+        "label": "Rechercher une voiture",
+        "location": "Lieu de prise en charge",
+        "locationPlaceholder": "Ville ou aéroport",
+        "airports": "Aéroports",
+        "cities": "Villes",
+        "pickupDate": "Départ",
+        "returnDate": "Retour",
+        "submit": "Rechercher",
+        "soonTitle": "La recherche arrive très bientôt",
+        "soonText": "Nous finalisons la comparaison des offres des agences. Revenez très vite !"
+      },
+      "places": {
+        "tunisCarthage": "Aéroport Tunis-Carthage",
+        "enfidha": "Aéroport Enfidha-Hammamet",
+        "monastir": "Aéroport Monastir",
+        "djerba": "Aéroport Djerba-Zarzis",
+        "sfaxAirport": "Aéroport Sfax-Thyna",
+        "tozeur": "Aéroport Tozeur-Nefta",
+        "tabarka": "Aéroport Tabarka",
+        "gafsa": "Aéroport Gafsa",
+        "tunis": "Tunis",
+        "sousse": "Sousse",
+        "hammamet": "Hammamet",
+        "sfax": "Sfax",
+        "bizerte": "Bizerte"
+      },
+      "trust": {
+        "noCard": "Sans carte bancaire",
+        "payAtAgency": "Paiement à l’agence",
+        "whatsapp": "Agence joignable sur WhatsApp"
+      },
+      "preview": {
+        "label": "Aperçu d’une réservation DriveTN",
+        "tag": "Aperçu",
+        "category": "Citadine climatisée",
+        "specs": "Manuelle · 5 places · Climatisation",
+        "duration": "3 jours · départ à 10:00",
+        "total": "Total estimé",
+        "payAtAgency": "À régler à l’agence",
+        "confirmedTitle": "Réservation confirmée",
+        "confirmedText": "par l’agence, en 12 minutes",
+        "whatsappTitle": "Message de l’agence",
+        "whatsappText": "Votre voiture vous attend au terminal."
+      },
+      "howItWorks": {
+        "eyebrow": "Comment ça marche",
+        "title": "Réservez en 3 étapes, payez sur place",
+        "step": "Étape {step}",
+        "searchTitle": "Recherchez et comparez",
+        "searchText": "Choisissez votre lieu et vos dates, puis comparez les offres des agences locales.",
+        "bookTitle": "Réservez sans payer",
+        "bookText": "Envoyez votre demande en quelques clics : l’agence la confirme rapidement.",
+        "payTitle": "Payez à l’agence",
+        "payText": "Réglez au moment de récupérer la voiture, en espèces, par TPE, chèque ou virement."
+      },
       "features": {
+        "eyebrow": "Pourquoi DriveTN",
+        "title": "Louer une voiture, simplement et en confiance",
         "noPaymentTitle": "Zéro paiement en ligne",
-        "noPaymentText": "Aucune carte bancaire demandée. Vous réglez l’agence en espèces, par TPE, chèque ou virement.",
+        "noPaymentText": "Aucune carte bancaire demandée. Vous réglez l’agence directement, avec le mode de paiement de votre choix.",
+        "paymentMethods": "Modes de paiement acceptés sur place",
         "localTitle": "Agences locales vérifiées",
-        "localText": "Des loueurs tunisiens contrôlés, dans les 24 gouvernorats et dans tous les aéroports.",
+        "localText": "Des loueurs tunisiens contrôlés, dans les 24 gouvernorats et dans les aéroports.",
         "contactTitle": "Contact direct",
-        "contactText": "Échangez avec l’agence par WhatsApp ou téléphone avant et pendant votre location."
+        "contactText": "Échangez avec l’agence par WhatsApp ou téléphone, avant et pendant votre location.",
+        "languagesTitle": "Pensé pour tous",
+        "languagesText": "Touristes, Tunisiens résidant à l’étranger ou habitants : DriveTN parle votre langue."
+      },
+      "airports": {
+        "eyebrow": "Partout en Tunisie",
+        "title": "Récupérez votre voiture dès l’atterrissage",
+        "text": "Des agences présentes dans les principaux aéroports du pays, de Tunis-Carthage à Djerba."
+      },
+      "faq": {
+        "eyebrow": "Questions fréquentes",
+        "title": "Tout ce qu’il faut savoir avant de louer",
+        "paymentQuestion": "Dois-je payer en ligne ?",
+        "paymentAnswer": "Non. DriveTN n’encaisse aucun paiement : vous réglez directement l’agence au moment de la prise du véhicule.",
+        "documentsQuestion": "Quels documents dois-je présenter ?",
+        "documentsAnswer": "Votre carte d’identité ou votre passeport, ainsi que votre permis de conduire en cours de validité. Chaque agence précise ses conditions (âge minimum, ancienneté du permis).",
+        "depositQuestion": "Comment fonctionne la caution ?",
+        "depositAnswer": "La caution est demandée par l’agence au départ, selon les modes qu’elle accepte, puis restituée au retour du véhicule.",
+        "contactQuestion": "Comment joindre l’agence ?",
+        "contactAnswer": "Dès l’envoi de votre réservation, vous pouvez contacter l’agence par téléphone ou par WhatsApp."
+      },
+      "agencyCta": {
+        "title": "Vous êtes une agence de location ?",
+        "text": "Publiez votre flotte, recevez des réservations et suivez vos encaissements depuis un seul espace.",
+        "action": "Découvrir l’espace agence"
       }
     },
     "footer": {

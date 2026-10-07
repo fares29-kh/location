@@ -1,6 +1,6 @@
 'use client';
 
-import { getDirection, isLocale, type Locale, LOCALES } from '@drivetn/types';
+import { getDirection, isLocale, LOCALES } from '@drivetn/types';
 import { Button } from '@drivetn/ui/button';
 import {
   DropdownMenu,
@@ -14,14 +14,8 @@ import { Languages } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useTransition } from 'react';
 
+import { LOCALE_NAMES } from '@/i18n/locale-names';
 import { usePathname, useRouter } from '@/i18n/navigation';
-
-/** Chaque langue est présentée dans sa propre écriture. */
-const LOCALE_NAMES: Record<Locale, string> = {
-  fr: 'Français',
-  ar: 'العربية',
-  en: 'English',
-};
 
 export function LocaleSwitcher() {
   const t = useTranslations('common');

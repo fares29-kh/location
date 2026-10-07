@@ -1,6 +1,34 @@
 import { describe, expect, it } from 'vitest';
 
-import { resolveLocaleRoute, resolvePortal, toPortalPath } from './portal';
+import { buildPortalOrigin, resolveLocaleRoute, resolvePortal, toPortalPath } from './portal';
+
+describe('buildPortalOrigin', () => {
+  it('conserve le port de la requête', () => {
+    expect(
+      buildPortalOrigin('agency', {
+        host: 'localhost:8088',
+        rootDomain: 'localhost',
+        secure: false,
+      }),
+    ).toBe('http://agency.localhost:8088');
+  });
+
+  it('sert le portail client sur le domaine racine, en HTTPS', () => {
+    expect(
+      buildPortalOrigin('client', {
+        host: 'admin.drivetn.tn',
+        rootDomain: 'drivetn.tn',
+        secure: true,
+      }),
+    ).toBe('https://drivetn.tn');
+  });
+
+  it('fonctionne sans en-tête Host', () => {
+    expect(buildPortalOrigin('admin', { host: null, rootDomain: 'localhost', secure: false })).toBe(
+      'http://admin.localhost',
+    );
+  });
+});
 
 describe('resolvePortal', () => {
   it.each([
