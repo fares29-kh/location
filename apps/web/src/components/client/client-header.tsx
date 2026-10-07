@@ -7,7 +7,7 @@ import { cn } from '@drivetn/ui/lib/cn';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@drivetn/ui/sheet';
 import { type LucideIcon, Menu, Palette } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { UserMenu } from '@/components/auth/user-menu';
 import { BrandLogo } from '@/components/brand-logo';
@@ -85,6 +85,18 @@ export function ClientHeader({
   const tShell = useTranslations('shell');
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => {
+      setScrolled(window.scrollY > 8);
+    };
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+    };
+  }, []);
 
   const links: HeaderLink[] = [
     ...HEADER_NAV.map((item) => ({ ...item, label: t(item.id) })),
@@ -107,7 +119,12 @@ export function ClientHeader({
     ));
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-surface/85 backdrop-blur supports-[backdrop-filter]:bg-surface/70">
+    <header
+      className={cn(
+        'sticky top-0 z-40 border-b border-border bg-surface/85 backdrop-blur transition-shadow duration-300 supports-[backdrop-filter]:bg-surface/70',
+        scrolled && 'shadow-soft',
+      )}
+    >
       <div className="container flex h-16 items-center gap-6">
         <Link
           href="/"

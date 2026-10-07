@@ -9,15 +9,15 @@ export interface ClientNavItem {
 
 export const HEADER_NAV: readonly ClientNavItem[] = [
   { id: 'home', href: '/', icon: House },
-  { id: 'search', href: null, icon: Search },
-  { id: 'agencies', href: null, icon: Building2 },
-  { id: 'bookings', href: null, icon: CalendarCheck },
+  { id: 'search', href: '/search', icon: Search },
+  { id: 'agencies', href: '/agencies', icon: Building2 },
+  { id: 'bookings', href: '/bookings', icon: CalendarCheck },
 ];
 
 export const BOTTOM_NAV: readonly ClientNavItem[] = [
   { id: 'home', href: '/', icon: House },
-  { id: 'search', href: null, icon: Search },
-  { id: 'bookings', href: null, icon: CalendarCheck },
+  { id: 'search', href: '/search', icon: Search },
+  { id: 'bookings', href: '/bookings', icon: CalendarCheck },
   { id: 'account', href: '/account', icon: UserRound },
 ];
 

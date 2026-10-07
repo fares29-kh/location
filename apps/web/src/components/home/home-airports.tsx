@@ -1,5 +1,8 @@
-import { Plane } from 'lucide-react';
+import { ArrowRight, Plane } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+
+import { buildSearchHref } from '@/components/search/search-href';
+import { Link } from '@/i18n/navigation';
 
 import { AIRPORTS } from './places';
 import { SectionHeading } from './section-heading';
@@ -19,22 +22,28 @@ export function HomeAirports() {
         />
         <ul className="grid gap-3 sm:grid-cols-2">
           {AIRPORTS.map((airport) => (
-            <li
-              key={airport.id}
-              className="reveal flex items-center gap-3 rounded-card border border-border bg-surface p-3 shadow-soft transition-colors duration-300 hover:border-primary/30"
-            >
-              <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary-soft text-primary-soft-foreground">
-                <Plane className="size-5 rtl:-scale-x-100" aria-hidden="true" />
-              </span>
-              <span className="min-w-0 flex-1 text-sm font-medium">
-                {t(`places.${airport.id}`)}
-              </span>
-              <span
-                dir="ltr"
-                className="rounded-md bg-surface-muted px-2 py-0.5 font-mono text-xs font-semibold text-muted-foreground"
+            <li key={airport.id} className="reveal">
+              <Link
+                href={buildSearchHref({ location: airport.slug })}
+                className="group flex items-center gap-3 rounded-card border border-border bg-surface p-3 shadow-soft transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-elevated focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
-                {airport.code}
-              </span>
+                <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary-soft text-primary-soft-foreground transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+                  <Plane className="size-5 rtl:-scale-x-100" aria-hidden="true" />
+                </span>
+                <span className="min-w-0 flex-1 text-sm font-medium">
+                  {t(`places.${airport.id}`)}
+                </span>
+                <span
+                  dir="ltr"
+                  className="rounded-md bg-surface-muted px-2 py-0.5 font-mono text-xs font-semibold text-muted-foreground"
+                >
+                  {airport.code}
+                </span>
+                <ArrowRight
+                  className="size-4 shrink-0 text-muted-foreground opacity-0 transition-all group-hover:translate-x-0.5 group-hover:text-primary group-hover:opacity-100 rtl:rotate-180 rtl:group-hover:-translate-x-0.5"
+                  aria-hidden="true"
+                />
+              </Link>
             </li>
           ))}
         </ul>
