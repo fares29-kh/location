@@ -5,6 +5,7 @@ Plateforme SaaS multi-tenant de location de voitures pour le marché tunisien.
 - **Aucun paiement en ligne** : le client réserve sans payer et règle directement l'agence. Les paiements et cautions sont uniquement **déclarés** par l'agence dans son portail.
 - **Trois portails** servis par une seule application Next.js : client, agence et administration.
 - **Montants en millimes** (entiers), dates stockées en UTC et affichées en `Africa/Tunis`.
+- **Trois langues** : français (par défaut), arabe (RTL complet) et anglais.
 
 > Le nom `DriveTN` est configurable via la variable `APP_NAME`.
 
@@ -16,6 +17,7 @@ Plateforme SaaS multi-tenant de location de voitures pour le marché tunisien.
 - [Commandes utiles](#commandes-utiles)
 - [Variables d'environnement](#variables-denvironnement)
 - [Architecture](#architecture)
+- [Langues et design system](#langues-et-design-system)
 - [Qualité et tests](#qualité-et-tests)
 - [Choix techniques notables](#choix-techniques-notables)
 - [Avancement](#avancement)
@@ -48,6 +50,10 @@ Au démarrage, l'API applique les migrations Prisma (`prisma migrate deploy`) pu
 | Tableau de bord Traefik (dev uniquement) | http://traefik.localhost                 |
 
 L'API est servie sous `/api` **sur chaque sous-domaine** (même origine), ce qui évite le CORS et simplifie les cookies httpOnly.
+
+**Langues** : chaque portail est disponible en français sans préfixe (`/`), en arabe sous `/ar` et en anglais sous `/en` (ex. `http://agency.localhost/ar`). `/fr/...` redirige (308) vers l'URL sans préfixe.
+
+**Page de démo du design system** : `/design` sur chaque portail (ex. `http://localhost/ar/design`), activée par `DESIGN_PAGE_ENABLED`.
 
 **Résolution de `*.localhost`** : Chrome, Edge et Firefox résolvent automatiquement les sous-domaines de `localhost`. Pour d'autres outils (curl, certains navigateurs), ajoutez au fichier hosts (`C:\Windows\System32\drivers\etc\hosts` ou `/etc/hosts`) :
 
@@ -115,6 +121,7 @@ Toutes les variables sont documentées dans [`.env.example`](.env.example). Les 
 | `SWAGGER_ENABLED`                        | Active `/api/docs`                             | `true`                               |
 | `CORS_ORIGINS`                           | Origines CORS autorisées (vide = même origine) | vide                                 |
 | `SEED_ON_START`                          | Exécute le seed au démarrage de l'API          | `true`                               |
+| `DESIGN_PAGE_ENABLED`                    | Active la page `/design` (`false` en prod)     | `false` (`true` dans `.env.example`) |
 
 L'API et le front valident leur configuration avec Zod au démarrage et refusent de démarrer si une variable est invalide.
 
@@ -125,8 +132,9 @@ apps/
   api/        NestJS : API REST /api/v1, Swagger, Prisma, Redis, worker BullMQ
   web/        Next.js 15 (App Router) : les 3 portails, sélectionnés par nom d'hôte
 packages/
-  types/      Schémas Zod et types partagés front/back
-  config/     tsconfig, ESLint (flat config), Prettier
+  types/      Schémas Zod et types partagés front/back (langues, téléphone, montants, statuts)
+  ui/         Composants React accessibles (Radix + Tailwind), clair/sombre et RTL
+  config/     tsconfig, ESLint (flat config), Prettier, preset Tailwind
 docker/       Dockerfiles multi-stage, configuration Traefik, init MinIO
 ```
 
@@ -143,12 +151,20 @@ flowchart LR
   worker[worker BullMQ] --> redis
 ```
 
-- **Sélection du portail** : le middleware Next.js lit l'en-tête `Host` et réécrit la requête vers le segment interne (`/client`, `/agency`, `/admin`). Un portail n'est donc pas accessible depuis le sous-domaine d'un autre.
+- **Sélection du portail et de la langue** : le middleware Next.js lit l'en-tête `Host` et le préfixe de langue, puis réécrit la requête vers le segment interne (`/client/fr`, `/agency/ar`, `/admin/en`...). Un portail n'est donc pas accessible depuis le sous-domaine d'un autre.
 - **API** : préfixe `/api`, versionnement par URI (`/api/v1/...`), erreurs normalisées `{ code, message, details }`, Helmet, `trust proxy` pour Traefik.
 - **Santé** : `GET /api/v1/health` vérifie PostgreSQL, Redis et le battement du worker. Le statut vaut `ok`, `degraded` (worker arrêté) ou `error` (HTTP 503, dépendance critique indisponible).
 - **Worker** : même image que l'API, point d'entrée `dist/worker.js`. Il exécute la file BullMQ `maintenance` (job planifié de battement). Les files métier (OTP, rappels, expirations) arriveront dans les phases suivantes.
 - **Images** : multi-stage, finales en `node:20-alpine`, utilisateur non-root `node`. L'image API ne contient que `dist/`, le schéma Prisma et les dépendances de production (`pnpm deploy --prod`).
 - **Données** : volumes nommés `pgdata`, `redisdata` et `miniodata`.
+
+## Langues et design system
+
+- **i18n** : `next-intl`, messages dans [`apps/web/messages`](apps/web/messages) (`fr.json` fait référence). Les clés sont typées : une clé manquante en arabe ou en anglais fait échouer `typecheck`, et un test vérifie clés et paramètres `{...}`.
+- **RTL** : `<html lang="ar" dir="rtl">`, propriétés CSS logiques (`ms-*`, `start-*`...), icônes directionnelles inversées, police IBM Plex Sans Arabic. Les chiffres restent latins dans les trois langues.
+- **Montants** : `85,000 DT` en français, `85.000 د.ت` en arabe (composant `Money`, 3 décimales).
+- **Thèmes** : clair, sombre ou système (`next-themes`). Chaque portail a sa couleur : client bleu `#2563EB`, agence émeraude `#059669`, admin violet `#7C3AED`, via l'attribut `data-portal` et des variables CSS HSL du preset Tailwind.
+- **Composants** (`@drivetn/ui`) : boutons, champs (téléphone `+216`, code OTP), sélecteurs, cartes, badges de statut réservation/paiement, alertes, états vide/erreur/chargement, fenêtres, panneaux, menus, onglets, stepper, pagination, tableaux, sidebar, topbar, bouton WhatsApp (`wa.me`).
 
 ## Qualité et tests
 
@@ -157,7 +173,8 @@ pnpm check     # codegen + lint + format + typecheck + tests
 ```
 
 - TypeScript strict partout (`noUncheckedIndexedAccess`, aucun `any`), ESLint `strictTypeChecked`, `no-console` interdit.
-- Tests avec **Vitest** : schémas partagés, configuration, filtre d'erreurs, service et contrôleur de santé, test d'intégration HTTP de l'API (supertest), seed, résolution des portails.
+- ESLint `jsx-a11y` et `react-hooks` sur le front et `@drivetn/ui`.
+- Tests avec **Vitest** : schémas partagés (téléphone, montants, langues), configuration, filtre d'erreurs, service et contrôleur de santé, test d'intégration HTTP de l'API (supertest), seed, résolution des portails et des langues, cohérence des traductions, composants UI (Testing Library).
 - **Husky** : `lint-staged` avant chaque commit, **Commitlint** (Conventional Commits, ex. `feat(api): ...`) sur le message.
 - **CI GitHub Actions** ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) : lint, format, typecheck, tests, puis build des images Docker et smoke test de la pile complète.
 
@@ -167,6 +184,9 @@ pnpm check     # codegen + lint + format + typecheck + tests
 - **Pas de Turborepo** : les scripts `pnpm -r` / `--filter` suffisent à cette échelle.
 - **`@drivetn/types` compilé en CommonJS** : il est consommé tel quel par NestJS (CommonJS) et par Next.js. Lancez `pnpm codegen` après avoir modifié ce paquet ou le schéma Prisma.
 - **`@swc/core` figé en 1.15.x** (utilisé uniquement par Vitest côté API) : la 1.16 échoue au chargement de son binaire natif sur certains postes Windows.
+- **`next build` / `next dev` hors Docker sous Windows** : le plugin `next-intl` charge `@swc/core` 1.16, qui copie son binaire natif dans `%LOCALAPPDATA%\swc`. Si les droits NTFS de ce dossier sont incorrects, le chargement échoue (« Failed to load native binding »). Utilisez Docker (`make dev`), ou corrigez les droits de `%LOCALAPPDATA%\swc` (propriétaire et contrôle total pour votre compte). Linux, macOS et la CI ne sont pas concernés.
+- **Pas de middleware `next-intl`** : un seul middleware résout portail et langue, puis transmet la langue au rendu serveur via l'en-tête interne `x-drivetn-locale`.
+- **Polices auto-hébergées** via `next/font` (aucune requête vers Google côté navigateur).
 - **Paramètres plateforme** : le modèle `PlatformSetting` stocke la TVA (19 %), le timbre fiscal (1 DT) et la commission par défaut. Les taux sont en points de base, les montants en millimes.
 
 ## Avancement
@@ -174,7 +194,7 @@ pnpm check     # codegen + lint + format + typecheck + tests
 | Phase  | Contenu                                                                          | État     |
 | ------ | -------------------------------------------------------------------------------- | -------- |
 | 1      | Fondations : monorepo, Docker Compose, CI, page Hello, `/api/v1/health`          | Terminée |
-| 2      | Design system, thèmes clair/sombre, RTL, layouts des 3 portails                  | À venir  |
+| 2      | Design system, thèmes clair/sombre, RTL, layouts des 3 portails                  | Terminée |
 | 3      | Authentification, OTP, rôles, seed (gouvernorats, aéroports, comptes de démo)    | À venir  |
 | 4 à 10 | Flotte, recherche, réservation, opérations agence, admin, finitions, déploiement | À venir  |
 
