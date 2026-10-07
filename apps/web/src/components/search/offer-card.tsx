@@ -1,26 +1,26 @@
 'use client';
 
-import type { Locale } from '@drivetn/types';
+import { type Locale, rentalPriceMillimes } from '@drivetn/types';
 import { Badge } from '@drivetn/ui/badge';
 import { Button } from '@drivetn/ui/button';
 import { cn } from '@drivetn/ui/lib/cn';
 import { Money } from '@drivetn/ui/money';
 import { Rating } from '@drivetn/ui/rating';
-import { toast } from '@drivetn/ui/toaster';
 import {
   BadgeCheck,
-  Briefcase,
+  Building2,
   CarFront,
   Cog,
   Fuel,
   Gauge,
   type LucideIcon,
-  MapPin,
+  Snowflake,
   Users,
+  Zap,
 } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
-import { CATEGORY_GRADIENTS, type SampleOffer } from './catalog';
+import { CATEGORY_GRADIENTS, type SearchOffer } from './catalog';
 
 function formatRating(value: number, locale: Locale): string {
   const fixed = value.toFixed(1);
@@ -38,19 +38,18 @@ function Spec({ icon: Icon, label }: { icon: LucideIcon; label: string }) {
 
 export function OfferCard({
   offer,
-  locationLabel,
   days,
+  onBook,
 }: {
-  offer: SampleOffer;
-  /** Lieu recherché ; à défaut, la ville de l'offre. */
-  locationLabel: string | null;
+  offer: SearchOffer;
+  /** Durée de la location quand les dates sont choisies. */
   days: number | null;
+  onBook: (offer: SearchOffer) => void;
 }) {
   const t = useTranslations('client.search.offer');
   const tCatalog = useTranslations('client.catalog');
-  const tPlaces = useTranslations('client.home.places');
   const locale = useLocale();
-  const rating = formatRating(offer.rating, locale);
+  const rating = offer.rating === null ? null : formatRating(offer.rating, locale);
 
   return (
     <article className="group flex flex-col overflow-hidden rounded-panel border border-border bg-surface shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-elevated">
@@ -81,48 +80,58 @@ export function OfferCard({
         <span className="absolute start-3 top-3 rounded-full bg-white/20 px-2.5 py-1 text-xs font-semibold text-white backdrop-blur">
           {tCatalog(`categories.${offer.category}`)}
         </span>
-        <span className="absolute end-3 top-3 rounded-full bg-black/25 px-2 py-0.5 text-[0.6875rem] font-semibold uppercase tracking-wider text-white/90 backdrop-blur">
-          {t('preview')}
-        </span>
+        {offer.agency.instantConfirmation && (
+          <span className="absolute end-3 top-3 flex items-center gap-1 rounded-full bg-black/25 px-2 py-0.5 text-[0.6875rem] font-semibold text-white/95 backdrop-blur">
+            <Zap className="size-3" aria-hidden="true" />
+            {t('instant')}
+          </span>
+        )}
       </div>
 
       <div className="flex flex-1 flex-col gap-4 p-5">
         <div className="grid gap-1">
           <h3 className="text-lg font-bold leading-tight">
-            {offer.model}{' '}
-            <span className="text-sm font-medium text-muted-foreground">{t('orSimilar')}</span>
+            {offer.brand} {offer.model}{' '}
+            <span className="text-sm font-medium text-muted-foreground">{offer.year}</span>
           </h3>
+          <p className="flex min-w-0 items-center gap-1.5 text-sm text-muted-foreground">
+            <Building2 className="size-4 shrink-0 text-primary" aria-hidden="true" />
+            <span className="truncate font-medium text-foreground">{offer.agency.name}</span>
+          </p>
           <div className="flex items-center gap-2 text-sm">
-            <Rating value={offer.rating} label={t('rating', { value: rating })} />
-            <span className="font-semibold tabular-nums">{rating}</span>
-            <span className="text-muted-foreground">
-              ({t('reviews', { count: offer.reviews })})
-            </span>
+            {offer.rating !== null && rating !== null ? (
+              <>
+                <Rating value={offer.rating} label={t('rating', { value: rating })} />
+                <span className="font-semibold tabular-nums">{rating}</span>
+                <span className="text-muted-foreground">
+                  ({t('reviews', { count: offer.reviews })})
+                </span>
+              </>
+            ) : (
+              <span className="text-muted-foreground">{t('newAgency')}</span>
+            )}
           </div>
         </div>
 
         <ul className="grid grid-cols-2 gap-x-3 gap-y-2 text-sm">
           <Spec icon={Users} label={t('seats', { count: offer.seats })} />
-          <Spec icon={Briefcase} label={t('bags', { count: offer.bags })} />
           <Spec icon={Cog} label={tCatalog(`transmission.${offer.transmission}`)} />
           <Spec icon={Fuel} label={tCatalog(`fuel.${offer.fuel}`)} />
+          {offer.airConditioning && <Spec icon={Snowflake} label={t('airConditioning')} />}
         </ul>
 
         <div className="flex flex-wrap gap-2">
           <Badge tone={offer.unlimitedMileage ? 'success' : 'neutral'}>
             <Gauge aria-hidden="true" />
-            {offer.unlimitedMileage ? t('unlimitedMileage') : t('limitedMileage')}
+            {offer.mileageLimitKm === null
+              ? t('unlimitedMileage')
+              : t('mileagePerDay', { km: offer.mileageLimitKm })}
           </Badge>
           <Badge tone="primary">
             <BadgeCheck aria-hidden="true" />
             {t('verifiedAgency')}
           </Badge>
         </div>
-
-        <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
-          <MapPin className="size-4 shrink-0 text-primary" aria-hidden="true" />
-          <span className="truncate">{locationLabel ?? tPlaces(offer.city)}</span>
-        </p>
 
         <div className="mt-auto flex items-end justify-between gap-3 border-t border-border pt-4">
           <div className="grid min-w-0 gap-0.5">
@@ -138,7 +147,7 @@ export function OfferCard({
               <p className="text-xs text-muted-foreground">
                 {t('total', { count: days })}{' '}
                 <Money
-                  millimes={offer.pricePerDayMillimes * days}
+                  millimes={rentalPriceMillimes(offer.pricePerDayMillimes, days)}
                   locale={locale}
                   className="font-semibold text-foreground"
                 />
@@ -153,7 +162,7 @@ export function OfferCard({
             variant="cta"
             className="shadow-md shadow-cta/20"
             onClick={() => {
-              toast.info(t('bookSoonTitle'), { description: t('bookSoonText') });
+              onBook(offer);
             }}
           >
             {t('book')}

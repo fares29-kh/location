@@ -1,7 +1,28 @@
+import type {
+  VehicleCategory as ApiVehicleCategory,
+  FuelType,
+  Offer,
+  OfferAgency,
+} from '@drivetn/types';
+
 import type { CITIES } from '@/components/home/places';
 
 export const VEHICLE_CATEGORIES = ['city', 'compact', 'sedan', 'suv', 'family', 'premium'] as const;
 export type VehicleCategory = (typeof VEHICLE_CATEGORIES)[number];
+
+/** Catégorie de flotte (API) correspondant à chaque catégorie affichée aux clients. */
+export const API_CATEGORIES = {
+  city: 'ECONOMY',
+  compact: 'COMPACT',
+  sedan: 'SEDAN',
+  suv: 'SUV',
+  family: 'MINIVAN',
+  premium: 'LUXURY',
+} as const satisfies Record<VehicleCategory, ApiVehicleCategory>;
+
+export function fromApiCategory(category: ApiVehicleCategory): VehicleCategory {
+  return VEHICLE_CATEGORIES.find((item) => API_CATEGORIES[item] === category) ?? 'compact';
+}
 
 /** Dégradé (classes Tailwind `bg-gradient-to-*`) qui illustre chaque catégorie. */
 export const CATEGORY_GRADIENTS: Record<VehicleCategory, string> = {
@@ -16,8 +37,6 @@ export const CATEGORY_GRADIENTS: Record<VehicleCategory, string> = {
 export const TRANSMISSIONS = ['MANUAL', 'AUTOMATIC'] as const;
 export type Transmission = (typeof TRANSMISSIONS)[number];
 
-export type FuelType = 'PETROL' | 'DIESEL' | 'HYBRID';
-
 export const SORT_OPTIONS = ['recommended', 'priceAsc', 'priceDesc', 'rating'] as const;
 export type SortOption = (typeof SORT_OPTIONS)[number];
 
@@ -25,26 +44,64 @@ export type SortOption = (typeof SORT_OPTIONS)[number];
 export const PRICE_CAPS = [null, 100_000, 150_000, 250_000] as const;
 export type PriceCap = (typeof PRICE_CAPS)[number];
 
-export interface SampleOffer {
-  id: string;
-  model: string;
+/** Ce dont les filtres et les tris de la recherche ont besoin. */
+export interface FilterableOffer {
   category: VehicleCategory;
   transmission: Transmission;
+  pricePerDayMillimes: number;
+  unlimitedMileage: boolean;
+  /** Note moyenne sur 5, `null` sans avis. */
+  rating: number | null;
+  reviews: number;
+}
+
+export interface SampleOffer extends FilterableOffer {
+  id: string;
+  model: string;
   fuel: FuelType;
   seats: number;
   bags: number;
-  pricePerDayMillimes: number;
   depositMillimes: number;
   rating: number;
-  reviews: number;
-  unlimitedMileage: boolean;
   city: (typeof CITIES)[number];
 }
 
-/**
- * Offres d'illustration affichées tant que les agences ne publient pas encore leur flotte.
- * Elles sont signalées comme « aperçu » dans l'interface.
- */
+/** Offre réelle d'une agence, prête pour l'affichage et les filtres. */
+export interface SearchOffer extends FilterableOffer {
+  id: string;
+  brand: string;
+  model: string;
+  year: number;
+  fuel: FuelType;
+  seats: number;
+  airConditioning: boolean;
+  depositMillimes: number;
+  mileageLimitKm: number | null;
+  agency: OfferAgency;
+}
+
+export function toSearchOffer(offer: Offer): SearchOffer {
+  return {
+    id: offer.vehicleId,
+    brand: offer.brand,
+    model: offer.model,
+    year: offer.year,
+    category: fromApiCategory(offer.category),
+    transmission: offer.transmission,
+    fuel: offer.fuel,
+    seats: offer.seats,
+    airConditioning: offer.airConditioning,
+    pricePerDayMillimes: offer.dailyRateMillimes,
+    depositMillimes: offer.depositMillimes,
+    mileageLimitKm: offer.mileageLimitKm,
+    unlimitedMileage: offer.mileageLimitKm === null,
+    rating: offer.agency.rating,
+    reviews: offer.agency.reviewsCount,
+    agency: offer.agency,
+  };
+}
+
+/** Modèles d'illustration de chaque catégorie (page d'accueil), avec des prix indicatifs. */
 export const SAMPLE_OFFERS: readonly SampleOffer[] = [
   {
     id: 'picanto',
@@ -251,7 +308,10 @@ export function countActiveFilters(filters: OfferFilters): number {
   );
 }
 
-export function filterOffers(offers: readonly SampleOffer[], filters: OfferFilters): SampleOffer[] {
+export function filterOffers<T extends FilterableOffer>(
+  offers: readonly T[],
+  filters: OfferFilters,
+): T[] {
   return offers.filter(
     (offer) =>
       (filters.categories.length === 0 || filters.categories.includes(offer.category)) &&
@@ -261,7 +321,7 @@ export function filterOffers(offers: readonly SampleOffer[], filters: OfferFilte
   );
 }
 
-export function sortOffers(offers: readonly SampleOffer[], sort: SortOption): SampleOffer[] {
+export function sortOffers<T extends FilterableOffer>(offers: readonly T[], sort: SortOption): T[] {
   const sorted = [...offers];
   switch (sort) {
     case 'priceAsc':
@@ -269,7 +329,7 @@ export function sortOffers(offers: readonly SampleOffer[], sort: SortOption): Sa
     case 'priceDesc':
       return sorted.sort((a, b) => b.pricePerDayMillimes - a.pricePerDayMillimes);
     case 'rating':
-      return sorted.sort((a, b) => b.rating - a.rating || b.reviews - a.reviews);
+      return sorted.sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0) || b.reviews - a.reviews);
     case 'recommended':
       return sorted;
   }
@@ -289,6 +349,23 @@ export function rentalDays(pickup: string | null, dropoff: string | null): numbe
     return null;
   }
   return Math.max(1, Math.round((end - start) / DAY_MS));
+}
+
+export interface RentalDates {
+  pickup: string;
+  dropoff: string;
+}
+
+/** Dates réservables : bien formées, retour après le départ et départ à partir d'aujourd'hui. */
+export function bookableDates(
+  pickup: string | null,
+  dropoff: string | null,
+  today: string,
+): RentalDates | null {
+  if (pickup === null || dropoff === null || !ISO_DATE.test(pickup) || !ISO_DATE.test(dropoff)) {
+    return null;
+  }
+  return pickup >= today && dropoff > pickup ? { pickup, dropoff } : null;
 }
 
 export function isVehicleCategory(value: string | null | undefined): value is VehicleCategory {

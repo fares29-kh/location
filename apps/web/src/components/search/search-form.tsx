@@ -1,6 +1,6 @@
 'use client';
 
-import type { LocationType } from '@drivetn/types';
+import { addDays, type LocationType, todayKey } from '@drivetn/types';
 import { Button } from '@drivetn/ui/button';
 import { inputClassName } from '@drivetn/ui/input';
 import { Label } from '@drivetn/ui/label';
@@ -26,6 +26,8 @@ export interface LocationOption {
   value: string;
   label: string;
   type: LocationType;
+  /** Connu quand les lieux viennent de l'API. */
+  governorateCode?: string;
 }
 
 const GROUP_LABEL_KEYS = {
@@ -80,6 +82,7 @@ export function SearchForm({
   const [location, setLocation] = useState(initialLocation ?? '');
   const [pickup, setPickup] = useState(initialPickup ?? '');
   const [dropoff, setDropoff] = useState(initialReturn ?? '');
+  const [today] = useState(todayKey);
 
   const groups = (Object.keys(GROUP_LABEL_KEYS) as LocationType[])
     .map((type) => ({ type, items: options.filter((option) => option.type === type) }))
@@ -131,9 +134,10 @@ export function SearchForm({
           name="pickup"
           type="date"
           value={pickup}
+          min={today}
           onChange={(event) => {
             setPickup(event.target.value);
-            if (dropoff !== '' && event.target.value > dropoff) {
+            if (dropoff !== '' && event.target.value >= dropoff) {
               setDropoff('');
             }
           }}
@@ -147,7 +151,7 @@ export function SearchForm({
           name="return"
           type="date"
           value={dropoff}
-          min={pickup === '' ? undefined : pickup}
+          min={pickup === '' ? today : addDays(pickup, 1)}
           onChange={(event) => {
             setDropoff(event.target.value);
           }}

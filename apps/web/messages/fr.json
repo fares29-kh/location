@@ -206,7 +206,8 @@
       "fuel": {
         "PETROL": "Essence",
         "DIESEL": "Diesel",
-        "HYBRID": "Hybride"
+        "HYBRID": "Hybride",
+        "ELECTRIC": "Électrique"
       }
     },
     "search": {
@@ -218,8 +219,15 @@
         "stations": "Gares",
         "ports": "Ports"
       },
-      "previewTitle": "Aperçu de la recherche",
-      "previewText": "Les offres ci-dessous sont des exemples : nos agences partenaires publient actuellement leur flotte. La réservation ouvrira très prochainement.",
+      "unavailableTitle": "Recherche momentanément indisponible",
+      "unavailableText": "Impossible de charger les offres des agences. Réessayez dans quelques instants.",
+      "datesHintTitle": "Indiquez vos dates",
+      "datesHintText": "Choisissez une date de départ et de retour pour ne voir que les voitures libres et connaître le prix total.",
+      "noOffers": {
+        "title": "Aucune voiture disponible pour cette recherche",
+        "text": "Essayez d’autres dates ou un autre lieu de prise en charge.",
+        "action": "Voir toutes les offres"
+      },
       "results": "{count, plural, one {# offre disponible} other {# offres disponibles}}",
       "summary": {
         "anywhere": "Toute la Tunisie",
@@ -254,21 +262,19 @@
         "action": "Réinitialiser les filtres"
       },
       "offer": {
-        "preview": "Exemple",
-        "orSimilar": "ou similaire",
+        "instant": "Confirmation immédiate",
+        "newAgency": "Nouvelle agence, pas encore d’avis",
         "rating": "{value} sur 5",
         "reviews": "{count} avis",
         "seats": "{count} places",
-        "bags": "{count, plural, one {# bagage} other {# bagages}}",
+        "airConditioning": "Climatisation",
         "unlimitedMileage": "Kilométrage illimité",
-        "limitedMileage": "Kilométrage limité",
+        "mileagePerDay": "{km} km / jour",
         "verifiedAgency": "Agence vérifiée",
         "perDay": "/ jour",
         "total": "Total pour {count, plural, one {# jour} other {# jours}} :",
         "deposit": "Caution :",
-        "book": "Réserver",
-        "bookSoonTitle": "Réservation bientôt disponible",
-        "bookSoonText": "Vous pourrez réserver dès que les agences partenaires auront publié leur flotte. Aucun paiement en ligne ne vous sera demandé."
+        "book": "Réserver"
       }
     },
     "agencies": {
@@ -345,6 +351,81 @@
         "license": "Permis de conduire en cours de validité",
         "deposit": "Caution, selon les modes acceptés par l’agence",
         "payment": "Règlement de la location directement à l’agence"
+      },
+      "loadErrorTitle": "Impossible de charger vos réservations",
+      "loadErrorText": "Vérifiez votre connexion puis réessayez.",
+      "statusHints": {
+        "PENDING": "Demande envoyée : l’agence vous répond rapidement.",
+        "CONFIRMED": "Réservation confirmée : présentez-vous à l’agence à l’heure prévue.",
+        "PICKED_UP": "Location en cours. Bonne route !",
+        "RETURNED": "Véhicule rendu, l’agence clôture la location.",
+        "COMPLETED": "Location terminée. Merci de votre confiance !",
+        "CANCELLED": "Réservation annulée.",
+        "REJECTED": "L’agence n’a pas pu accepter cette demande.",
+        "NO_SHOW": "Le véhicule n’a pas été retiré à la date prévue.",
+        "EXPIRED": "Demande expirée sans réponse de l’agence."
+      },
+      "card": {
+        "seats": "{count} places",
+        "days": "Total pour {count, plural, one {# jour} other {# jours}}",
+        "deposit": "Caution",
+        "payAtAgency": "Règlement et caution directement à l’agence, aucun paiement en ligne.",
+        "call": "Appeler",
+        "whatsappMessage": "Bonjour, je vous contacte au sujet de ma réservation {reference} sur DriveTN.",
+        "cancel": "Annuler"
+      },
+      "cancel": {
+        "title": "Annuler cette réservation ?",
+        "text": "La réservation {reference} sera annulée et le véhicule libéré. Cette action est définitive.",
+        "keep": "Garder ma réservation",
+        "confirm": "Oui, annuler",
+        "done": "Réservation annulée",
+        "notCancellable": "Cette réservation ne peut plus être annulée.",
+        "error": "L’annulation a échoué. Réessayez."
+      }
+    },
+    "booking": {
+      "title": "Réserver : {vehicle}",
+      "description": "Chez {agency}. Aucun paiement en ligne : vous réglez la location à l’agence.",
+      "unavailableTitle": "Véhicule indisponible sur ces dates",
+      "unavailableText": "Il vient d’être réservé ou n’est plus proposé. Choisissez d’autres dates ou une autre voiture.",
+      "fields": {
+        "pickup": "Date de départ",
+        "return": "Date de retour",
+        "location": "Lieu de prise en charge",
+        "note": "Message à l’agence (facultatif)"
+      },
+      "locationHint": "Prise en charge et retour à 10 h, au même endroit.",
+      "locationPlaceholder": "Choisissez un lieu",
+      "notePlaceholder": "Ex. : numéro de vol, siège enfant, heure d’arrivée…",
+      "summary": {
+        "title": "Récapitulatif",
+        "pickDates": "Choisissez vos dates pour voir le prix total.",
+        "rate": "{count, plural, one {# jour} other {# jours}} ×",
+        "weeklyDiscount": "Remise semaine (−10 %)",
+        "total": "Total de la location",
+        "deposit": "Caution (rendue au retour)"
+      },
+      "conditions": {
+        "instant": "Confirmation immédiate : la voiture vous est réservée dès l’envoi.",
+        "request": "L’agence confirme votre demande, en général sous quelques heures.",
+        "cancellation": "Annulation gratuite jusqu’à {hours} h avant le départ.",
+        "driverAge": "Conducteur âgé d’au moins {age} ans, permis valide.",
+        "payment": "Moyens de paiement acceptés à l’agence :"
+      },
+      "submit": "Envoyer ma demande",
+      "submitInstant": "Confirmer la réservation",
+      "confirmedTitle": "Réservation confirmée",
+      "confirmedText": "Votre référence : {reference}. Retrouvez tous les détails dans « Mes réservations ».",
+      "sentTitle": "Demande envoyée",
+      "sentText": "Référence {reference} : {agency} va confirmer votre demande.",
+      "error": "La réservation n’a pas pu être envoyée. Réessayez.",
+      "validation": {
+        "REQUIRED": "Ce champ est obligatoire.",
+        "TOO_LONG": "Texte trop long.",
+        "RETURN_BEFORE_PICKUP": "Le retour doit être après le départ.",
+        "PAST_DATE": "Choisissez une date à partir d’aujourd’hui.",
+        "generic": "Valeur invalide."
       }
     },
     "footer": {

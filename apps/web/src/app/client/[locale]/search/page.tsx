@@ -1,13 +1,15 @@
-import { type LocationType, pickLocalized } from '@drivetn/types';
+import { type LocationType, pickLocalized, todayKey } from '@drivetn/types';
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 
 import { AIRPORTS, CITIES } from '@/components/home/places';
-import { isVehicleCategory } from '@/components/search/catalog';
+import { bookableDates, isVehicleCategory, toSearchOffer } from '@/components/search/catalog';
 import type { LocationOption } from '@/components/search/search-form';
 import { SearchView } from '@/components/search/search-view';
+import { getPortalUser } from '@/lib/auth/session';
 import { type LocaleParams, resolveLocale } from '@/lib/locale-params';
 import { fetchPickupLocations } from '@/lib/locations';
+import { fetchOffers } from '@/lib/offers';
 
 interface SearchPageProps extends LocaleParams {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -30,9 +32,10 @@ export async function generateMetadata({ params }: LocaleParams): Promise<Metada
 
 export default async function SearchPage({ params, searchParams }: SearchPageProps) {
   const locale = await resolveLocale(params);
-  const [query, locations, t] = await Promise.all([
+  const [query, locations, user, t] = await Promise.all([
     searchParams,
     fetchPickupLocations(),
+    getPortalUser('client'),
     getTranslations({ locale, namespace: 'client.home.places' }),
   ]);
 
@@ -45,6 +48,7 @@ export default async function SearchPage({ params, searchParams }: SearchPagePro
             value: location.slug,
             label: pickLocalized(location.name, locale),
             type: location.type,
+            governorateCode: location.governorateCode,
           }))
       : [
           ...AIRPORTS.map((airport) => ({
@@ -55,16 +59,31 @@ export default async function SearchPage({ params, searchParams }: SearchPagePro
           ...CITIES.map((city) => ({ value: city, label: t(city), type: 'CITY' as const })),
         ];
 
-  const location = firstValue(query.location);
+  const requestedLocation = firstValue(query.location);
+  const location = options.some((option) => option.value === requestedLocation)
+    ? requestedLocation
+    : null;
+  const pickup = firstValue(query.pickup);
+  const dropoff = firstValue(query.return);
+  const dates = bookableDates(pickup, dropoff, todayKey());
   const category = firstValue(query.category);
+  const result = await fetchOffers({
+    location,
+    pickup: dates?.pickup ?? null,
+    dropoff: dates?.dropoff ?? null,
+  });
 
   return (
     <SearchView
       locationOptions={options}
-      initialLocation={options.some((option) => option.value === location) ? location : null}
-      initialPickup={firstValue(query.pickup)}
-      initialReturn={firstValue(query.return)}
+      initialLocation={location}
+      initialPickup={pickup}
+      initialReturn={dropoff}
       initialCategory={isVehicleCategory(category) ? category : null}
+      initialBooking={firstValue(query.book)}
+      offers={result === null ? null : result.offers.map(toSearchOffer)}
+      dates={dates}
+      signedIn={user !== null}
     />
   );
 }

@@ -206,7 +206,8 @@
       "fuel": {
         "PETROL": "Petrol",
         "DIESEL": "Diesel",
-        "HYBRID": "Hybrid"
+        "HYBRID": "Hybrid",
+        "ELECTRIC": "Electric"
       }
     },
     "search": {
@@ -218,8 +219,15 @@
         "stations": "Train stations",
         "ports": "Ports"
       },
-      "previewTitle": "Search preview",
-      "previewText": "The offers below are examples: our partner agencies are currently listing their fleets. Booking will open very soon.",
+      "unavailableTitle": "Search temporarily unavailable",
+      "unavailableText": "We couldn’t load the agencies’ offers. Please try again in a moment.",
+      "datesHintTitle": "Add your dates",
+      "datesHintText": "Pick a pick-up and return date to see only available cars and the total price.",
+      "noOffers": {
+        "title": "No cars available for this search",
+        "text": "Try other dates or another pick-up location.",
+        "action": "See all offers"
+      },
       "results": "{count, plural, one {# offer available} other {# offers available}}",
       "summary": {
         "anywhere": "All of Tunisia",
@@ -254,21 +262,19 @@
         "action": "Reset filters"
       },
       "offer": {
-        "preview": "Example",
-        "orSimilar": "or similar",
+        "instant": "Instant confirmation",
+        "newAgency": "New agency, no reviews yet",
         "rating": "{value} out of 5",
         "reviews": "{count} reviews",
         "seats": "{count} seats",
-        "bags": "{count, plural, one {# bag} other {# bags}}",
+        "airConditioning": "Air conditioning",
         "unlimitedMileage": "Unlimited mileage",
-        "limitedMileage": "Limited mileage",
+        "mileagePerDay": "{km} km / day",
         "verifiedAgency": "Verified agency",
         "perDay": "/ day",
         "total": "Total for {count, plural, one {# day} other {# days}}:",
         "deposit": "Deposit:",
-        "book": "Book",
-        "bookSoonTitle": "Booking available soon",
-        "bookSoonText": "You will be able to book as soon as partner agencies have listed their fleets. No online payment will ever be requested."
+        "book": "Book"
       }
     },
     "agencies": {
@@ -345,6 +351,81 @@
         "license": "Valid driving licence",
         "deposit": "Deposit, using the methods the agency accepts",
         "payment": "Rental payment directly at the agency"
+      },
+      "loadErrorTitle": "We couldn’t load your bookings",
+      "loadErrorText": "Check your connection and try again.",
+      "statusHints": {
+        "PENDING": "Request sent: the agency will reply shortly.",
+        "CONFIRMED": "Booking confirmed: go to the agency at the scheduled time.",
+        "PICKED_UP": "Rental in progress. Have a good trip!",
+        "RETURNED": "Car returned, the agency is closing the rental.",
+        "COMPLETED": "Rental completed. Thank you for your trust!",
+        "CANCELLED": "Booking cancelled.",
+        "REJECTED": "The agency couldn’t accept this request.",
+        "NO_SHOW": "The car was not picked up on the scheduled date.",
+        "EXPIRED": "Request expired without a reply from the agency."
+      },
+      "card": {
+        "seats": "{count} seats",
+        "days": "Total for {count, plural, one {# day} other {# days}}",
+        "deposit": "Deposit",
+        "payAtAgency": "Payment and deposit directly at the agency, no online payment.",
+        "call": "Call",
+        "whatsappMessage": "Hello, I’m contacting you about my booking {reference} on DriveTN.",
+        "cancel": "Cancel"
+      },
+      "cancel": {
+        "title": "Cancel this booking?",
+        "text": "Booking {reference} will be cancelled and the car released. This cannot be undone.",
+        "keep": "Keep my booking",
+        "confirm": "Yes, cancel",
+        "done": "Booking cancelled",
+        "notCancellable": "This booking can no longer be cancelled.",
+        "error": "Cancellation failed. Please try again."
+      }
+    },
+    "booking": {
+      "title": "Book: {vehicle}",
+      "description": "With {agency}. No online payment: you pay for the rental at the agency.",
+      "unavailableTitle": "Car unavailable on these dates",
+      "unavailableText": "It was just booked or is no longer offered. Pick other dates or another car.",
+      "fields": {
+        "pickup": "Pick-up date",
+        "return": "Return date",
+        "location": "Pick-up location",
+        "note": "Message to the agency (optional)"
+      },
+      "locationHint": "Pick-up and return at 10 am, at the same place.",
+      "locationPlaceholder": "Choose a location",
+      "notePlaceholder": "E.g. flight number, child seat, arrival time…",
+      "summary": {
+        "title": "Summary",
+        "pickDates": "Choose your dates to see the total price.",
+        "rate": "{count, plural, one {# day} other {# days}} ×",
+        "weeklyDiscount": "Weekly discount (−10%)",
+        "total": "Rental total",
+        "deposit": "Deposit (returned at drop-off)"
+      },
+      "conditions": {
+        "instant": "Instant confirmation: the car is reserved as soon as you send the request.",
+        "request": "The agency confirms your request, usually within a few hours.",
+        "cancellation": "Free cancellation up to {hours} h before pick-up.",
+        "driverAge": "Driver aged {age} or over, with a valid licence.",
+        "payment": "Payment methods accepted at the agency:"
+      },
+      "submit": "Send my request",
+      "submitInstant": "Confirm booking",
+      "confirmedTitle": "Booking confirmed",
+      "confirmedText": "Your reference: {reference}. Find all the details in “My bookings”.",
+      "sentTitle": "Request sent",
+      "sentText": "Reference {reference}: {agency} will confirm your request.",
+      "error": "The booking couldn’t be sent. Please try again.",
+      "validation": {
+        "REQUIRED": "This field is required.",
+        "TOO_LONG": "Text too long.",
+        "RETURN_BEFORE_PICKUP": "Return must be after pick-up.",
+        "PAST_DATE": "Choose a date from today onwards.",
+        "generic": "Invalid value."
       }
     },
     "footer": {

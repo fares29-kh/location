@@ -22,17 +22,20 @@ import {
   SlidersHorizontal,
 } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
-import { useId, useMemo, useState } from 'react';
+import { useEffect, useId, useMemo, useState } from 'react';
 
 import { PageHero } from '@/components/client/page-hero';
+import { Link, useRouter } from '@/i18n/navigation';
 
+import { BookingDialog } from './booking-dialog';
 import {
   countActiveFilters,
   DEFAULT_FILTERS,
   filterOffers,
   type OfferFilters,
+  type RentalDates,
   rentalDays,
-  SAMPLE_OFFERS,
+  type SearchOffer,
   SORT_OPTIONS,
   type SortOption,
   sortOffers,
@@ -60,17 +63,29 @@ export function SearchView({
   initialPickup,
   initialReturn,
   initialCategory,
+  initialBooking,
+  offers,
+  dates,
+  signedIn,
 }: {
   locationOptions: readonly LocationOption[];
   initialLocation: string | null;
   initialPickup: string | null;
   initialReturn: string | null;
   initialCategory: VehicleCategory | null;
+  /** Offre à rouvrir après la connexion (paramètre `book`). */
+  initialBooking: string | null;
+  /** `null` si la recherche n'a pas pu joindre l'API. */
+  offers: readonly SearchOffer[] | null;
+  /** Dates réservables issues de la recherche. */
+  dates: RentalDates | null;
+  signedIn: boolean;
 }) {
   const t = useTranslations('client.search');
   const tCatalog = useTranslations('client.catalog');
   const tCommon = useTranslations('common');
   const locale = useLocale();
+  const router = useRouter();
   const id = useId();
   const [filters, setFilters] = useState<OfferFilters>({
     ...DEFAULT_FILTERS,
@@ -78,26 +93,48 @@ export function SearchView({
   });
   const [sort, setSort] = useState<SortOption>('recommended');
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [booking, setBooking] = useState<SearchOffer | null>(() =>
+    signedIn ? (offers?.find((offer) => offer.id === initialBooking) ?? null) : null,
+  );
+
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (url.searchParams.has('book')) {
+      url.searchParams.delete('book');
+      window.history.replaceState(window.history.state, '', url);
+    }
+  }, []);
 
   const locationLabel =
     locationOptions.find((option) => option.value === initialLocation)?.label ?? null;
-  const days = rentalDays(initialPickup, initialReturn);
+  const days = dates === null ? null : rentalDays(dates.pickup, dates.dropoff);
   const activeFilters = countActiveFilters(filters);
+  const available = useMemo(() => offers ?? [], [offers]);
 
   const results = useMemo(
-    () => sortOffers(filterOffers(SAMPLE_OFFERS, filters), sort),
-    [filters, sort],
+    () => sortOffers(filterOffers(available, filters), sort),
+    [available, filters, sort],
   );
 
   const categoryCounts = useMemo(() => {
-    const withoutCategory = filterOffers(SAMPLE_OFFERS, { ...filters, categories: [] });
+    const withoutCategory = filterOffers(available, { ...filters, categories: [] });
     return Object.fromEntries(
       VEHICLE_CATEGORIES.map((category) => [
         category,
         withoutCategory.filter((offer) => offer.category === category).length,
       ]),
     ) as Record<VehicleCategory, number>;
-  }, [filters]);
+  }, [available, filters]);
+
+  const startBooking = (offer: SearchOffer) => {
+    if (signedIn) {
+      setBooking(offer);
+      return;
+    }
+    const next = new URL(window.location.href);
+    next.searchParams.set('book', offer.id);
+    router.push({ pathname: '/login', query: { next: `${next.pathname}${next.search}` } });
+  };
 
   const resetFilters = () => {
     setFilters(DEFAULT_FILTERS);
@@ -152,7 +189,13 @@ export function SearchView({
         </aside>
 
         <section aria-labelledby={`${id}-results`} className="grid content-start gap-5">
-          <Alert title={t('previewTitle')}>{t('previewText')}</Alert>
+          {offers === null ? (
+            <Alert tone="danger" title={t('unavailableTitle')}>
+              {t('unavailableText')}
+            </Alert>
+          ) : (
+            dates === null && <Alert title={t('datesHintTitle')}>{t('datesHintText')}</Alert>
+          )}
 
           <div className="flex flex-wrap items-center gap-3">
             <div className="grid min-w-0 flex-1 gap-1">
@@ -271,10 +314,27 @@ export function SearchView({
             <ul className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
               {results.map((offer) => (
                 <li key={offer.id} className="grid">
-                  <OfferCard offer={offer} locationLabel={locationLabel} days={days} />
+                  <OfferCard offer={offer} days={days} onBook={startBooking} />
                 </li>
               ))}
             </ul>
+          ) : available.length === 0 ? (
+            offers !== null && (
+              <EmptyState
+                icon={SearchX}
+                title={t('noOffers.title')}
+                description={t('noOffers.text')}
+                className="bg-surface py-16"
+                action={
+                  <Button asChild variant="secondary">
+                    <Link href="/search">
+                      <RotateCcw aria-hidden="true" />
+                      {t('noOffers.action')}
+                    </Link>
+                  </Button>
+                }
+              />
+            )
           ) : (
             <EmptyState
               icon={SearchX}
@@ -291,6 +351,21 @@ export function SearchView({
           )}
         </section>
       </div>
+
+      {booking !== null && (
+        <BookingDialog
+          key={booking.id}
+          offer={booking}
+          dates={dates}
+          location={initialLocation}
+          locationOptions={locationOptions}
+          onOpenChange={(open) => {
+            if (!open) {
+              setBooking(null);
+            }
+          }}
+        />
+      )}
     </>
   );
 }
