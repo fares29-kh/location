@@ -1,0 +1,11 @@
+{
+  "extends": "@drivetn/config/tsconfig/next.json",
+  "compilerOptions": {
+    "types": ["node"],
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["next-env.d.ts", "src", ".next/types/**/*.ts", "next.config.ts", "vitest.config.mts"],
+  "exclude": ["node_modules"]
+}
