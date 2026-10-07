@@ -1,0 +1,222 @@
+# DriveTN - pile complète "production-like".
+# Démarrage : cp .env.example .env && docker compose up --build
+# Développement (hot-reload) : voir docker-compose.dev.yml ou `make dev`.
+
+name: drivetn
+
+x-api-environment: &api-environment
+  TZ: UTC
+  NODE_ENV: production
+  PORT: '4000'
+  APP_NAME: ${APP_NAME:-DriveTN}
+  APP_TIMEZONE: ${APP_TIMEZONE:-Africa/Tunis}
+  DATABASE_URL: postgresql://${POSTGRES_USER:-drivetn}:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD manquant (copiez .env.example vers .env)}@postgres:5432/${POSTGRES_DB:-drivetn}?schema=public
+  REDIS_URL: redis://:${REDIS_PASSWORD:?REDIS_PASSWORD manquant (copiez .env.example vers .env)}@redis:6379
+  CORS_ORIGINS: ${CORS_ORIGINS:-}
+  SWAGGER_ENABLED: ${SWAGGER_ENABLED:-true}
+
+x-api-build: &api-build
+  context: .
+  dockerfile: docker/api.Dockerfile
+  target: runner
+
+services:
+  traefik:
+    image: traefik:v3.5
+    restart: unless-stopped
+    ports:
+      - '${HTTP_PORT:-80}:80'
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./docker/traefik/traefik.yml:/etc/traefik/traefik.yml:ro
+    healthcheck:
+      test: ['CMD', 'traefik', 'healthcheck', '--ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks: [drivetn]
+
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      TZ: UTC
+      PGTZ: UTC
+      POSTGRES_USER: ${POSTGRES_USER:-drivetn}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD manquant (copiez .env.example vers .env)}
+      POSTGRES_DB: ${POSTGRES_DB:-drivetn}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks: [drivetn]
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command:
+      - redis-server
+      - --appendonly
+      - 'yes'
+      - --requirepass
+      - ${REDIS_PASSWORD:?REDIS_PASSWORD manquant (copiez .env.example vers .env)}
+    environment:
+      REDISCLI_AUTH: ${REDIS_PASSWORD}
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ['CMD-SHELL', 'redis-cli ping | grep -q PONG']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks: [drivetn]
+
+  minio:
+    image: ${MINIO_IMAGE:-cgr.dev/chainguard/minio:latest}
+    restart: unless-stopped
+    command: ['server', '/data', '--console-address', ':9001']
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-drivetn}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:?MINIO_ROOT_PASSWORD manquant (copiez .env.example vers .env)}
+    volumes:
+      - miniodata:/data
+    healthcheck:
+      test:
+        - CMD
+        - bash
+        - -c
+        - >-
+          exec 3<>/dev/tcp/127.0.0.1/9000 &&
+          printf 'GET /minio/health/live HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n' >&3 &&
+          read -r status <&3 &&
+          [[ $$status == *' 200 '* ]]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.minio-s3.rule=Host(`s3.${APP_DOMAIN:-localhost}`)
+      - traefik.http.routers.minio-s3.entrypoints=web
+      - traefik.http.routers.minio-s3.service=minio-s3
+      - traefik.http.services.minio-s3.loadbalancer.server.port=9000
+      - traefik.http.routers.minio-console.rule=Host(`minio.${APP_DOMAIN:-localhost}`)
+      - traefik.http.routers.minio-console.entrypoints=web
+      - traefik.http.routers.minio-console.service=minio-console
+      - traefik.http.services.minio-console.loadbalancer.server.port=9001
+    networks: [drivetn]
+
+  minio-init:
+    image: ${MINIO_IMAGE:-cgr.dev/chainguard/minio:latest}
+    restart: 'no'
+    entrypoint: ['sh', '/init.sh']
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-drivetn}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      S3_BUCKET_PUBLIC: ${S3_BUCKET_PUBLIC:-drivetn-public}
+      S3_BUCKET_PRIVATE: ${S3_BUCKET_PRIVATE:-drivetn-private}
+    volumes:
+      - ./docker/minio/init.sh:/init.sh:ro
+    depends_on:
+      minio:
+        condition: service_healthy
+    networks: [drivetn]
+
+  mailpit:
+    image: axllent/mailpit:latest
+    restart: unless-stopped
+    environment:
+      TZ: UTC
+      MP_SMTP_AUTH_ACCEPT_ANY: 'true'
+      MP_SMTP_AUTH_ALLOW_INSECURE: 'true'
+    healthcheck:
+      test: ['CMD', '/mailpit', 'readyz']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.mailpit.rule=Host(`mail.${APP_DOMAIN:-localhost}`)
+      - traefik.http.routers.mailpit.entrypoints=web
+      - traefik.http.services.mailpit.loadbalancer.server.port=8025
+    networks: [drivetn]
+
+  api:
+    build: *api-build
+    image: drivetn-api:local
+    restart: unless-stopped
+    init: true
+    environment:
+      <<: *api-environment
+      RUN_MIGRATIONS: 'true'
+      SEED_ON_START: ${SEED_ON_START:-true}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ['CMD-SHELL', 'wget -q -O /dev/null http://127.0.0.1:4000/api/v1/health']
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 30s
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.api.rule=(Host(`${APP_DOMAIN:-localhost}`) || Host(`app.${APP_DOMAIN:-localhost}`) || Host(`agency.${APP_DOMAIN:-localhost}`) || Host(`admin.${APP_DOMAIN:-localhost}`)) && PathPrefix(`/api`)
+      - traefik.http.routers.api.entrypoints=web
+      - traefik.http.routers.api.priority=100
+      - traefik.http.services.api.loadbalancer.server.port=4000
+    networks: [drivetn]
+
+  worker:
+    build: *api-build
+    image: drivetn-api:local
+    restart: unless-stopped
+    init: true
+    command: ['node', 'dist/worker.js']
+    environment: *api-environment
+    depends_on:
+      api:
+        condition: service_healthy
+    networks: [drivetn]
+
+  web:
+    build:
+      context: .
+      dockerfile: docker/web.Dockerfile
+      target: runner
+    image: drivetn-web:local
+    restart: unless-stopped
+    init: true
+    environment:
+      TZ: UTC
+      APP_NAME: ${APP_NAME:-DriveTN}
+      APP_DOMAIN: ${APP_DOMAIN:-localhost}
+      API_INTERNAL_URL: http://api:4000
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ['CMD-SHELL', 'wget -q -O /dev/null http://127.0.0.1:3000/healthz']
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 20s
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.web.rule=Host(`${APP_DOMAIN:-localhost}`) || Host(`app.${APP_DOMAIN:-localhost}`) || Host(`agency.${APP_DOMAIN:-localhost}`) || Host(`admin.${APP_DOMAIN:-localhost}`)
+      - traefik.http.routers.web.entrypoints=web
+      - traefik.http.services.web.loadbalancer.server.port=3000
+    networks: [drivetn]
+
+networks:
+  drivetn:
+    name: drivetn
+
+volumes:
+  pgdata:
+  redisdata:
+  miniodata:

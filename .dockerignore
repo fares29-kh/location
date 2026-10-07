@@ -1,0 +1,24 @@
+# Dépendances et sorties de build (reconstruites dans l'image)
+**/node_modules
+**/dist
+**/dist-worker
+**/.next
+**/coverage
+**/*.tsbuildinfo
+**/next-env.d.ts
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Outillage local, inutile dans les images
+.git
+.github
+.vscode
+.idea
+.husky/_
+docker-compose*.yml
+Makefile
+**/*.md
+**/*.log

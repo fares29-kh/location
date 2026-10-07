@@ -1,0 +1,76 @@
+# Surcharge de développement : hot-reload, sources montées, ports de debug.
+# Usage : docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build -V
+# (-V recrée les volumes anonymes node_modules quand les dépendances changent.)
+
+x-dev-watch-env:
+  &dev-watch-env # Les événements fichiers ne traversent pas les montages Windows/macOS : on passe en polling.
+  CHOKIDAR_USEPOLLING: 'true'
+  WATCHPACK_POLLING: 'true'
+  TSC_WATCHFILE: DynamicPriorityPolling
+  TSC_WATCHDIRECTORY: RecursiveDirectoryUsingDynamicPriorityPolling
+
+x-api-dev-volumes: &api-dev-volumes
+  - .:/repo
+  - /repo/node_modules
+  - /repo/packages/config/node_modules
+  - /repo/packages/types/node_modules
+  - /repo/apps/api/node_modules
+
+services:
+  traefik:
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.dashboard.rule=Host(`traefik.${APP_DOMAIN:-localhost}`)
+      - traefik.http.routers.dashboard.entrypoints=web
+      - traefik.http.routers.dashboard.service=api@internal
+
+  postgres:
+    ports:
+      - '127.0.0.1:${POSTGRES_PORT:-5432}:5432'
+
+  redis:
+    ports:
+      - '127.0.0.1:${REDIS_PORT:-6379}:6379'
+
+  api:
+    build:
+      target: dev
+    image: drivetn-api:dev
+    working_dir: /repo/apps/api
+    command: sh -c "pnpm --filter @drivetn/types build && pnpm dev:docker"
+    environment:
+      <<: *dev-watch-env
+      NODE_ENV: development
+    volumes: *api-dev-volumes
+    healthcheck:
+      start_period: 180s
+
+  worker:
+    build:
+      target: dev
+    image: drivetn-api:dev
+    working_dir: /repo/apps/api
+    command: pnpm dev:worker
+    environment:
+      <<: *dev-watch-env
+      NODE_ENV: development
+    volumes: *api-dev-volumes
+
+  web:
+    build:
+      target: dev
+    image: drivetn-web:dev
+    working_dir: /repo
+    command: sh -c "pnpm --filter @drivetn/types build && pnpm --filter @drivetn/web dev"
+    environment:
+      <<: *dev-watch-env
+      NODE_ENV: development
+    volumes:
+      - .:/repo
+      - /repo/node_modules
+      - /repo/packages/config/node_modules
+      - /repo/packages/types/node_modules
+      - /repo/apps/web/node_modules
+      - /repo/apps/web/.next
+    healthcheck:
+      start_period: 180s

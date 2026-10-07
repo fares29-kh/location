@@ -1,0 +1,25 @@
+# Configuration statique de Traefik (reverse proxy des sous-domaines *.localhost).
+global:
+  checkNewVersion: false
+  sendAnonymousUsage: false
+
+log:
+  level: INFO
+
+accessLog: {}
+
+ping: {}
+
+api:
+  # Le tableau de bord n'est routé qu'en développement (docker-compose.dev.yml).
+  dashboard: true
+
+entryPoints:
+  web:
+    address: ':80'
+
+providers:
+  docker:
+    endpoint: unix:///var/run/docker.sock
+    exposedByDefault: false
+    network: drivetn
