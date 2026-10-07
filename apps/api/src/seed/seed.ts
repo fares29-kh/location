@@ -2,6 +2,7 @@ import { Logger } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 
 import { PasswordService } from '../auth/password.service';
+import { seedDemoAgency } from './agency.seed';
 import { seedGovernorates } from './governorates.seed';
 import { seedLocations } from './locations.seed';
 import { seedPlatformSettings } from './platform-settings.seed';
@@ -27,6 +28,13 @@ async function main(): Promise<void> {
       const passwords = new PasswordService();
       const created = await seedDemoUsers(prisma, (password) => passwords.hash(password));
       logger.log(`Comptes de démo : ${created} créés sur ${DEMO_USERS.length}`);
+
+      const agency = await seedDemoAgency(prisma);
+      if (agency.created) {
+        logger.log(
+          `Agence de démo : ${agency.vehicles} véhicules, ${agency.bookings} réservations`,
+        );
+      }
     }
   } finally {
     await prisma.$disconnect();

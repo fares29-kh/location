@@ -1,7 +1,9 @@
 import { Module } from '@nestjs/common';
 
+import { AgencyModule } from './agency/agency.module';
 import { AuditModule } from './audit/audit.module';
 import { AuthModule } from './auth/auth.module';
+import { BookingsModule } from './bookings/bookings.module';
 import { SecurityModule } from './common/security/security.module';
 import { ConfigModule } from './config/config.module';
 import { HealthModule } from './health/health.module';
@@ -23,6 +25,8 @@ import { UsersModule } from './users/users.module';
     AuthModule,
     UsersModule,
     LocationsModule,
+    AgencyModule,
+    BookingsModule,
   ],
 })
 export class AppModule {}

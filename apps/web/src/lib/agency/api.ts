@@ -6,9 +6,11 @@ import type {
   VehicleInput,
   VehicleStatus,
 } from '@drivetn/types';
+import { z } from 'zod';
+
+import { apiFetch } from '@/lib/api/client';
 
 import type { DayKey } from './dates';
-import { createMockAgencyApi } from './mock-api';
 import type {
   AgencySettings,
   BookingList,
@@ -30,11 +32,11 @@ import type {
 } from './types';
 
 /**
- * Contrat de l'API du portail agence. Les écrans ne dépendent que de cette interface :
- * brancher l'API NestJS revient à fournir une implémentation basée sur `apiFetch`.
+ * Contrat de l'API du portail agence. Les écrans ne dépendent que de cette interface,
+ * implémentée par les routes `/api/v1/agency/*`.
  */
 export interface AgencyApi {
-  /** Vrai pour l'implémentation de démonstration (données fictives en mémoire). */
+  /** Vrai pour une implémentation de démonstration (données fictives en mémoire). */
   readonly isDemo: boolean;
 
   getDashboard(): Promise<DashboardData>;
@@ -65,8 +67,99 @@ export interface AgencyApi {
   updateConditions(input: RentalConditions): Promise<AgencySettings>;
 }
 
-/** Données de démonstration tant que les modules agence de l'API ne sont pas livrés. */
-export const agencyApi: AgencyApi = createMockAgencyApi();
+/** Réponse typée par le contrat partagé `@drivetn/types` (l'API valide ses propres sorties). */
+function shape<T>() {
+  return z.custom<T>(() => true);
+}
+
+function withQuery(path: string, params: Record<string, string | number>): string {
+  const search = new URLSearchParams(
+    Object.entries(params).map(([key, value]) => [key, String(value)]),
+  );
+  return `${path}?${search.toString()}`;
+}
+
+const segment = encodeURIComponent;
+
+function createHttpAgencyApi(): AgencyApi {
+  return {
+    isDemo: false,
+
+    getDashboard: () => apiFetch('/agency/dashboard', { schema: shape<DashboardData>() }),
+    getNavCounts: () => apiFetch('/agency/nav-counts', { schema: shape<NavCounts>() }),
+
+    listBookings: (query) =>
+      apiFetch(withQuery('/agency/bookings', { ...query }), { schema: shape<BookingList>() }),
+    getBooking: (id) =>
+      apiFetch(`/agency/bookings/${segment(id)}`, { schema: shape<BookingView>() }),
+    transitionBooking: (id, input) =>
+      apiFetch(`/agency/bookings/${segment(id)}/transition`, {
+        method: 'POST',
+        body: input,
+        schema: shape<BookingView>(),
+      }),
+    recordPayment: (bookingId, input) =>
+      apiFetch(`/agency/bookings/${segment(bookingId)}/payments`, {
+        method: 'POST',
+        body: input,
+        schema: shape<BookingView>(),
+      }),
+
+    getPlanning: (from, days) =>
+      apiFetch(withQuery('/agency/planning', { from, days }), { schema: shape<PlanningData>() }),
+
+    listVehicles: () => apiFetch('/agency/vehicles', { schema: shape<VehicleView[]>() }),
+    createVehicle: (input) =>
+      apiFetch('/agency/vehicles', { method: 'POST', body: input, schema: shape<VehicleView>() }),
+    updateVehicle: (id, input) =>
+      apiFetch(`/agency/vehicles/${segment(id)}`, {
+        method: 'PUT',
+        body: input,
+        schema: shape<VehicleView>(),
+      }),
+    setVehicleStatus: (id, status) =>
+      apiFetch(`/agency/vehicles/${segment(id)}/status`, {
+        method: 'PATCH',
+        body: { status },
+        schema: shape<VehicleView>(),
+      }),
+
+    listCustomers: (query) =>
+      apiFetch(withQuery('/agency/customers', { ...query }), {
+        schema: shape<Paginated<CustomerView>>(),
+      }),
+    getCustomer: (id) =>
+      apiFetch(`/agency/customers/${segment(id)}`, { schema: shape<CustomerDetail>() }),
+
+    listPayments: (query) =>
+      apiFetch(withQuery('/agency/payments', { ...query }), { schema: shape<PaymentList>() }),
+
+    listReviews: (filter) =>
+      apiFetch(withQuery('/agency/reviews', { filter }), { schema: shape<ReviewList>() }),
+    replyToReview: (id, reply) =>
+      apiFetch(`/agency/reviews/${segment(id)}/reply`, {
+        method: 'POST',
+        body: { reply },
+        schema: shape<Review>(),
+      }),
+
+    getSettings: () => apiFetch('/agency/settings', { schema: shape<AgencySettings>() }),
+    updateProfile: (input) =>
+      apiFetch('/agency/settings/profile', {
+        method: 'PUT',
+        body: input,
+        schema: shape<AgencySettings>(),
+      }),
+    updateConditions: (input) =>
+      apiFetch('/agency/settings/conditions', {
+        method: 'PUT',
+        body: input,
+        schema: shape<AgencySettings>(),
+      }),
+  };
+}
+
+export const agencyApi: AgencyApi = createHttpAgencyApi();
 
 /** Vrai tant que le portail affiche des données de démonstration. */
 export const AGENCY_DEMO_MODE = agencyApi.isDemo;

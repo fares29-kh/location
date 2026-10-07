@@ -1,8 +1,9 @@
-import { isBookingBlocking, isValidTunisianPhone, summarizePayments } from '@drivetn/types';
 import { describe, expect, it } from 'vitest';
 
+import { isBookingBlocking, summarizePayments } from './booking';
 import { toDayKey } from './dates';
-import { createAgencyDataset } from './mock-data';
+import { createAgencyDataset } from './demo-agency';
+import { isValidTunisianPhone } from './phone';
 
 const NOW = new Date('2026-10-07T09:00:00Z');
 

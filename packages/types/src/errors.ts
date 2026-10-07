@@ -19,6 +19,9 @@ export const ERROR_CODES = [
   'EMAIL_ALREADY_USED',
   'PHONE_NOT_VERIFIED',
   'ACCOUNT_SUSPENDED',
+  // Codes métier des réservations.
+  'VEHICLE_UNAVAILABLE',
+  'BOOKING_NOT_CANCELLABLE',
 ] as const;
 
 export const errorCodeSchema = z.enum(ERROR_CODES);

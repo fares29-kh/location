@@ -1,34 +1,18 @@
-import {
-  type BookingStatus,
-  type LocalizedText,
-  type PaymentKind,
-  type PaymentMethod,
-  rentalDays,
-  type VehicleCategory,
-} from '@drivetn/types';
-
-import { createRandom, type Random } from '@/lib/demo-random';
-
-import { addDays, type DayKey, todayKey, tunisDateTime } from './dates';
+import type { AgencyDataset } from './agency-engine';
 import type {
-  AgencySettings,
   Booking,
   BookingEvent,
   Customer,
   PaymentRecord,
   Review,
   Vehicle,
-} from './types';
-
-/** Jeu de données de démonstration, déterministe (graine fixe) et relatif à la date du jour. */
-export interface AgencyDataset {
-  vehicles: Vehicle[];
-  customers: Customer[];
-  bookings: Booking[];
-  payments: PaymentRecord[];
-  reviews: Review[];
-  settings: AgencySettings;
-}
+} from './agency-portal';
+import { type BookingStatus, type PaymentKind, type PaymentMethod, rentalDays } from './booking';
+import { rentalPriceMillimes } from './catalog';
+import { addDays, type DayKey, todayKey, tunisDateTime } from './dates';
+import type { LocalizedText } from './location';
+import { createRandom, type Random } from './random';
+import type { VehicleCategory } from './vehicle';
 
 const VEHICLE_SPECS: readonly Omit<
   Vehicle,
@@ -239,11 +223,6 @@ function hoursBefore(date: Date, hours: number): Date {
   return new Date(date.getTime() - hours * 3_600_000);
 }
 
-function priceFor(dailyRate: number, days: number): number {
-  const discount = days >= 7 ? 0.9 : 1;
-  return Math.round((dailyRate * days * discount) / 1000) * 1000;
-}
-
 interface Slot {
   start: DayKey;
   days: number;
@@ -399,7 +378,7 @@ export function createAgencyDataset(now: Date = new Date()): AgencyDataset {
       returnLocation: random.chance(0.85) ? place : random.pick(PLACES),
       status,
       dailyRateMillimes: target.dailyRateMillimes,
-      totalMillimes: priceFor(target.dailyRateMillimes, days),
+      totalMillimes: rentalPriceMillimes(target.dailyRateMillimes, days),
       depositMillimes: target.depositMillimes,
       customerNote: random.chance(0.25)
         ? random.pick([

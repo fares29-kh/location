@@ -12,6 +12,11 @@ export const AUDIT_ACTIONS = [
   'auth.password_reset',
   'auth.password_changed',
   'auth.refresh_token_reused',
+  'agency.created',
+  'booking.created',
+  'booking.status_changed',
+  'booking.cancelled_by_customer',
+  'payment.recorded',
 ] as const;
 
 export type AuditAction = (typeof AUDIT_ACTIONS)[number];
