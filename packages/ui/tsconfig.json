@@ -1,0 +1,7 @@
+{
+  "extends": "@drivetn/config/tsconfig/react-library.json",
+  "compilerOptions": {
+    "types": ["node", "@testing-library/jest-dom/vitest"]
+  },
+  "include": ["src", "vitest.config.mts"]
+}
