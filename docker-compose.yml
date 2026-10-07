@@ -196,6 +196,7 @@ services:
       APP_NAME: ${APP_NAME:-DriveTN}
       APP_DOMAIN: ${APP_DOMAIN:-localhost}
       API_INTERNAL_URL: http://api:4000
+      DESIGN_PAGE_ENABLED: ${DESIGN_PAGE_ENABLED:-true}
     depends_on:
       api:
         condition: service_healthy

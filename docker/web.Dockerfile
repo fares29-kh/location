@@ -18,6 +18,7 @@ COPY pnpm-lock.yaml pnpm-workspace.yaml package.json .npmrc ./
 COPY .husky/install.mjs .husky/install.mjs
 COPY packages/config/package.json packages/config/
 COPY packages/types/package.json packages/types/
+COPY packages/ui/package.json packages/ui/
 COPY apps/web/package.json apps/web/
 RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store \
     pnpm install --frozen-lockfile --store-dir /pnpm/store --filter "@drivetn/web..."
