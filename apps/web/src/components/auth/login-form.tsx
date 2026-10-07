@@ -26,6 +26,7 @@ import { ApiError } from '@/lib/api/errors';
 
 import { ChannelPicker } from './channel-picker';
 import { controlProps } from './control-props';
+import { type DemoCredentials, DemoAccounts } from './demo-accounts';
 import { PasswordInput } from './password-input';
 import { type PendingVerification, PhoneVerification } from './phone-verification';
 import { applyServerIssues, useAuthMessages } from './use-auth-messages';
@@ -34,11 +35,18 @@ import { useCompleteAuth } from './use-complete-auth';
 type PasswordLoginOutcome =
   { kind: 'authenticated'; result: AuthResult } | { kind: 'verify'; dispatch: OtpDispatch };
 
+interface PasswordCredentials {
+  identifier: string;
+  password: string;
+}
+
 function PasswordLogin({
+  initialValues,
   redirecting,
   onAuthenticated,
   onVerificationRequired,
 }: {
+  initialValues: PasswordCredentials;
   redirecting: boolean;
   onAuthenticated: (result: AuthResult) => void;
   onVerificationRequired: (verification: PendingVerification) => void;
@@ -49,11 +57,11 @@ function PasswordLogin({
   const [formError, setFormError] = useState<string | null>(null);
   const form = useForm({
     resolver: zodResolver(loginSchema, undefined, { raw: true }),
-    defaultValues: { identifier: '', password: '' },
+    defaultValues: initialValues,
   });
 
   const login = useMutation({
-    mutationFn: async (values: { identifier: string; password: string }) => {
+    mutationFn: async (values: PasswordCredentials) => {
       try {
         const result = await authApi.login(values);
         return { kind: 'authenticated', result } satisfies PasswordLoginOutcome;
@@ -203,11 +211,23 @@ function OtpLogin({ onCodeSent }: { onCodeSent: (verification: PendingVerificati
 }
 
 /** Connexion par mot de passe ou par code à usage unique, puis vérification du téléphone si besoin. */
-export function LoginForm({ portal, nextPath }: { portal: Portal; nextPath: string | null }) {
+export function LoginForm({
+  portal,
+  nextPath,
+  demo = null,
+}: {
+  portal: Portal;
+  nextPath: string | null;
+  demo?: DemoCredentials | null;
+}) {
   const t = useTranslations('auth');
   const { complete, redirecting } = useCompleteAuth(nextPath);
   const [method, setMethod] = useState('password');
   const [verification, setVerification] = useState<PendingVerification | null>(null);
+  const [prefill, setPrefill] = useState({
+    version: 0,
+    values: { identifier: '', password: '' } satisfies PasswordCredentials,
+  });
 
   if (verification !== null) {
     return (
@@ -237,6 +257,8 @@ export function LoginForm({ portal, nextPath }: { portal: Portal; nextPath: stri
         </TabsList>
         <TabsContent value="password" className="mt-6">
           <PasswordLogin
+            key={prefill.version}
+            initialValues={prefill.values}
             redirecting={redirecting}
             onAuthenticated={complete}
             onVerificationRequired={setVerification}
@@ -257,6 +279,19 @@ export function LoginForm({ portal, nextPath }: { portal: Portal; nextPath: stri
             {t('login.signupLink')}
           </Link>
         </p>
+      )}
+
+      {demo !== null && demo.accounts.length > 0 && (
+        <DemoAccounts
+          demo={demo}
+          onUse={(account) => {
+            setMethod('password');
+            setPrefill((current) => ({
+              version: current.version + 1,
+              values: { identifier: account.email, password: demo.password },
+            }));
+          }}
+        />
       )}
     </div>
   );

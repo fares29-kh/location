@@ -205,6 +205,7 @@ services:
       APP_DOMAIN: ${APP_DOMAIN:-localhost}
       API_INTERNAL_URL: http://api:4000
       DESIGN_PAGE_ENABLED: ${DESIGN_PAGE_ENABLED:-true}
+      DEMO_ACCOUNTS_ENABLED: ${SEED_DEMO_ACCOUNTS:-false}
     depends_on:
       api:
         condition: service_healthy

@@ -35,7 +35,7 @@ Au démarrage, l'API applique les migrations Prisma (`prisma migrate deploy`) pu
 
 Le seed crée les 24 gouvernorats et les lieux de prise en charge (villes, aéroports, gares et ports).
 
-**Comptes de démo** : créés uniquement si `SEED_DEMO_ACCOUNTS=true` (valeur de `.env.example`, jamais en production). Mot de passe commun : `Demo2026!`.
+**Comptes de démo** : créés uniquement si `SEED_DEMO_ACCOUNTS=true` (valeur de `.env.example`, jamais en production). Mot de passe commun : `Demo2026!`. Le même drapeau (transmis au front sous `DEMO_ACCOUNTS_ENABLED`) les affiche sous le formulaire de connexion de chaque portail, avec un bouton qui remplit les identifiants.
 
 | Compte             | Téléphone       | Rôle                  | Portail                 |
 | ------------------ | --------------- | --------------------- | ----------------------- |
@@ -122,27 +122,27 @@ pnpm --filter @drivetn/web dev
 
 Toutes les variables sont documentées dans [`.env.example`](.env.example). Les principales :
 
-| Variable                                 | Rôle                                           | Défaut                               |
-| ---------------------------------------- | ---------------------------------------------- | ------------------------------------ |
-| `APP_NAME`                               | Nom affiché de la plateforme                   | `DriveTN`                            |
-| `APP_DOMAIN`                             | Domaine racine des portails                    | `localhost`                          |
-| `APP_TIMEZONE`                           | Fuseau d'affichage                             | `Africa/Tunis`                       |
-| `HTTP_PORT`                              | Port HTTP publié par Traefik                   | `80`                                 |
-| `POSTGRES_PASSWORD`                      | Mot de passe PostgreSQL                        | **obligatoire**                      |
-| `REDIS_PASSWORD`                         | Mot de passe Redis                             | **obligatoire**                      |
-| `MINIO_ROOT_PASSWORD`                    | Mot de passe MinIO (8 caractères minimum)      | **obligatoire**                      |
-| `S3_BUCKET_PUBLIC` / `S3_BUCKET_PRIVATE` | Buckets photos / documents d'identité          | `drivetn-public` / `drivetn-private` |
-| `SWAGGER_ENABLED`                        | Active `/api/docs`                             | `true`                               |
-| `CORS_ORIGINS`                           | Origines CORS autorisées (vide = même origine) | vide                                 |
-| `SEED_ON_START`                          | Exécute le seed au démarrage de l'API          | `true`                               |
-| `SEED_DEMO_ACCOUNTS`                     | Crée les comptes de démo (jamais en prod)      | `false` (`true` dans `.env.example`) |
-| `JWT_ACCESS_SECRET`                      | Signature des access tokens (32 car. min.)     | **obligatoire**                      |
-| `OTP_HASH_SECRET`                        | Clé HMAC des codes OTP stockés (32 car. min.)  | **obligatoire**                      |
-| `ACCESS_TOKEN_TTL_SECONDS`               | Durée de vie de l'access token                 | `900`                                |
-| `REFRESH_TOKEN_TTL_DAYS`                 | Durée de vie du refresh token rotatif          | `30`                                 |
-| `COOKIE_SECURE`                          | Cookies `Secure` (à activer en HTTPS)          | `false`                              |
-| `MESSAGING_PROVIDER`                     | Envoi des SMS/WhatsApp (`console` en dev)      | `console`                            |
-| `DESIGN_PAGE_ENABLED`                    | Active la page `/design` (`false` en prod)     | `false` (`true` dans `.env.example`) |
+| Variable                                 | Rôle                                                                                       | Défaut                               |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------ | ------------------------------------ |
+| `APP_NAME`                               | Nom affiché de la plateforme                                                               | `DriveTN`                            |
+| `APP_DOMAIN`                             | Domaine racine des portails                                                                | `localhost`                          |
+| `APP_TIMEZONE`                           | Fuseau d'affichage                                                                         | `Africa/Tunis`                       |
+| `HTTP_PORT`                              | Port HTTP publié par Traefik                                                               | `80`                                 |
+| `POSTGRES_PASSWORD`                      | Mot de passe PostgreSQL                                                                    | **obligatoire**                      |
+| `REDIS_PASSWORD`                         | Mot de passe Redis                                                                         | **obligatoire**                      |
+| `MINIO_ROOT_PASSWORD`                    | Mot de passe MinIO (8 caractères minimum)                                                  | **obligatoire**                      |
+| `S3_BUCKET_PUBLIC` / `S3_BUCKET_PRIVATE` | Buckets photos / documents d'identité                                                      | `drivetn-public` / `drivetn-private` |
+| `SWAGGER_ENABLED`                        | Active `/api/docs`                                                                         | `true`                               |
+| `CORS_ORIGINS`                           | Origines CORS autorisées (vide = même origine)                                             | vide                                 |
+| `SEED_ON_START`                          | Exécute le seed au démarrage de l'API                                                      | `true`                               |
+| `SEED_DEMO_ACCOUNTS`                     | Crée les comptes de démo (jamais en prod) et les affiche sous les formulaires de connexion | `false` (`true` dans `.env.example`) |
+| `JWT_ACCESS_SECRET`                      | Signature des access tokens (32 car. min.)                                                 | **obligatoire**                      |
+| `OTP_HASH_SECRET`                        | Clé HMAC des codes OTP stockés (32 car. min.)                                              | **obligatoire**                      |
+| `ACCESS_TOKEN_TTL_SECONDS`               | Durée de vie de l'access token                                                             | `900`                                |
+| `REFRESH_TOKEN_TTL_DAYS`                 | Durée de vie du refresh token rotatif                                                      | `30`                                 |
+| `COOKIE_SECURE`                          | Cookies `Secure` (à activer en HTTPS)                                                      | `false`                              |
+| `MESSAGING_PROVIDER`                     | Envoi des SMS/WhatsApp (`console` en dev)                                                  | `console`                            |
+| `DESIGN_PAGE_ENABLED`                    | Active la page `/design` (`false` en prod)                                                 | `false` (`true` dans `.env.example`) |
 
 L'API et le front valident leur configuration avec Zod au démarrage et refusent de démarrer si une variable est invalide.
 

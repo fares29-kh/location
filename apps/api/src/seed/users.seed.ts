@@ -1,8 +1,7 @@
-import { toE164 } from '@drivetn/types';
+import { DEMO_PASSWORD, type DemoAccount, getDemoAccounts, toE164 } from '@drivetn/types';
 import type { AdminRole, PrismaClient, UserRole } from '@prisma/client';
 
-/** Mot de passe commun des comptes de démo (développement uniquement, documenté dans le README). */
-export const DEMO_PASSWORD = 'Demo2026!';
+export { DEMO_PASSWORD };
 
 export interface DemoUserSeed {
   email: string;
@@ -13,26 +12,32 @@ export interface DemoUserSeed {
   lastName: string;
 }
 
+/** Les identifiants viennent de `@drivetn/types`, partagés avec les pages de connexion. */
+function credentials(portal: DemoAccount['portal']): Pick<DemoUserSeed, 'email' | 'phone'> {
+  const [account] = getDemoAccounts(portal);
+  if (account === undefined) {
+    throw new Error(`Aucun compte de démo pour le portail ${portal}`);
+  }
+  return { email: account.email, phone: account.phone };
+}
+
 export const DEMO_USERS: readonly DemoUserSeed[] = [
   {
-    email: 'admin@demo.tn',
-    phone: '20000001',
+    ...credentials('admin'),
     role: 'ADMIN',
     adminRole: 'SUPER_ADMIN',
     firstName: 'Salma',
     lastName: 'Trabelsi',
   },
   {
-    email: 'agency@demo.tn',
-    phone: '20000002',
+    ...credentials('agency'),
     role: 'AGENCY_OWNER',
     adminRole: null,
     firstName: 'Karim',
     lastName: 'Ben Ali',
   },
   {
-    email: 'customer@demo.tn',
-    phone: '20000003',
+    ...credentials('client'),
     role: 'CUSTOMER',
     adminRole: null,
     firstName: 'Amira',

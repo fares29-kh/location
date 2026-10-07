@@ -1,8 +1,9 @@
-import type { Portal } from '@drivetn/types';
+import { DEMO_PASSWORD, getDemoAccounts, type Portal } from '@drivetn/types';
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import type { ReactNode } from 'react';
 
+import { getServerEnv } from '@/env';
 import { redirectIfAuthenticated } from '@/lib/auth/session';
 import { sanitizeNextPath } from '@/lib/auth/routes';
 import { type LocaleParams, resolveLocale } from '@/lib/locale-params';
@@ -59,7 +60,15 @@ export function createLoginPage(portal: Portal) {
     return (
       <AuthPageFrame portal={portal}>
         <AuthCard title={t('login.title')} description={t(`login.subtitle.${portal}`)}>
-          <LoginForm portal={portal} nextPath={await nextPathFrom(searchParams)} />
+          <LoginForm
+            portal={portal}
+            nextPath={await nextPathFrom(searchParams)}
+            demo={
+              getServerEnv().DEMO_ACCOUNTS_ENABLED
+                ? { accounts: getDemoAccounts(portal), password: DEMO_PASSWORD }
+                : null
+            }
+          />
         </AuthCard>
       </AuthPageFrame>
     );
