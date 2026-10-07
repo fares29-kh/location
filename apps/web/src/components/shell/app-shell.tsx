@@ -1,5 +1,6 @@
 'use client';
 
+import type { CurrentUser } from '@drivetn/types';
 import { Badge } from '@drivetn/ui/badge';
 import { Button } from '@drivetn/ui/button';
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@drivetn/ui/sheet';
@@ -16,6 +17,7 @@ import { type LucideIcon, Menu, PanelLeftClose, PanelLeftOpen } from 'lucide-rea
 import { useTranslations } from 'next-intl';
 import { type ReactNode, useState } from 'react';
 
+import { UserMenu } from '@/components/auth/user-menu';
 import { BrandLogo } from '@/components/brand-logo';
 import { isActivePath } from '@/components/client/client-nav';
 import { LocaleSwitcher } from '@/components/locale-switcher';
@@ -38,6 +40,8 @@ export interface ShellNavSection {
 }
 
 export interface AppShellProps {
+  portal: 'agency' | 'admin';
+  user: CurrentUser;
   portalLabel: string;
   sections: ShellNavSection[];
   children: ReactNode;
@@ -79,7 +83,7 @@ function ShellNavigation({
 }
 
 /** Mise en page des espaces agence et admin : barre latérale repliable, menu mobile, barre supérieure. */
-export function AppShell({ portalLabel, sections, children }: AppShellProps) {
+export function AppShell({ portal, user, portalLabel, sections, children }: AppShellProps) {
   const t = useTranslations('common');
   const tShell = useTranslations('shell');
   const [collapsed, setCollapsed] = useState(false);
@@ -158,6 +162,7 @@ export function AppShell({ portalLabel, sections, children }: AppShellProps) {
           <TopbarSection>
             <LocaleSwitcher />
             <ThemeToggle />
+            <UserMenu user={user} portal={portal} className="ms-2" />
           </TopbarSection>
         </Topbar>
         <main id={MAIN_CONTENT_ID} className="flex-1 p-4 sm:p-6 lg:p-8">

@@ -398,5 +398,175 @@
       "whatsapp": "Contacter l’agence",
       "whatsappMessage": "Bonjour, je vous contacte au sujet de ma réservation DriveTN."
     }
+  },
+  "auth": {
+    "greeting": "Bonjour {name}",
+    "fields": {
+      "firstName": "Prénom",
+      "lastName": "Nom",
+      "phone": "Téléphone",
+      "email": "Email",
+      "emailOptional": "Email (facultatif)",
+      "password": "Mot de passe",
+      "newPassword": "Nouveau mot de passe",
+      "currentPassword": "Mot de passe actuel",
+      "identifier": "Téléphone ou email",
+      "identifierPlaceholder": "98 123 456 ou nom@exemple.tn",
+      "code": "Code de vérification"
+    },
+    "passwordHint": "8 caractères minimum, avec au moins une lettre et un chiffre.",
+    "showPassword": "Afficher le mot de passe",
+    "hidePassword": "Masquer le mot de passe",
+    "channel": {
+      "label": "Recevoir le code par",
+      "SMS": "SMS",
+      "WHATSAPP": "WhatsApp"
+    },
+    "login": {
+      "title": "Connexion",
+      "subtitle": {
+        "client": "Retrouvez vos réservations et réservez en quelques clics.",
+        "agency": "Accédez au tableau de bord de votre agence.",
+        "admin": "Espace réservé à l'équipe de la plateforme."
+      },
+      "methodsLabel": "Méthode de connexion",
+      "methodPassword": "Mot de passe",
+      "methodOtp": "Code par SMS",
+      "otpHint": "Nous vous envoyons un code à usage unique, sans mot de passe.",
+      "submit": "Se connecter",
+      "sendCode": "Recevoir un code",
+      "forgotPassword": "Mot de passe oublié ?",
+      "noAccount": "Pas encore de compte ?",
+      "signupLink": "Créer un compte"
+    },
+    "signup": {
+      "title": {
+        "client": "Créer votre compte",
+        "agency": "Créer votre compte agence"
+      },
+      "subtitle": {
+        "client": "Un compte gratuit pour réserver sans carte bancaire et suivre vos locations.",
+        "agency": "Commencez par votre compte gérant : vous configurerez ensuite votre agence et votre flotte."
+      },
+      "submit": "Créer mon compte",
+      "terms": "En créant un compte, vous acceptez les conditions d'utilisation et la politique de confidentialité de la plateforme.",
+      "hasAccount": "Déjà un compte ?",
+      "loginLink": "Se connecter"
+    },
+    "otp": {
+      "title": "Vérifiez votre téléphone",
+      "description": "Saisissez le code à 6 chiffres envoyé au {phone}.",
+      "digitLabel": "Chiffre {index} sur {length}",
+      "verify": "Valider le code",
+      "resend": "Renvoyer le code",
+      "resendIn": "Renvoyer le code dans {seconds} s",
+      "resent": "Un nouveau code vous a été envoyé.",
+      "back": "Modifier le numéro"
+    },
+    "forgot": {
+      "title": "Mot de passe oublié",
+      "subtitle": "Indiquez votre numéro : nous vous enverrons un code pour choisir un nouveau mot de passe.",
+      "sendCode": "Envoyer le code",
+      "resetTitle": "Nouveau mot de passe",
+      "resetSubtitle": "Saisissez le code reçu au {phone} et votre nouveau mot de passe.",
+      "submit": "Enregistrer le mot de passe",
+      "successTitle": "Mot de passe modifié",
+      "successText": "Vous pouvez maintenant vous connecter avec votre nouveau mot de passe.",
+      "backToLogin": "Retour à la connexion"
+    },
+    "handoff": {
+      "title": "Connexion en cours",
+      "text": "Nous ouvrons votre espace, un instant…",
+      "errorTitle": "Lien de connexion expiré",
+      "errorText": "Ce lien n'est plus valide. Connectez-vous à nouveau pour accéder à votre espace.",
+      "backToLogin": "Se connecter"
+    },
+    "aside": {
+      "agency": {
+        "title": "Votre agence, en ligne et organisée",
+        "points": {
+          "fleet": "Flotte, tarifs saisonniers et disponibilités au même endroit",
+          "bookings": "Réservations confirmées en un clic, contact WhatsApp direct",
+          "payments": "Encaissements et cautions déclarés, sans paiement en ligne"
+        }
+      },
+      "admin": {
+        "title": "Supervision de la plateforme",
+        "points": {
+          "agencies": "Validation et suivi des agences",
+          "billing": "Abonnements et facturation des agences",
+          "audit": "Actions sensibles tracées dans le journal d'audit"
+        }
+      }
+    },
+    "userMenu": {
+      "label": "Menu du compte",
+      "account": "Mon compte",
+      "logout": "Se déconnecter"
+    },
+    "roles": {
+      "CUSTOMER": "Client",
+      "AGENCY_OWNER": "Gérant d'agence",
+      "AGENCY_STAFF": "Collaborateur",
+      "ADMIN": "Administrateur"
+    },
+    "adminRoles": {
+      "SUPER_ADMIN": "Super-administrateur",
+      "SUPPORT": "Support",
+      "FINANCE": "Finance"
+    },
+    "errors": {
+      "generic": "Une erreur est survenue. Réessayez.",
+      "NETWORK_ERROR": "Connexion impossible. Vérifiez votre réseau et réessayez.",
+      "INVALID_CREDENTIALS": "Identifiant ou mot de passe incorrect.",
+      "OTP_INVALID": "Code incorrect. Essais restants : {attempts}.",
+      "OTP_EXPIRED": "Ce code a expiré. Demandez-en un nouveau.",
+      "OTP_TOO_MANY_ATTEMPTS": "Trop d'essais. Demandez un nouveau code.",
+      "PHONE_ALREADY_USED": "Ce numéro est déjà associé à un compte. Connectez-vous.",
+      "EMAIL_ALREADY_USED": "Cet email est déjà associé à un compte.",
+      "PHONE_NOT_VERIFIED": "Vérifiez votre numéro de téléphone pour continuer.",
+      "ACCOUNT_SUSPENDED": "Ce compte est suspendu. Contactez le support.",
+      "TOO_MANY_REQUESTS": "Trop de tentatives. Réessayez dans {seconds} s.",
+      "FORBIDDEN": "Action non autorisée sur cet espace.",
+      "UNAUTHORIZED": "Votre session a expiré. Reconnectez-vous."
+    },
+    "validation": {
+      "generic": "Valeur invalide.",
+      "REQUIRED": "Ce champ est obligatoire.",
+      "TOO_LONG": "Ce champ est trop long.",
+      "INVALID_TUNISIAN_PHONE": "Numéro invalide : 8 chiffres commençant par 2, 3, 4, 5, 7 ou 9.",
+      "INVALID_EMAIL": "Adresse email invalide.",
+      "INVALID_IDENTIFIER": "Saisissez un numéro tunisien ou une adresse email valide.",
+      "INVALID_OTP_FORMAT": "Le code contient 6 chiffres.",
+      "PASSWORD_TOO_SHORT": "8 caractères minimum.",
+      "PASSWORD_TOO_LONG": "128 caractères maximum.",
+      "PASSWORD_TOO_WEAK": "Utilisez au moins une lettre et un chiffre."
+    }
+  },
+  "account": {
+    "title": "Mon compte",
+    "subtitle": "Gérez vos informations personnelles et la sécurité de votre compte.",
+    "profile": {
+      "title": "Informations personnelles",
+      "description": "Ces informations sont transmises à l'agence lors de vos réservations.",
+      "language": "Langue préférée (SMS et emails)",
+      "save": "Enregistrer",
+      "saved": "Profil mis à jour."
+    },
+    "phone": {
+      "verified": "Vérifié",
+      "hint": "Pour changer de numéro, contactez le support."
+    },
+    "security": {
+      "title": "Mot de passe",
+      "description": "Vos autres appareils seront déconnectés après le changement.",
+      "submit": "Changer le mot de passe",
+      "success": "Mot de passe modifié."
+    },
+    "session": {
+      "title": "Session",
+      "description": "Déconnectez-vous de cet appareil.",
+      "logout": "Se déconnecter"
+    }
   }
 }

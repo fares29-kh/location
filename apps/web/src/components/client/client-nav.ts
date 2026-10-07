@@ -18,7 +18,7 @@ export const BOTTOM_NAV: readonly ClientNavItem[] = [
   { id: 'home', href: '/', icon: House },
   { id: 'search', href: null, icon: Search },
   { id: 'bookings', href: null, icon: CalendarCheck },
-  { id: 'account', href: null, icon: UserRound },
+  { id: 'account', href: '/account', icon: UserRound },
 ];
 
 export function isActivePath(pathname: string, href: string): boolean {

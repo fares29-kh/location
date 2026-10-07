@@ -11,15 +11,18 @@ import {
   Star,
   Users,
 } from 'lucide-react';
+import type { CurrentUser } from '@drivetn/types';
 import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 
 import { AppShell, type ShellNavSection } from '@/components/shell/app-shell';
 
 export function AgencyShell({
+  user,
   designEnabled,
   children,
 }: {
+  user: CurrentUser;
   designEnabled: boolean;
   children: ReactNode;
 }) {
@@ -54,7 +57,12 @@ export function AgencyShell({
   ];
 
   return (
-    <AppShell portalLabel={tCommon('portals.agency')} sections={sections}>
+    <AppShell
+      portal="agency"
+      user={user}
+      portalLabel={tCommon('portals.agency')}
+      sections={sections}
+    >
       {children}
     </AppShell>
   );

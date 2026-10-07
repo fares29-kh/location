@@ -2,8 +2,6 @@ import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 
 import { RootDocument } from '@/components/root-document';
-import { AdminShell } from '@/components/shell/admin-shell';
-import { getServerEnv } from '@/env';
 import { type LocaleParams, resolveLocale } from '@/lib/locale-params';
 import { buildPortalMetadata, buildPortalViewport } from '@/lib/metadata';
 
@@ -21,7 +19,7 @@ export default async function AdminLayout({
 
   return (
     <RootDocument locale={locale} portal="admin">
-      <AdminShell designEnabled={getServerEnv().DESIGN_PAGE_ENABLED}>{children}</AdminShell>
+      {children}
     </RootDocument>
   );
 }

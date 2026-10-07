@@ -398,5 +398,175 @@
       "whatsapp": "Contact the agency",
       "whatsappMessage": "Hello, I am contacting you about my DriveTN booking."
     }
+  },
+  "auth": {
+    "greeting": "Hello {name}",
+    "fields": {
+      "firstName": "First name",
+      "lastName": "Last name",
+      "phone": "Phone",
+      "email": "Email",
+      "emailOptional": "Email (optional)",
+      "password": "Password",
+      "newPassword": "New password",
+      "currentPassword": "Current password",
+      "identifier": "Phone or email",
+      "identifierPlaceholder": "98 123 456 or name@example.com",
+      "code": "Verification code"
+    },
+    "passwordHint": "At least 8 characters, with at least one letter and one digit.",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "channel": {
+      "label": "Receive the code by",
+      "SMS": "SMS",
+      "WHATSAPP": "WhatsApp"
+    },
+    "login": {
+      "title": "Sign in",
+      "subtitle": {
+        "client": "Find your bookings and book in a few clicks.",
+        "agency": "Access your agency dashboard.",
+        "admin": "Restricted to the platform team."
+      },
+      "methodsLabel": "Sign-in method",
+      "methodPassword": "Password",
+      "methodOtp": "Code by SMS",
+      "otpHint": "We send you a one-time code, no password needed.",
+      "submit": "Sign in",
+      "sendCode": "Get a code",
+      "forgotPassword": "Forgot your password?",
+      "noAccount": "No account yet?",
+      "signupLink": "Create an account"
+    },
+    "signup": {
+      "title": {
+        "client": "Create your account",
+        "agency": "Create your agency account"
+      },
+      "subtitle": {
+        "client": "A free account to book without a credit card and track your rentals.",
+        "agency": "Start with your manager account: you will then set up your agency and fleet."
+      },
+      "submit": "Create my account",
+      "terms": "By creating an account, you accept the platform's terms of use and privacy policy.",
+      "hasAccount": "Already have an account?",
+      "loginLink": "Sign in"
+    },
+    "otp": {
+      "title": "Verify your phone",
+      "description": "Enter the 6-digit code sent to {phone}.",
+      "digitLabel": "Digit {index} of {length}",
+      "verify": "Verify code",
+      "resend": "Resend code",
+      "resendIn": "Resend code in {seconds} s",
+      "resent": "A new code has been sent.",
+      "back": "Change number"
+    },
+    "forgot": {
+      "title": "Forgot password",
+      "subtitle": "Enter your number: we will send you a code to choose a new password.",
+      "sendCode": "Send code",
+      "resetTitle": "New password",
+      "resetSubtitle": "Enter the code sent to {phone} and your new password.",
+      "submit": "Save password",
+      "successTitle": "Password changed",
+      "successText": "You can now sign in with your new password.",
+      "backToLogin": "Back to sign in"
+    },
+    "handoff": {
+      "title": "Signing you in",
+      "text": "Opening your workspace, one moment…",
+      "errorTitle": "Sign-in link expired",
+      "errorText": "This link is no longer valid. Sign in again to access your workspace.",
+      "backToLogin": "Sign in"
+    },
+    "aside": {
+      "agency": {
+        "title": "Your agency, online and organised",
+        "points": {
+          "fleet": "Fleet, seasonal rates and availability in one place",
+          "bookings": "Confirm bookings in one click, contact customers on WhatsApp",
+          "payments": "Payments and deposits recorded, no online payment"
+        }
+      },
+      "admin": {
+        "title": "Platform supervision",
+        "points": {
+          "agencies": "Agency approval and monitoring",
+          "billing": "Agency subscriptions and invoicing",
+          "audit": "Sensitive actions tracked in the audit log"
+        }
+      }
+    },
+    "userMenu": {
+      "label": "Account menu",
+      "account": "My account",
+      "logout": "Sign out"
+    },
+    "roles": {
+      "CUSTOMER": "Customer",
+      "AGENCY_OWNER": "Agency manager",
+      "AGENCY_STAFF": "Team member",
+      "ADMIN": "Administrator"
+    },
+    "adminRoles": {
+      "SUPER_ADMIN": "Super administrator",
+      "SUPPORT": "Support",
+      "FINANCE": "Finance"
+    },
+    "errors": {
+      "generic": "Something went wrong. Please try again.",
+      "NETWORK_ERROR": "Unable to connect. Check your network and try again.",
+      "INVALID_CREDENTIALS": "Incorrect login or password.",
+      "OTP_INVALID": "Incorrect code. Attempts left: {attempts}.",
+      "OTP_EXPIRED": "This code has expired. Request a new one.",
+      "OTP_TOO_MANY_ATTEMPTS": "Too many attempts. Request a new code.",
+      "PHONE_ALREADY_USED": "This number is already linked to an account. Please sign in.",
+      "EMAIL_ALREADY_USED": "This email is already linked to an account.",
+      "PHONE_NOT_VERIFIED": "Verify your phone number to continue.",
+      "ACCOUNT_SUSPENDED": "This account is suspended. Contact support.",
+      "TOO_MANY_REQUESTS": "Too many attempts. Try again in {seconds} s.",
+      "FORBIDDEN": "This action is not allowed on this workspace.",
+      "UNAUTHORIZED": "Your session has expired. Please sign in again."
+    },
+    "validation": {
+      "generic": "Invalid value.",
+      "REQUIRED": "This field is required.",
+      "TOO_LONG": "This field is too long.",
+      "INVALID_TUNISIAN_PHONE": "Invalid number: 8 digits starting with 2, 3, 4, 5, 7 or 9.",
+      "INVALID_EMAIL": "Invalid email address.",
+      "INVALID_IDENTIFIER": "Enter a valid Tunisian number or email address.",
+      "INVALID_OTP_FORMAT": "The code has 6 digits.",
+      "PASSWORD_TOO_SHORT": "At least 8 characters.",
+      "PASSWORD_TOO_LONG": "128 characters maximum.",
+      "PASSWORD_TOO_WEAK": "Use at least one letter and one digit."
+    }
+  },
+  "account": {
+    "title": "My account",
+    "subtitle": "Manage your personal details and account security.",
+    "profile": {
+      "title": "Personal details",
+      "description": "These details are shared with the agency when you book.",
+      "language": "Preferred language (SMS and emails)",
+      "save": "Save",
+      "saved": "Profile updated."
+    },
+    "phone": {
+      "verified": "Verified",
+      "hint": "To change your number, contact support."
+    },
+    "security": {
+      "title": "Password",
+      "description": "Your other devices will be signed out after the change.",
+      "submit": "Change password",
+      "success": "Password changed."
+    },
+    "session": {
+      "title": "Session",
+      "description": "Sign out from this device.",
+      "logout": "Sign out"
+    }
   }
 }
