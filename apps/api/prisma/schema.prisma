@@ -1,0 +1,23 @@
+// Schéma Prisma DriveTN.
+// Conventions : montants en millimes (Int), dates en UTC, tables en snake_case.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// Paramètres globaux de la plateforme (TVA, timbre fiscal, commission par défaut...).
+/// Les taux sont exprimés en points de base (1900 = 19 %), les montants en millimes.
+model PlatformSetting {
+  key         String   @id
+  value       Json
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("platform_settings")
+}
