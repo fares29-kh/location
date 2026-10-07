@@ -2,6 +2,7 @@ import js from '@eslint/js';
 import nextPlugin from '@next/eslint-plugin-next';
 import prettier from 'eslint-config-prettier';
 import { defineConfig } from 'eslint/config';
+import jsxA11y from 'eslint-plugin-jsx-a11y';
 import reactHooks from 'eslint-plugin-react-hooks';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
@@ -9,11 +10,17 @@ import tseslint from 'typescript-eslint';
 /**
  * Configuration ESLint (flat config) partagée par tout le monorepo.
  *
- * @param {{ tsconfigRootDir: string; nestApps?: string[]; nextApps?: string[] }} options
+ * @param {{ tsconfigRootDir: string; nestApps?: string[]; nextApps?: string[]; reactPackages?: string[] }} options
  */
-export function createConfig({ tsconfigRootDir, nestApps = [], nextApps = [] }) {
+export function createConfig({
+  tsconfigRootDir,
+  nestApps = [],
+  nextApps = [],
+  reactPackages = [],
+}) {
   const nestFiles = nestApps.map((dir) => `${dir}/**/*.ts`);
   const nextFiles = nextApps.map((dir) => `${dir}/**/*.{ts,tsx}`);
+  const reactFiles = [...nextApps, ...reactPackages].map((dir) => `${dir}/**/*.{ts,tsx}`);
 
   return defineConfig(
     {
@@ -64,18 +71,29 @@ export function createConfig({ tsconfigRootDir, nestApps = [], nextApps = [] }) 
           },
         ]
       : []),
+    ...(reactFiles.length > 0
+      ? [
+          {
+            files: reactFiles,
+            plugins: { 'react-hooks': reactHooks, 'jsx-a11y': jsxA11y },
+            languageOptions: { globals: { ...globals.browser, ...globals.node } },
+            rules: {
+              ...reactHooks.configs.recommended.rules,
+              ...jsxA11y.flatConfigs.recommended.rules,
+              '@typescript-eslint/consistent-type-imports': 'error',
+            },
+          },
+        ]
+      : []),
     ...(nextFiles.length > 0
       ? [
           {
             files: nextFiles,
-            plugins: { '@next/next': nextPlugin, 'react-hooks': reactHooks },
-            languageOptions: { globals: { ...globals.browser, ...globals.node } },
+            plugins: { '@next/next': nextPlugin },
             settings: { next: { rootDir: nextApps } },
             rules: {
               ...nextPlugin.configs.recommended.rules,
               ...nextPlugin.configs['core-web-vitals'].rules,
-              ...reactHooks.configs.recommended.rules,
-              '@typescript-eslint/consistent-type-imports': 'error',
             },
           },
         ]
