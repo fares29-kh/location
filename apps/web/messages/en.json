@@ -1,0 +1,321 @@
+{
+  "common": {
+    "tagline": "Car rental all across Tunisia",
+    "noOnlinePayment": "No online payment: you pay the agency directly.",
+    "skipToContent": "Skip to main content",
+    "comingSoon": "Soon",
+    "close": "Close",
+    "openMenu": "Open menu",
+    "retry": "Try again",
+    "backHome": "Back to home",
+    "language": "Language",
+    "theme": {
+      "label": "Theme",
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    },
+    "portals": {
+      "client": "Customer area",
+      "agency": "Agency area",
+      "admin": "Administration"
+    }
+  },
+  "notFound": {
+    "title": "Page not found",
+    "description": "The page you are looking for does not exist or has been moved."
+  },
+  "routeError": {
+    "title": "Something went wrong",
+    "description": "We could not display this page. Please try again in a moment."
+  },
+  "apiStatus": {
+    "title": "Platform status",
+    "status": {
+      "ok": "Operational",
+      "degraded": "Degraded",
+      "error": "Error",
+      "unreachable": "Unreachable"
+    },
+    "checks": {
+      "database": "Database",
+      "redis": "Cache and queues",
+      "worker": "Background jobs"
+    },
+    "up": "Available",
+    "down": "Unavailable"
+  },
+  "client": {
+    "nav": {
+      "mainLabel": "Main navigation",
+      "mobileLabel": "Mobile navigation",
+      "home": "Home",
+      "search": "Search",
+      "agencies": "Agencies",
+      "bookings": "Bookings",
+      "account": "Account",
+      "login": "Log in",
+      "signup": "Sign up"
+    },
+    "banner": {
+      "label": "Our commitments",
+      "noPayment": "No online payment",
+      "payAtAgency": "Pay at the agency",
+      "verifiedAgencies": "Verified agencies",
+      "support": "Direct WhatsApp contact"
+    },
+    "home": {
+      "eyebrow": "Car rental in Tunisia",
+      "title": "The right car at the right price, anywhere in Tunisia",
+      "subtitle": "Compare local agencies, book without a credit card and pay on site when you pick up the car.",
+      "searchCta": "Search for a car",
+      "agencyCta": "Are you an agency?",
+      "features": {
+        "noPaymentTitle": "Zero online payment",
+        "noPaymentText": "No credit card required. Pay the agency in cash, by card terminal, cheque or bank transfer.",
+        "localTitle": "Verified local agencies",
+        "localText": "Vetted Tunisian rental companies in all 24 governorates and at every airport.",
+        "contactTitle": "Direct contact",
+        "contactText": "Talk to the agency on WhatsApp or by phone before and during your rental."
+      }
+    },
+    "footer": {
+      "about": "DriveTN connects individuals, tourists and Tunisians living abroad with local car rental agencies.",
+      "explore": "Explore",
+      "company": "DriveTN",
+      "howItWorks": "How it works",
+      "becomePartner": "Become a partner agency",
+      "help": "Help",
+      "terms": "Terms and conditions",
+      "privacy": "Privacy",
+      "rights": "© {year} DriveTN. All rights reserved."
+    }
+  },
+  "shell": {
+    "navLabel": "Area navigation",
+    "collapse": "Collapse menu",
+    "expand": "Expand menu",
+    "designSystem": "Design system"
+  },
+  "agency": {
+    "nav": {
+      "operations": "Operations",
+      "management": "Management",
+      "dashboard": "Dashboard",
+      "bookings": "Bookings",
+      "calendar": "Schedule",
+      "fleet": "Fleet",
+      "customers": "Customers",
+      "payments": "Payments received",
+      "reviews": "Reviews",
+      "settings": "Settings"
+    },
+    "home": {
+      "title": "Welcome to your agency area",
+      "subtitle": "Manage your fleet, bookings and payments in one place.",
+      "emptyTitle": "Your dashboard is coming soon",
+      "emptyText": "Booking and revenue statistics will appear here once your agency is live."
+    }
+  },
+  "admin": {
+    "nav": {
+      "platform": "Platform",
+      "system": "System",
+      "dashboard": "Dashboard",
+      "agencies": "Agencies",
+      "users": "Users",
+      "bookings": "Bookings",
+      "billing": "Billing",
+      "reviews": "Review moderation",
+      "settings": "Settings",
+      "audit": "Audit log"
+    },
+    "home": {
+      "title": "Platform administration",
+      "subtitle": "Oversee agencies, users and DriveTN activity.",
+      "emptyTitle": "Metrics are coming soon",
+      "emptyText": "Agency, booking and billing monitoring will be available in the next phases."
+    }
+  },
+  "status": {
+    "booking": {
+      "PENDING": "Pending",
+      "CONFIRMED": "Confirmed",
+      "PICKED_UP": "In progress",
+      "RETURNED": "Car returned",
+      "COMPLETED": "Completed",
+      "CANCELLED": "Cancelled",
+      "REJECTED": "Rejected",
+      "NO_SHOW": "No-show",
+      "EXPIRED": "Expired"
+    },
+    "payment": {
+      "UNPAID": "Unpaid",
+      "DEPOSIT_PAID": "Deposit received",
+      "PAID": "Paid",
+      "REFUNDED_OFFLINE": "Refunded"
+    },
+    "paymentMethod": {
+      "CASH": "Cash",
+      "CARD_TPE": "Card (terminal)",
+      "CHECK": "Cheque",
+      "BANK_TRANSFER": "Bank transfer",
+      "MOBILE_PAYMENT": "Mobile payment",
+      "MONEY_ORDER": "Money order"
+    }
+  },
+  "design": {
+    "metaTitle": "Design system",
+    "title": "DriveTN design system",
+    "subtitle": "Components shared by the three portals, in light and dark mode, LTR and RTL.",
+    "sections": {
+      "colors": "Colors",
+      "typography": "Typography",
+      "buttons": "Buttons",
+      "forms": "Forms",
+      "badges": "Badges and statuses",
+      "feedback": "User feedback",
+      "states": "Loading, empty and error states",
+      "overlays": "Dialogs and menus",
+      "navigation": "Navigation",
+      "data": "Data"
+    },
+    "colors": {
+      "primary": "Primary (portal)",
+      "cta": "Main action",
+      "success": "Success",
+      "warning": "Warning",
+      "danger": "Danger",
+      "info": "Info",
+      "tunisia": "Tunisia red"
+    },
+    "typography": {
+      "heading": "Rent with confidence",
+      "body": "Book your car online and pay the agency when you pick it up.",
+      "small": "Secondary text for hints and notes."
+    },
+    "buttons": {
+      "primary": "Primary",
+      "cta": "Book now",
+      "secondary": "Secondary",
+      "soft": "Soft",
+      "ghost": "Ghost",
+      "danger": "Delete",
+      "link": "Link",
+      "loading": "Sending…",
+      "disabled": "Disabled",
+      "icon": "Add"
+    },
+    "forms": {
+      "fullName": "Full name",
+      "fullNamePlaceholder": "e.g. Amira Ben Salah",
+      "phone": "Phone",
+      "phoneHint": "8-digit Tunisian number.",
+      "phoneError": "Invalid Tunisian number.",
+      "governorate": "Governorate",
+      "governoratePlaceholder": "Choose a governorate",
+      "governorates": {
+        "tunis": "Tunis",
+        "sousse": "Sousse",
+        "sfax": "Sfax",
+        "medenine": "Medenine (Djerba)"
+      },
+      "notes": "Notes",
+      "notesPlaceholder": "Arrival time, flight number…",
+      "otp": "Verification code",
+      "otpHint": "Enter the code you received by SMS.",
+      "otpDigit": "Digit {index} of {length}",
+      "transmission": "Transmission",
+      "manual": "Manual",
+      "automatic": "Automatic",
+      "terms": "I accept the rental terms",
+      "notifications": "Get reminders on WhatsApp",
+      "required": "*"
+    },
+    "badges": {
+      "neutral": "Neutral",
+      "primary": "Portal",
+      "new": "New",
+      "airport": "Airport",
+      "paymentMethods": "Accepted payment methods (on site)"
+    },
+    "feedback": {
+      "infoTitle": "Pay at the agency",
+      "infoText": "Nothing is charged online. You pay the agency when you pick up the car.",
+      "successTitle": "Booking sent",
+      "successText": "The agency will reply within 2 hours.",
+      "warningTitle": "Security deposit required",
+      "warningText": "The agency asks for a deposit at pick-up, returned when the car is brought back.",
+      "dangerTitle": "Expired document",
+      "dangerText": "Your driving licence has expired. Update it to book.",
+      "toastButton": "Show a notification",
+      "toastTitle": "Changes saved",
+      "toastText": "Your details have been updated."
+    },
+    "states": {
+      "loading": "Loading",
+      "emptyTitle": "No bookings",
+      "emptyText": "Your upcoming rentals will appear here.",
+      "emptyAction": "Search for a car",
+      "errorTitle": "Unable to load data",
+      "errorText": "Check your connection and try again."
+    },
+    "overlays": {
+      "openDialog": "Open a dialog",
+      "dialogTitle": "Cancel this booking?",
+      "dialogText": "The agency will be notified immediately. This cannot be undone.",
+      "dialogCancel": "Keep my booking",
+      "dialogConfirm": "Cancel booking",
+      "openSheetStart": "Panel (start)",
+      "openSheetEnd": "Panel (end)",
+      "openSheetBottom": "Drawer (bottom)",
+      "sheetTitle": "Filters",
+      "sheetText": "Refine your search by category, transmission and price.",
+      "menu": "Actions menu",
+      "menuView": "View details",
+      "menuEdit": "Edit",
+      "menuDelete": "Delete",
+      "tooltip": "Hover me",
+      "tooltipText": "Tooltips complement a label, they never replace it."
+    },
+    "navigation": {
+      "tabsDetails": "Details",
+      "tabsConditions": "Conditions",
+      "tabsReviews": "Reviews",
+      "tabsDetailsText": "Air conditioning, 5 seats, unlimited mileage.",
+      "tabsConditionsText": "Minimum age 21, licence held for 2 years.",
+      "tabsReviewsText": "4.6 out of 5 from 128 verified reviews.",
+      "stepVehicle": "Car",
+      "stepOptions": "Extras",
+      "stepDriver": "Driver",
+      "stepConfirm": "Confirmation",
+      "previous": "Previous step",
+      "next": "Next step",
+      "paginationLabel": "Pagination",
+      "paginationPrevious": "Previous page",
+      "paginationNext": "Next page",
+      "paginationPage": "Page {page}",
+      "breadcrumbLabel": "Breadcrumb",
+      "breadcrumbHome": "Home",
+      "breadcrumbCity": "Tunis",
+      "breadcrumbCar": "Peugeot 208"
+    },
+    "data": {
+      "statBookings": "Bookings this month",
+      "statRevenue": "Collected this month",
+      "statFleet": "Available cars",
+      "statTrendUp": "+12% vs last month",
+      "statTrendDown": "−2 cars in maintenance",
+      "tableCaption": "Latest bookings",
+      "reference": "Reference",
+      "customer": "Customer",
+      "dates": "Dates",
+      "total": "Total",
+      "status": "Status",
+      "payment": "Payment",
+      "rating": "{value} out of 5",
+      "whatsapp": "Contact the agency",
+      "whatsappMessage": "Hello, I am contacting you about my DriveTN booking."
+    }
+  }
+}

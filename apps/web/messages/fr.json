@@ -1,0 +1,321 @@
+{
+  "common": {
+    "tagline": "Location de voitures partout en Tunisie",
+    "noOnlinePayment": "Aucun paiement en ligne : vous réglez directement à l’agence.",
+    "skipToContent": "Aller au contenu principal",
+    "comingSoon": "Bientôt",
+    "close": "Fermer",
+    "openMenu": "Ouvrir le menu",
+    "retry": "Réessayer",
+    "backHome": "Retour à l’accueil",
+    "language": "Langue",
+    "theme": {
+      "label": "Thème",
+      "light": "Clair",
+      "dark": "Sombre",
+      "system": "Système"
+    },
+    "portals": {
+      "client": "Espace client",
+      "agency": "Espace agence",
+      "admin": "Administration"
+    }
+  },
+  "notFound": {
+    "title": "Page introuvable",
+    "description": "La page demandée n’existe pas ou a été déplacée."
+  },
+  "routeError": {
+    "title": "Une erreur est survenue",
+    "description": "Nous n’avons pas pu afficher cette page. Réessayez dans quelques instants."
+  },
+  "apiStatus": {
+    "title": "État de la plateforme",
+    "status": {
+      "ok": "Opérationnelle",
+      "degraded": "Dégradée",
+      "error": "En erreur",
+      "unreachable": "Injoignable"
+    },
+    "checks": {
+      "database": "Base de données",
+      "redis": "Cache et files d’attente",
+      "worker": "Tâches de fond"
+    },
+    "up": "Disponible",
+    "down": "Indisponible"
+  },
+  "client": {
+    "nav": {
+      "mainLabel": "Navigation principale",
+      "mobileLabel": "Navigation mobile",
+      "home": "Accueil",
+      "search": "Rechercher",
+      "agencies": "Agences",
+      "bookings": "Réservations",
+      "account": "Compte",
+      "login": "Connexion",
+      "signup": "Créer un compte"
+    },
+    "banner": {
+      "label": "Nos engagements",
+      "noPayment": "Aucun paiement en ligne",
+      "payAtAgency": "Paiement sur place à l’agence",
+      "verifiedAgencies": "Agences vérifiées",
+      "support": "Contact direct par WhatsApp"
+    },
+    "home": {
+      "eyebrow": "Location de voitures en Tunisie",
+      "title": "La bonne voiture, au bon prix, partout en Tunisie",
+      "subtitle": "Comparez les agences locales, réservez sans carte bancaire et payez sur place au moment de la prise du véhicule.",
+      "searchCta": "Rechercher une voiture",
+      "agencyCta": "Vous êtes une agence ?",
+      "features": {
+        "noPaymentTitle": "Zéro paiement en ligne",
+        "noPaymentText": "Aucune carte bancaire demandée. Vous réglez l’agence en espèces, par TPE, chèque ou virement.",
+        "localTitle": "Agences locales vérifiées",
+        "localText": "Des loueurs tunisiens contrôlés, dans les 24 gouvernorats et dans tous les aéroports.",
+        "contactTitle": "Contact direct",
+        "contactText": "Échangez avec l’agence par WhatsApp ou téléphone avant et pendant votre location."
+      }
+    },
+    "footer": {
+      "about": "DriveTN met en relation particuliers, touristes et Tunisiens résidant à l’étranger avec des agences de location locales.",
+      "explore": "Découvrir",
+      "company": "DriveTN",
+      "howItWorks": "Comment ça marche",
+      "becomePartner": "Devenir agence partenaire",
+      "help": "Aide",
+      "terms": "Conditions générales",
+      "privacy": "Confidentialité",
+      "rights": "© {year} DriveTN. Tous droits réservés."
+    }
+  },
+  "shell": {
+    "navLabel": "Navigation de l’espace",
+    "collapse": "Réduire le menu",
+    "expand": "Agrandir le menu",
+    "designSystem": "Design system"
+  },
+  "agency": {
+    "nav": {
+      "operations": "Activité",
+      "management": "Gestion",
+      "dashboard": "Tableau de bord",
+      "bookings": "Réservations",
+      "calendar": "Planning",
+      "fleet": "Flotte",
+      "customers": "Clients",
+      "payments": "Encaissements",
+      "reviews": "Avis",
+      "settings": "Paramètres"
+    },
+    "home": {
+      "title": "Bienvenue dans votre espace agence",
+      "subtitle": "Gérez votre flotte, vos réservations et vos encaissements au même endroit.",
+      "emptyTitle": "Votre tableau de bord arrive bientôt",
+      "emptyText": "Les statistiques de réservations et de revenus apparaîtront ici dès l’ouverture de votre agence."
+    }
+  },
+  "admin": {
+    "nav": {
+      "platform": "Plateforme",
+      "system": "Système",
+      "dashboard": "Tableau de bord",
+      "agencies": "Agences",
+      "users": "Utilisateurs",
+      "bookings": "Réservations",
+      "billing": "Facturation",
+      "reviews": "Modération des avis",
+      "settings": "Paramètres",
+      "audit": "Journal d’audit"
+    },
+    "home": {
+      "title": "Administration de la plateforme",
+      "subtitle": "Supervisez les agences, les utilisateurs et l’activité de DriveTN.",
+      "emptyTitle": "Les indicateurs arrivent bientôt",
+      "emptyText": "Le suivi des agences, des réservations et de la facturation sera disponible dans les prochaines étapes."
+    }
+  },
+  "status": {
+    "booking": {
+      "PENDING": "En attente",
+      "CONFIRMED": "Confirmée",
+      "PICKED_UP": "En cours",
+      "RETURNED": "Véhicule rendu",
+      "COMPLETED": "Terminée",
+      "CANCELLED": "Annulée",
+      "REJECTED": "Refusée",
+      "NO_SHOW": "Client absent",
+      "EXPIRED": "Expirée"
+    },
+    "payment": {
+      "UNPAID": "Non payé",
+      "DEPOSIT_PAID": "Avance reçue",
+      "PAID": "Payé",
+      "REFUNDED_OFFLINE": "Remboursé"
+    },
+    "paymentMethod": {
+      "CASH": "Espèces",
+      "CARD_TPE": "Carte (TPE)",
+      "CHECK": "Chèque",
+      "BANK_TRANSFER": "Virement",
+      "MOBILE_PAYMENT": "Paiement mobile",
+      "MONEY_ORDER": "Mandat"
+    }
+  },
+  "design": {
+    "metaTitle": "Design system",
+    "title": "Design system DriveTN",
+    "subtitle": "Composants partagés par les trois portails, en clair et en sombre, en LTR et en RTL.",
+    "sections": {
+      "colors": "Couleurs",
+      "typography": "Typographie",
+      "buttons": "Boutons",
+      "forms": "Formulaires",
+      "badges": "Badges et statuts",
+      "feedback": "Retours utilisateur",
+      "states": "États de chargement, vide et erreur",
+      "overlays": "Fenêtres et menus",
+      "navigation": "Navigation",
+      "data": "Données"
+    },
+    "colors": {
+      "primary": "Primaire (portail)",
+      "cta": "Action principale",
+      "success": "Succès",
+      "warning": "Avertissement",
+      "danger": "Danger",
+      "info": "Information",
+      "tunisia": "Rouge Tunisie"
+    },
+    "typography": {
+      "heading": "Louez en toute confiance",
+      "body": "Réservez votre voiture en ligne et payez à l’agence au moment de la prise du véhicule.",
+      "small": "Texte secondaire pour les aides et les mentions."
+    },
+    "buttons": {
+      "primary": "Primaire",
+      "cta": "Réserver",
+      "secondary": "Secondaire",
+      "soft": "Doux",
+      "ghost": "Discret",
+      "danger": "Supprimer",
+      "link": "Lien",
+      "loading": "Envoi…",
+      "disabled": "Désactivé",
+      "icon": "Ajouter"
+    },
+    "forms": {
+      "fullName": "Nom complet",
+      "fullNamePlaceholder": "Ex. Amira Ben Salah",
+      "phone": "Téléphone",
+      "phoneHint": "Numéro tunisien à 8 chiffres.",
+      "phoneError": "Numéro tunisien invalide.",
+      "governorate": "Gouvernorat",
+      "governoratePlaceholder": "Choisir un gouvernorat",
+      "governorates": {
+        "tunis": "Tunis",
+        "sousse": "Sousse",
+        "sfax": "Sfax",
+        "medenine": "Médenine (Djerba)"
+      },
+      "notes": "Remarques",
+      "notesPlaceholder": "Heure d’arrivée, numéro de vol…",
+      "otp": "Code de vérification",
+      "otpHint": "Saisissez le code reçu par SMS.",
+      "otpDigit": "Chiffre {index} sur {length}",
+      "transmission": "Boîte de vitesses",
+      "manual": "Manuelle",
+      "automatic": "Automatique",
+      "terms": "J’accepte les conditions de location",
+      "notifications": "Recevoir les rappels par WhatsApp",
+      "required": "*"
+    },
+    "badges": {
+      "neutral": "Neutre",
+      "primary": "Portail",
+      "new": "Nouveau",
+      "airport": "Aéroport",
+      "paymentMethods": "Modes de paiement acceptés (sur place)"
+    },
+    "feedback": {
+      "infoTitle": "Paiement à l’agence",
+      "infoText": "Aucun montant n’est prélevé en ligne. Vous réglez l’agence lors de la prise du véhicule.",
+      "successTitle": "Réservation envoyée",
+      "successText": "L’agence vous répondra sous 2 heures.",
+      "warningTitle": "Caution à prévoir",
+      "warningText": "Une caution est demandée par l’agence au départ, restituée au retour du véhicule.",
+      "dangerTitle": "Document expiré",
+      "dangerText": "Votre permis de conduire a expiré. Mettez-le à jour pour réserver.",
+      "toastButton": "Afficher une notification",
+      "toastTitle": "Modifications enregistrées",
+      "toastText": "Vos informations ont bien été mises à jour."
+    },
+    "states": {
+      "loading": "Chargement",
+      "emptyTitle": "Aucune réservation",
+      "emptyText": "Vos prochaines locations apparaîtront ici.",
+      "emptyAction": "Rechercher une voiture",
+      "errorTitle": "Impossible de charger les données",
+      "errorText": "Vérifiez votre connexion puis réessayez."
+    },
+    "overlays": {
+      "openDialog": "Ouvrir une fenêtre",
+      "dialogTitle": "Annuler la réservation ?",
+      "dialogText": "L’agence sera prévenue immédiatement. Cette action est définitive.",
+      "dialogCancel": "Garder ma réservation",
+      "dialogConfirm": "Annuler la réservation",
+      "openSheetStart": "Panneau (début)",
+      "openSheetEnd": "Panneau (fin)",
+      "openSheetBottom": "Tiroir (bas)",
+      "sheetTitle": "Filtres",
+      "sheetText": "Affinez votre recherche par catégorie, boîte de vitesses et prix.",
+      "menu": "Menu d’actions",
+      "menuView": "Voir le détail",
+      "menuEdit": "Modifier",
+      "menuDelete": "Supprimer",
+      "tooltip": "Survolez-moi",
+      "tooltipText": "Les infobulles complètent un libellé, sans le remplacer."
+    },
+    "navigation": {
+      "tabsDetails": "Détails",
+      "tabsConditions": "Conditions",
+      "tabsReviews": "Avis",
+      "tabsDetailsText": "Climatisation, 5 places, kilométrage illimité.",
+      "tabsConditionsText": "Âge minimum 21 ans, permis depuis 2 ans.",
+      "tabsReviewsText": "4,6 sur 5 d’après 128 avis vérifiés.",
+      "stepVehicle": "Véhicule",
+      "stepOptions": "Options",
+      "stepDriver": "Conducteur",
+      "stepConfirm": "Confirmation",
+      "previous": "Étape précédente",
+      "next": "Étape suivante",
+      "paginationLabel": "Pagination",
+      "paginationPrevious": "Page précédente",
+      "paginationNext": "Page suivante",
+      "paginationPage": "Page {page}",
+      "breadcrumbLabel": "Fil d’Ariane",
+      "breadcrumbHome": "Accueil",
+      "breadcrumbCity": "Tunis",
+      "breadcrumbCar": "Peugeot 208"
+    },
+    "data": {
+      "statBookings": "Réservations du mois",
+      "statRevenue": "Encaissé ce mois",
+      "statFleet": "Véhicules disponibles",
+      "statTrendUp": "+12 % par rapport au mois dernier",
+      "statTrendDown": "−2 véhicules en maintenance",
+      "tableCaption": "Dernières réservations",
+      "reference": "Référence",
+      "customer": "Client",
+      "dates": "Dates",
+      "total": "Total",
+      "status": "Statut",
+      "payment": "Paiement",
+      "rating": "{value} sur 5",
+      "whatsapp": "Contacter l’agence",
+      "whatsappMessage": "Bonjour, je vous contacte au sujet de ma réservation DriveTN."
+    }
+  }
+}

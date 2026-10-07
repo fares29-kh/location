@@ -1,0 +1,321 @@
+{
+  "common": {
+    "tagline": "كراء السيارات في كامل أنحاء تونس",
+    "noOnlinePayment": "لا دفع عبر الإنترنت: تدفع مباشرة لدى الوكالة.",
+    "skipToContent": "الانتقال إلى المحتوى الرئيسي",
+    "comingSoon": "قريبًا",
+    "close": "إغلاق",
+    "openMenu": "فتح القائمة",
+    "retry": "إعادة المحاولة",
+    "backHome": "العودة إلى الصفحة الرئيسية",
+    "language": "اللغة",
+    "theme": {
+      "label": "المظهر",
+      "light": "فاتح",
+      "dark": "داكن",
+      "system": "حسب الجهاز"
+    },
+    "portals": {
+      "client": "فضاء الحريف",
+      "agency": "فضاء الوكالة",
+      "admin": "الإدارة"
+    }
+  },
+  "notFound": {
+    "title": "الصفحة غير موجودة",
+    "description": "الصفحة المطلوبة غير موجودة أو تم نقلها."
+  },
+  "routeError": {
+    "title": "حدث خطأ",
+    "description": "تعذّر عرض هذه الصفحة. أعد المحاولة بعد قليل."
+  },
+  "apiStatus": {
+    "title": "حالة المنصة",
+    "status": {
+      "ok": "تعمل بشكل طبيعي",
+      "degraded": "أداء منخفض",
+      "error": "خطأ",
+      "unreachable": "غير متاحة"
+    },
+    "checks": {
+      "database": "قاعدة البيانات",
+      "redis": "الذاكرة المؤقتة وقوائم الانتظار",
+      "worker": "المهام الخلفية"
+    },
+    "up": "متاح",
+    "down": "غير متاح"
+  },
+  "client": {
+    "nav": {
+      "mainLabel": "التنقل الرئيسي",
+      "mobileLabel": "التنقل على الهاتف",
+      "home": "الرئيسية",
+      "search": "بحث",
+      "agencies": "الوكالات",
+      "bookings": "الحجوزات",
+      "account": "الحساب",
+      "login": "تسجيل الدخول",
+      "signup": "إنشاء حساب"
+    },
+    "banner": {
+      "label": "التزاماتنا",
+      "noPayment": "لا دفع عبر الإنترنت",
+      "payAtAgency": "الدفع في الوكالة",
+      "verifiedAgencies": "وكالات موثوقة",
+      "support": "تواصل مباشر عبر واتساب"
+    },
+    "home": {
+      "eyebrow": "كراء السيارات في تونس",
+      "title": "السيارة المناسبة بالسعر المناسب في كامل تونس",
+      "subtitle": "قارن بين الوكالات المحلية، احجز دون بطاقة بنكية وادفع عند استلام السيارة.",
+      "searchCta": "ابحث عن سيارة",
+      "agencyCta": "هل أنت وكالة؟",
+      "features": {
+        "noPaymentTitle": "دون أي دفع عبر الإنترنت",
+        "noPaymentText": "لا نطلب أي بطاقة بنكية. تدفع للوكالة نقدًا أو بالبطاقة عبر جهاز الدفع أو بصك أو بتحويل.",
+        "localTitle": "وكالات محلية موثوقة",
+        "localText": "وكالات كراء تونسية مراقبة في الولايات الـ24 وفي جميع المطارات.",
+        "contactTitle": "تواصل مباشر",
+        "contactText": "تواصل مع الوكالة عبر واتساب أو الهاتف قبل الكراء وخلاله."
+      }
+    },
+    "footer": {
+      "about": "تربط DriveTN الأفراد والسياح والتونسيين المقيمين بالخارج بوكالات كراء السيارات المحلية.",
+      "explore": "اكتشف",
+      "company": "DriveTN",
+      "howItWorks": "كيف تعمل المنصة",
+      "becomePartner": "انضم كوكالة شريكة",
+      "help": "المساعدة",
+      "terms": "الشروط العامة",
+      "privacy": "الخصوصية",
+      "rights": "© {year} DriveTN. جميع الحقوق محفوظة."
+    }
+  },
+  "shell": {
+    "navLabel": "التنقل داخل الفضاء",
+    "collapse": "تصغير القائمة",
+    "expand": "توسيع القائمة",
+    "designSystem": "نظام التصميم"
+  },
+  "agency": {
+    "nav": {
+      "operations": "النشاط",
+      "management": "التسيير",
+      "dashboard": "لوحة القيادة",
+      "bookings": "الحجوزات",
+      "calendar": "الجدول الزمني",
+      "fleet": "الأسطول",
+      "customers": "الحرفاء",
+      "payments": "المقبوضات",
+      "reviews": "التقييمات",
+      "settings": "الإعدادات"
+    },
+    "home": {
+      "title": "مرحبًا بك في فضاء الوكالة",
+      "subtitle": "تصرّف في أسطولك وحجوزاتك ومقبوضاتك من مكان واحد.",
+      "emptyTitle": "لوحة القيادة قريبًا",
+      "emptyText": "ستظهر هنا إحصائيات الحجوزات والمداخيل فور تفعيل وكالتك."
+    }
+  },
+  "admin": {
+    "nav": {
+      "platform": "المنصة",
+      "system": "النظام",
+      "dashboard": "لوحة القيادة",
+      "agencies": "الوكالات",
+      "users": "المستخدمون",
+      "bookings": "الحجوزات",
+      "billing": "الفوترة",
+      "reviews": "مراقبة التقييمات",
+      "settings": "الإعدادات",
+      "audit": "سجل العمليات"
+    },
+    "home": {
+      "title": "إدارة المنصة",
+      "subtitle": "تابع الوكالات والمستخدمين ونشاط DriveTN.",
+      "emptyTitle": "المؤشرات قريبًا",
+      "emptyText": "ستتوفر متابعة الوكالات والحجوزات والفوترة في المراحل القادمة."
+    }
+  },
+  "status": {
+    "booking": {
+      "PENDING": "في الانتظار",
+      "CONFIRMED": "مؤكد",
+      "PICKED_UP": "جارٍ",
+      "RETURNED": "تم إرجاع السيارة",
+      "COMPLETED": "منتهٍ",
+      "CANCELLED": "ملغى",
+      "REJECTED": "مرفوض",
+      "NO_SHOW": "لم يحضر الحريف",
+      "EXPIRED": "منتهي الصلاحية"
+    },
+    "payment": {
+      "UNPAID": "غير مدفوع",
+      "DEPOSIT_PAID": "تم دفع تسبقة",
+      "PAID": "مدفوع",
+      "REFUNDED_OFFLINE": "تم الاسترجاع"
+    },
+    "paymentMethod": {
+      "CASH": "نقدًا",
+      "CARD_TPE": "بطاقة (جهاز دفع)",
+      "CHECK": "صك",
+      "BANK_TRANSFER": "تحويل بنكي",
+      "MOBILE_PAYMENT": "دفع بالهاتف",
+      "MONEY_ORDER": "حوالة"
+    }
+  },
+  "design": {
+    "metaTitle": "نظام التصميم",
+    "title": "نظام تصميم DriveTN",
+    "subtitle": "مكوّنات مشتركة بين البوابات الثلاث، بالمظهر الفاتح والداكن، من اليسار إلى اليمين ومن اليمين إلى اليسار.",
+    "sections": {
+      "colors": "الألوان",
+      "typography": "الخطوط",
+      "buttons": "الأزرار",
+      "forms": "الاستمارات",
+      "badges": "الشارات والحالات",
+      "feedback": "رسائل المستخدم",
+      "states": "حالات التحميل والفراغ والخطأ",
+      "overlays": "النوافذ والقوائم",
+      "navigation": "التنقل",
+      "data": "البيانات"
+    },
+    "colors": {
+      "primary": "الأساسي (البوابة)",
+      "cta": "الإجراء الرئيسي",
+      "success": "نجاح",
+      "warning": "تنبيه",
+      "danger": "خطر",
+      "info": "معلومة",
+      "tunisia": "أحمر تونس"
+    },
+    "typography": {
+      "heading": "اكترِ بكل ثقة",
+      "body": "احجز سيارتك عبر الإنترنت وادفع للوكالة عند استلام السيارة.",
+      "small": "نص ثانوي للإرشادات والملاحظات."
+    },
+    "buttons": {
+      "primary": "أساسي",
+      "cta": "احجز",
+      "secondary": "ثانوي",
+      "soft": "هادئ",
+      "ghost": "خفيف",
+      "danger": "حذف",
+      "link": "رابط",
+      "loading": "جارٍ الإرسال…",
+      "disabled": "معطّل",
+      "icon": "إضافة"
+    },
+    "forms": {
+      "fullName": "الاسم الكامل",
+      "fullNamePlaceholder": "مثال: أميرة بن صالح",
+      "phone": "الهاتف",
+      "phoneHint": "رقم تونسي من 8 أرقام.",
+      "phoneError": "رقم تونسي غير صالح.",
+      "governorate": "الولاية",
+      "governoratePlaceholder": "اختر ولاية",
+      "governorates": {
+        "tunis": "تونس",
+        "sousse": "سوسة",
+        "sfax": "صفاقس",
+        "medenine": "مدنين (جربة)"
+      },
+      "notes": "ملاحظات",
+      "notesPlaceholder": "ساعة الوصول، رقم الرحلة…",
+      "otp": "رمز التحقق",
+      "otpHint": "أدخل الرمز الذي وصلك عبر الإرساليات القصيرة.",
+      "otpDigit": "الرقم {index} من {length}",
+      "transmission": "علبة السرعات",
+      "manual": "يدوية",
+      "automatic": "أوتوماتيكية",
+      "terms": "أوافق على شروط الكراء",
+      "notifications": "تلقي التذكيرات عبر واتساب",
+      "required": "*"
+    },
+    "badges": {
+      "neutral": "محايد",
+      "primary": "البوابة",
+      "new": "جديد",
+      "airport": "المطار",
+      "paymentMethods": "طرق الدفع المقبولة (في الوكالة)"
+    },
+    "feedback": {
+      "infoTitle": "الدفع في الوكالة",
+      "infoText": "لا يتم اقتطاع أي مبلغ عبر الإنترنت. تدفع للوكالة عند استلام السيارة.",
+      "successTitle": "تم إرسال الحجز",
+      "successText": "ستجيبك الوكالة في غضون ساعتين.",
+      "warningTitle": "ضمان مطلوب",
+      "warningText": "تطلب الوكالة ضمانًا عند الانطلاق، يُسترجع عند إرجاع السيارة.",
+      "dangerTitle": "وثيقة منتهية الصلاحية",
+      "dangerText": "انتهت صلاحية رخصة السياقة. قم بتحديثها لتتمكن من الحجز.",
+      "toastButton": "عرض إشعار",
+      "toastTitle": "تم حفظ التغييرات",
+      "toastText": "تم تحديث معلوماتك بنجاح."
+    },
+    "states": {
+      "loading": "جارٍ التحميل",
+      "emptyTitle": "لا توجد حجوزات",
+      "emptyText": "ستظهر عمليات الكراء القادمة هنا.",
+      "emptyAction": "ابحث عن سيارة",
+      "errorTitle": "تعذّر تحميل البيانات",
+      "errorText": "تحقق من اتصالك ثم أعد المحاولة."
+    },
+    "overlays": {
+      "openDialog": "فتح نافذة",
+      "dialogTitle": "إلغاء الحجز؟",
+      "dialogText": "سيتم إعلام الوكالة فورًا. هذا الإجراء نهائي.",
+      "dialogCancel": "الإبقاء على الحجز",
+      "dialogConfirm": "إلغاء الحجز",
+      "openSheetStart": "لوحة (البداية)",
+      "openSheetEnd": "لوحة (النهاية)",
+      "openSheetBottom": "درج (الأسفل)",
+      "sheetTitle": "عوامل التصفية",
+      "sheetText": "حدّد بحثك حسب الصنف وعلبة السرعات والسعر.",
+      "menu": "قائمة الإجراءات",
+      "menuView": "عرض التفاصيل",
+      "menuEdit": "تعديل",
+      "menuDelete": "حذف",
+      "tooltip": "مرّر المؤشر هنا",
+      "tooltipText": "التلميحات تكمّل التسمية ولا تعوّضها."
+    },
+    "navigation": {
+      "tabsDetails": "التفاصيل",
+      "tabsConditions": "الشروط",
+      "tabsReviews": "التقييمات",
+      "tabsDetailsText": "مكيّف، 5 مقاعد، عدد كيلومترات غير محدود.",
+      "tabsConditionsText": "السن الأدنى 21 سنة، رخصة منذ سنتين.",
+      "tabsReviewsText": "4.6 من 5 حسب 128 تقييمًا موثّقًا.",
+      "stepVehicle": "السيارة",
+      "stepOptions": "الخيارات",
+      "stepDriver": "السائق",
+      "stepConfirm": "التأكيد",
+      "previous": "الخطوة السابقة",
+      "next": "الخطوة التالية",
+      "paginationLabel": "ترقيم الصفحات",
+      "paginationPrevious": "الصفحة السابقة",
+      "paginationNext": "الصفحة التالية",
+      "paginationPage": "الصفحة {page}",
+      "breadcrumbLabel": "مسار التنقل",
+      "breadcrumbHome": "الرئيسية",
+      "breadcrumbCity": "تونس",
+      "breadcrumbCar": "بيجو 208"
+    },
+    "data": {
+      "statBookings": "حجوزات الشهر",
+      "statRevenue": "المقبوض هذا الشهر",
+      "statFleet": "السيارات المتاحة",
+      "statTrendUp": "+12٪ مقارنة بالشهر الماضي",
+      "statTrendDown": "−2 سيارات في الصيانة",
+      "tableCaption": "آخر الحجوزات",
+      "reference": "المرجع",
+      "customer": "الحريف",
+      "dates": "التواريخ",
+      "total": "المجموع",
+      "status": "الحالة",
+      "payment": "الدفع",
+      "rating": "{value} من 5",
+      "whatsapp": "تواصل مع الوكالة",
+      "whatsappMessage": "مرحبًا، أتواصل معكم بخصوص حجزي على DriveTN."
+    }
+  }
+}

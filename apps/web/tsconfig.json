@@ -6,6 +6,14 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "src", ".next/types/**/*.ts", "next.config.ts", "vitest.config.mts"],
+  "include": [
+    "next-env.d.ts",
+    "src",
+    "messages/*.json",
+    ".next/types/**/*.ts",
+    "next.config.ts",
+    "tailwind.config.ts",
+    "vitest.config.mts"
+  ],
   "exclude": ["node_modules"]
 }

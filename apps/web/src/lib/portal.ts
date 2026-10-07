@@ -1,31 +1,10 @@
-import type { Portal } from '@drivetn/types';
+import { DEFAULT_LOCALE, isLocale, type Locale, type Portal } from '@drivetn/types';
 
-export interface PortalConfig {
-  label: string;
-  audience: string;
-  accent: string;
-  accentSoft: string;
-}
-
-export const PORTAL_CONFIG: Record<Portal, PortalConfig> = {
-  client: {
-    label: 'Portail client',
-    audience: 'Particuliers, touristes et TRE',
-    accent: '#2563EB',
-    accentSoft: '#DBEAFE',
-  },
-  agency: {
-    label: 'Portail agence',
-    audience: 'Agences de location',
-    accent: '#059669',
-    accentSoft: '#D1FAE5',
-  },
-  admin: {
-    label: 'Portail administrateur',
-    audience: 'Équipe de la plateforme',
-    accent: '#7C3AED',
-    accentSoft: '#EDE9FE',
-  },
+/** Couleur de la barre du navigateur mobile, par portail. */
+export const PORTAL_THEME_COLORS: Record<Portal, string> = {
+  client: '#2563EB',
+  agency: '#059669',
+  admin: '#7C3AED',
 };
 
 const SUBDOMAIN_TO_PORTAL: Readonly<Record<string, Portal>> = {
@@ -55,7 +34,26 @@ export function resolvePortal(host: string | null, rootDomain: string): Portal |
   return SUBDOMAIN_TO_PORTAL[subdomain] ?? null;
 }
 
-/** Chemin interne (segment App Router) correspondant à une URL publique du portail. */
-export function toPortalPath(portal: Portal, pathname: string): string {
-  return pathname === '/' ? `/${portal}` : `/${portal}${pathname}`;
+export type LocaleRoute =
+  { type: 'redirect'; pathname: string } | { type: 'rewrite'; locale: Locale; pathname: string };
+
+/**
+ * Extrait la langue du premier segment de l'URL publique (préfixe « as-needed ») :
+ * `/ar/...` et `/en/...` sont préfixés, le français ne l'est pas et `/fr/...` redirige.
+ */
+export function resolveLocaleRoute(pathname: string): LocaleRoute {
+  const [, firstSegment = '', ...rest] = pathname.split('/');
+  const remainder = `/${rest.join('/')}`;
+  if (firstSegment === DEFAULT_LOCALE) {
+    return { type: 'redirect', pathname: remainder };
+  }
+  if (isLocale(firstSegment)) {
+    return { type: 'rewrite', locale: firstSegment, pathname: remainder };
+  }
+  return { type: 'rewrite', locale: DEFAULT_LOCALE, pathname };
+}
+
+/** Chemin interne (segments App Router `/{portail}/{langue}/...`) d'une URL publique. */
+export function toPortalPath(portal: Portal, locale: Locale, pathname: string): string {
+  return pathname === '/' ? `/${portal}/${locale}` : `/${portal}/${locale}${pathname}`;
 }
