@@ -2,7 +2,9 @@
 
 import { cn } from '@drivetn/ui/lib/cn';
 import {
+  Banknote,
   Building2,
+  CalendarCheck,
   KeyRound,
   type LucideIcon,
   MessageSquareWarning,
@@ -28,6 +30,8 @@ export const AUDIT_CATEGORY_ICONS: Record<AuditCategory, LucideIcon> = {
   auth: KeyRound,
   agency: Building2,
   user: UserCog,
+  booking: CalendarCheck,
+  payment: Banknote,
   invoice: ReceiptText,
   review: MessageSquareWarning,
   settings: Settings,
@@ -35,6 +39,7 @@ export const AUDIT_CATEGORY_ICONS: Record<AuditCategory, LucideIcon> = {
 
 const SENSITIVE_ACTIONS: readonly AuditAction[] = [
   'auth.login_failed',
+  'auth.refresh_token_reused',
   'agency.rejected',
   'agency.suspended',
   'user.suspended',

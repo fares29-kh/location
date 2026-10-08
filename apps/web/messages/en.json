@@ -1443,7 +1443,8 @@
         "noReminder": "No reminder sent.",
         "remindedAt": "Last reminder {date}.",
         "sendReminder": "Send a reminder",
-        "reminderSuccess": "Reminder sent to {name}.",
+        "reminderSuccess": "Reminder sent to {name} via WhatsApp.",
+        "reminderTooSoon": "A reminder was already sent for this invoice in the last 24 hours.",
         "print": "Print"
       }
     },
@@ -1546,6 +1547,8 @@
         "auth": "Sign-ins",
         "agency": "Agencies",
         "user": "Accounts",
+        "booking": "Bookings",
+        "payment": "Payments",
         "invoice": "Billing",
         "review": "Reviews",
         "settings": "Settings"
@@ -1566,9 +1569,13 @@
           "login_failed": "Failed sign-in",
           "signup": "Sign-up",
           "password_reset": "Password reset",
-          "password_changed": "Password changed"
+          "password_changed": "Password changed",
+          "phone_verified": "Phone verified",
+          "logout": "Sign-out",
+          "refresh_token_reused": "Suspicious session reuse"
         },
         "agency": {
+          "created": "Agency created",
           "approved": "Agency approved",
           "rejected": "Agency rejected",
           "suspended": "Agency suspended",
@@ -1577,6 +1584,14 @@
         "user": {
           "suspended": "Account suspended",
           "reactivated": "Account reactivated"
+        },
+        "booking": {
+          "created": "Booking request",
+          "status_changed": "Booking status changed",
+          "cancelled_by_customer": "Booking cancelled by the customer"
+        },
+        "payment": {
+          "recorded": "Payment recorded"
         },
         "invoice": {
           "issued": "Invoice issued",

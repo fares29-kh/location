@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import { emailSchema } from './auth';
+import { addMonths, tunisDateTime } from './dates';
 import { tunisianPhoneSchema } from './phone';
 
 /** 1 % = 100 points de base. Les taux (TVA, commission) sont stockés en points de base entiers. */
@@ -151,6 +152,66 @@ export function computeInvoiceTotals({
   };
 }
 
+/** Jour du mois d'émission avant lequel la facture du mois précédent doit être réglée. */
+export const INVOICE_DUE_DAY = 15;
+
+export interface BillingPeriod {
+  /** Mois facturé « AAAA-MM ». */
+  period: string;
+  /** Bornes de la période (heure de Tunis) : [start, end[. */
+  start: Date;
+  end: Date;
+  /** Émission le 1er du mois suivant, échéance le 15 à 23 h 59. */
+  issuedAt: Date;
+  dueAt: Date;
+}
+
+export function billingPeriod(period: string): BillingPeriod {
+  const issueMonth = addMonths(period, 1);
+  return {
+    period,
+    start: tunisDateTime(`${period}-01`, 0),
+    end: tunisDateTime(`${issueMonth}-01`, 0),
+    issuedAt: tunisDateTime(`${issueMonth}-01`, 8),
+    dueAt: tunisDateTime(`${issueMonth}-${String(INVOICE_DUE_DAY)}`, 23, 59),
+  };
+}
+
+export interface InvoiceAmounts extends InvoiceTotals {
+  subscriptionMillimes: number;
+  commissionMillimes: number;
+  vatRateBps: number;
+}
+
+/** Montants de la facture mensuelle d'une agence : abonnement de l'offre + commission sur le CA. */
+export function computeInvoiceAmounts({
+  plan,
+  commissionBps,
+  revenueMillimes,
+  vatRateBps,
+  fiscalStampMillimes,
+}: {
+  plan: SubscriptionPlan;
+  commissionBps: number;
+  /** Chiffre d'affaires des locations terminées sur la période. */
+  revenueMillimes: number;
+  vatRateBps: number;
+  fiscalStampMillimes: number;
+}): InvoiceAmounts {
+  const subscriptionMillimes = SUBSCRIPTION_PLAN_DEFINITIONS[plan].monthlyPriceMillimes;
+  const commissionMillimes = applyRateBps(revenueMillimes, commissionBps);
+  return {
+    subscriptionMillimes,
+    commissionMillimes,
+    vatRateBps,
+    ...computeInvoiceTotals({
+      subtotalMillimes: subscriptionMillimes + commissionMillimes,
+      vatRateBps,
+      fiscalStampMillimes,
+    }),
+  };
+}
+
 // --- Paramètres de la plateforme ------------------------------------------------------
 
 export const VAT_RATE_MAX_BPS = 3000;
@@ -186,6 +247,15 @@ export const platformSettingsSchema = z.object({
   supportEmail: emailSchema,
 });
 export type PlatformSettings = z.infer<typeof platformSettingsSchema>;
+
+export const DEFAULT_PLATFORM_SETTINGS: PlatformSettings = {
+  vatRateBps: 1900,
+  fiscalStampMillimes: 1000,
+  defaultCommissionBps: 0,
+  bookingExpiryHours: 24,
+  supportPhone: '71000000',
+  supportEmail: 'support@drivetn.tn',
+};
 
 // --- Modération des avis --------------------------------------------------------------
 

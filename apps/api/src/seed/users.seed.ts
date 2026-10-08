@@ -1,4 +1,4 @@
-import { DEMO_PASSWORD, type DemoAccount, getDemoAccounts, toE164 } from '@drivetn/types';
+import { DEMO_ACCOUNTS, DEMO_PASSWORD, toE164 } from '@drivetn/types';
 import type { AdminRole, PrismaClient, UserRole } from '@prisma/client';
 
 export { DEMO_PASSWORD };
@@ -13,31 +13,45 @@ export interface DemoUserSeed {
 }
 
 /** Les identifiants viennent de `@drivetn/types`, partagés avec les pages de connexion. */
-function credentials(portal: DemoAccount['portal']): Pick<DemoUserSeed, 'email' | 'phone'> {
-  const [account] = getDemoAccounts(portal);
+function credentials(email: string): Pick<DemoUserSeed, 'email' | 'phone'> {
+  const account = DEMO_ACCOUNTS.find((candidate) => candidate.email === email);
   if (account === undefined) {
-    throw new Error(`Aucun compte de démo pour le portail ${portal}`);
+    throw new Error(`Compte de démo inconnu : ${email}`);
   }
   return { email: account.email, phone: account.phone };
 }
 
 export const DEMO_USERS: readonly DemoUserSeed[] = [
   {
-    ...credentials('admin'),
+    ...credentials('admin@demo.tn'),
     role: 'ADMIN',
     adminRole: 'SUPER_ADMIN',
     firstName: 'Salma',
     lastName: 'Trabelsi',
   },
   {
-    ...credentials('agency'),
+    ...credentials('support@demo.tn'),
+    role: 'ADMIN',
+    adminRole: 'SUPPORT',
+    firstName: 'Karim',
+    lastName: 'Jaziri',
+  },
+  {
+    ...credentials('finance@demo.tn'),
+    role: 'ADMIN',
+    adminRole: 'FINANCE',
+    firstName: 'Mehdi',
+    lastName: 'Gharbi',
+  },
+  {
+    ...credentials('agency@demo.tn'),
     role: 'AGENCY_OWNER',
     adminRole: null,
     firstName: 'Karim',
     lastName: 'Ben Ali',
   },
   {
-    ...credentials('client'),
+    ...credentials('customer@demo.tn'),
     role: 'CUSTOMER',
     adminRole: null,
     firstName: 'Amira',

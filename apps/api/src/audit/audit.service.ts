@@ -1,30 +1,17 @@
+import type { AuditAction } from '@drivetn/types';
 import { Injectable, Logger } from '@nestjs/common';
 import type { Prisma } from '@prisma/client';
 
 import { PrismaService } from '../prisma/prisma.service';
 
-export const AUDIT_ACTIONS = [
-  'auth.signup',
-  'auth.phone_verified',
-  'auth.login',
-  'auth.login_failed',
-  'auth.logout',
-  'auth.password_reset',
-  'auth.password_changed',
-  'auth.refresh_token_reused',
-  'agency.created',
-  'booking.created',
-  'booking.status_changed',
-  'booking.cancelled_by_customer',
-  'payment.recorded',
-] as const;
-
-export type AuditAction = (typeof AUDIT_ACTIONS)[number];
+/** Type d'élément concerné, utilisé par le journal de l'administration pour le libellé. */
+export type AuditEntityType =
+  'agency' | 'user' | 'booking' | 'payment' | 'invoice' | 'review' | 'refresh_token_family';
 
 export interface AuditEntry {
   action: AuditAction;
   actorId?: string | null;
-  entityType?: string;
+  entityType?: AuditEntityType;
   entityId?: string;
   metadata?: Prisma.InputJsonObject;
   ip?: string | null;

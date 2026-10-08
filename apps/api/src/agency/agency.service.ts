@@ -326,7 +326,9 @@ export class AgencyService {
 
   async replyToReview(ownerId: string, reviewId: string, reply: string): Promise<Review> {
     const agencyId = await this.agencyIdFor(ownerId);
-    const review = await this.prisma.review.findFirst({ where: { id: reviewId, agencyId } });
+    const review = await this.prisma.review.findFirst({
+      where: { id: reviewId, agencyId, moderationStatus: { not: 'HIDDEN' } },
+    });
     if (review === null) {
       throw new NotFoundException('Avis introuvable.');
     }

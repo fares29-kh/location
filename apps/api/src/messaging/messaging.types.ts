@@ -21,7 +21,21 @@ export interface OtpMessageJob {
   expiresInMinutes: number;
 }
 
-export type MessageJob = OtpMessageJob;
+/** Relance d'une facture d'abonnement impayée, envoyée au gérant de l'agence. */
+export interface InvoiceReminderJob {
+  template: 'invoice_reminder';
+  channel: OtpChannel;
+  to: string;
+  locale: Locale;
+  invoiceNumber: string;
+  totalMillimes: number;
+  /** Échéance « AAAA-MM-JJ » (heure de Tunis). */
+  dueDate: string;
+  /** Échéance dépassée au moment de la relance. */
+  overdue: boolean;
+}
+
+export type MessageJob = OtpMessageJob | InvoiceReminderJob;
 
 /**
  * Fournisseur d'envoi pluggable (passerelle SMS tunisienne, WhatsApp Business API,

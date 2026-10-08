@@ -1,6 +1,6 @@
-import type { Locale, OtpPurpose } from '@drivetn/types';
+import { formatMillimes, type Locale, type OtpPurpose } from '@drivetn/types';
 
-import type { MessageJob } from './messaging.types';
+import type { InvoiceReminderJob, MessageJob, OtpMessageJob } from './messaging.types';
 
 const OTP_INTRO: Record<Locale, Record<OtpPurpose, string>> = {
   fr: {
@@ -26,13 +26,49 @@ const OTP_FOOTER: Record<Locale, string> = {
   en: 'Valid for {minutes} min. Never share it with anyone.',
 };
 
+const INVOICE_REMINDER: Record<'upcoming' | 'overdue', Record<Locale, string>> = {
+  upcoming: {
+    fr: '{app} : la facture {number} ({amount}) arrive à échéance le {due}. Merci de procéder au règlement ou de contacter le support.',
+    ar: '{app}: الفاتورة {number} ({amount}) مستحقة بتاريخ {due}. يرجى تسديدها أو الاتصال بالدعم.',
+    en: '{app}: invoice {number} ({amount}) is due on {due}. Please settle it or contact support.',
+  },
+  overdue: {
+    fr: '{app} : la facture {number} ({amount}) était à régler avant le {due} et reste impayée. Merci de procéder au règlement ou de contacter le support.',
+    ar: '{app}: الفاتورة {number} ({amount}) كانت مستحقة بتاريخ {due} ولم تُسدَّد بعد. يرجى تسديدها أو الاتصال بالدعم.',
+    en: '{app}: invoice {number} ({amount}) was due on {due} and remains unpaid. Please settle it or contact support.',
+  },
+};
+
 function fill(template: string, values: Record<string, string>): string {
   return template.replace(/\{(\w+)\}/g, (match, key: string) => values[key] ?? match);
 }
 
-/** Texte du SMS / message WhatsApp, dans la langue du destinataire. */
-export function renderMessage(job: MessageJob, appName: string): string {
+/** « AAAA-MM-JJ » → « JJ/MM/AAAA ». */
+function formatDay(day: string): string {
+  return day.split('-').reverse().join('/');
+}
+
+function renderOtp(job: OtpMessageJob, appName: string): string {
   const intro = fill(OTP_INTRO[job.locale][job.purpose], { app: appName });
   const footer = fill(OTP_FOOTER[job.locale], { minutes: String(job.expiresInMinutes) });
   return `${intro} : ${job.code}. ${footer}`;
+}
+
+function renderInvoiceReminder(job: InvoiceReminderJob, appName: string): string {
+  return fill(INVOICE_REMINDER[job.overdue ? 'overdue' : 'upcoming'][job.locale], {
+    app: appName,
+    number: job.invoiceNumber,
+    amount: formatMillimes(job.totalMillimes, job.locale),
+    due: formatDay(job.dueDate),
+  });
+}
+
+/** Texte du SMS / message WhatsApp, dans la langue du destinataire. */
+export function renderMessage(job: MessageJob, appName: string): string {
+  switch (job.template) {
+    case 'otp':
+      return renderOtp(job, appName);
+    case 'invoice_reminder':
+      return renderInvoiceReminder(job, appName);
+  }
 }

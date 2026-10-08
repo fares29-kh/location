@@ -81,7 +81,7 @@ export function useAgencyDecision() {
   return useMutation({
     mutationFn: ({ id, input }: { id: string; input: AgencyDecisionInput }) =>
       adminApi.decideAgency(id, input),
-    onSuccess: () => invalidateAdmin(queryClient),
+    onSettled: () => invalidateAdmin(queryClient),
   });
 }
 
@@ -106,7 +106,7 @@ export function useUserStatus() {
   return useMutation({
     mutationFn: ({ id, input }: { id: string; input: UserStatusInput }) =>
       adminApi.setUserStatus(id, input),
-    onSuccess: () => invalidateAdmin(queryClient),
+    onSettled: () => invalidateAdmin(queryClient),
   });
 }
 
@@ -139,7 +139,7 @@ export function useMarkInvoicePaid() {
   return useMutation({
     mutationFn: ({ id, method }: { id: string; method: PaymentMethod }) =>
       adminApi.markInvoicePaid(id, method),
-    onSuccess: () => invalidateAdmin(queryClient),
+    onSettled: () => invalidateAdmin(queryClient),
   });
 }
 
@@ -147,7 +147,7 @@ export function useInvoiceReminder() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => adminApi.sendInvoiceReminder(id),
-    onSuccess: () => invalidateAdmin(queryClient),
+    onSettled: () => invalidateAdmin(queryClient),
   });
 }
 
@@ -164,7 +164,7 @@ export function useModerateReview() {
   return useMutation({
     mutationFn: ({ id, input }: { id: string; input: ReviewModerationInput }) =>
       adminApi.moderateReview(id, input),
-    onSuccess: () => invalidateAdmin(queryClient),
+    onSettled: () => invalidateAdmin(queryClient),
   });
 }
 

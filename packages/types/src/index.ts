@@ -1,3 +1,5 @@
+export * from './admin-permissions';
+export * from './admin-portal';
 export * from './agency';
 export * from './agency-engine';
 export * from './agency-portal';

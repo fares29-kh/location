@@ -2,6 +2,7 @@ import { Logger } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 
 import { PasswordService } from '../auth/password.service';
+import { seedAdminDemo } from './admin.seed';
 import { seedDemoAgency } from './agency.seed';
 import { seedGovernorates } from './governorates.seed';
 import { seedLocations } from './locations.seed';
@@ -33,6 +34,13 @@ async function main(): Promise<void> {
       if (agency.created) {
         logger.log(
           `Agence de démo : ${agency.vehicles} véhicules, ${agency.bookings} réservations`,
+        );
+      }
+
+      const admin = await seedAdminDemo(prisma);
+      if (admin.created) {
+        logger.log(
+          `Administration : ${admin.agencies} agences partenaires, ${admin.bookings} réservations, ${admin.invoices} factures`,
         );
       }
     }

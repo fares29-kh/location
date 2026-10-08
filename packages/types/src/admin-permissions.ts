@@ -1,4 +1,4 @@
-import type { AdminRole } from '@drivetn/types';
+import type { AdminRole } from './auth';
 
 /**
  * Actions sensibles de l'administration. Tous les rôles consultent l'ensemble des écrans ;

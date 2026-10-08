@@ -13,11 +13,18 @@ function prismaMock(existingEmails: string[]) {
 }
 
 describe('seedDemoUsers', () => {
-  it('fournit un compte par portail avec un téléphone valide', () => {
+  it('fournit un compte par rôle avec un téléphone valide', () => {
     expect(DEMO_USERS.map((u) => u.email)).toEqual([
       'admin@demo.tn',
+      'support@demo.tn',
+      'finance@demo.tn',
       'agency@demo.tn',
       'customer@demo.tn',
+    ]);
+    expect(DEMO_USERS.filter((u) => u.role === 'ADMIN').map((u) => u.adminRole)).toEqual([
+      'SUPER_ADMIN',
+      'SUPPORT',
+      'FINANCE',
     ]);
     for (const user of DEMO_USERS) {
       expect(isValidTunisianPhone(user.phone)).toBe(true);
@@ -30,7 +37,7 @@ describe('seedDemoUsers', () => {
 
     const created = await seedDemoUsers(prisma, hash);
 
-    expect(created).toBe(3);
+    expect(created).toBe(DEMO_USERS.length);
     expect(hash).toHaveBeenCalledWith(DEMO_PASSWORD);
     expect(create.mock.calls[0]?.[0]).toMatchObject({
       data: { status: 'ACTIVE', passwordHash: 'hashed', phone: '+21620000001' },
@@ -42,7 +49,7 @@ describe('seedDemoUsers', () => {
 
     const created = await seedDemoUsers(prisma, () => Promise.resolve('hashed'));
 
-    expect(created).toBe(1);
-    expect(create).toHaveBeenCalledTimes(1);
+    expect(created).toBe(DEMO_USERS.length - 2);
+    expect(create).toHaveBeenCalledTimes(DEMO_USERS.length - 2);
   });
 });

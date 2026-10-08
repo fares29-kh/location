@@ -1,10 +1,7 @@
 'use client';
 
-import type { CurrentUser } from '@drivetn/types';
-import { createContext, type ReactNode, use, useEffect } from 'react';
-
-import { ADMIN_DEMO_MODE, identifyDemoAdmin } from '@/lib/admin/api';
-import { type AdminPermission, hasAdminPermission } from '@/lib/admin/permissions';
+import { type AdminPermission, type CurrentUser, hasAdminPermission } from '@drivetn/types';
+import { createContext, type ReactNode, use } from 'react';
 
 const AdminSessionContext = createContext<CurrentUser | null>(null);
 
@@ -16,11 +13,6 @@ export function AdminSessionProvider({
   user: CurrentUser;
   children: ReactNode;
 }) {
-  useEffect(() => {
-    if (ADMIN_DEMO_MODE) {
-      identifyDemoAdmin(user);
-    }
-  }, [user]);
   return <AdminSessionContext value={user}>{children}</AdminSessionContext>;
 }
 

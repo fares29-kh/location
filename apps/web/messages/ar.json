@@ -1443,7 +1443,8 @@
         "noReminder": "لم يُرسل أي تذكير.",
         "remindedAt": "آخر تذكير {date}.",
         "sendReminder": "إرسال تذكير",
-        "reminderSuccess": "تم إرسال تذكير إلى {name}.",
+        "reminderSuccess": "تم إرسال تذكير إلى {name} عبر واتساب.",
+        "reminderTooSoon": "تم إرسال تذكير لهذه الفاتورة خلال الـ 24 ساعة الأخيرة.",
         "print": "طباعة"
       }
     },
@@ -1546,6 +1547,8 @@
         "auth": "الدخول",
         "agency": "الوكالات",
         "user": "الحسابات",
+        "booking": "الحجوزات",
+        "payment": "المقبوضات",
         "invoice": "الفوترة",
         "review": "التقييمات",
         "settings": "الإعدادات"
@@ -1566,9 +1569,13 @@
           "login_failed": "فشل تسجيل الدخول",
           "signup": "تسجيل حساب",
           "password_reset": "إعادة تعيين كلمة المرور",
-          "password_changed": "تغيير كلمة المرور"
+          "password_changed": "تغيير كلمة المرور",
+          "phone_verified": "تأكيد رقم الهاتف",
+          "logout": "تسجيل خروج",
+          "refresh_token_reused": "إعادة استعمال مشبوهة لجلسة"
         },
         "agency": {
+          "created": "إنشاء وكالة",
           "approved": "مصادقة على وكالة",
           "rejected": "رفض وكالة",
           "suspended": "تعليق وكالة",
@@ -1577,6 +1584,14 @@
         "user": {
           "suspended": "تعليق حساب",
           "reactivated": "إعادة تفعيل حساب"
+        },
+        "booking": {
+          "created": "طلب حجز",
+          "status_changed": "تغيير حالة حجز",
+          "cancelled_by_customer": "إلغاء الحجز من قبل الحريف"
+        },
+        "payment": {
+          "recorded": "تسجيل مقبوض"
         },
         "invoice": {
           "issued": "إصدار فاتورة",

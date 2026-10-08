@@ -1,39 +1,36 @@
+import { DEFAULT_PLATFORM_SETTINGS } from '@drivetn/types';
 import type { PrismaClient } from '@prisma/client';
+
+import {
+  PLATFORM_SETTING_DESCRIPTIONS,
+  PLATFORM_SETTING_FIELDS,
+  PLATFORM_SETTING_KEYS,
+} from '../platform/platform-settings.keys';
 
 interface PlatformSettingSeed {
   key: string;
-  value: number;
+  value: number | string;
   description: string;
 }
 
-export const DEFAULT_PLATFORM_SETTINGS: readonly PlatformSettingSeed[] = [
-  {
-    key: 'tax.vatRateBps',
-    value: 1900,
-    description: 'Taux de TVA par défaut, en points de base (1900 = 19 %)',
-  },
-  {
-    key: 'tax.fiscalStampMillimes',
-    value: 1000,
-    description: 'Timbre fiscal appliqué sur les factures, en millimes (1000 = 1 DT)',
-  },
-  {
-    key: 'billing.defaultCommissionBps',
-    value: 0,
-    description: 'Commission par défaut sur les réservations, en points de base (0 = désactivée)',
-  },
-];
+export const PLATFORM_SETTING_SEEDS: readonly PlatformSettingSeed[] = PLATFORM_SETTING_FIELDS.map(
+  (field) => ({
+    key: PLATFORM_SETTING_KEYS[field],
+    value: DEFAULT_PLATFORM_SETTINGS[field],
+    description: PLATFORM_SETTING_DESCRIPTIONS[field],
+  }),
+);
 
 /** Idempotent : ne remplace jamais une valeur modifiée depuis le portail admin. */
 export async function seedPlatformSettings(
   prisma: Pick<PrismaClient, 'platformSetting'>,
 ): Promise<number> {
-  for (const setting of DEFAULT_PLATFORM_SETTINGS) {
+  for (const setting of PLATFORM_SETTING_SEEDS) {
     await prisma.platformSetting.upsert({
       where: { key: setting.key },
       create: setting,
       update: {},
     });
   }
-  return DEFAULT_PLATFORM_SETTINGS.length;
+  return PLATFORM_SETTING_SEEDS.length;
 }

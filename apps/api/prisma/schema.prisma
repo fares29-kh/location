@@ -68,6 +68,8 @@ model User {
   /// Ville de résidence déclarée (affichée à l'agence).
   city            String?
   lastLoginAt     DateTime?  @map("last_login_at")
+  /// Motif communiqué lors d'une suspension par l'administration.
+  statusReason    String?    @map("status_reason")
   createdAt       DateTime   @default(now()) @map("created_at")
   updatedAt       DateTime   @updatedAt @map("updated_at")
   deletedAt       DateTime?  @map("deleted_at")
@@ -246,35 +248,117 @@ enum PaymentMethod {
   MONEY_ORDER
 }
 
+enum SubscriptionPlan {
+  STARTER
+  PRO
+  BUSINESS
+}
+
+enum AgencyDocumentKind {
+  TRADE_REGISTER
+  TAX_ID
+  INSURANCE
+  MANAGER_ID
+}
+
+enum ReviewModerationStatus {
+  PUBLISHED
+  FLAGGED
+  HIDDEN
+}
+
+enum ReviewReportReason {
+  OFFENSIVE
+  SPAM
+  PERSONAL_DATA
+  OFF_TOPIC
+}
+
 /// Agence de location, rattachée à son propriétaire. Seules les agences ACTIVE sont visibles des clients.
 model Agency {
-  id                     String          @id @default(cuid())
-  ownerId                String          @unique @map("owner_id")
-  status                 AgencyStatus    @default(PENDING_REVIEW)
+  id                     String           @id @default(cuid())
+  ownerId                String           @unique @map("owner_id")
+  status                 AgencyStatus     @default(PENDING_REVIEW)
   name                   String
   /// Numéros nationaux à 8 chiffres.
   phone                  String
-  whatsappPhone          String          @map("whatsapp_phone")
+  whatsappPhone          String           @map("whatsapp_phone")
   email                  String?
   address                String
-  governorateCode        String          @map("governorate_code")
-  description            String          @default("")
-  minDriverAge           Int             @default(21) @map("min_driver_age")
-  minLicenseYears        Int             @default(2) @map("min_license_years")
-  freeCancellationHours  Int             @default(48) @map("free_cancellation_hours")
-  instantConfirmation    Boolean         @default(false) @map("instant_confirmation")
-  acceptedPaymentMethods PaymentMethod[] @default([CASH]) @map("accepted_payment_methods")
-  createdAt              DateTime        @default(now()) @map("created_at")
-  updatedAt              DateTime        @updatedAt @map("updated_at")
+  governorateCode        String           @map("governorate_code")
+  description            String           @default("")
+  minDriverAge           Int              @default(21) @map("min_driver_age")
+  minLicenseYears        Int              @default(2) @map("min_license_years")
+  freeCancellationHours  Int              @default(48) @map("free_cancellation_hours")
+  instantConfirmation    Boolean          @default(false) @map("instant_confirmation")
+  acceptedPaymentMethods PaymentMethod[]  @default([CASH]) @map("accepted_payment_methods")
+  /// Matricule fiscal (ex. 1234567/A/M/000), vide tant qu'il n'est pas déclaré.
+  taxId                  String           @default("") @map("tax_id")
+  plan                   SubscriptionPlan @default(STARTER)
+  /// Commission propre à l'agence en points de base (`null` = commission par défaut).
+  commissionBps          Int?             @map("commission_bps")
+  /// Dernière décision de l'administration et son motif (refus, suspension).
+  decidedAt              DateTime?        @map("decided_at")
+  statusReason           String?          @map("status_reason")
+  createdAt              DateTime         @default(now()) @map("created_at")
+  updatedAt              DateTime         @updatedAt @map("updated_at")
 
-  owner       User        @relation(fields: [ownerId], references: [id], onDelete: Restrict)
-  governorate Governorate @relation(fields: [governorateCode], references: [code])
+  owner       User             @relation(fields: [ownerId], references: [id], onDelete: Restrict)
+  governorate Governorate      @relation(fields: [governorateCode], references: [code])
   vehicles    Vehicle[]
   bookings    Booking[]
   reviews     Review[]
+  documents   AgencyDocument[]
+  invoices    Invoice[]
 
   @@index([status, governorateCode])
   @@map("agencies")
+}
+
+/// Pièce justificative déposée par une agence (une par type).
+model AgencyDocument {
+  id         String             @id @default(cuid())
+  agencyId   String             @map("agency_id")
+  kind       AgencyDocumentKind
+  /// Clé de l'objet dans le stockage S3.
+  fileKey    String             @map("file_key")
+  uploadedAt DateTime           @default(now()) @map("uploaded_at")
+
+  agency Agency @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+
+  @@unique([agencyId, kind])
+  @@map("agency_documents")
+}
+
+/// Facture mensuelle d'abonnement (et de commission) émise à une agence.
+/// Le statut se déduit : réglée si `paidAt`, en retard après `dueAt`, sinon émise.
+model Invoice {
+  id                   String           @id @default(cuid())
+  number               String           @unique
+  agencyId             String           @map("agency_id")
+  /// Mois facturé « AAAA-MM ».
+  period               String
+  plan                 SubscriptionPlan
+  subscriptionMillimes Int              @map("subscription_millimes")
+  commissionMillimes   Int              @map("commission_millimes")
+  subtotalMillimes     Int              @map("subtotal_millimes")
+  vatRateBps           Int              @map("vat_rate_bps")
+  vatMillimes          Int              @map("vat_millimes")
+  fiscalStampMillimes  Int              @map("fiscal_stamp_millimes")
+  totalMillimes        Int              @map("total_millimes")
+  issuedAt             DateTime         @map("issued_at")
+  dueAt                DateTime         @map("due_at")
+  paidAt               DateTime?        @map("paid_at")
+  paymentMethod        PaymentMethod?   @map("payment_method")
+  remindedAt           DateTime?        @map("reminded_at")
+  createdAt            DateTime         @default(now()) @map("created_at")
+  updatedAt            DateTime         @updatedAt @map("updated_at")
+
+  agency Agency @relation(fields: [agencyId], references: [id], onDelete: Restrict)
+
+  @@unique([agencyId, period])
+  @@index([paidAt, dueAt])
+  @@map("invoices")
 }
 
 model Vehicle {
@@ -378,22 +462,42 @@ model Payment {
 }
 
 model Review {
-  id         String    @id @default(cuid())
-  bookingId  String    @unique @map("booking_id")
-  agencyId   String    @map("agency_id")
-  customerId String    @map("customer_id")
-  rating     Int
-  comment    String
-  reply      String?
-  repliedAt  DateTime? @map("replied_at")
-  createdAt  DateTime  @default(now()) @map("created_at")
+  id               String                 @id @default(cuid())
+  bookingId        String                 @unique @map("booking_id")
+  agencyId         String                 @map("agency_id")
+  customerId       String                 @map("customer_id")
+  rating           Int
+  comment          String
+  reply            String?
+  repliedAt        DateTime?              @map("replied_at")
+  /// Les avis masqués ne sont plus publics ni comptés dans la note de l'agence.
+  moderationStatus ReviewModerationStatus @default(PUBLISHED) @map("moderation_status")
+  moderatedAt      DateTime?              @map("moderated_at")
+  moderationReason String?                @map("moderation_reason")
+  createdAt        DateTime               @default(now()) @map("created_at")
 
-  booking  Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
-  agency   Agency  @relation(fields: [agencyId], references: [id], onDelete: Cascade)
-  customer User    @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  booking  Booking        @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  agency   Agency         @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  customer User           @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  reports  ReviewReport[]
 
   @@index([agencyId, createdAt])
+  @@index([moderationStatus])
   @@map("reviews")
+}
+
+/// Signalement d'un avis (par l'agence concernée ou un utilisateur).
+model ReviewReport {
+  id         String             @id @default(cuid())
+  reviewId   String             @map("review_id")
+  reason     ReviewReportReason
+  reporterId String?            @map("reporter_id")
+  createdAt  DateTime           @default(now()) @map("created_at")
+
+  review Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+
+  @@index([reviewId])
+  @@map("review_reports")
 }
 
 // --- Audit -------------------------------------------------------------------

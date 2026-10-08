@@ -20,6 +20,7 @@ import { useId, useState } from 'react';
 import { useAgencyFormat } from '@/components/agency/use-agency-format';
 import { useInvoiceReminder, useMarkInvoicePaid } from '@/lib/admin/queries';
 import type { Invoice } from '@/lib/admin/types';
+import { ApiError } from '@/lib/api/errors';
 
 import { useAdminPermission } from '../admin-session';
 import { InvoiceStatusTag, PlanTag } from '../status-tags';
@@ -118,8 +119,12 @@ function PaymentForm({ invoice, onDone }: { invoice: Invoice; onDone: () => void
               onSuccess: () => {
                 toast.success(t('reminderSuccess', { name: invoice.agency.name }));
               },
-              onError: () => {
-                toast.error(t('error'));
+              onError: (error) => {
+                toast.error(
+                  error instanceof ApiError && error.code === 'TOO_MANY_REQUESTS'
+                    ? t('reminderTooSoon')
+                    : t('error'),
+                );
               },
             });
           }}

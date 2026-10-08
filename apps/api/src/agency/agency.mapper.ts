@@ -140,7 +140,7 @@ export function toAgencyDataset(agency: AgencyWithDataset): AgencyDataset {
   for (const booking of agency.bookings) {
     customers.set(booking.customerId, toCustomer(booking.customer));
     payments.push(...booking.payments.map(toPayment));
-    if (booking.review !== null) {
+    if (booking.review !== null && booking.review.moderationStatus !== 'HIDDEN') {
       const { review, customer } = booking;
       reviews.push({
         id: review.id,

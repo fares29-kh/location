@@ -1,4 +1,4 @@
-import type { UserRole } from '@drivetn/types';
+import { type AdminPermission, hasAdminPermission, type UserRole } from '@drivetn/types';
 import {
   type CanActivate,
   type ExecutionContext,
@@ -8,23 +8,34 @@ import {
 import { Reflector } from '@nestjs/core';
 import type { Request } from 'express';
 
-import { ROLES_KEY } from './auth.constants';
+import { ADMIN_PERMISSION_KEY, ROLES_KEY } from './auth.constants';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
   constructor(private readonly reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
-    const roles = this.reflector.getAllAndOverride<UserRole[] | undefined>(ROLES_KEY, [
-      context.getHandler(),
-      context.getClass(),
-    ]);
-    if (roles === undefined || roles.length === 0) {
+    const targets = [context.getHandler(), context.getClass()];
+    const roles = this.reflector.getAllAndOverride<UserRole[] | undefined>(ROLES_KEY, targets);
+    const permission = this.reflector.getAllAndOverride<AdminPermission | undefined>(
+      ADMIN_PERMISSION_KEY,
+      targets,
+    );
+    if ((roles === undefined || roles.length === 0) && permission === undefined) {
       return true;
     }
     const user = context.switchToHttp().getRequest<Request>().user;
-    if (user === undefined || !roles.includes(user.role)) {
+    if (user === undefined) {
       throw new ForbiddenException('Accès réservé.');
+    }
+    if (roles !== undefined && roles.length > 0 && !roles.includes(user.role)) {
+      throw new ForbiddenException('Accès réservé.');
+    }
+    if (
+      permission !== undefined &&
+      (user.role !== 'ADMIN' || !hasAdminPermission(user.adminRole, permission))
+    ) {
+      throw new ForbiddenException('Votre rôle ne permet pas cette action.');
     }
     return true;
   }

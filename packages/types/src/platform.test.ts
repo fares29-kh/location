@@ -1,10 +1,14 @@
 import { describe, expect, it } from 'vitest';
 
+import { hasAdminPermission } from './admin-permissions';
+import { invoiceStatus } from './admin-portal';
 import {
   agencyDecisionInputSchema,
   applyAgencyDecision,
   applyRateBps,
+  billingPeriod,
   bpsToPercentInput,
+  computeInvoiceAmounts,
   computeInvoiceTotals,
   getAgencyDecisions,
   parsePercentToBps,
@@ -57,6 +61,53 @@ describe('facturation', () => {
       fiscalStampMillimes: 1000,
       totalMillimes: 118_810,
     });
+  });
+
+  it("ajoute la commission sur le chiffre d'affaires à l'abonnement de l'offre", () => {
+    expect(
+      computeInvoiceAmounts({
+        plan: 'PRO',
+        commissionBps: 500,
+        revenueMillimes: 1_000_000,
+        vatRateBps: 1900,
+        fiscalStampMillimes: 1000,
+      }),
+    ).toEqual({
+      subscriptionMillimes: 99_000,
+      commissionMillimes: 50_000,
+      vatRateBps: 1900,
+      subtotalMillimes: 149_000,
+      vatMillimes: 28_310,
+      fiscalStampMillimes: 1000,
+      totalMillimes: 178_310,
+    });
+  });
+
+  it('émet la facture le 1er du mois suivant, payable avant le 15 (heure de Tunis)', () => {
+    const { start, end, issuedAt, dueAt } = billingPeriod('2026-12');
+    expect(start.toISOString()).toBe('2026-11-30T23:00:00.000Z');
+    expect(end.toISOString()).toBe('2026-12-31T23:00:00.000Z');
+    expect(issuedAt.toISOString()).toBe('2027-01-01T07:00:00.000Z');
+    expect(dueAt.toISOString()).toBe('2027-01-15T22:59:00.000Z');
+  });
+
+  it("déduit le statut d'une facture de son règlement et de son échéance", () => {
+    const now = new Date('2026-10-20T10:00:00Z');
+    const dueAt = '2026-10-15T22:59:00Z';
+    expect(invoiceStatus({ paidAt: null, dueAt }, now)).toBe('OVERDUE');
+    expect(invoiceStatus({ paidAt: '2026-10-02T09:00:00Z', dueAt }, now)).toBe('PAID');
+    expect(invoiceStatus({ paidAt: null, dueAt: '2026-11-15T22:59:00Z' }, now)).toBe('ISSUED');
+  });
+});
+
+describe("droits de l'administration", () => {
+  it('réserve chaque action aux rôles concernés', () => {
+    expect(hasAdminPermission('SUPER_ADMIN', 'settings.manage')).toBe(true);
+    expect(hasAdminPermission('SUPPORT', 'agencies.decide')).toBe(true);
+    expect(hasAdminPermission('SUPPORT', 'billing.manage')).toBe(false);
+    expect(hasAdminPermission('FINANCE', 'billing.manage')).toBe(true);
+    expect(hasAdminPermission('FINANCE', 'users.manage')).toBe(false);
+    expect(hasAdminPermission(null, 'agencies.decide')).toBe(false);
   });
 });
 

@@ -5,8 +5,10 @@ import type {
   ReviewModerationInput,
   UserStatusInput,
 } from '@drivetn/types';
+import { z } from 'zod';
 
-import { createMockAdminApi } from './mock-api';
+import { apiFetch } from '@/lib/api/client';
+
 import type {
   AdminDashboard,
   AdminNavCounts,
@@ -32,13 +34,10 @@ import type {
 } from './types';
 
 /**
- * Contrat de l'API du portail d'administration. Les écrans ne dépendent que de cette interface :
- * brancher l'API NestJS revient à fournir une implémentation basée sur `apiFetch`.
+ * Contrat de l'API du portail d'administration. Les écrans ne dépendent que de cette interface,
+ * implémentée par les routes `/api/v1/admin/*`.
  */
 export interface AdminApi {
-  /** Vrai pour l'implémentation de démonstration (données fictives en mémoire). */
-  readonly isDemo: boolean;
-
   getDashboard(): Promise<AdminDashboard>;
   getNavCounts(): Promise<AdminNavCounts>;
 
@@ -66,13 +65,68 @@ export interface AdminApi {
   updateSettings(input: PlatformSettings): Promise<PlatformSettings>;
 }
 
-const mockAdminApi = createMockAdminApi();
+/** Réponse typée par le contrat partagé `@drivetn/types` (l'API valide ses propres entrées). */
+function shape<T>() {
+  return z.custom<T>(() => true);
+}
 
-/** Données de démonstration tant que les modules d'administration de l'API ne sont pas livrés. */
-export const adminApi: AdminApi = mockAdminApi;
+function withQuery(path: string, params: Record<string, string | number>): string {
+  const search = new URLSearchParams(
+    Object.entries(params).map(([key, value]) => [key, String(value)]),
+  );
+  return `${path}?${search.toString()}`;
+}
 
-/** Vrai tant que le portail affiche des données de démonstration. */
-export const ADMIN_DEMO_MODE = adminApi.isDemo;
+const segment = encodeURIComponent;
 
-/** Rattache les actions de démonstration (journal d'audit, droits) à l'administrateur connecté. */
-export const identifyDemoAdmin = mockAdminApi.identify;
+function post<T>(path: string, body?: unknown) {
+  return apiFetch(path, { method: 'POST', body, schema: shape<T>() });
+}
+
+function createHttpAdminApi(): AdminApi {
+  return {
+    getDashboard: () => apiFetch('/admin/dashboard', { schema: shape<AdminDashboard>() }),
+    getNavCounts: () => apiFetch('/admin/nav-counts', { schema: shape<AdminNavCounts>() }),
+
+    listAgencies: (query) =>
+      apiFetch(withQuery('/admin/agencies', { ...query }), { schema: shape<AgencyList>() }),
+    getAgency: (id) =>
+      apiFetch(`/admin/agencies/${segment(id)}`, { schema: shape<AgencyDetail>() }),
+    decideAgency: (id, input) => post<Agency>(`/admin/agencies/${segment(id)}/decision`, input),
+
+    listUsers: (query) =>
+      apiFetch(withQuery('/admin/users', { ...query }), { schema: shape<UserList>() }),
+    getUser: (id) => apiFetch(`/admin/users/${segment(id)}`, { schema: shape<UserDetail>() }),
+    setUserStatus: (id, input) => post<PlatformUser>(`/admin/users/${segment(id)}/status`, input),
+
+    listBookings: (query) =>
+      apiFetch(withQuery('/admin/bookings', { ...query }), { schema: shape<BookingList>() }),
+
+    listInvoices: (query) =>
+      apiFetch(withQuery('/admin/invoices', { ...query }), { schema: shape<InvoiceList>() }),
+    getInvoice: (id) => apiFetch(`/admin/invoices/${segment(id)}`, { schema: shape<Invoice>() }),
+    markInvoicePaid: (id, method) =>
+      post<Invoice>(`/admin/invoices/${segment(id)}/payment`, { method }),
+    sendInvoiceReminder: (id) => post<Invoice>(`/admin/invoices/${segment(id)}/reminder`),
+
+    listReviews: (query) =>
+      apiFetch(withQuery('/admin/reviews', { ...query }), { schema: shape<ReviewList>() }),
+    moderateReview: (id, input) =>
+      post<ModeratedReview>(`/admin/reviews/${segment(id)}/moderation`, input),
+
+    listAudit: (query) =>
+      apiFetch(withQuery('/admin/audit', { ...query }), {
+        schema: shape<Paginated<AuditEntry>>(),
+      }),
+
+    getSettings: () => apiFetch('/admin/settings', { schema: shape<PlatformSettings>() }),
+    updateSettings: (input) =>
+      apiFetch('/admin/settings', {
+        method: 'PUT',
+        body: input,
+        schema: shape<PlatformSettings>(),
+      }),
+  };
+}
+
+export const adminApi: AdminApi = createHttpAdminApi();

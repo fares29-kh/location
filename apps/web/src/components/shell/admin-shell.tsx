@@ -17,9 +17,7 @@ import type { ReactNode } from 'react';
 
 import { AdminSessionProvider } from '@/components/admin/admin-session';
 import { AdminNotificationsMenu } from '@/components/admin/notifications-menu';
-import { DemoDataBadge } from '@/components/agency/demo-data-badge';
 import { AppShell, type ShellNavSection } from '@/components/shell/app-shell';
-import { ADMIN_DEMO_MODE } from '@/lib/admin/api';
 import { useAdminNavCounts } from '@/lib/admin/queries';
 
 export function AdminShell({
@@ -96,12 +94,7 @@ export function AdminShell({
         portalLabel={tCommon('portals.admin')}
         sections={sections}
         defaultCollapsed={sidebarCollapsed}
-        topbarActions={
-          <>
-            {ADMIN_DEMO_MODE && <DemoDataBadge />}
-            <AdminNotificationsMenu />
-          </>
-        }
+        topbarActions={<AdminNotificationsMenu />}
       >
         {children}
       </AppShell>

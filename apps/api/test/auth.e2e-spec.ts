@@ -79,8 +79,10 @@ describe.skipIf(databaseUrl === undefined || redisUrl === undefined)(
     const http = () => request(app.getHttpServer());
 
     function lastCode(nationalPhone: string): string {
-      const job = sent.findLast((message) => message.to === toE164(nationalPhone));
-      if (job === undefined) {
+      const job = sent.findLast(
+        (message) => message.template === 'otp' && message.to === toE164(nationalPhone),
+      );
+      if (job?.template !== 'otp') {
         throw new Error(`Aucun code envoyé au ${nationalPhone}`);
       }
       return job.code;

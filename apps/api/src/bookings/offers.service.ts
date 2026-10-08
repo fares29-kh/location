@@ -65,7 +65,7 @@ export class OffersService {
     const agencyIds = [...new Set(vehicles.map((vehicle) => vehicle.agencyId))];
     const ratings = await this.prisma.review.groupBy({
       by: ['agencyId'],
-      where: { agencyId: { in: agencyIds } },
+      where: { agencyId: { in: agencyIds }, moderationStatus: { not: 'HIDDEN' } },
       _avg: { rating: true },
       _count: { _all: true },
     });

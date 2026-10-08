@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 
+import { AdminModule } from './admin/admin.module';
 import { AgencyModule } from './agency/agency.module';
 import { AuditModule } from './audit/audit.module';
 import { AuthModule } from './auth/auth.module';
@@ -8,6 +9,7 @@ import { SecurityModule } from './common/security/security.module';
 import { ConfigModule } from './config/config.module';
 import { HealthModule } from './health/health.module';
 import { LocationsModule } from './locations/locations.module';
+import { PlatformModule } from './platform/platform.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { RateLimitModule } from './rate-limit/rate-limit.module';
 import { RedisModule } from './redis/redis.module';
@@ -20,6 +22,7 @@ import { UsersModule } from './users/users.module';
     RedisModule,
     RateLimitModule,
     AuditModule,
+    PlatformModule,
     SecurityModule,
     HealthModule,
     AuthModule,
@@ -27,6 +30,7 @@ import { UsersModule } from './users/users.module';
     LocationsModule,
     AgencyModule,
     BookingsModule,
+    AdminModule,
   ],
 })
 export class AppModule {}

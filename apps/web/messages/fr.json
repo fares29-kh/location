@@ -1443,7 +1443,8 @@
         "noReminder": "Aucune relance envoyée.",
         "remindedAt": "Dernière relance {date}.",
         "sendReminder": "Envoyer une relance",
-        "reminderSuccess": "Relance envoyée à {name}.",
+        "reminderSuccess": "Relance envoyée à {name} par WhatsApp.",
+        "reminderTooSoon": "Une relance a déjà été envoyée pour cette facture dans les dernières 24 h.",
         "print": "Imprimer"
       }
     },
@@ -1546,6 +1547,8 @@
         "auth": "Connexions",
         "agency": "Agences",
         "user": "Comptes",
+        "booking": "Réservations",
+        "payment": "Encaissements",
         "invoice": "Facturation",
         "review": "Avis",
         "settings": "Paramètres"
@@ -1566,9 +1569,13 @@
           "login_failed": "Échec de connexion",
           "signup": "Inscription",
           "password_reset": "Mot de passe réinitialisé",
-          "password_changed": "Mot de passe modifié"
+          "password_changed": "Mot de passe modifié",
+          "phone_verified": "Téléphone vérifié",
+          "logout": "Déconnexion",
+          "refresh_token_reused": "Réutilisation suspecte d’une session"
         },
         "agency": {
+          "created": "Agence créée",
           "approved": "Agence validée",
           "rejected": "Agence refusée",
           "suspended": "Agence suspendue",
@@ -1577,6 +1584,14 @@
         "user": {
           "suspended": "Compte suspendu",
           "reactivated": "Compte réactivé"
+        },
+        "booking": {
+          "created": "Demande de réservation",
+          "status_changed": "Statut de réservation modifié",
+          "cancelled_by_customer": "Réservation annulée par le client"
+        },
+        "payment": {
+          "recorded": "Encaissement déclaré"
         },
         "invoice": {
           "issued": "Facture émise",

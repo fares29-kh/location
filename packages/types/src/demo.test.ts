@@ -5,8 +5,16 @@ import { isValidTunisianPhone } from './phone';
 import { PORTALS } from './portal';
 
 describe('comptes de démo', () => {
-  it.each(PORTALS)('propose un compte pour le portail %s', (portal) => {
-    expect(getDemoAccounts(portal)).toHaveLength(1);
+  it.each(PORTALS)('propose au moins un compte pour le portail %s', (portal) => {
+    expect(getDemoAccounts(portal).length).toBeGreaterThan(0);
+  });
+
+  it("propose un compte par rôle d'administration", () => {
+    expect(getDemoAccounts('admin').map((account) => account.email)).toEqual([
+      'admin@demo.tn',
+      'support@demo.tn',
+      'finance@demo.tn',
+    ]);
   });
 
   it('utilise des identifiants uniques et des téléphones valides', () => {
