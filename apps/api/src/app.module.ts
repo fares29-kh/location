@@ -5,6 +5,7 @@ import { AgencyModule } from './agency/agency.module';
 import { AuditModule } from './audit/audit.module';
 import { AuthModule } from './auth/auth.module';
 import { BookingsModule } from './bookings/bookings.module';
+import { CatalogModule } from './catalog/catalog.module';
 import { SecurityModule } from './common/security/security.module';
 import { ConfigModule } from './config/config.module';
 import { HealthModule } from './health/health.module';
@@ -13,6 +14,7 @@ import { PlatformModule } from './platform/platform.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { RateLimitModule } from './rate-limit/rate-limit.module';
 import { RedisModule } from './redis/redis.module';
+import { StorageModule } from './storage/storage.module';
 import { UsersModule } from './users/users.module';
 
 @Module({
@@ -20,6 +22,7 @@ import { UsersModule } from './users/users.module';
     ConfigModule,
     PrismaModule,
     RedisModule,
+    StorageModule,
     RateLimitModule,
     AuditModule,
     PlatformModule,
@@ -28,6 +31,7 @@ import { UsersModule } from './users/users.module';
     AuthModule,
     UsersModule,
     LocationsModule,
+    CatalogModule,
     AgencyModule,
     BookingsModule,
     AdminModule,

@@ -9,6 +9,11 @@ import {
 } from '@nestjs/common';
 import type { Response } from 'express';
 
+import {
+  constraintViolationException,
+  findConstraintViolation,
+} from '../errors/constraint-violation';
+
 const STATUS_TO_CODE: Partial<Record<number, ErrorCode>> = {
   [HttpStatus.BAD_REQUEST]: 'BAD_REQUEST',
   [HttpStatus.UNAUTHORIZED]: 'UNAUTHORIZED',
@@ -29,6 +34,10 @@ interface NormalizedError {
 
 export function normalizeException(exception: unknown): NormalizedError {
   if (!(exception instanceof HttpException)) {
+    const violation = findConstraintViolation(exception);
+    if (violation !== null) {
+      return normalizeException(constraintViolationException(violation));
+    }
     return {
       status: HttpStatus.INTERNAL_SERVER_ERROR,
       body: { code: 'INTERNAL_ERROR', message: INTERNAL_ERROR_MESSAGE },
@@ -79,6 +88,13 @@ export class HttpExceptionFilter implements ExceptionFilter {
     if (status >= 500) {
       this.logger.error(
         exception instanceof Error ? (exception.stack ?? exception.message) : String(exception),
+      );
+    } else if (!(exception instanceof HttpException)) {
+      // Contrainte de la base atteinte malgré les contrôles applicatifs (concurrence, oubli).
+      // Le détail PostgreSQL contient la ligne entière : seul le nom de la contrainte est journalisé.
+      const violation = findConstraintViolation(exception);
+      this.logger.warn(
+        `Contrainte ${violation?.constraint ?? 'inconnue'} (SQLSTATE ${violation?.sqlState ?? '?'}) : réponse ${String(status)}.`,
       );
     }
 

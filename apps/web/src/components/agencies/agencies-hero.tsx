@@ -1,15 +1,17 @@
 import { Button } from '@drivetn/ui/button';
-import { Building2, MapPinned, Plane, Search } from 'lucide-react';
+import { Building2, Map as MapIcon, MapPinned, Plane, Search, Store } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 import { PageHero } from '@/components/client/page-hero';
 import { Link } from '@/i18n/navigation';
 
 export function AgenciesHero({
+  agencies,
   governorates,
   airports,
   pickupPoints,
 }: {
+  agencies: number;
   governorates: number;
   airports: number;
   pickupPoints: number;
@@ -17,6 +19,7 @@ export function AgenciesHero({
   const t = useTranslations('client.agencies');
 
   const stats = [
+    { id: 'agencies', icon: Store, value: agencies },
     { id: 'governorates', icon: MapPinned, value: governorates },
     { id: 'airports', icon: Plane, value: airports },
     { id: 'pickupPoints', icon: Building2, value: pickupPoints },
@@ -30,16 +33,24 @@ export function AgenciesHero({
       title={t('title')}
       subtitle={t('subtitle')}
       actions={
-        <Button asChild variant="cta" size="lg" className="shadow-lg shadow-cta/25">
-          <Link href="/search">
-            <Search aria-hidden="true" />
-            {t('findCar')}
-          </Link>
-        </Button>
+        <>
+          <Button asChild variant="secondary" size="lg">
+            <a href="#carte">
+              <MapIcon aria-hidden="true" />
+              {t('exploreMap')}
+            </a>
+          </Button>
+          <Button asChild variant="cta" size="lg" className="shadow-lg shadow-cta/25">
+            <Link href="/search">
+              <Search aria-hidden="true" />
+              {t('findCar')}
+            </Link>
+          </Button>
+        </>
       }
     >
       {pickupPoints > 0 && (
-        <dl className="grid gap-3 sm:grid-cols-3">
+        <dl className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {stats.map((stat) => (
             <div
               key={stat.id}

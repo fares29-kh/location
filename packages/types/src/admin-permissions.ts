@@ -5,7 +5,12 @@ import type { AdminRole } from './auth';
  * seules les actions sont restreintes (l'API applique les mêmes règles côté serveur).
  */
 export type AdminPermission =
-  'agencies.decide' | 'users.manage' | 'reviews.moderate' | 'billing.manage' | 'settings.manage';
+  | 'agencies.decide'
+  | 'users.manage'
+  | 'reviews.moderate'
+  | 'billing.manage'
+  | 'settings.manage'
+  | 'referentials.manage';
 
 const ROLE_PERMISSIONS: Record<AdminRole, readonly AdminPermission[]> = {
   SUPER_ADMIN: [
@@ -14,6 +19,7 @@ const ROLE_PERMISSIONS: Record<AdminRole, readonly AdminPermission[]> = {
     'reviews.moderate',
     'billing.manage',
     'settings.manage',
+    'referentials.manage',
   ],
   SUPPORT: ['agencies.decide', 'users.manage', 'reviews.moderate'],
   FINANCE: ['billing.manage'],

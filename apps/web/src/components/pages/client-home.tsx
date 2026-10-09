@@ -1,3 +1,5 @@
+import type { VehicleCategoryInfo } from '@drivetn/types';
+
 import { AgencyCta } from '@/components/home/agency-cta';
 import { HomeAirports } from '@/components/home/home-airports';
 import { HomeCategories } from '@/components/home/home-categories';
@@ -6,11 +8,17 @@ import { HomeFeatures } from '@/components/home/home-features';
 import { HomeHero } from '@/components/home/home-hero';
 import { HowItWorks } from '@/components/home/how-it-works';
 
-export function ClientHome({ agencyUrl }: { agencyUrl: string }) {
+export function ClientHome({
+  agencyUrl,
+  categories,
+}: {
+  agencyUrl: string;
+  categories: readonly VehicleCategoryInfo[];
+}) {
   return (
     <>
       <HomeHero />
-      <HomeCategories />
+      <HomeCategories categories={categories} />
       <HowItWorks />
       <HomeFeatures />
       <HomeAirports />

@@ -29,5 +29,10 @@
     "lint-staged": "^16.4.0",
     "prettier": "^3.9.9",
     "typescript": "~5.9.3"
+  },
+  "pnpm": {
+    "overrides": {
+      "@mapbox/jsonlint-lines-primitives": "2.0.2"
+    }
   }
 }

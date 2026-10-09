@@ -1,31 +1,23 @@
-import type {
-  VehicleCategory as ApiVehicleCategory,
-  FuelType,
-  Offer,
-  OfferAgency,
+import {
+  FUEL_TYPES,
+  type FuelType,
+  type Locale,
+  type Offer,
+  type OfferAgency,
+  pickLocalized,
+  SLUG_MAX,
+  SLUG_PATTERN,
+  type VehicleCategoryInfo,
+  type VehiclePhoto,
 } from '@drivetn/types';
 
 import type { CITIES } from '@/components/home/places';
 
-export const VEHICLE_CATEGORIES = ['city', 'compact', 'sedan', 'suv', 'family', 'premium'] as const;
-export type VehicleCategory = (typeof VEHICLE_CATEGORIES)[number];
+/** Slug d'une catégorie gérée par l'administration (ex. « suv »). */
+export type VehicleCategory = string;
 
-/** Catégorie de flotte (API) correspondant à chaque catégorie affichée aux clients. */
-export const API_CATEGORIES = {
-  city: 'ECONOMY',
-  compact: 'COMPACT',
-  sedan: 'SEDAN',
-  suv: 'SUV',
-  family: 'MINIVAN',
-  premium: 'LUXURY',
-} as const satisfies Record<VehicleCategory, ApiVehicleCategory>;
-
-export function fromApiCategory(category: ApiVehicleCategory): VehicleCategory {
-  return VEHICLE_CATEGORIES.find((item) => API_CATEGORIES[item] === category) ?? 'compact';
-}
-
-/** Dégradé (classes Tailwind `bg-gradient-to-*`) qui illustre chaque catégorie. */
-export const CATEGORY_GRADIENTS: Record<VehicleCategory, string> = {
+/** Dégradés (classes Tailwind `bg-gradient-to-*`) des catégories d'origine. */
+const KNOWN_GRADIENTS: Readonly<Record<string, string>> = {
   city: 'from-sky-500 via-blue-500 to-blue-700',
   compact: 'from-indigo-500 via-indigo-600 to-violet-700',
   sedan: 'from-slate-500 via-slate-600 to-slate-800',
@@ -33,6 +25,43 @@ export const CATEGORY_GRADIENTS: Record<VehicleCategory, string> = {
   family: 'from-amber-500 via-orange-500 to-orange-700',
   premium: 'from-zinc-700 via-zinc-800 to-black',
 };
+
+/** Dégradés attribués aux catégories ajoutées depuis l'administration. */
+const FALLBACK_GRADIENTS = [
+  'from-cyan-500 via-cyan-600 to-sky-700',
+  'from-rose-500 via-rose-600 to-pink-700',
+  'from-lime-500 via-green-600 to-emerald-700',
+  'from-fuchsia-500 via-purple-600 to-violet-700',
+  'from-orange-500 via-red-500 to-red-700',
+  'from-teal-500 via-teal-600 to-cyan-800',
+] as const;
+
+/** Dégradé qui illustre une catégorie ; stable pour un même slug. */
+export function categoryGradient(slug: string): string {
+  const known = KNOWN_GRADIENTS[slug];
+  if (known !== undefined) {
+    return known;
+  }
+  let hash = 0;
+  for (const char of slug) {
+    hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
+  }
+  return FALLBACK_GRADIENTS[hash % FALLBACK_GRADIENTS.length] ?? FALLBACK_GRADIENTS[0];
+}
+
+/** Nom traduit d'une catégorie, ou son slug mis en forme si elle n'est plus au référentiel. */
+export function categoryLabel(
+  categories: readonly VehicleCategoryInfo[],
+  slug: string,
+  locale: Locale,
+): string {
+  const category = categories.find((item) => item.slug === slug);
+  if (category !== undefined) {
+    return pickLocalized(category.name, locale);
+  }
+  const words = slug.replaceAll('-', ' ');
+  return words.charAt(0).toUpperCase() + words.slice(1);
+}
 
 export const TRANSMISSIONS = ['MANUAL', 'AUTOMATIC'] as const;
 export type Transmission = (typeof TRANSMISSIONS)[number];
@@ -44,22 +73,33 @@ export type SortOption = (typeof SORT_OPTIONS)[number];
 export const PRICE_CAPS = [null, 100_000, 150_000, 250_000] as const;
 export type PriceCap = (typeof PRICE_CAPS)[number];
 
+/** Nombre minimal de places proposé dans les filtres (`null` = indifférent). */
+export const SEAT_OPTIONS = [null, 5, 7] as const;
+export type SeatOption = (typeof SEAT_OPTIONS)[number];
+
 /** Ce dont les filtres et les tris de la recherche ont besoin. */
 export interface FilterableOffer {
+  brand: string;
+  model: string;
   category: VehicleCategory;
   transmission: Transmission;
+  fuel: FuelType;
+  seats: number;
   pricePerDayMillimes: number;
   unlimitedMileage: boolean;
+  instantConfirmation: boolean;
   /** Note moyenne sur 5, `null` sans avis. */
   rating: number | null;
   reviews: number;
 }
 
-export interface SampleOffer extends FilterableOffer {
+export interface SampleOffer extends Omit<
+  FilterableOffer,
+  'brand' | 'model' | 'instantConfirmation'
+> {
   id: string;
+  /** Marque et modèle (ex. « Kia Picanto »). */
   model: string;
-  fuel: FuelType;
-  seats: number;
   bags: number;
   depositMillimes: number;
   rating: number;
@@ -69,15 +109,13 @@ export interface SampleOffer extends FilterableOffer {
 /** Offre réelle d'une agence, prête pour l'affichage et les filtres. */
 export interface SearchOffer extends FilterableOffer {
   id: string;
-  brand: string;
-  model: string;
   year: number;
-  fuel: FuelType;
-  seats: number;
   airConditioning: boolean;
   depositMillimes: number;
   mileageLimitKm: number | null;
   agency: OfferAgency;
+  /** Photos de l'agence, la première sert de couverture. */
+  photos: VehiclePhoto[];
 }
 
 export function toSearchOffer(offer: Offer): SearchOffer {
@@ -86,7 +124,7 @@ export function toSearchOffer(offer: Offer): SearchOffer {
     brand: offer.brand,
     model: offer.model,
     year: offer.year,
-    category: fromApiCategory(offer.category),
+    category: offer.category,
     transmission: offer.transmission,
     fuel: offer.fuel,
     seats: offer.seats,
@@ -95,9 +133,11 @@ export function toSearchOffer(offer: Offer): SearchOffer {
     depositMillimes: offer.depositMillimes,
     mileageLimitKm: offer.mileageLimitKm,
     unlimitedMileage: offer.mileageLimitKm === null,
+    instantConfirmation: offer.agency.instantConfirmation,
     rating: offer.agency.rating,
     reviews: offer.agency.reviewsCount,
     agency: offer.agency,
+    photos: offer.photos,
   };
 }
 
@@ -285,27 +325,170 @@ export const SAMPLE_OFFERS: readonly SampleOffer[] = [
   },
 ];
 
+/** Identifiant d'un modèle, marque comprise (ex. « Kia Sportage »). */
+export function modelKey(offer: Pick<FilterableOffer, 'brand' | 'model'>): string {
+  return `${offer.brand} ${offer.model}`;
+}
+
+export interface BrandGroup {
+  brand: string;
+  models: readonly { key: string; name: string }[];
+}
+
+/**
+ * Marques et modèles des véhicules réellement proposés par les agences, triés par ordre
+ * alphabétique. Les noms viennent du référentiel de l'administration (imposé à la saisie).
+ */
+export function brandGroups(
+  offers: readonly Pick<FilterableOffer, 'brand' | 'model'>[],
+): BrandGroup[] {
+  const groups = new Map<string, Set<string>>();
+  for (const offer of offers) {
+    const models = groups.get(offer.brand) ?? new Set<string>();
+    models.add(offer.model);
+    groups.set(offer.brand, models);
+  }
+  const compare = (a: string, b: string) =>
+    a.localeCompare(b, 'fr', { sensitivity: 'base', numeric: true });
+  return [...groups.entries()]
+    .sort(([a], [b]) => compare(a, b))
+    .map(([brand, models]) => ({
+      brand,
+      models: [...models]
+        .sort(compare)
+        .map((name) => ({ key: modelKey({ brand, model: name }), name })),
+    }));
+}
+
 export interface OfferFilters {
   categories: readonly VehicleCategory[];
+  /** Marques entières retenues. */
+  brands: readonly string[];
+  /** Modèles retenus individuellement (voir `modelKey`), hors marques entières. */
+  models: readonly string[];
   transmission: Transmission | 'ALL';
+  fuels: readonly FuelType[];
+  minSeats: SeatOption;
   priceCap: PriceCap;
   unlimitedMileageOnly: boolean;
+  instantOnly: boolean;
 }
 
 export const DEFAULT_FILTERS: OfferFilters = {
   categories: [],
+  brands: [],
+  models: [],
   transmission: 'ALL',
+  fuels: [],
+  minSeats: null,
   priceCap: null,
   unlimitedMileageOnly: false,
+  instantOnly: false,
 };
 
+/** Critère actif, affiché sous forme de pastille que le client peut retirer. */
+export type ActiveFilter =
+  | { kind: 'category'; value: VehicleCategory }
+  | { kind: 'brand'; value: string }
+  | { kind: 'model'; value: string }
+  | { kind: 'transmission'; value: Transmission }
+  | { kind: 'fuel'; value: FuelType }
+  | { kind: 'seats'; value: number }
+  | { kind: 'price'; value: number }
+  | { kind: 'mileage' }
+  | { kind: 'instant' };
+
+export function listActiveFilters(filters: OfferFilters): ActiveFilter[] {
+  const active: ActiveFilter[] = [
+    ...filters.categories.map((value) => ({ kind: 'category' as const, value })),
+    ...filters.brands.map((value) => ({ kind: 'brand' as const, value })),
+    ...filters.models.map((value) => ({ kind: 'model' as const, value })),
+  ];
+  if (filters.priceCap !== null) {
+    active.push({ kind: 'price', value: filters.priceCap });
+  }
+  if (filters.transmission !== 'ALL') {
+    active.push({ kind: 'transmission', value: filters.transmission });
+  }
+  if (filters.minSeats !== null) {
+    active.push({ kind: 'seats', value: filters.minSeats });
+  }
+  active.push(...filters.fuels.map((value) => ({ kind: 'fuel' as const, value })));
+  if (filters.unlimitedMileageOnly) {
+    active.push({ kind: 'mileage' });
+  }
+  if (filters.instantOnly) {
+    active.push({ kind: 'instant' });
+  }
+  return active;
+}
+
+export function removeFilter(filters: OfferFilters, active: ActiveFilter): OfferFilters {
+  switch (active.kind) {
+    case 'category':
+      return { ...filters, categories: filters.categories.filter((item) => item !== active.value) };
+    case 'brand':
+      return { ...filters, brands: filters.brands.filter((item) => item !== active.value) };
+    case 'model':
+      return { ...filters, models: filters.models.filter((item) => item !== active.value) };
+    case 'transmission':
+      return { ...filters, transmission: 'ALL' };
+    case 'fuel':
+      return { ...filters, fuels: filters.fuels.filter((item) => item !== active.value) };
+    case 'seats':
+      return { ...filters, minSeats: null };
+    case 'price':
+      return { ...filters, priceCap: null };
+    case 'mileage':
+      return { ...filters, unlimitedMileageOnly: false };
+    case 'instant':
+      return { ...filters, instantOnly: false };
+  }
+}
+
 export function countActiveFilters(filters: OfferFilters): number {
-  return (
-    filters.categories.length +
-    (filters.transmission === 'ALL' ? 0 : 1) +
-    (filters.priceCap === null ? 0 : 1) +
-    (filters.unlimitedMileageOnly ? 1 : 0)
-  );
+  return listActiveFilters(filters).length;
+}
+
+/** Coche ou décoche une marque entière (ses modèles cochés un à un sont alors oubliés). */
+export function toggleBrand(
+  filters: OfferFilters,
+  group: BrandGroup,
+  checked: boolean,
+): OfferFilters {
+  const keys = group.models.map((model) => model.key);
+  const brands = filters.brands.filter((brand) => brand !== group.brand);
+  return {
+    ...filters,
+    brands: checked ? [...brands, group.brand] : brands,
+    models: filters.models.filter((key) => !keys.includes(key)),
+  };
+}
+
+/** Coche ou décoche un modèle ; tous les modèles d'une marque cochés reviennent à la marque. */
+export function toggleModel(
+  filters: OfferFilters,
+  group: BrandGroup,
+  key: string,
+  checked: boolean,
+): OfferFilters {
+  const keys = group.models.map((model) => model.key);
+  if (filters.brands.includes(group.brand)) {
+    return checked
+      ? filters
+      : {
+          ...filters,
+          brands: filters.brands.filter((brand) => brand !== group.brand),
+          models: [...filters.models, ...keys.filter((item) => item !== key)],
+        };
+  }
+  if (!checked) {
+    return { ...filters, models: filters.models.filter((item) => item !== key) };
+  }
+  const models = [...filters.models, key];
+  return keys.every((item) => models.includes(item))
+    ? toggleBrand(filters, group, true)
+    : { ...filters, models };
 }
 
 export function filterOffers<T extends FilterableOffer>(
@@ -315,13 +498,121 @@ export function filterOffers<T extends FilterableOffer>(
   return offers.filter(
     (offer) =>
       (filters.categories.length === 0 || filters.categories.includes(offer.category)) &&
+      ((filters.brands.length === 0 && filters.models.length === 0) ||
+        filters.brands.includes(offer.brand) ||
+        filters.models.includes(modelKey(offer))) &&
       (filters.transmission === 'ALL' || offer.transmission === filters.transmission) &&
+      (filters.fuels.length === 0 || filters.fuels.includes(offer.fuel)) &&
+      (filters.minSeats === null || offer.seats >= filters.minSeats) &&
       (filters.priceCap === null || offer.pricePerDayMillimes <= filters.priceCap) &&
-      (!filters.unlimitedMileageOnly || offer.unlimitedMileage),
+      (!filters.unlimitedMileageOnly || offer.unlimitedMileage) &&
+      (!filters.instantOnly || offer.instantConfirmation),
   );
 }
 
-export function sortOffers<T extends FilterableOffer>(offers: readonly T[], sort: SortOption): T[] {
+/** Paramètres d'URL propres aux filtres et au tri (conservés d'une recherche à l'autre). */
+export const FILTER_PARAM_KEYS = [
+  'category',
+  'brand',
+  'model',
+  'maxPrice',
+  'transmission',
+  'seats',
+  'fuel',
+  'unlimited',
+  'instant',
+  'sort',
+] as const;
+
+function parseList<T extends string>(value: string | null, allowed: readonly T[]): T[] {
+  if (value === null) {
+    return [];
+  }
+  const items = value.split(',');
+  return allowed.filter((item) => items.includes(item));
+}
+
+const MAX_NAMES = 20;
+const MAX_NAME_LENGTH = 60;
+
+/** Slugs de catégories : la liste vient de l'administration, on vérifie seulement leur forme. */
+function parseSlugs(value: string | null): string[] {
+  if (value === null) {
+    return [];
+  }
+  const slugs = value
+    .split(',')
+    .map((slug) => slug.trim())
+    .filter((slug) => slug.length <= SLUG_MAX && SLUG_PATTERN.test(slug));
+  return [...new Set(slugs)].slice(0, MAX_NAMES);
+}
+
+/** Noms libres (marques, modèles) : la liste dépend des offres, on borne seulement la saisie. */
+function parseNames(value: string | null): string[] {
+  if (value === null) {
+    return [];
+  }
+  const names = value
+    .split(',')
+    .map((name) => name.trim())
+    .filter((name) => name.length > 0 && name.length <= MAX_NAME_LENGTH);
+  return [...new Set(names)].slice(0, MAX_NAMES);
+}
+
+/** Lit les filtres et le tri depuis l'URL en ignorant les valeurs inconnues. */
+export function parseSearchFilters(get: (key: string) => string | null): {
+  filters: OfferFilters;
+  sort: SortOption;
+} {
+  const maxPrice = Number(get('maxPrice')) * 1000;
+  const seats = Number(get('seats'));
+  return {
+    filters: {
+      categories: parseSlugs(get('category')),
+      brands: parseNames(get('brand')),
+      models: parseNames(get('model')),
+      transmission: TRANSMISSIONS.find((item) => item === get('transmission')) ?? 'ALL',
+      fuels: parseList(get('fuel'), FUEL_TYPES),
+      minSeats: SEAT_OPTIONS.find((option) => option !== null && option === seats) ?? null,
+      priceCap: PRICE_CAPS.find((cap) => cap !== null && cap === maxPrice) ?? null,
+      unlimitedMileageOnly: get('unlimited') === '1',
+      instantOnly: get('instant') === '1',
+    },
+    sort: SORT_OPTIONS.find((option) => option === get('sort')) ?? 'recommended',
+  };
+}
+
+/** Reporte les filtres et le tri dans l'URL ; les valeurs par défaut n'y figurent pas. */
+export function writeSearchFilters(
+  params: URLSearchParams,
+  filters: OfferFilters,
+  sort: SortOption,
+): void {
+  const values: Record<(typeof FILTER_PARAM_KEYS)[number], string | null> = {
+    category: filters.categories.length > 0 ? filters.categories.join(',') : null,
+    brand: filters.brands.length > 0 ? filters.brands.join(',') : null,
+    model: filters.models.length > 0 ? filters.models.join(',') : null,
+    maxPrice: filters.priceCap === null ? null : String(filters.priceCap / 1000),
+    transmission: filters.transmission === 'ALL' ? null : filters.transmission,
+    seats: filters.minSeats === null ? null : String(filters.minSeats),
+    fuel: filters.fuels.length > 0 ? filters.fuels.join(',') : null,
+    unlimited: filters.unlimitedMileageOnly ? '1' : null,
+    instant: filters.instantOnly ? '1' : null,
+    sort: sort === 'recommended' ? null : sort,
+  };
+  for (const key of FILTER_PARAM_KEYS) {
+    const value = values[key];
+    if (value === null) {
+      params.delete(key);
+    } else {
+      params.set(key, value);
+    }
+  }
+}
+
+export function sortOffers<
+  T extends Pick<FilterableOffer, 'pricePerDayMillimes' | 'rating' | 'reviews'>,
+>(offers: readonly T[], sort: SortOption): T[] {
   const sorted = [...offers];
   switch (sort) {
     case 'priceAsc':
@@ -366,8 +657,4 @@ export function bookableDates(
     return null;
   }
   return pickup >= today && dropoff > pickup ? { pickup, dropoff } : null;
-}
-
-export function isVehicleCategory(value: string | null | undefined): value is VehicleCategory {
-  return VEHICLE_CATEGORIES.some((category) => category === value);
 }

@@ -35,6 +35,7 @@ import { useId } from 'react';
 import { Controller, type UseFormReturn, useForm, useWatch } from 'react-hook-form';
 import { z } from 'zod';
 
+import { AgencyLogo } from '@/components/agencies/agency-logo';
 import { controlProps } from '@/components/auth/control-props';
 import { displayPhone } from '@/components/auth/otp-step';
 import { useAgencySettings, useUpdateConditions, useUpdateProfile } from '@/lib/agency/queries';
@@ -45,6 +46,7 @@ import { QueryError } from '../query-states';
 import { useAgencyFormat } from '../use-agency-format';
 import { useUrlState } from '../use-url-state';
 import { useValidationMessage } from '../use-validation-message';
+import { LogoField } from './logo-field';
 
 const DESCRIPTION_MAX_LENGTH = 600;
 const CANCELLATION_OPTIONS = [0, 12, 24, 48, 72, CANCELLATION_HOURS_MAX] as const;
@@ -104,9 +106,11 @@ function SaveBar({
 
 function ProfileForm({
   governorates,
+  logoUrl,
   form,
 }: {
   governorates: Governorate[];
+  logoUrl: string | null;
   form: UseFormReturn<ProfileFormValues, unknown, ProfileFormOutput>;
 }) {
   const t = useTranslations('agency.settings.profile');
@@ -117,6 +121,7 @@ function ProfileForm({
   const { errors, isDirty } = form.formState;
   const description = useWatch({ control: form.control, name: 'description' });
   const phone = useWatch({ control: form.control, name: 'phone' });
+  const name = useWatch({ control: form.control, name: 'name' });
 
   const textField = (
     name: 'name' | 'email' | 'address',
@@ -187,6 +192,7 @@ function ProfileForm({
           <CardDescription>{t('identityText')}</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4">
+          <LogoField name={name} logoUrl={logoUrl} />
           {textField('name', t('name'), { autoComplete: 'organization' })}
           <Field
             id={`${id}-description`}
@@ -525,10 +531,12 @@ function ConditionsForm({
 /** Aperçu de la fiche telle que les clients la voient, mis à jour pendant la saisie. */
 function ClientPreview({
   profile,
+  logoUrl,
   conditions,
   governorates,
 }: {
   profile: ProfileFormValues;
+  logoUrl: string | null;
   conditions: RentalConditions;
   governorates: Governorate[];
 }) {
@@ -544,9 +552,17 @@ function ClientPreview({
         <p className="text-xs font-medium uppercase tracking-wide opacity-80">{t('title')}</p>
       </div>
       <div className="-mt-7 grid gap-4 px-5 pb-5">
-        <span className="flex size-14 items-center justify-center rounded-card border-4 border-surface bg-surface-muted text-primary shadow-sm">
-          <Building2 className="size-6" aria-hidden="true" />
-        </span>
+        {logoUrl === null && profile.name.trim().length === 0 ? (
+          <span className="flex size-14 items-center justify-center rounded-card border-4 border-surface bg-surface-muted text-primary shadow-sm">
+            <Building2 className="size-6" aria-hidden="true" />
+          </span>
+        ) : (
+          <AgencyLogo
+            name={profile.name}
+            logoUrl={logoUrl}
+            className="size-14 rounded-card ring-4 ring-surface dark:ring-surface"
+          />
+        )}
         <div>
           <p className="font-heading text-lg font-semibold">
             {profile.name.trim().length > 0 ? profile.name : t('namePlaceholder')}
@@ -640,14 +656,19 @@ function SettingsForms({
           <TabsTrigger value="conditions">{t('tabs.conditions')}</TabsTrigger>
         </TabsList>
         <TabsContent value="profile" forceMount className="data-[state=inactive]:hidden">
-          <ProfileForm governorates={governorates} form={profileForm} />
+          <ProfileForm governorates={governorates} logoUrl={settings.logoUrl} form={profileForm} />
         </TabsContent>
         <TabsContent value="conditions" forceMount className="data-[state=inactive]:hidden">
           <ConditionsForm form={conditionsForm} />
         </TabsContent>
       </Tabs>
       <aside className="grid gap-3 lg:sticky lg:top-20">
-        <ClientPreview profile={profile} conditions={conditions} governorates={governorates} />
+        <ClientPreview
+          profile={profile}
+          logoUrl={settings.logoUrl}
+          conditions={conditions}
+          governorates={governorates}
+        />
         <p className="px-1 text-xs text-muted-foreground">{t('previewHint')}</p>
       </aside>
     </div>

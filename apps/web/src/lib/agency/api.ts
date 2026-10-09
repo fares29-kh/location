@@ -4,6 +4,7 @@ import type {
   RecordPaymentInput,
   RentalConditions,
   VehicleInput,
+  VehiclePhoto,
   VehicleStatus,
 } from '@drivetn/types';
 import { z } from 'zod';
@@ -26,8 +27,8 @@ import type {
   PaymentQuery,
   PlanningData,
   Review,
-  ReviewFilter,
   ReviewList,
+  ReviewQuery,
   VehicleView,
 } from './types';
 
@@ -53,18 +54,23 @@ export interface AgencyApi {
   createVehicle(input: VehicleInput): Promise<VehicleView>;
   updateVehicle(id: string, input: VehicleInput): Promise<VehicleView>;
   setVehicleStatus(id: string, status: VehicleStatus): Promise<VehicleView>;
+  uploadVehiclePhoto(vehicleId: string, file: File): Promise<VehiclePhoto>;
+  deleteVehiclePhoto(vehicleId: string, photoId: string): Promise<void>;
+  reorderVehiclePhotos(vehicleId: string, photoIds: string[]): Promise<VehiclePhoto[]>;
 
   listCustomers(query: CustomerQuery): Promise<Paginated<CustomerView>>;
   getCustomer(id: string): Promise<CustomerDetail>;
 
   listPayments(query: PaymentQuery): Promise<PaymentList>;
 
-  listReviews(filter: ReviewFilter): Promise<ReviewList>;
+  listReviews(query: ReviewQuery): Promise<ReviewList>;
   replyToReview(id: string, reply: string): Promise<Review>;
 
   getSettings(): Promise<AgencySettings>;
   updateProfile(input: AgencyProfileInput): Promise<AgencySettings>;
   updateConditions(input: RentalConditions): Promise<AgencySettings>;
+  uploadLogo(file: File): Promise<AgencySettings>;
+  removeLogo(): Promise<AgencySettings>;
 }
 
 /** Réponse typée par le contrat partagé `@drivetn/types` (l'API valide ses propres sorties). */
@@ -80,6 +86,8 @@ function withQuery(path: string, params: Record<string, string | number>): strin
 }
 
 const segment = encodeURIComponent;
+/** Une photo de 10 Mo sur une connexion mobile lente. */
+const PHOTO_UPLOAD_TIMEOUT_MS = 120_000;
 
 function createHttpAgencyApi(): AgencyApi {
   return {
@@ -123,6 +131,26 @@ function createHttpAgencyApi(): AgencyApi {
         body: { status },
         schema: shape<VehicleView>(),
       }),
+    uploadVehiclePhoto: (vehicleId, file) => {
+      const body = new FormData();
+      body.append('file', file);
+      return apiFetch(`/agency/vehicles/${segment(vehicleId)}/photos`, {
+        method: 'POST',
+        body,
+        schema: shape<VehiclePhoto>(),
+        timeoutMs: PHOTO_UPLOAD_TIMEOUT_MS,
+      });
+    },
+    deleteVehiclePhoto: (vehicleId, photoId) =>
+      apiFetch(`/agency/vehicles/${segment(vehicleId)}/photos/${segment(photoId)}`, {
+        method: 'DELETE',
+      }),
+    reorderVehiclePhotos: (vehicleId, photoIds) =>
+      apiFetch(`/agency/vehicles/${segment(vehicleId)}/photos/order`, {
+        method: 'PUT',
+        body: { photoIds },
+        schema: shape<VehiclePhoto[]>(),
+      }),
 
     listCustomers: (query) =>
       apiFetch(withQuery('/agency/customers', { ...query }), {
@@ -134,8 +162,8 @@ function createHttpAgencyApi(): AgencyApi {
     listPayments: (query) =>
       apiFetch(withQuery('/agency/payments', { ...query }), { schema: shape<PaymentList>() }),
 
-    listReviews: (filter) =>
-      apiFetch(withQuery('/agency/reviews', { filter }), { schema: shape<ReviewList>() }),
+    listReviews: (query) =>
+      apiFetch(withQuery('/agency/reviews', { ...query }), { schema: shape<ReviewList>() }),
     replyToReview: (id, reply) =>
       apiFetch(`/agency/reviews/${segment(id)}/reply`, {
         method: 'POST',
@@ -156,6 +184,18 @@ function createHttpAgencyApi(): AgencyApi {
         body: input,
         schema: shape<AgencySettings>(),
       }),
+    uploadLogo: (file) => {
+      const body = new FormData();
+      body.append('file', file);
+      return apiFetch('/agency/settings/logo', {
+        method: 'PUT',
+        body,
+        schema: shape<AgencySettings>(),
+        timeoutMs: PHOTO_UPLOAD_TIMEOUT_MS,
+      });
+    },
+    removeLogo: () =>
+      apiFetch('/agency/settings/logo', { method: 'DELETE', schema: shape<AgencySettings>() }),
   };
 }
 

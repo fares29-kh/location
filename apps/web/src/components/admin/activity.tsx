@@ -10,6 +10,7 @@ import {
   MessageSquareWarning,
   ReceiptText,
   Settings,
+  Tags,
   UserCog,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
@@ -35,6 +36,7 @@ export const AUDIT_CATEGORY_ICONS: Record<AuditCategory, LucideIcon> = {
   invoice: ReceiptText,
   review: MessageSquareWarning,
   settings: Settings,
+  referential: Tags,
 };
 
 const SENSITIVE_ACTIONS: readonly AuditAction[] = [

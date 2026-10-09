@@ -183,22 +183,6 @@
       }
     },
     "catalog": {
-      "categories": {
-        "city": "سيارة مدينة",
-        "compact": "مدمجة",
-        "sedan": "سيدان",
-        "suv": "دفع رباعي",
-        "family": "عائلية",
-        "premium": "فاخرة"
-      },
-      "hints": {
-        "city": "اقتصادية وسهلة الركن، مثالية داخل المدينة.",
-        "compact": "متعددة الاستعمالات ومريحة، في المدينة وعلى الطريق.",
-        "sedan": "صندوق واسع وراحة للرحلات الطويلة.",
-        "suv": "وضعية قيادة مرتفعة، مريحة على كل الطرقات.",
-        "family": "حتى 7 مقاعد للسفر مع العائلة أو الأصدقاء.",
-        "premium": "راحة راقية لتنقلاتك المهنية."
-      },
       "transmission": {
         "MANUAL": "يدوية",
         "AUTOMATIC": "أوتوماتيكية"
@@ -217,7 +201,11 @@
       "subtitle": "قارن بين عروض الوكالات المحلية، صفِّ النتائج حسب احتياجاتك واحجز دون بطاقة بنكية.",
       "form": {
         "stations": "محطات القطار",
-        "ports": "الموانئ"
+        "ports": "الموانئ",
+        "governorate": "الولاية",
+        "allGovernorates": "كامل تونس",
+        "allLocations": "كل الأماكن",
+        "allLocationsIn": "كل أماكن الولاية"
       },
       "unavailableTitle": "البحث غير متاح مؤقتًا",
       "unavailableText": "تعذّر تحميل عروض الوكالات. أعد المحاولة بعد لحظات.",
@@ -229,6 +217,7 @@
         "action": "عرض كل العروض"
       },
       "results": "{count, plural, zero {لا توجد عروض متاحة} one {عرض واحد متاح} two {عرضان متاحان} few {# عروض متاحة} many {# عرضًا متاحًا} other {# عرض متاح}}",
+      "filteredFrom": "من أصل {total}",
       "summary": {
         "anywhere": "كامل تونس",
         "anyDates": "تواريخ مرنة",
@@ -248,21 +237,40 @@
         "show": "إظهار {count, plural, zero {النتائج} one {عرض واحد} two {عرضين} few {# عروض} many {# عرضًا} other {# عرض}}",
         "quickLabel": "التصفية حسب الصنف",
         "category": "الصنف",
+        "brandModel": "العلامة والطراز",
+        "showModels": "عرض طرازات {brand}",
+        "showAllBrands": "عرض كل العلامات ({count})",
+        "showLessBrands": "عرض علامات أقل",
+        "allModels": "{brand} (كل الطرازات)",
         "transmission": "علبة السرعات",
         "allTransmissions": "الكل",
         "maxPrice": "السعر الأقصى لليوم",
         "anyPrice": "دون حد",
         "upTo": "حتى",
-        "mileage": "المسافة المقطوعة",
-        "unlimitedMileage": "مسافة غير محدودة فقط"
+        "seats": "عدد المقاعد",
+        "anySeats": "لا يهم",
+        "minSeats": "{count} مقاعد فأكثر",
+        "fuel": "الوقود",
+        "conditions": "شروط الكراء",
+        "unlimitedMileage": "مسافة غير محدودة",
+        "unlimitedMileageHint": "تنقّل كما تشاء دون أي تكلفة إضافية.",
+        "instant": "تأكيد فوري",
+        "instantHint": "تؤكد الوكالة حجزك دون انتظار.",
+        "activeLabel": "التصفية المفعّلة",
+        "remove": "إزالة التصفية: {label}",
+        "clearAll": "مسح الكل"
       },
       "empty": {
         "title": "لا يوجد عرض يطابق اختياراتك",
         "text": "وسّع معايير البحث لاكتشاف المزيد من السيارات.",
+        "tryWithout": "جرّب إزالة أحد المعايير:",
+        "more": "+{count, plural, zero {# عرض} one {عرض واحد} two {عرضان} few {# عروض} many {# عرضًا} other {# عرض}}",
         "action": "إعادة ضبط التصفية"
       },
       "offer": {
         "instant": "تأكيد فوري",
+        "photoAlt": "صورة {vehicle}",
+        "photoCount": "{count, plural, one {صورة واحدة} two {صورتان} few {# صور} other {# صورة}}",
         "newAgency": "وكالة جديدة، دون تقييمات بعد",
         "rating": "{value} من 5",
         "reviews": "{count} تقييم",
@@ -283,10 +291,67 @@
       "title": "وكالات محلية موثوقة في كامل تونس",
       "subtitle": "اعثر على نقاط الاستلام في مطارات البلاد ومدنها ومحطات القطار والموانئ، واكترِ من وكالات تونسية مراقبة.",
       "findCar": "اعثر على سيارة",
+      "exploreMap": "استكشف الخريطة",
       "stats": {
+        "agencies": "وكالات موثوقة",
         "governorates": "ولاية",
         "airports": "مطارات مخدومة",
         "pickupPoints": "نقاط الاستلام"
+      },
+      "map": {
+        "eyebrow": "خريطة الشبكة",
+        "title": "كل وكالاتنا على خريطة واحدة",
+        "text": "اعثر على الوكالات الموثوقة القريبة منك، قارن تقييماتها وأسعارها، ثم تواصل معها أو احجز في بضع نقرات.",
+        "searchLabel": "ابحث عن وكالة",
+        "searchPlaceholder": "اسم الوكالة أو المدينة أو العنوان…",
+        "clearSearch": "مسح البحث",
+        "governorateLabel": "التصفية حسب الولاية",
+        "allGovernorates": "كل الولايات",
+        "nearMe": "بالقرب مني",
+        "instantOnly": "تأكيد فوري",
+        "topRated": "تقييم 4+",
+        "reset": "إعادة الضبط",
+        "results": "{count, plural, zero {لا توجد وكالات} one {وكالة واحدة} two {وكالتان} few {# وكالات} many {# وكالة} other {# وكالة}}",
+        "noResults": "لا توجد وكالات",
+        "byDistance": "مرتبة حسب المسافة",
+        "listLabel": "الوكالات المعروضة على الخريطة",
+        "mapLabel": "خريطة تفاعلية للوكالات",
+        "vehicles": "{count, plural, zero {الأسطول قريبًا} one {سيارة واحدة} two {سيارتان} few {# سيارات} many {# سيارة} other {# سيارة}}",
+        "fleetSoon": "الأسطول قريبًا",
+        "from": "ابتداءً من",
+        "perDay": "/ اليوم",
+        "newAgency": "وكالة جديدة",
+        "reviews": "{count, plural, zero {لا تقييمات} one {تقييم واحد} two {تقييمان} few {# تقييمات} many {# تقييمًا} other {# تقييم}}",
+        "ratingLabel": "التقييم {rating} من 5",
+        "instant": "تأكيد فوري",
+        "statVehicles": "السيارات",
+        "statFrom": "ابتداءً من / يوم",
+        "statCancellation": "إلغاء مجاني",
+        "cancellationHours": "قبل {hours} ساعة",
+        "categories": "الفئات المتوفرة",
+        "distance": "على بعد {distance} كم",
+        "seeCars": "عرض السيارات",
+        "whatsapp": "واتساب",
+        "whatsappMessage": "مرحبًا {name}، وجدتكم على DriveTN وأرغب في كراء سيارة.",
+        "call": "اتصال",
+        "directions": "الاتجاهات",
+        "close": "إغلاق",
+        "zoomIn": "تكبير",
+        "zoomOut": "تصغير",
+        "locate": "عرض الوكالات القريبة مني",
+        "locateError": "تعذّر تحديد موقعك. اسمح بالوصول إلى الموقع في متصفحك ثم أعد المحاولة.",
+        "resetView": "عرض كامل تونس",
+        "you": "موقعك",
+        "approximate": "موقع تقريبي: مركز ولاية الوكالة",
+        "loading": "جارٍ تحميل الخريطة…",
+        "unsupportedTitle": "الخريطة غير متاحة",
+        "unsupportedText": "لا يدعم متصفحك عرض الخريطة التفاعلية. تبقى قائمة الوكالات متاحة.",
+        "emptyTitle": "لا توجد وكالة مطابقة",
+        "emptyText": "عدّل البحث أو المرشحات لعرض المزيد من الوكالات.",
+        "noAgenciesTitle": "أولى الوكالات قادمة قريبًا",
+        "noAgenciesText": "تتوسع شبكة DriveTN كل أسبوع. عُد قريبًا!",
+        "unavailableTitle": "الخريطة غير متاحة مؤقتًا",
+        "unavailableText": "تعذّر تحميل الوكالات. أعد المحاولة بعد لحظات."
       },
       "network": {
         "eyebrow": "أين تجدنا",
@@ -498,6 +563,12 @@
       "INVALID_EMAIL": "بريد إلكتروني غير صالح.",
       "INVALID_PLATE": "رقم تسجيل غير صالح (مثال: 245 TU 1234).",
       "PLATE_ALREADY_USED": "رقم التسجيل هذا مستعمل في أسطولك.",
+      "INVALID_BRAND": "اختر علامة من القائمة.",
+      "INVALID_MODEL": "اختر طرازًا لهذه العلامة من القائمة.",
+      "INVALID_CATEGORY": "اختر صنفًا من القائمة.",
+      "INVALID_SLUG": "أحرف لاتينية صغيرة وأرقام وشرطات فقط (مثال: mini-van).",
+      "INVALID_CODE": "رمز من رقمين (مثال: 11).",
+      "ALREADY_USED": "هذه القيمة مستعملة.",
       "OUT_OF_RANGE": "القيمة خارج الحدود المسموح بها.",
       "INVALID_AMOUNT": "مبلغ غير صالح (مثال: 120 أو 120.500).",
       "PAYMENT_METHOD_REQUIRED": "اختر طريقة دفع واحدة على الأقل.",
@@ -787,14 +858,6 @@
         "MAINTENANCE": "في الصيانة",
         "INACTIVE": "خارج الخدمة"
       },
-      "categories": {
-        "ECONOMY": "اقتصادية",
-        "COMPACT": "صغيرة",
-        "SEDAN": "سيدان",
-        "SUV": "رباعية الدفع",
-        "MINIVAN": "عائلية",
-        "LUXURY": "فاخرة"
-      },
       "transmissions": {
         "MANUAL": "يدوية",
         "AUTOMATIC": "أوتوماتيكية"
@@ -818,6 +881,7 @@
       "noUpcoming": "لا توجد حجوزات قادمة",
       "unavailableHint": "غير معروضة للكراء",
       "edit": "تعديل",
+      "photoCount": "{count, plural, one {صورة واحدة} two {صورتان} few {# صور} other {# صورة}}",
       "moreActions": "إجراءات أخرى لـ {name}",
       "viewPlanning": "عرض الجدول الزمني",
       "statusMenu": {
@@ -847,13 +911,22 @@
         "sections": {
           "identity": "التعريف",
           "specs": "المواصفات",
-          "pricing": "الأسعار والشروط"
+          "pricing": "الأسعار والشروط",
+          "photos": "الصور"
         },
         "brand": "العلامة",
+        "brandPlaceholder": "اختر علامة",
+        "brandSearch": "ابحث عن علامة",
+        "brandEmpty": "لا توجد علامة مطابقة",
+        "modelPlaceholder": "اختر طرازًا",
+        "modelSearch": "البحث عن طراز",
+        "modelEmpty": "لا يوجد طراز مطابق",
+        "modelSelectBrand": "اختر العلامة أولًا.",
+        "modelNone": "لا توجد طرازات مسجّلة لهذه العلامة بعد: تواصل مع فريق DriveTN.",
         "model": "الطراز",
         "year": "السنة",
-        "plate": "رقم التسجيل",
-        "plateHint": "الصيغة التونسية، مثال: 245 TU 1234.",
+        "plate": "رقم التسجيل (اختياري)",
+        "plateHint": "الصيغة التونسية، مثال: 245 TU 1234. يظهر لوكالتك فقط.",
         "category": "الصنف",
         "fuel": "الوقود",
         "transmission": "علبة السرعات",
@@ -874,7 +947,25 @@
         "submitEdit": "حفظ",
         "created": "تمت إضافة السيارة إلى أسطولك.",
         "updated": "تم تحديث السيارة.",
-        "saveError": "تعذّر حفظ السيارة."
+        "saveError": "تعذّر حفظ السيارة.",
+        "photos": {
+          "add": "إضافة صور",
+          "dropHint": "اسحب صورك هنا أو انقر للتصفح",
+          "count": "{count} / {max}",
+          "hint": "JPEG أو PNG أو WebP، بحد أقصى {size} ميغابايت للصورة و{max} صور. تُستعمل الصورة الأولى كغلاف في صفحتك.",
+          "cover": "الغلاف",
+          "pending": "في انتظار الإرسال",
+          "alt": "صورة السيارة {index}",
+          "makeCover": "استعمالها كغلاف",
+          "moveEarlier": "نقل إلى الأمام",
+          "moveLater": "نقل إلى الخلف",
+          "remove": "حذف الصورة",
+          "rejectedType": "{name}: صيغة غير مدعومة (JPEG أو PNG أو WebP).",
+          "rejectedSize": "{name}: الملف كبير جدًا ({size} ميغابايت كحد أقصى).",
+          "rejectedLimit": "تم بلوغ الحد الأقصى ({max} صور): لم تُضف بعض الصور.",
+          "uploading": "جارٍ إرسال الصور… {current} / {total}",
+          "partialError": "تم حفظ السيارة، لكن {count, plural, one {فشلت عملية واحدة على الصور} other {فشلت # عمليات على الصور}}. أعد فتح السيارة للمحاولة مجددًا."
+        }
       }
     },
     "customers": {
@@ -983,7 +1074,18 @@
       "previewHint": "معاينة بطاقتك كما تظهر للحرفاء.",
       "profile": {
         "identityTitle": "التقديم",
-        "identityText": "الاسم والوصف المعروضان في بطاقتك العلنية.",
+        "identityText": "الشعار والاسم والوصف المعروضة في بطاقتك العلنية.",
+        "logo": "شعار الوكالة",
+        "logoHint": "يُفضّل شكل مربّع بخلفية بيضاء أو شفافة. JPG أو PNG أو WebP، بحد أقصى {size} ميغابايت.",
+        "logoUpload": "إضافة شعار",
+        "logoReplace": "تغيير الشعار",
+        "logoRemove": "إزالة",
+        "logoSaved": "تم حفظ الشعار: يظهر الآن في عروضك.",
+        "logoRemoved": "تمت إزالة الشعار.",
+        "logoError": "تعذّر حفظ الشعار.",
+        "logoRemoveError": "تعذّرت إزالة الشعار.",
+        "logoInvalid": "صورة غير مقروءة: اختر ملف JPG أو PNG أو WebP.",
+        "logoTooLarge": "الصورة كبيرة جدًا (بحد أقصى {size} ميغابايت).",
         "name": "اسم الوكالة",
         "description": "الوصف",
         "descriptionHint": "{count} / {max} حرف",
@@ -1046,6 +1148,9 @@
       "reviews": "مراقبة التقييمات",
       "settings": "الإعدادات",
       "audit": "سجل العمليات",
+      "referentials": "المراجع",
+      "catalog": "دليل السيارات",
+      "geography": "التقسيم الجغرافي",
       "pendingAgencies": "{count, plural, one {# وكالة بانتظار المصادقة} two {# وكالتان بانتظار المصادقة} few {# وكالات بانتظار المصادقة} other {# وكالة بانتظار المصادقة}}",
       "flaggedReviews": "{count, plural, one {# تقييم مُبلَّغ عنه} few {# تقييمات مُبلَّغ عنها} other {# تقييمًا مُبلَّغًا عنه}}",
       "overdueInvoices": "{count, plural, one {# فاتورة متأخرة} few {# فواتير متأخرة} other {# فاتورة متأخرة}}"
@@ -1491,6 +1596,127 @@
         }
       }
     },
+    "referentials": {
+      "name": {
+        "fr": "الاسم بالفرنسية",
+        "ar": "الاسم بالعربية",
+        "en": "الاسم بالإنجليزية"
+      },
+      "create": "إضافة",
+      "save": "حفظ",
+      "delete": "حذف",
+      "editLabel": "تعديل «{name}»",
+      "deleteLabel": "حذف «{name}»",
+      "inUseHint": "لا يمكن الحذف: توجد عناصر مرتبطة به.",
+      "readOnlyTitle": "قراءة فقط",
+      "readOnlyText": "يمكن للمشرف العام فقط تعديل المراجع.",
+      "created": "تمت الإضافة.",
+      "saved": "تم حفظ التعديلات.",
+      "deleted": "تم الحذف.",
+      "saveError": "تعذّر الحفظ. أعد المحاولة.",
+      "deleteError": "تعذّر الحذف. أعد المحاولة.",
+      "inUseError": "لا يمكن الحذف: هذا العنصر ما زال مستعملًا.",
+      "deleteTitle": "حذف «{name}»؟",
+      "deleteText": "هذا الحذف نهائي وسيُسجَّل في سجل العمليات."
+    },
+    "catalog": {
+      "title": "دليل السيارات",
+      "subtitle": "الأصناف والعلامات والطرازات المتاحة للوكالات في أسطولها وللحرفاء في البحث.",
+      "tabsLabel": "المرجع المعروض",
+      "tabs": {
+        "categories": "الأصناف",
+        "brands": "العلامات والطرازات"
+      },
+      "vehiclesCount": "{count, plural, =0 {لا توجد سيارات} one {سيارة واحدة} two {سيارتان} few {# سيارات} other {# سيارة}}",
+      "categories": {
+        "text": "تُعرض بهذا الترتيب في فلاتر البحث وفي استمارة الأسطول.",
+        "add": "إضافة صنف",
+        "columns": {
+          "position": "الترتيب",
+          "name": "الصنف",
+          "slug": "المعرّف",
+          "vehicles": "السيارات",
+          "actions": "الإجراءات"
+        },
+        "emptyTitle": "لا توجد أصناف",
+        "emptyText": "أضف صنفًا أولًا حتى تتمكن الوكالات من تصنيف سياراتها.",
+        "createTitle": "صنف جديد",
+        "editTitle": "تعديل الصنف",
+        "slug": "معرّف الرابط",
+        "slugHint": "أحرف لاتينية صغيرة وأرقام وشرطات. لا يمكن تعديله لاحقًا.",
+        "slugLocked": "ثابت منذ الإنشاء: يظهر في روابط البحث المتداولة.",
+        "position": "ترتيب العرض",
+        "positionHint": "تُرتَّب الأصناف تصاعديًا.",
+        "description": {
+          "fr": "الوصف بالفرنسية",
+          "ar": "الوصف بالعربية",
+          "en": "الوصف بالإنجليزية"
+        }
+      },
+      "brands": {
+        "title": "العلامات",
+        "add": "إضافة",
+        "searchLabel": "البحث عن علامة",
+        "searchPlaceholder": "البحث عن علامة",
+        "stats": "{models, plural, one {طراز واحد} two {طرازان} few {# طرازات} other {# طرازًا}} · {vehicles, plural, one {سيارة واحدة} two {سيارتان} few {# سيارات} other {# سيارة}}",
+        "empty": "لا توجد علامات. أضف العلامات التي يمكن للوكالات اختيارها لسياراتها.",
+        "noResults": "لا توجد علامة تطابق «{search}».",
+        "clearSearch": "مسح البحث",
+        "createTitle": "علامة جديدة",
+        "editTitle": "إعادة تسمية العلامة",
+        "name": "اسم العلامة",
+        "renameHint": "{count, plural, one {ستتم إعادة تسمية السيارة المرتبطة بهذه العلامة.} other {ستتم إعادة تسمية # سيارات مرتبطة بهذه العلامة.}}"
+      },
+      "models": {
+        "title": "الطرازات",
+        "titleFor": "طرازات {brand}",
+        "add": "إضافة",
+        "selectBrand": "اختر علامة لعرض طرازاتها وإدارتها.",
+        "empty": "لا توجد طرازات لـ {brand}: لا يمكن للوكالات بعد إضافة سيارات من هذه العلامة.",
+        "createTitle": "طراز جديد",
+        "editTitle": "إعادة تسمية الطراز",
+        "context": "العلامة: {brand}",
+        "name": "اسم الطراز",
+        "namePlaceholder": "مثال: X6",
+        "renameHint": "{count, plural, one {ستتم إعادة تسمية السيارة المرتبطة بهذا الطراز.} other {ستتم إعادة تسمية # سيارات مرتبطة بهذا الطراز.}}"
+      }
+    },
+    "geography": {
+      "title": "التقسيم الجغرافي",
+      "subtitle": "التقسيم الإداري: الولايات والمعتمديات والبلديات.",
+      "governorates": {
+        "title": "الولايات",
+        "add": "إضافة",
+        "empty": "لا توجد ولايات.",
+        "stats": "{delegations, plural, =0 {لا توجد معتمديات} one {معتمدية واحدة} two {معتمديتان} few {# معتمديات} other {# معتمدية}} · {agencies, plural, =0 {لا توجد وكالات} one {وكالة واحدة} two {وكالتان} few {# وكالات} other {# وكالة}}",
+        "createTitle": "ولاية جديدة",
+        "editTitle": "تعديل الولاية",
+        "code": "الرمز الرسمي",
+        "codeHint": "رقمان (مثال: 11). لا يمكن تعديله لاحقًا.",
+        "codeLocked": "لا يمكن تعديل رمز الولاية.",
+        "slug": "معرّف الرابط",
+        "slugHint": "أحرف لاتينية صغيرة وأرقام وشرطات (مثال: ben-arous)."
+      },
+      "delegations": {
+        "title": "المعتمديات",
+        "add": "إضافة",
+        "selectGovernorate": "اختر ولاية لعرض معتمدياتها.",
+        "empty": "لا توجد معتمديات في {governorate}.",
+        "municipalitiesCount": "{count, plural, =0 {لا توجد بلديات} one {بلدية واحدة} two {بلديتان} few {# بلديات} other {# بلدية}}",
+        "createTitle": "معتمدية جديدة",
+        "editTitle": "إعادة تسمية المعتمدية",
+        "context": "الولاية: {governorate}"
+      },
+      "municipalities": {
+        "title": "البلديات",
+        "add": "إضافة",
+        "selectDelegation": "اختر معتمدية لعرض بلدياتها.",
+        "empty": "لا توجد بلديات في {delegation}.",
+        "createTitle": "بلدية جديدة",
+        "editTitle": "إعادة تسمية البلدية",
+        "context": "المعتمدية: {delegation}"
+      }
+    },
     "settings": {
       "title": "إعدادات المنصة",
       "subtitle": "الجباية والقواعد التجارية وبيانات الدعم.",
@@ -1551,7 +1777,8 @@
         "payment": "المقبوضات",
         "invoice": "الفوترة",
         "review": "التقييمات",
-        "settings": "الإعدادات"
+        "settings": "الإعدادات",
+        "referential": "المراجع"
       },
       "columns": {
         "date": "التاريخ",
@@ -1604,6 +1831,11 @@
         },
         "settings": {
           "updated": "تعديل الإعدادات"
+        },
+        "referential": {
+          "created": "المراجع: إضافة",
+          "updated": "المراجع: تعديل",
+          "deleted": "المراجع: حذف"
         }
       }
     }

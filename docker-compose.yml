@@ -21,6 +21,11 @@ x-api-environment: &api-environment
   REFRESH_TOKEN_TTL_DAYS: ${REFRESH_TOKEN_TTL_DAYS:-30}
   COOKIE_SECURE: ${COOKIE_SECURE:-false}
   MESSAGING_PROVIDER: ${MESSAGING_PROVIDER:-console}
+  S3_ENDPOINT: http://minio:9000
+  S3_ACCESS_KEY_ID: ${MINIO_ROOT_USER:-drivetn}
+  S3_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD:?MINIO_ROOT_PASSWORD manquant (copiez .env.example vers .env)}
+  S3_BUCKET_PUBLIC: ${S3_BUCKET_PUBLIC:-drivetn-public}
+  MEDIA_PUBLIC_URL: /media
 
 x-api-build: &api-build
   context: .
@@ -109,6 +114,14 @@ services:
       - traefik.http.routers.minio-s3.entrypoints=web
       - traefik.http.routers.minio-s3.service=minio-s3
       - traefik.http.services.minio-s3.loadbalancer.server.port=9000
+      # Photos publiques servies sur le domaine des portails : /media/<clé> -> /<bucket public>/<clé>.
+      - traefik.http.routers.media.rule=(Host(`${APP_DOMAIN:-localhost}`) || Host(`app.${APP_DOMAIN:-localhost}`) || Host(`agency.${APP_DOMAIN:-localhost}`) || Host(`admin.${APP_DOMAIN:-localhost}`)) && PathPrefix(`/media/`) && (Method(`GET`) || Method(`HEAD`))
+      - traefik.http.routers.media.entrypoints=web
+      - traefik.http.routers.media.priority=100
+      - traefik.http.routers.media.service=minio-s3
+      - traefik.http.routers.media.middlewares=media-bucket
+      - traefik.http.middlewares.media-bucket.replacepathregex.regex=^/media/(.+)$$
+      - traefik.http.middlewares.media-bucket.replacepathregex.replacement=/${S3_BUCKET_PUBLIC:-drivetn-public}/$$1
       - traefik.http.routers.minio-console.rule=Host(`minio.${APP_DOMAIN:-localhost}`)
       - traefik.http.routers.minio-console.entrypoints=web
       - traefik.http.routers.minio-console.service=minio-console
@@ -160,11 +173,18 @@ services:
       RUN_MIGRATIONS: 'true'
       SEED_ON_START: ${SEED_ON_START:-true}
       SEED_DEMO_ACCOUNTS: ${SEED_DEMO_ACCOUNTS:-false}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-}
+      ADMIN_PHONE: ${ADMIN_PHONE:-}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+      ADMIN_FIRST_NAME: ${ADMIN_FIRST_NAME:-}
+      ADMIN_LAST_NAME: ${ADMIN_LAST_NAME:-}
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
     healthcheck:
       test: ['CMD-SHELL', 'wget -q -O /dev/null http://127.0.0.1:4000/api/v1/health']
       interval: 10s

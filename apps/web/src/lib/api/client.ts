@@ -10,10 +10,12 @@ const NO_REFRESH_PREFIXES = ['/auth/login', '/auth/refresh', '/auth/logout', '/a
 
 export interface ApiRequestOptions<T extends z.ZodType> {
   method?: 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE';
+  /** Sérialisé en JSON, sauf un `FormData` envoyé tel quel (multipart). */
   body?: unknown;
   /** Schéma de la réponse ; omis pour une réponse vide (204). */
   schema?: T;
   signal?: AbortSignal;
+  timeoutMs?: number;
 }
 
 let refreshInFlight: Promise<boolean> | null = null;
@@ -33,13 +35,15 @@ function refreshSession(): Promise<boolean> {
 }
 
 async function send(path: string, options: ApiRequestOptions<z.ZodType>): Promise<Response> {
-  const signal = options.signal ?? AbortSignal.timeout(REQUEST_TIMEOUT_MS);
+  const signal = options.signal ?? AbortSignal.timeout(options.timeoutMs ?? REQUEST_TIMEOUT_MS);
+  const { body } = options;
+  const json = body !== undefined && !(body instanceof FormData);
   try {
     return await fetch(`${API_BASE}${path}`, {
       method: options.method ?? 'GET',
       credentials: 'same-origin',
-      headers: options.body === undefined ? undefined : { 'Content-Type': 'application/json' },
-      body: options.body === undefined ? undefined : JSON.stringify(options.body),
+      headers: json ? { 'Content-Type': 'application/json' } : undefined,
+      body: body instanceof FormData ? body : json ? JSON.stringify(body) : undefined,
       signal,
     });
   } catch {

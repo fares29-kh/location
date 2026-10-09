@@ -1,6 +1,8 @@
 import { type AgencyDataset, createAgencyDataset, getDemoAccounts, toE164 } from '@drivetn/types';
 import type { PrismaClient } from '@prisma/client';
 
+import { categoryIdsBySlug } from './categories';
+
 export interface DemoAgencySeedResult {
   created: boolean;
   vehicles: number;
@@ -76,11 +78,17 @@ export async function seedDemoAgency(
     customerIds.set(customer.id, user.id);
   }
 
+  const categoryId = await categoryIdsBySlug(prisma);
   const vehicleIds = new Map<string, string>();
   for (const vehicle of dataset.vehicles) {
-    const { id, createdAt, ...data } = vehicle;
+    const { id, createdAt, photos: _photos, category, ...data } = vehicle;
     const row = await prisma.vehicle.create({
-      data: { ...data, agencyId: agency.id, createdAt: new Date(createdAt) },
+      data: {
+        ...data,
+        categoryId: categoryId(category),
+        agencyId: agency.id,
+        createdAt: new Date(createdAt),
+      },
     });
     vehicleIds.set(id, row.id);
   }

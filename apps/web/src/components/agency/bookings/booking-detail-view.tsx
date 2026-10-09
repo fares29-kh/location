@@ -24,6 +24,7 @@ import {
 import { useTranslations } from 'next-intl';
 import { type ReactNode, useState } from 'react';
 
+import { useCategoryLabel } from '@/components/vehicle-categories';
 import { Link } from '@/i18n/navigation';
 import { useAgencySettings, useBooking } from '@/lib/agency/queries';
 import type { BookingView } from '@/lib/agency/types';
@@ -33,6 +34,8 @@ import { ContactActions, customerName, CustomerIdentity } from '../people';
 import { QueryError } from '../query-states';
 import { BookingStatusTag, PaymentStatusTag } from '../status-tags';
 import { useAgencyFormat } from '../use-agency-format';
+import { vehicleCoverUrl } from '@/lib/agency/vehicle-photos';
+
 import { VehicleThumb } from '../vehicle-thumb';
 import { BookingActionsBar } from './booking-actions';
 import { RecordPaymentDialog } from './record-payment-dialog';
@@ -115,6 +118,7 @@ function TripCard({ booking }: { booking: BookingView }) {
 function VehicleCard({ booking }: { booking: BookingView }) {
   const t = useTranslations('agency.bookingDetail');
   const tFleet = useTranslations('agency.fleet');
+  const categoryLabel = useCategoryLabel();
   const { vehicle } = booking;
   const specs = [
     { icon: Settings2, label: tFleet(`transmissions.${vehicle.transmission}`) },
@@ -134,17 +138,24 @@ function VehicleCard({ booking }: { booking: BookingView }) {
         <CardTitle className="text-base">{t('vehicle')}</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col gap-4 sm:flex-row sm:items-center">
-        <VehicleThumb color={vehicle.color} size="md" className="sm:size-16" />
+        <VehicleThumb
+          color={vehicle.color}
+          photoUrl={vehicleCoverUrl(vehicle)}
+          size="md"
+          className="sm:size-16"
+        />
         <div className="grid flex-1 gap-1">
           <p className="font-heading text-lg font-semibold">
             {vehicle.brand} {vehicle.model}{' '}
             <span className="text-sm font-normal text-muted-foreground">{vehicle.year}</span>
           </p>
           <p className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-            <Badge tone="outline" className="tabular-nums" dir="ltr">
-              {vehicle.plateNumber}
-            </Badge>
-            {tFleet(`categories.${vehicle.category}`)}
+            {vehicle.plateNumber !== null && (
+              <Badge tone="outline" className="tabular-nums" dir="ltr">
+                {vehicle.plateNumber}
+              </Badge>
+            )}
+            {categoryLabel(vehicle.category)}
           </p>
         </div>
         <ul className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-sm text-muted-foreground">

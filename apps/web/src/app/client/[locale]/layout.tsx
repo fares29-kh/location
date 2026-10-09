@@ -7,11 +7,13 @@ import { MobileBottomNav } from '@/components/client/mobile-bottom-nav';
 import { ReassuranceBanner } from '@/components/client/reassurance-banner';
 import { RootDocument } from '@/components/root-document';
 import { MAIN_CONTENT_ID } from '@/components/skip-link';
+import { VehicleCategoriesProvider } from '@/components/vehicle-categories';
 import { getServerEnv } from '@/env';
 import { getPortalUser } from '@/lib/auth/session';
 import { type LocaleParams, resolveLocale } from '@/lib/locale-params';
 import { buildPortalMetadata, buildPortalViewport } from '@/lib/metadata';
 import { getPortalOrigin } from '@/lib/portal-origin';
+import { fetchVehicleCategories } from '@/lib/vehicle-catalog';
 
 export const viewport = buildPortalViewport('client');
 
@@ -24,19 +26,21 @@ export default async function ClientLayout({
   params,
 }: LocaleParams & { children: ReactNode }) {
   const locale = await resolveLocale(params);
-  const user = await getPortalUser('client');
+  const [user, categories] = await Promise.all([getPortalUser('client'), fetchVehicleCategories()]);
 
   return (
     <RootDocument locale={locale} portal="client">
-      <div className="flex min-h-dvh flex-col">
-        <ReassuranceBanner />
-        <ClientHeader user={user} designEnabled={getServerEnv().DESIGN_PAGE_ENABLED} />
-        <main id={MAIN_CONTENT_ID} className="flex-1">
-          {children}
-        </main>
-        <ClientFooter agencyUrl={await getPortalOrigin('agency')} />
-      </div>
-      <MobileBottomNav />
+      <VehicleCategoriesProvider categories={categories}>
+        <div className="flex min-h-dvh flex-col">
+          <ReassuranceBanner />
+          <ClientHeader user={user} designEnabled={getServerEnv().DESIGN_PAGE_ENABLED} />
+          <main id={MAIN_CONTENT_ID} className="flex-1">
+            {children}
+          </main>
+          <ClientFooter agencyUrl={await getPortalOrigin('agency')} />
+        </div>
+        <MobileBottomNav />
+      </VehicleCategoriesProvider>
     </RootDocument>
   );
 }

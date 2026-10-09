@@ -1,28 +1,30 @@
-import type {
-  AgencySettings,
-  Booking,
-  BookingFilter,
-  BookingList,
-  BookingQuery,
-  BookingRef,
-  BookingView,
-  Customer,
-  CustomerDetail,
-  CustomerQuery,
-  CustomerView,
-  DashboardData,
-  NavCounts,
-  Paginated,
-  PaymentList,
-  PaymentQuery,
-  PaymentRecord,
-  PaymentView,
-  PlanningData,
-  Review,
-  ReviewFilter,
-  ReviewList,
-  Vehicle,
-  VehicleView,
+import {
+  AGENCY_LIST_LIMIT_DEFAULT,
+  type AgencySettings,
+  type Booking,
+  type BookingFilter,
+  type BookingList,
+  type BookingQuery,
+  type BookingRef,
+  type BookingView,
+  type Customer,
+  type CustomerDetail,
+  type CustomerQuery,
+  type CustomerView,
+  type DashboardData,
+  type NavCounts,
+  type Paginated,
+  type PaymentList,
+  type PaymentQuery,
+  type PaymentRecord,
+  type PaymentView,
+  type PlanningBooking,
+  type PlanningData,
+  type Review,
+  type ReviewList,
+  type ReviewQuery,
+  type Vehicle,
+  type VehicleView,
 } from './agency-portal';
 import {
   type BookingStatus,
@@ -35,10 +37,10 @@ import {
   addDays,
   addMonths,
   type DayKey,
-  dayKeyToDate,
   toDayKey,
   todayKey,
   toMonthKey,
+  tunisDateTime,
 } from './dates';
 
 /** Données d'une agence à partir desquelles toutes les vues du portail sont calculées. */
@@ -176,7 +178,7 @@ export function createAgencyQueries(data: AgencyDataset, now: Date = new Date())
         fullName(view.customer),
         view.vehicle.brand,
         view.vehicle.model,
-        view.vehicle.plateNumber,
+        view.vehicle.plateNumber ?? '',
       ].join(' '),
     );
     return (
@@ -409,7 +411,7 @@ export function createAgencyQueries(data: AgencyDataset, now: Date = new Date())
             return b.pickupAt.localeCompare(a.pickupAt);
         }
       });
-      return { ...paginate(sorted, query.page), counts };
+      return { ...paginate(sorted, query.page, query.limit), counts };
     },
 
     getBooking(id: string): BookingView | undefined {
@@ -417,11 +419,14 @@ export function createAgencyQueries(data: AgencyDataset, now: Date = new Date())
       return booking === undefined ? undefined : toView(booking);
     },
 
+    /** Réservations qui chevauchent [from, to[, bornes à minuit heure de Tunis. */
     getPlanning(from: DayKey, days: number): PlanningData {
-      const start = dayKeyToDate(from).getTime() - DAY_MS;
-      const end = dayKeyToDate(addDays(from, days)).getTime() + DAY_MS;
+      const to = addDays(from, days);
+      const start = tunisDateTime(from, 0).getTime();
+      const end = tunisDateTime(to, 0).getTime();
       return {
         from,
+        to,
         days,
         vehicles: data.vehicles.filter((vehicle) => vehicle.status !== 'INACTIVE'),
         bookings: data.bookings
@@ -435,7 +440,23 @@ export function createAgencyQueries(data: AgencyDataset, now: Date = new Date())
                 end,
               ) > 0,
           )
-          .map(toView),
+          .map((booking): PlanningBooking => {
+            const customer = customerOf(booking.customerId);
+            return {
+              id: booking.id,
+              reference: booking.reference,
+              vehicleId: booking.vehicleId,
+              status: booking.status,
+              pickupAt: booking.pickupAt,
+              returnAt: booking.returnAt,
+              totalMillimes: booking.totalMillimes,
+              customer: {
+                id: customer.id,
+                firstName: customer.firstName,
+                lastName: customer.lastName,
+              },
+            };
+          }),
       };
     },
 
@@ -467,7 +488,7 @@ export function createAgencyQueries(data: AgencyDataset, now: Date = new Date())
           );
         })
         .sort((a, b) => (b.lastBookingAt ?? '').localeCompare(a.lastBookingAt ?? ''));
-      return paginate(views, query.page);
+      return paginate(views, query.page, query.limit);
     },
 
     getCustomer(id: string): CustomerDetail | undefined {
@@ -516,7 +537,7 @@ export function createAgencyQueries(data: AgencyDataset, now: Date = new Date())
         }
       }
       return {
-        ...paginate(views, query.page, AGENCY_PAYMENTS_PAGE_SIZE),
+        ...paginate(views, query.page, query.limit ?? AGENCY_PAYMENTS_PAGE_SIZE),
         summary: {
           collectedMonthMillimes: rentalCollectedIn(month),
           refundedMonthMillimes: thisMonth
@@ -532,10 +553,10 @@ export function createAgencyQueries(data: AgencyDataset, now: Date = new Date())
       };
     },
 
-    listReviews(filter: ReviewFilter): ReviewList {
+    listReviews(query: ReviewQuery): ReviewList {
       const items = [...data.reviews]
         .filter((review) => {
-          switch (filter) {
+          switch (query.filter) {
             case 'unanswered':
               return review.reply === null;
             case 'positive':
@@ -547,7 +568,10 @@ export function createAgencyQueries(data: AgencyDataset, now: Date = new Date())
           }
         })
         .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
-      return { items, ...reviewStats() };
+      return {
+        ...paginate(items, query.page, query.limit ?? AGENCY_LIST_LIMIT_DEFAULT),
+        ...reviewStats(),
+      };
     },
   };
 }

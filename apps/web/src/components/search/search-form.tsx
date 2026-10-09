@@ -14,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@drivetn/ui/select';
-import { CalendarDays, type LucideIcon, MapPin, Search } from 'lucide-react';
+import { CalendarDays, Landmark, type LucideIcon, MapPin, Search } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { type ReactNode, useId, useState } from 'react';
 
@@ -29,6 +29,14 @@ export interface LocationOption {
   /** Connu quand les lieux viennent de l'API. */
   governorateCode?: string;
 }
+
+export interface GovernorateOption {
+  code: string;
+  label: string;
+}
+
+/** Valeur des options « Toute la Tunisie » / « Tous les lieux » (Radix refuse une valeur vide). */
+const ALL = 'all';
 
 const GROUP_LABEL_KEYS = {
   AIRPORT: 'airports',
@@ -66,11 +74,16 @@ function FormField({
 
 export function SearchForm({
   options,
+  governorates,
+  initialGovernorate,
   initialLocation,
   initialPickup,
   initialReturn,
 }: {
   options: readonly LocationOption[];
+  /** Vide si le référentiel est indisponible : le choix du gouvernorat est alors masqué. */
+  governorates: readonly GovernorateOption[];
+  initialGovernorate: string | null;
   initialLocation: string | null;
   initialPickup: string | null;
   initialReturn: string | null;
@@ -79,14 +92,36 @@ export function SearchForm({
   const tForm = useTranslations('client.search.form');
   const router = useRouter();
   const id = useId();
-  const [location, setLocation] = useState(initialLocation ?? '');
+  const [governorate, setGovernorate] = useState(initialGovernorate ?? ALL);
+  const [location, setLocation] = useState(initialLocation ?? ALL);
   const [pickup, setPickup] = useState(initialPickup ?? '');
   const [dropoff, setDropoff] = useState(initialReturn ?? '');
   const [today] = useState(todayKey);
+  const withGovernorate = governorates.length > 0;
 
+  const places =
+    governorate === ALL
+      ? options
+      : options.filter((option) => option.governorateCode === governorate);
   const groups = (Object.keys(GROUP_LABEL_KEYS) as LocationType[])
-    .map((type) => ({ type, items: options.filter((option) => option.type === type) }))
+    .map((type) => ({ type, items: places.filter((option) => option.type === type) }))
     .filter((group) => group.items.length > 0);
+
+  const changeGovernorate = (value: string) => {
+    setGovernorate(value);
+    const place = options.find((option) => option.value === location);
+    if (value !== ALL && place !== undefined && place.governorateCode !== value) {
+      setLocation(ALL);
+    }
+  };
+
+  const changeLocation = (value: string) => {
+    setLocation(value);
+    const code = options.find((option) => option.value === value)?.governorateCode;
+    if (code !== undefined && withGovernorate) {
+      setGovernorate(code);
+    }
+  };
 
   const groupLabel = (type: LocationType) => {
     const key = GROUP_LABEL_KEYS[type];
@@ -99,21 +134,63 @@ export function SearchForm({
       aria-label={t('label')}
       onSubmit={(event) => {
         event.preventDefault();
-        router.push(buildSearchHref({ location, pickup, dropoff }), { scroll: false });
+        router.push(
+          buildSearchHref(
+            {
+              governorate: governorate === ALL ? null : governorate,
+              location: location === ALL ? null : location,
+              pickup,
+              dropoff,
+            },
+            new URLSearchParams(window.location.search),
+          ),
+          { scroll: false },
+        );
       }}
-      className="grid grid-cols-2 gap-3 rounded-panel border border-border/80 bg-surface/90 p-3 shadow-elevated backdrop-blur-xl sm:gap-4 sm:p-4 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)_minmax(0,1fr)_auto] lg:items-end"
+      className={cn(
+        'grid grid-cols-2 gap-3 rounded-panel border border-border/80 bg-surface/90 p-3 shadow-elevated backdrop-blur-xl sm:gap-4 sm:p-4 lg:items-end',
+        withGovernorate
+          ? 'lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,1fr)_auto]'
+          : 'lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)_minmax(0,1fr)_auto]',
+      )}
     >
+      {withGovernorate && (
+        <FormField
+          id={`${id}-governorate`}
+          icon={Landmark}
+          label={tForm('governorate')}
+          className="col-span-2 sm:col-span-1"
+        >
+          <Select name="governorate" value={governorate} onValueChange={changeGovernorate}>
+            <SelectTrigger id={`${id}-governorate`} className="h-12 bg-background/60">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="max-h-80 overflow-y-auto">
+              <SelectItem value={ALL}>{tForm('allGovernorates')}</SelectItem>
+              {governorates.map((option) => (
+                <SelectItem key={option.code} value={option.code}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </FormField>
+      )}
+
       <FormField
         id={`${id}-location`}
         icon={MapPin}
         label={t('location')}
-        className="col-span-2 lg:col-span-1"
+        className={withGovernorate ? 'col-span-2 sm:col-span-1' : 'col-span-2 lg:col-span-1'}
       >
-        <Select name="location" value={location} onValueChange={setLocation}>
+        <Select name="location" value={location} onValueChange={changeLocation}>
           <SelectTrigger id={`${id}-location`} className="h-12 bg-background/60">
             <SelectValue placeholder={t('locationPlaceholder')} />
           </SelectTrigger>
           <SelectContent className="max-h-80 overflow-y-auto">
+            <SelectItem value={ALL}>
+              {governorate === ALL ? tForm('allLocations') : tForm('allLocationsIn')}
+            </SelectItem>
             {groups.map((group) => (
               <SelectGroup key={group.type}>
                 <SelectLabel>{groupLabel(group.type)}</SelectLabel>

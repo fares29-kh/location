@@ -1,4 +1,5 @@
 import {
+  AGENCY_LOGO_MAX_BYTES,
   agencyProfileSchema,
   type AgencySettings,
   type BookingList,
@@ -18,6 +19,7 @@ import {
   type PaymentQuery,
   paymentQuerySchema,
   type PlanningData,
+  type PlanningQuery,
   planningQuerySchema,
   type RecordPaymentInput,
   recordPaymentSchema,
@@ -25,22 +27,88 @@ import {
   rentalConditionsSchema,
   type Review,
   type ReviewList,
+  type ReviewQuery,
   reviewQuerySchema,
   reviewReplySchema,
+  isVehiclePhotoType,
+  VEHICLE_PHOTO_MAX_BYTES,
   type VehicleInput,
   vehicleInputSchema,
+  type VehiclePhoto,
+  type VehiclePhotoOrder,
+  vehiclePhotoOrderSchema,
   vehicleStatusInputSchema,
   type VehicleView,
 } from '@drivetn/types';
-import { Body, Controller, Get, Param, Patch, Post, Put, Query, Req } from '@nestjs/common';
-import { ApiCookieAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Patch,
+  Post,
+  Put,
+  Query,
+  Req,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiBody, ApiConsumes, ApiCookieAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { Request } from 'express';
 import type { z } from 'zod';
 
 import type { AuthenticatedUser } from '../common/auth/authenticated-user';
 import { CurrentUser, Roles } from '../common/auth/decorators';
+import { AppException } from '../common/errors/app.exception';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
 import { AgencyService } from './agency.service';
+import { planningWindow } from './planning-window';
+import { renderLogo, VehiclePhotosService } from './vehicle-photos.service';
+
+function imageUpload(maxBytes: number) {
+  return FileInterceptor('file', {
+    limits: { fileSize: maxBytes, files: 1, fields: 0 },
+    fileFilter: (_request, file, accept) => {
+      if (isVehiclePhotoType(file.mimetype)) {
+        accept(null, true);
+        return;
+      }
+      accept(
+        new AppException(
+          HttpStatus.UNSUPPORTED_MEDIA_TYPE,
+          'BAD_REQUEST',
+          'Format non pris en charge (JPG, PNG ou WebP).',
+          [{ path: 'file', message: 'UNSUPPORTED_IMAGE_TYPE' }],
+        ),
+        false,
+      );
+    },
+  });
+}
+
+const photoUpload = imageUpload(VEHICLE_PHOTO_MAX_BYTES);
+const logoUpload = imageUpload(AGENCY_LOGO_MAX_BYTES);
+
+const FILE_BODY: Parameters<typeof ApiBody>[0] = {
+  schema: {
+    type: 'object',
+    required: ['file'],
+    properties: { file: { type: 'string', format: 'binary' } },
+  },
+};
+
+function requireFile(file: { buffer: Buffer } | undefined): Buffer {
+  if (file === undefined) {
+    throw new AppException(HttpStatus.BAD_REQUEST, 'BAD_REQUEST', 'Aucune image reçue.', [
+      { path: 'file', message: 'REQUIRED' },
+    ]);
+  }
+  return file.buffer;
+}
 
 /** Portail agence : données de l'agence du propriétaire connecté uniquement. */
 @ApiTags('agency')
@@ -48,7 +116,10 @@ import { AgencyService } from './agency.service';
 @Roles('AGENCY_OWNER')
 @Controller({ path: 'agency', version: '1' })
 export class AgencyController {
-  constructor(private readonly agency: AgencyService) {}
+  constructor(
+    private readonly agency: AgencyService,
+    private readonly photos: VehiclePhotosService,
+  ) {}
 
   @Get('dashboard')
   @ApiOperation({ summary: 'Indicateurs, demandes en attente, départs et retours du jour' })
@@ -100,12 +171,14 @@ export class AgencyController {
   }
 
   @Get('planning')
-  @ApiOperation({ summary: 'Planning de la flotte sur une période' })
+  @ApiOperation({
+    summary: 'Planning de la flotte sur [from, to[ (jours de Tunis, 62 jours au plus)',
+  })
   planning(
     @CurrentUser() user: AuthenticatedUser,
-    @Query(new ZodValidationPipe(planningQuerySchema)) query: z.output<typeof planningQuerySchema>,
+    @Query(new ZodValidationPipe(planningQuerySchema)) query: PlanningQuery,
   ): Promise<PlanningData> {
-    return this.agency.getPlanning(user.id, query.from, query.days);
+    return this.agency.getPlanning(user.id, planningWindow(query));
   }
 
   @Get('vehicles')
@@ -144,6 +217,40 @@ export class AgencyController {
     return this.agency.setVehicleStatus(user.id, id, body.status);
   }
 
+  @Post('vehicles/:id/photos')
+  @ApiOperation({ summary: 'Ajouter une photo (JPG, PNG ou WebP, 10 Mo max.)' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody(FILE_BODY)
+  @UseInterceptors(photoUpload)
+  addVehiclePhoto(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id') id: string,
+    @UploadedFile() file: { buffer: Buffer } | undefined,
+  ): Promise<VehiclePhoto> {
+    return this.photos.add(user.id, id, requireFile(file));
+  }
+
+  @Put('vehicles/:id/photos/order')
+  @ApiOperation({ summary: 'Réordonner les photos (la première devient la couverture)' })
+  reorderVehiclePhotos(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id') id: string,
+    @Body(new ZodValidationPipe(vehiclePhotoOrderSchema)) body: VehiclePhotoOrder,
+  ): Promise<VehiclePhoto[]> {
+    return this.photos.reorder(user.id, id, body.photoIds);
+  }
+
+  @Delete('vehicles/:id/photos/:photoId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Supprimer une photo' })
+  deleteVehiclePhoto(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id') id: string,
+    @Param('photoId') photoId: string,
+  ): Promise<void> {
+    return this.photos.remove(user.id, id, photoId);
+  }
+
   @Get('customers')
   @ApiOperation({ summary: 'Clients ayant réservé auprès de l’agence' })
   customers(
@@ -172,12 +279,12 @@ export class AgencyController {
   }
 
   @Get('reviews')
-  @ApiOperation({ summary: 'Avis clients et statistiques' })
+  @ApiOperation({ summary: 'Avis clients paginés et statistiques de tous les avis' })
   reviews(
     @CurrentUser() user: AuthenticatedUser,
-    @Query(new ZodValidationPipe(reviewQuerySchema)) query: z.output<typeof reviewQuerySchema>,
+    @Query(new ZodValidationPipe(reviewQuerySchema)) query: ReviewQuery,
   ): Promise<ReviewList> {
-    return this.agency.listReviews(user.id, query.filter);
+    return this.agency.listReviews(user.id, query);
   }
 
   @Post('reviews/:id/reply')
@@ -212,5 +319,23 @@ export class AgencyController {
     @Body(new ZodValidationPipe(rentalConditionsSchema)) body: RentalConditions,
   ): Promise<AgencySettings> {
     return this.agency.updateConditions(user.id, body);
+  }
+
+  @Put('settings/logo')
+  @ApiOperation({ summary: 'Remplacer le logo de l’agence (JPG, PNG ou WebP, 5 Mo max.)' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody(FILE_BODY)
+  @UseInterceptors(logoUpload)
+  async updateLogo(
+    @CurrentUser() user: AuthenticatedUser,
+    @UploadedFile() file: { buffer: Buffer } | undefined,
+  ): Promise<AgencySettings> {
+    return this.agency.setLogo(user.id, await renderLogo(requireFile(file)));
+  }
+
+  @Delete('settings/logo')
+  @ApiOperation({ summary: 'Retirer le logo de l’agence' })
+  removeLogo(@CurrentUser() user: AuthenticatedUser): Promise<AgencySettings> {
+    return this.agency.removeLogo(user.id);
   }
 }

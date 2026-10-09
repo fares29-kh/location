@@ -24,11 +24,13 @@ export {
   type PaymentRecord,
   type PaymentSummaryTotals,
   type PaymentView,
+  type PlanningBooking,
   type PlanningData,
   REVIEW_FILTERS,
   type Review,
   type ReviewFilter,
   type ReviewList,
+  type ReviewQuery,
   type Vehicle,
   type VehicleView,
 } from '@drivetn/types';

@@ -19,12 +19,13 @@ import { toPlace } from '../agency/agency.mapper';
 import { AuditService } from '../audit/audit.service';
 import { AppException } from '../common/errors/app.exception';
 import { PrismaService } from '../prisma/prisma.service';
+import { StorageService } from '../storage/storage.service';
 
 const REFERENCE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 const REFERENCE_ATTEMPTS = 5;
 
 const CUSTOMER_BOOKING_INCLUDE = {
-  vehicle: true,
+  vehicle: { include: { category: { select: { slug: true } } } },
   agency: true,
   events: { orderBy: { createdAt: 'asc' } },
 } satisfies Prisma.BookingInclude;
@@ -47,7 +48,11 @@ function unavailable(): AppException {
   );
 }
 
-function toCustomerBooking(row: CustomerBookingRow, now: Date): CustomerBooking {
+function toCustomerBooking(
+  row: CustomerBookingRow,
+  now: Date,
+  publicUrl: (key: string) => string,
+): CustomerBooking {
   return {
     id: row.id,
     reference: row.reference,
@@ -70,13 +75,14 @@ function toCustomerBooking(row: CustomerBookingRow, now: Date): CustomerBooking 
     vehicle: {
       brand: row.vehicle.brand,
       model: row.vehicle.model,
-      category: row.vehicle.category,
+      category: row.vehicle.category.slug,
       transmission: row.vehicle.transmission,
       seats: row.vehicle.seats,
       color: row.vehicle.color,
     },
     agency: {
       name: row.agency.name,
+      logoUrl: row.agency.logoKey === null ? null : publicUrl(row.agency.logoKey),
       phone: row.agency.phone,
       whatsappPhone: row.agency.whatsappPhone,
       address: row.agency.address,
@@ -89,7 +95,10 @@ export class CustomerBookingsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly audit: AuditService,
+    private readonly storage: StorageService,
   ) {}
+
+  private publicUrl = (key: string): string => this.storage.publicUrl(key);
 
   async list(customerId: string): Promise<CustomerBooking[]> {
     const rows = await this.prisma.booking.findMany({
@@ -98,7 +107,7 @@ export class CustomerBookingsService {
       orderBy: { pickupAt: 'desc' },
     });
     const now = new Date();
-    return rows.map((row) => toCustomerBooking(row, now));
+    return rows.map((row) => toCustomerBooking(row, now, this.publicUrl));
   }
 
   /**
@@ -180,7 +189,7 @@ export class CustomerBookingsService {
           metadata: { vehicleId: booking.vehicleId, status: booking.status },
           ip,
         });
-        return toCustomerBooking(booking, new Date());
+        return toCustomerBooking(booking, new Date(), this.publicUrl);
       } catch (error) {
         if (isUniqueViolation(error) && attempt < REFERENCE_ATTEMPTS) {
           continue;
@@ -239,6 +248,6 @@ export class CustomerBookingsService {
       where: { id: booking.id },
       include: CUSTOMER_BOOKING_INCLUDE,
     });
-    return toCustomerBooking(row, new Date());
+    return toCustomerBooking(row, new Date(), this.publicUrl);
   }
 }

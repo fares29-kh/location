@@ -210,7 +210,8 @@ function AgendaList({
                   {customerName(booking.customer)}
                 </span>
                 <span className="truncate text-xs text-muted-foreground">
-                  {booking.vehicle.brand} {booking.vehicle.model} · {booking.vehicle.plateNumber}
+                  {booking.vehicle.brand} {booking.vehicle.model}
+                  {booking.vehicle.plateNumber !== null && ` · ${booking.vehicle.plateNumber}`}
                 </span>
               </span>
               <BookingStatusTag status={booking.status} />

@@ -183,22 +183,6 @@
       }
     },
     "catalog": {
-      "categories": {
-        "city": "City car",
-        "compact": "Compact",
-        "sedan": "Sedan",
-        "suv": "SUV",
-        "family": "Family",
-        "premium": "Premium"
-      },
-      "hints": {
-        "city": "Economical and easy to park, ideal in town.",
-        "compact": "Versatile and comfortable, in town and on the road.",
-        "sedan": "Large boot and comfort for long journeys.",
-        "suv": "High driving position, at ease on every road.",
-        "family": "Up to 7 seats for trips with family or friends.",
-        "premium": "Top-of-the-range comfort for business travel."
-      },
       "transmission": {
         "MANUAL": "Manual",
         "AUTOMATIC": "Automatic"
@@ -217,7 +201,11 @@
       "subtitle": "Compare offers from local agencies, filter by what matters to you and book without a credit card.",
       "form": {
         "stations": "Train stations",
-        "ports": "Ports"
+        "ports": "Ports",
+        "governorate": "Governorate",
+        "allGovernorates": "All of Tunisia",
+        "allLocations": "All locations",
+        "allLocationsIn": "All locations in the governorate"
       },
       "unavailableTitle": "Search temporarily unavailable",
       "unavailableText": "We couldn’t load the agencies’ offers. Please try again in a moment.",
@@ -229,6 +217,7 @@
         "action": "See all offers"
       },
       "results": "{count, plural, one {# offer available} other {# offers available}}",
+      "filteredFrom": "out of {total}",
       "summary": {
         "anywhere": "All of Tunisia",
         "anyDates": "Flexible dates",
@@ -248,21 +237,40 @@
         "show": "Show {count, plural, one {# offer} other {# offers}}",
         "quickLabel": "Filter by category",
         "category": "Category",
+        "brandModel": "Make and model",
+        "showModels": "Show {brand} models",
+        "showAllBrands": "Show all {count} makes",
+        "showLessBrands": "Show fewer makes",
+        "allModels": "{brand} (all models)",
         "transmission": "Transmission",
         "allTransmissions": "All",
         "maxPrice": "Maximum price per day",
         "anyPrice": "No limit",
         "upTo": "Up to",
-        "mileage": "Mileage",
-        "unlimitedMileage": "Unlimited mileage only"
+        "seats": "Seats",
+        "anySeats": "Any",
+        "minSeats": "{count}+ seats",
+        "fuel": "Fuel",
+        "conditions": "Rental conditions",
+        "unlimitedMileage": "Unlimited mileage",
+        "unlimitedMileageHint": "Drive as much as you like, at no extra cost.",
+        "instant": "Instant confirmation",
+        "instantHint": "The agency confirms your booking right away.",
+        "activeLabel": "Active filters",
+        "remove": "Remove filter: {label}",
+        "clearAll": "Clear all"
       },
       "empty": {
         "title": "No offer matches your filters",
         "text": "Broaden your criteria to discover more cars.",
+        "tryWithout": "Try removing a filter:",
+        "more": "+{count, plural, one {# offer} other {# offers}}",
         "action": "Reset filters"
       },
       "offer": {
         "instant": "Instant confirmation",
+        "photoAlt": "Photo of the {vehicle}",
+        "photoCount": "{count, plural, one {# photo} other {# photos}}",
         "newAgency": "New agency, no reviews yet",
         "rating": "{value} out of 5",
         "reviews": "{count} reviews",
@@ -283,10 +291,67 @@
       "title": "Verified local agencies, all over Tunisia",
       "subtitle": "Find our pick-up points at the country’s airports, cities, train stations and ports, and rent from vetted Tunisian companies.",
       "findCar": "Find a car",
+      "exploreMap": "Explore the map",
       "stats": {
+        "agencies": "Verified agencies",
         "governorates": "Governorates",
         "airports": "Airports served",
         "pickupPoints": "Pick-up points"
+      },
+      "map": {
+        "eyebrow": "Network map",
+        "title": "All our agencies, on a single map",
+        "text": "Spot verified agencies near you, compare their ratings and prices, then contact them or book in a few clicks.",
+        "searchLabel": "Search for an agency",
+        "searchPlaceholder": "Agency name, city or address…",
+        "clearSearch": "Clear search",
+        "governorateLabel": "Filter by governorate",
+        "allGovernorates": "All governorates",
+        "nearMe": "Near me",
+        "instantOnly": "Instant confirmation",
+        "topRated": "Rated 4+",
+        "reset": "Reset",
+        "results": "{count, plural, one {# agency} other {# agencies}}",
+        "noResults": "No agencies",
+        "byDistance": "sorted by distance",
+        "listLabel": "Agencies shown on the map",
+        "mapLabel": "Interactive agency map",
+        "vehicles": "{count, plural, one {# vehicle} other {# vehicles}}",
+        "fleetSoon": "Fleet coming soon",
+        "from": "From",
+        "perDay": "/ day",
+        "newAgency": "New agency",
+        "reviews": "{count, plural, one {# review} other {# reviews}}",
+        "ratingLabel": "Rated {rating} out of 5",
+        "instant": "Instant confirmation",
+        "statVehicles": "Vehicles",
+        "statFrom": "From / day",
+        "statCancellation": "Free cancel.",
+        "cancellationHours": "{hours} h before",
+        "categories": "Available categories",
+        "distance": "{distance} km away",
+        "seeCars": "See cars",
+        "whatsapp": "WhatsApp",
+        "whatsappMessage": "Hello {name}, I found you on DriveTN and would like to rent a car.",
+        "call": "Call",
+        "directions": "Directions",
+        "close": "Close",
+        "zoomIn": "Zoom in",
+        "zoomOut": "Zoom out",
+        "locate": "Show agencies near me",
+        "locateError": "Location unavailable. Allow location access in your browser and try again.",
+        "resetView": "Show all of Tunisia",
+        "you": "Your location",
+        "approximate": "Approximate position: centre of the agency’s governorate",
+        "loading": "Loading map…",
+        "unsupportedTitle": "Map unavailable",
+        "unsupportedText": "Your browser can’t display the interactive map. The agency list is still available.",
+        "emptyTitle": "No matching agencies",
+        "emptyText": "Change your search or filters to see more agencies.",
+        "noAgenciesTitle": "The first agencies are coming soon",
+        "noAgenciesText": "The DriveTN network grows every week. Check back soon!",
+        "unavailableTitle": "Map temporarily unavailable",
+        "unavailableText": "We couldn’t load the agencies. Please try again in a moment."
       },
       "network": {
         "eyebrow": "Where to find us",
@@ -498,6 +563,12 @@
       "INVALID_EMAIL": "Invalid email address.",
       "INVALID_PLATE": "Invalid plate number (e.g. 245 TU 1234).",
       "PLATE_ALREADY_USED": "This plate number is already used in your fleet.",
+      "INVALID_BRAND": "Choose a make from the list.",
+      "INVALID_MODEL": "Choose a model of this make from the list.",
+      "INVALID_CATEGORY": "Choose a category from the list.",
+      "INVALID_SLUG": "Lowercase letters without accents, digits and hyphens only (e.g. mini-van).",
+      "INVALID_CODE": "Two-digit code (e.g. 11).",
+      "ALREADY_USED": "This value is already in use.",
       "OUT_OF_RANGE": "Value outside the allowed range.",
       "INVALID_AMOUNT": "Invalid amount (e.g. 120 or 120.500).",
       "PAYMENT_METHOD_REQUIRED": "Select at least one payment method.",
@@ -787,14 +858,6 @@
         "MAINTENANCE": "In maintenance",
         "INACTIVE": "Out of service"
       },
-      "categories": {
-        "ECONOMY": "Economy",
-        "COMPACT": "Compact",
-        "SEDAN": "Sedan",
-        "SUV": "SUV",
-        "MINIVAN": "Minivan",
-        "LUXURY": "Premium"
-      },
       "transmissions": {
         "MANUAL": "Manual",
         "AUTOMATIC": "Automatic"
@@ -818,6 +881,7 @@
       "noUpcoming": "No upcoming bookings",
       "unavailableHint": "Not available for rent",
       "edit": "Edit",
+      "photoCount": "{count, plural, one {# photo} other {# photos}}",
       "moreActions": "More actions for {name}",
       "viewPlanning": "View schedule",
       "statusMenu": {
@@ -847,13 +911,22 @@
         "sections": {
           "identity": "Identification",
           "specs": "Specifications",
-          "pricing": "Rates and terms"
+          "pricing": "Rates and terms",
+          "photos": "Photos"
         },
         "brand": "Make",
+        "brandPlaceholder": "Choose a make",
+        "brandSearch": "Search makes",
+        "brandEmpty": "No make found",
         "model": "Model",
+        "modelPlaceholder": "Choose a model",
+        "modelSearch": "Search models",
+        "modelEmpty": "No model found",
+        "modelSelectBrand": "Choose the make first.",
+        "modelNone": "No models are listed for this make yet: contact the DriveTN team.",
         "year": "Year",
-        "plate": "Plate number",
-        "plateHint": "Tunisian format, e.g. 245 TU 1234.",
+        "plate": "Plate number (optional)",
+        "plateHint": "Tunisian format, e.g. 245 TU 1234. Only visible to your agency.",
         "category": "Category",
         "fuel": "Fuel",
         "transmission": "Gearbox",
@@ -874,7 +947,25 @@
         "submitEdit": "Save",
         "created": "Vehicle added to your fleet.",
         "updated": "Vehicle updated.",
-        "saveError": "The vehicle couldn’t be saved."
+        "saveError": "The vehicle couldn’t be saved.",
+        "photos": {
+          "add": "Add photos",
+          "dropHint": "Drag your photos here or click to browse",
+          "count": "{count} / {max}",
+          "hint": "JPEG, PNG or WebP, up to {size} MB each, {max} photos max. The first photo is used as the cover on your listing.",
+          "cover": "Cover",
+          "pending": "To upload",
+          "alt": "Vehicle photo {index}",
+          "makeCover": "Use as cover",
+          "moveEarlier": "Move earlier",
+          "moveLater": "Move later",
+          "remove": "Remove photo",
+          "rejectedType": "{name}: unsupported format (JPEG, PNG or WebP).",
+          "rejectedSize": "{name}: file too large ({size} MB max).",
+          "rejectedLimit": "{max}-photo limit reached: some photos weren’t added.",
+          "uploading": "Uploading photos… {current} / {total}",
+          "partialError": "Vehicle saved, but {count, plural, one {# photo operation failed} other {# photo operations failed}}. Reopen the vehicle to try again."
+        }
       }
     },
     "customers": {
@@ -983,7 +1074,18 @@
       "previewHint": "Preview of your profile as customers see it.",
       "profile": {
         "identityTitle": "About",
-        "identityText": "The name and description shown on your public profile.",
+        "identityText": "The logo, name and description shown on your public profile.",
+        "logo": "Agency logo",
+        "logoHint": "Square format recommended, on a white or transparent background. JPG, PNG or WebP, {size} MB max.",
+        "logoUpload": "Add a logo",
+        "logoReplace": "Change logo",
+        "logoRemove": "Remove",
+        "logoSaved": "Logo saved: it now appears on your listings.",
+        "logoRemoved": "Logo removed.",
+        "logoError": "The logo couldn’t be saved.",
+        "logoRemoveError": "The logo couldn’t be removed.",
+        "logoInvalid": "Unreadable image: choose a JPG, PNG or WebP file.",
+        "logoTooLarge": "Image too large ({size} MB max.).",
         "name": "Agency name",
         "description": "Description",
         "descriptionHint": "{count} / {max} characters",
@@ -1046,6 +1148,9 @@
       "reviews": "Review moderation",
       "settings": "Settings",
       "audit": "Audit log",
+      "referentials": "Reference data",
+      "catalog": "Vehicle catalog",
+      "geography": "Geography",
       "pendingAgencies": "{count, plural, one {# agency to review} other {# agencies to review}}",
       "flaggedReviews": "{count, plural, one {# flagged review} other {# flagged reviews}}",
       "overdueInvoices": "{count, plural, one {# overdue invoice} other {# overdue invoices}}"
@@ -1491,6 +1596,127 @@
         }
       }
     },
+    "referentials": {
+      "name": {
+        "fr": "Name in French",
+        "ar": "Name in Arabic",
+        "en": "Name in English"
+      },
+      "create": "Add",
+      "save": "Save",
+      "delete": "Delete",
+      "editLabel": "Edit “{name}”",
+      "deleteLabel": "Delete “{name}”",
+      "inUseHint": "Cannot be deleted: other items still depend on it.",
+      "readOnlyTitle": "Read only",
+      "readOnlyText": "Only a super administrator can edit reference data.",
+      "created": "Item added.",
+      "saved": "Changes saved.",
+      "deleted": "Item deleted.",
+      "saveError": "Saving failed. Please try again.",
+      "deleteError": "Deletion failed. Please try again.",
+      "inUseError": "Cannot delete: this item is still in use.",
+      "deleteTitle": "Delete “{name}”?",
+      "deleteText": "This deletion is permanent and will be recorded in the audit log."
+    },
+    "catalog": {
+      "title": "Vehicle catalog",
+      "subtitle": "Categories, makes and models offered to agencies for their fleet and to customers in search.",
+      "tabsLabel": "Reference data shown",
+      "tabs": {
+        "categories": "Categories",
+        "brands": "Makes and models"
+      },
+      "vehiclesCount": "{count, plural, one {# vehicle} other {# vehicles}}",
+      "categories": {
+        "text": "Shown in this order in search filters and in the fleet form.",
+        "add": "Add a category",
+        "columns": {
+          "position": "Order",
+          "name": "Category",
+          "slug": "Identifier",
+          "vehicles": "Vehicles",
+          "actions": "Actions"
+        },
+        "emptyTitle": "No categories",
+        "emptyText": "Add a first category so agencies can classify their vehicles.",
+        "createTitle": "New category",
+        "editTitle": "Edit category",
+        "slug": "URL identifier",
+        "slugHint": "Lowercase letters, digits and hyphens. It cannot be changed later.",
+        "slugLocked": "Set at creation: it appears in shared search links.",
+        "position": "Display order",
+        "positionHint": "Categories are sorted in ascending order.",
+        "description": {
+          "fr": "Description in French",
+          "ar": "Description in Arabic",
+          "en": "Description in English"
+        }
+      },
+      "brands": {
+        "title": "Makes",
+        "add": "Add",
+        "searchLabel": "Search makes",
+        "searchPlaceholder": "Search makes",
+        "stats": "{models, plural, one {# model} other {# models}} · {vehicles, plural, one {# vehicle} other {# vehicles}}",
+        "empty": "No makes. Add the ones agencies can choose for their vehicles.",
+        "noResults": "No make matches “{search}”.",
+        "clearSearch": "Clear search",
+        "createTitle": "New make",
+        "editTitle": "Rename make",
+        "name": "Make name",
+        "renameHint": "{count, plural, one {# vehicle of this make will be renamed.} other {# vehicles of this make will be renamed.}}"
+      },
+      "models": {
+        "title": "Models",
+        "titleFor": "{brand} models",
+        "add": "Add",
+        "selectBrand": "Choose a make to see and manage its models.",
+        "empty": "No models for {brand}: agencies cannot add vehicles of this make yet.",
+        "createTitle": "New model",
+        "editTitle": "Rename model",
+        "context": "Make: {brand}",
+        "name": "Model name",
+        "namePlaceholder": "e.g. X6",
+        "renameHint": "{count, plural, one {# vehicle of this model will be renamed.} other {# vehicles of this model will be renamed.}}"
+      }
+    },
+    "geography": {
+      "title": "Geography",
+      "subtitle": "Administrative divisions: governorates, delegations and municipalities.",
+      "governorates": {
+        "title": "Governorates",
+        "add": "Add",
+        "empty": "No governorates.",
+        "stats": "{delegations, plural, one {# delegation} other {# delegations}} · {agencies, plural, one {# agency} other {# agencies}}",
+        "createTitle": "New governorate",
+        "editTitle": "Edit governorate",
+        "code": "Official code",
+        "codeHint": "Two digits (e.g. 11). It cannot be changed later.",
+        "codeLocked": "A governorate code cannot be changed.",
+        "slug": "URL identifier",
+        "slugHint": "Lowercase letters, digits and hyphens (e.g. ben-arous)."
+      },
+      "delegations": {
+        "title": "Delegations",
+        "add": "Add",
+        "selectGovernorate": "Choose a governorate to see its delegations.",
+        "empty": "No delegations in {governorate}.",
+        "municipalitiesCount": "{count, plural, one {# municipality} other {# municipalities}}",
+        "createTitle": "New delegation",
+        "editTitle": "Rename delegation",
+        "context": "Governorate: {governorate}"
+      },
+      "municipalities": {
+        "title": "Municipalities",
+        "add": "Add",
+        "selectDelegation": "Choose a delegation to see its municipalities.",
+        "empty": "No municipalities in {delegation}.",
+        "createTitle": "New municipality",
+        "editTitle": "Rename municipality",
+        "context": "Delegation: {delegation}"
+      }
+    },
     "settings": {
       "title": "Platform settings",
       "subtitle": "Taxes, business rules and support contact.",
@@ -1551,7 +1777,8 @@
         "payment": "Payments",
         "invoice": "Billing",
         "review": "Reviews",
-        "settings": "Settings"
+        "settings": "Settings",
+        "referential": "Reference data"
       },
       "columns": {
         "date": "Date",
@@ -1604,6 +1831,11 @@
         },
         "settings": {
           "updated": "Settings changed"
+        },
+        "referential": {
+          "created": "Reference data: added",
+          "updated": "Reference data: changed",
+          "deleted": "Reference data: deleted"
         }
       }
     }

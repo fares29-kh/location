@@ -38,6 +38,18 @@ export const envSchema = z.object({
   COOKIE_SECURE: booleanString,
   MESSAGING_PROVIDER: z.enum(MESSAGING_PROVIDERS).default('console'),
   SEED_DEMO_ACCOUNTS: booleanString,
+  /** Stockage S3 (MinIO en local) ; sans point d'accès, l'envoi de photos est désactivé. */
+  S3_ENDPOINT: z.url({ protocol: /^https?$/ }).optional(),
+  S3_REGION: z.string().min(1).default('us-east-1'),
+  S3_ACCESS_KEY_ID: z.string().default(''),
+  S3_SECRET_ACCESS_KEY: z.string().default(''),
+  S3_BUCKET_PUBLIC: z.string().min(3).default('drivetn-public'),
+  /** URL publique du bucket public (relative : servie par Traefik sur le même domaine). */
+  MEDIA_PUBLIC_URL: z
+    .string()
+    .min(1)
+    .default('/media')
+    .transform((value) => value.replace(/\/+$/, '')),
 });
 
 export type Env = z.infer<typeof envSchema>;

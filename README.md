@@ -43,6 +43,8 @@ Le seed crée les 24 gouvernorats et les lieux de prise en charge (villes, aéro
 | `agency@demo.tn`   | `+216 20000002` | Propriétaire d'agence | http://agency.localhost |
 | `customer@demo.tn` | `+216 20000003` | Client                | http://localhost        |
 
+**Mode local « comme en prod »** : la pile `docker compose up` utilise déjà les images de production. Pour en reproduire aussi la configuration, mettez dans `.env` `SEED_DEMO_ACCOUNTS=false`, `SWAGGER_ENABLED=false` et `DESIGN_PAGE_ENABLED=false`, puis renseignez `ADMIN_EMAIL`, `ADMIN_PHONE` et `ADMIN_PASSWORD` pour créer le super-administrateur initial (les comptes de démo déjà en base sont conservés). Seul le HTTPS diffère encore : laissez `COOKIE_SECURE=false` tant que la pile est servie en HTTP.
+
 **Codes OTP en développement** : aucun SMS n'est envoyé (`MESSAGING_PROVIDER=console`). Les codes d'inscription, de connexion et de réinitialisation du mot de passe s'affichent dans les logs du worker :
 
 ```bash
@@ -61,6 +63,7 @@ docker compose logs -f worker
 | Mailpit (e-mails de dev)                 | http://mail.localhost                    |
 | Console MinIO                            | http://minio.localhost                   |
 | Endpoint S3                              | http://s3.localhost                      |
+| Photos publiques (bucket public)         | http://localhost/media/…                 |
 | Tableau de bord Traefik (dev uniquement) | http://traefik.localhost                 |
 
 L'API est servie sous `/api` **sur chaque sous-domaine** (même origine), ce qui évite le CORS et simplifie les cookies httpOnly.
@@ -122,27 +125,28 @@ pnpm --filter @drivetn/web dev
 
 Toutes les variables sont documentées dans [`.env.example`](.env.example). Les principales :
 
-| Variable                                 | Rôle                                                                                       | Défaut                               |
-| ---------------------------------------- | ------------------------------------------------------------------------------------------ | ------------------------------------ |
-| `APP_NAME`                               | Nom affiché de la plateforme                                                               | `DriveTN`                            |
-| `APP_DOMAIN`                             | Domaine racine des portails                                                                | `localhost`                          |
-| `APP_TIMEZONE`                           | Fuseau d'affichage                                                                         | `Africa/Tunis`                       |
-| `HTTP_PORT`                              | Port HTTP publié par Traefik                                                               | `80`                                 |
-| `POSTGRES_PASSWORD`                      | Mot de passe PostgreSQL                                                                    | **obligatoire**                      |
-| `REDIS_PASSWORD`                         | Mot de passe Redis                                                                         | **obligatoire**                      |
-| `MINIO_ROOT_PASSWORD`                    | Mot de passe MinIO (8 caractères minimum)                                                  | **obligatoire**                      |
-| `S3_BUCKET_PUBLIC` / `S3_BUCKET_PRIVATE` | Buckets photos / documents d'identité                                                      | `drivetn-public` / `drivetn-private` |
-| `SWAGGER_ENABLED`                        | Active `/api/docs`                                                                         | `true`                               |
-| `CORS_ORIGINS`                           | Origines CORS autorisées (vide = même origine)                                             | vide                                 |
-| `SEED_ON_START`                          | Exécute le seed au démarrage de l'API                                                      | `true`                               |
-| `SEED_DEMO_ACCOUNTS`                     | Crée les comptes de démo (jamais en prod) et les affiche sous les formulaires de connexion | `false` (`true` dans `.env.example`) |
-| `JWT_ACCESS_SECRET`                      | Signature des access tokens (32 car. min.)                                                 | **obligatoire**                      |
-| `OTP_HASH_SECRET`                        | Clé HMAC des codes OTP stockés (32 car. min.)                                              | **obligatoire**                      |
-| `ACCESS_TOKEN_TTL_SECONDS`               | Durée de vie de l'access token                                                             | `900`                                |
-| `REFRESH_TOKEN_TTL_DAYS`                 | Durée de vie du refresh token rotatif                                                      | `30`                                 |
-| `COOKIE_SECURE`                          | Cookies `Secure` (à activer en HTTPS)                                                      | `false`                              |
-| `MESSAGING_PROVIDER`                     | Envoi des SMS/WhatsApp (`console` en dev)                                                  | `console`                            |
-| `DESIGN_PAGE_ENABLED`                    | Active la page `/design` (`false` en prod)                                                 | `false` (`true` dans `.env.example`) |
+| Variable                                         | Rôle                                                                                       | Défaut                               |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------------ | ------------------------------------ |
+| `APP_NAME`                                       | Nom affiché de la plateforme                                                               | `DriveTN`                            |
+| `APP_DOMAIN`                                     | Domaine racine des portails                                                                | `localhost`                          |
+| `APP_TIMEZONE`                                   | Fuseau d'affichage                                                                         | `Africa/Tunis`                       |
+| `HTTP_PORT`                                      | Port HTTP publié par Traefik                                                               | `80`                                 |
+| `POSTGRES_PASSWORD`                              | Mot de passe PostgreSQL                                                                    | **obligatoire**                      |
+| `REDIS_PASSWORD`                                 | Mot de passe Redis                                                                         | **obligatoire**                      |
+| `MINIO_ROOT_PASSWORD`                            | Mot de passe MinIO (8 caractères minimum)                                                  | **obligatoire**                      |
+| `S3_BUCKET_PUBLIC` / `S3_BUCKET_PRIVATE`         | Buckets photos (servi sous `/media`) / documents d'identité                                | `drivetn-public` / `drivetn-private` |
+| `SWAGGER_ENABLED`                                | Active `/api/docs`                                                                         | `true`                               |
+| `CORS_ORIGINS`                                   | Origines CORS autorisées (vide = même origine)                                             | vide                                 |
+| `SEED_ON_START`                                  | Exécute le seed au démarrage de l'API                                                      | `true`                               |
+| `SEED_DEMO_ACCOUNTS`                             | Crée les comptes de démo (jamais en prod) et les affiche sous les formulaires de connexion | `false` (`true` dans `.env.example`) |
+| `ADMIN_EMAIL` / `ADMIN_PHONE` / `ADMIN_PASSWORD` | Super-administrateur initial, créé au démarrage s'il n'existe pas (jamais modifié ensuite) | vide (rien n'est créé)               |
+| `JWT_ACCESS_SECRET`                              | Signature des access tokens (32 car. min.)                                                 | **obligatoire**                      |
+| `OTP_HASH_SECRET`                                | Clé HMAC des codes OTP stockés (32 car. min.)                                              | **obligatoire**                      |
+| `ACCESS_TOKEN_TTL_SECONDS`                       | Durée de vie de l'access token                                                             | `900`                                |
+| `REFRESH_TOKEN_TTL_DAYS`                         | Durée de vie du refresh token rotatif                                                      | `30`                                 |
+| `COOKIE_SECURE`                                  | Cookies `Secure` (à activer en HTTPS)                                                      | `false`                              |
+| `MESSAGING_PROVIDER`                             | Envoi des SMS/WhatsApp (`console` en dev)                                                  | `console`                            |
+| `DESIGN_PAGE_ENABLED`                            | Active la page `/design` (`false` en prod)                                                 | `false` (`true` dans `.env.example`) |
 
 L'API et le front valident leur configuration avec Zod au démarrage et refusent de démarrer si une variable est invalide.
 
@@ -214,6 +218,7 @@ pnpm check     # codegen + lint + format + typecheck + tests
   E2E_DATABASE_URL=postgresql://test:test@localhost:5432/drivetn_test E2E_REDIS_URL=redis://localhost:6379/15 pnpm --filter @drivetn/api test
   ```
 
+- **Contraintes d'intégrité en base** : bornes (notes de 1 à 5, retour après départ, montants, facture cohérente) et exclusion des réservations actives qui se chevauchent sur un véhicule. Une violation (SQLSTATE 23514 ou 23P01) répond 409 avec un message en français, jamais 500 ([`constraint-violation.ts`](apps/api/src/common/errors/constraint-violation.ts)). Mise en production des migrations (sauvegarde, index `CONCURRENTLY`, `migrate resolve`, `migrate deploy`, retour arrière) : [`docs/production-migrations.md`](docs/production-migrations.md).
 - **Husky** : `lint-staged` avant chaque commit, **Commitlint** (Conventional Commits, ex. `feat(api): ...`) sur le message.
 - **CI GitHub Actions** ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) : lint, format, typecheck, tests (dont les tests e2e avec des services PostgreSQL et Redis), puis build des images Docker et smoke test de la pile complète (santé, gouvernorats, pages de connexion des trois portails, connexion du client de démo).
 

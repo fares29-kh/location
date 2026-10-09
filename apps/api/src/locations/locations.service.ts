@@ -53,6 +53,28 @@ export class LocationsService {
     });
   }
 
+  /** Vide le cache après une modification du référentiel par l'administration. */
+  async invalidate(): Promise<void> {
+    try {
+      let cursor = '0';
+      do {
+        const [next, keys] = await this.redis.scan(
+          cursor,
+          'MATCH',
+          `${CACHE_PREFIX}*`,
+          'COUNT',
+          100,
+        );
+        if (keys.length > 0) {
+          await this.redis.del(...keys);
+        }
+        cursor = next;
+      } while (cursor !== '0');
+    } catch (error) {
+      this.logger.warn(`Invalidation du cache impossible : ${(error as Error).message}`);
+    }
+  }
+
   // Le cache est une optimisation : en cas d'indisponibilité de Redis, on lit la base.
   private async cached<T>(key: string, load: () => Promise<T>): Promise<T> {
     const cacheKey = `${CACHE_PREFIX}${key}`;

@@ -24,15 +24,18 @@ import {
 
 import { FilterTabs } from '../filter-tabs';
 import { PageHeader } from '../page-header';
+import { PaginationBar } from '../pagination-bar';
 import { QueryError } from '../query-states';
 import { useAgencyFormat } from '../use-agency-format';
 import { useUrlState } from '../use-url-state';
 
 const REPLY_MAX_LENGTH = 1000;
-const URL_DEFAULTS = { filter: 'all' };
+const URL_DEFAULTS = { filter: 'all', page: '1' };
 
-function isValidParam(_key: keyof typeof URL_DEFAULTS, value: string): boolean {
-  return (REVIEW_FILTERS as readonly string[]).includes(value);
+function isValidParam(key: keyof typeof URL_DEFAULTS, value: string): boolean {
+  return key === 'page'
+    ? /^\d+$/.test(value)
+    : (REVIEW_FILTERS as readonly string[]).includes(value);
 }
 
 function RatingSummary({ data }: { data: ReviewList }) {
@@ -296,8 +299,10 @@ export function ReviewsView() {
   const t = useTranslations('agency.reviews');
   const [params, setParams] = useUrlState(URL_DEFAULTS, isValidParam);
   const filter = params.filter as ReviewFilter;
-  const { data, isPending, isError, error, refetch, isFetching, isPlaceholderData } =
-    useReviews(filter);
+  const { data, isPending, isError, error, refetch, isFetching, isPlaceholderData } = useReviews({
+    filter,
+    page: Number(params.page),
+  });
 
   return (
     <div className="grid gap-6">
@@ -316,7 +321,7 @@ export function ReviewsView() {
             label={t('filterLabel')}
             value={filter}
             onValueChange={(value) => {
-              setParams({ filter: value });
+              setParams({ filter: value, page: '1' });
             }}
             options={REVIEW_FILTERS.map((value) => ({
               value,
@@ -336,16 +341,24 @@ export function ReviewsView() {
               description={t('emptyFilteredText')}
             />
           ) : (
-            <ul
+            <div
               className={cn('grid gap-4 transition-opacity', isPlaceholderData && 'opacity-60')}
               aria-busy={isPlaceholderData}
             >
-              {data.items.map((review) => (
-                <li key={review.id}>
-                  <ReviewCard review={review} />
-                </li>
-              ))}
-            </ul>
+              <ul className="grid gap-4">
+                {data.items.map((review) => (
+                  <li key={review.id}>
+                    <ReviewCard review={review} />
+                  </li>
+                ))}
+              </ul>
+              <PaginationBar
+                data={data}
+                onPageChange={(page) => {
+                  setParams({ page: String(page) });
+                }}
+              />
+            </div>
           )}
         </>
       )}

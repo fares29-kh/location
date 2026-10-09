@@ -70,6 +70,65 @@
   }
 }
 
+/* Carte des agences (MapLibre) */
+.maplibregl-map {
+  font: inherit;
+}
+
+.agency-map-popup {
+  z-index: 5;
+}
+
+.agency-map-popup .maplibregl-popup-content {
+  padding: 0;
+  border-radius: 1rem;
+  background: transparent;
+  box-shadow: 0 24px 48px -16px rgb(15 23 42 / 0.45);
+}
+
+.agency-map-popup .maplibregl-popup-tip {
+  display: none;
+}
+
+.agency-map-user {
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 3px solid #fff;
+  border-radius: 9999px;
+  background: hsl(var(--info));
+  box-shadow: 0 0 0 0 hsl(var(--info) / 0.5);
+  animation: agency-map-pulse 2s ease-out infinite;
+}
+
+@keyframes agency-map-pulse {
+  70% {
+    box-shadow: 0 0 0 1rem hsl(var(--info) / 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 hsl(var(--info) / 0);
+  }
+}
+
+.maplibregl-ctrl-attrib.maplibregl-compact {
+  margin: 0.75rem;
+  /* Le bouton « i » est positionné à droite par MapLibre, même en RTL. */
+  direction: ltr;
+}
+
+.dark .maplibregl-ctrl-attrib,
+.dark .maplibregl-ctrl-attrib.maplibregl-compact {
+  background: hsl(var(--surface) / 0.9);
+  color: hsl(var(--muted-foreground));
+}
+
+.dark .maplibregl-ctrl-attrib a {
+  color: inherit;
+}
+
+.dark .maplibregl-ctrl-attrib-button {
+  filter: invert(1);
+}
+
 /* Apparition au défilement, sans JavaScript, là où le navigateur le permet. */
 @keyframes reveal {
   from {

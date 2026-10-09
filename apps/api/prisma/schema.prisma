@@ -81,6 +81,9 @@ model User {
   reviews       Review[]
 
   @@index([role, status])
+  /// Recherche par fragment de numéro (pg_trgm). Les index de recherche sur les noms, l'e-mail et
+  /// la ville portent sur des expressions : ils n'existent que dans la migration 20261008050000.
+  @@index([phone(ops: raw("gin_trgm_ops"))], type: Gin, map: "users_phone_search_idx")
   @@map("users")
 }
 
@@ -147,10 +150,44 @@ model Governorate {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  locations Location[]
-  agencies  Agency[]
+  locations   Location[]
+  agencies    Agency[]
+  delegations Delegation[]
 
   @@map("governorates")
+}
+
+/// Délégation, subdivision d'un gouvernorat (référentiel géré par l'administration).
+model Delegation {
+  id              String   @id @default(cuid())
+  governorateCode String   @map("governorate_code")
+  nameFr          String   @map("name_fr")
+  nameAr          String   @map("name_ar")
+  nameEn          String   @map("name_en")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  governorate    Governorate    @relation(fields: [governorateCode], references: [code], onDelete: Restrict)
+  municipalities Municipality[]
+
+  @@unique([governorateCode, nameFr])
+  @@map("delegations")
+}
+
+/// Municipalité, rattachée à une délégation (référentiel géré par l'administration).
+model Municipality {
+  id           String   @id @default(cuid())
+  delegationId String   @map("delegation_id")
+  nameFr       String   @map("name_fr")
+  nameAr       String   @map("name_ar")
+  nameEn       String   @map("name_en")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  delegation Delegation @relation(fields: [delegationId], references: [id], onDelete: Restrict)
+
+  @@unique([delegationId, nameFr])
+  @@map("municipalities")
 }
 
 enum LocationType {
@@ -191,15 +228,6 @@ enum AgencyStatus {
   ACTIVE
   SUSPENDED
   REJECTED
-}
-
-enum VehicleCategory {
-  ECONOMY
-  COMPACT
-  SEDAN
-  SUV
-  MINIVAN
-  LUXURY
 }
 
 enum Transmission {
@@ -287,6 +315,8 @@ model Agency {
   address                String
   governorateCode        String           @map("governorate_code")
   description            String           @default("")
+  /// Clé du logo dans le bucket public (WebP), `null` sans logo.
+  logoKey                String?          @map("logo_key")
   minDriverAge           Int              @default(21) @map("min_driver_age")
   minLicenseYears        Int              @default(2) @map("min_license_years")
   freeCancellationHours  Int              @default(48) @map("free_cancellation_hours")
@@ -361,15 +391,61 @@ model Invoice {
   @@map("invoices")
 }
 
+/// Catégorie de véhicule, gérée par l'administration.
+model VehicleCategory {
+  id            String   @id @default(cuid())
+  /// Identifiant stable des URL de recherche (ex. « suv »), fixé à la création.
+  slug          String   @unique
+  nameFr        String   @map("name_fr")
+  nameAr        String   @map("name_ar")
+  nameEn        String   @map("name_en")
+  descriptionFr String   @default("") @map("description_fr")
+  descriptionAr String   @default("") @map("description_ar")
+  descriptionEn String   @default("") @map("description_en")
+  /// Ordre d'affichage croissant.
+  position      Int      @default(0)
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  vehicles Vehicle[]
+
+  @@map("vehicle_categories")
+}
+
+/// Marque proposée aux agences pour leur flotte. `Vehicle.brand` en recopie le nom.
+model VehicleBrand {
+  id        String         @id @default(cuid())
+  name      String         @unique
+  createdAt DateTime       @default(now()) @map("created_at")
+  updatedAt DateTime       @updatedAt @map("updated_at")
+  models    VehicleModel[]
+
+  @@map("vehicle_brands")
+}
+
+/// Modèle d'une marque (ex. BMW X6). Le nom est recopié sur les véhicules (`Vehicle.model`).
+model VehicleModel {
+  id        String       @id @default(cuid())
+  brandId   String       @map("brand_id")
+  name      String
+  createdAt DateTime     @default(now()) @map("created_at")
+  updatedAt DateTime     @updatedAt @map("updated_at")
+  brand     VehicleBrand @relation(fields: [brandId], references: [id], onDelete: Cascade)
+
+  @@unique([brandId, name])
+  @@map("vehicle_models")
+}
+
 model Vehicle {
   id                String          @id @default(cuid())
   agencyId          String          @map("agency_id")
+  /// Nom d'une marque de `vehicle_brands`, renommé avec elle.
   brand             String
   model             String
   year              Int
-  /// Forme canonique « 123 TU 4567 ».
-  plateNumber       String          @map("plate_number")
-  category          VehicleCategory
+  /// Forme canonique « 123 TU 4567 » ; facultative.
+  plateNumber       String?         @map("plate_number")
+  categoryId        String          @map("category_id")
   transmission      Transmission
   fuel              FuelType
   seats             Int
@@ -385,13 +461,35 @@ model Vehicle {
   createdAt         DateTime        @default(now()) @map("created_at")
   updatedAt         DateTime        @updatedAt @map("updated_at")
 
-  agency   Agency    @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  agency   Agency          @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  category VehicleCategory @relation(fields: [categoryId], references: [id], onDelete: Restrict)
   bookings Booking[]
+  photos   VehiclePhoto[]
 
   @@unique([agencyId, plateNumber])
   @@index([agencyId, status])
-  @@index([category, status])
+  @@index([categoryId, status])
+  @@index([brand])
   @@map("vehicles")
+}
+
+/// Photo d'un véhicule, stockée dans le bucket public en deux tailles (WebP).
+model VehiclePhoto {
+  id         String   @id @default(cuid())
+  vehicleId  String   @map("vehicle_id")
+  /// Préfixe des objets du bucket : « <préfixe>/lg.webp » et « <préfixe>/sm.webp ».
+  storageKey String   @unique @map("storage_key")
+  /// Ordre d'affichage ; la plus petite position est la couverture.
+  position   Int
+  width      Int
+  height     Int
+  sizeBytes  Int      @map("size_bytes")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  vehicle Vehicle @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+
+  @@index([vehicleId, position])
+  @@map("vehicle_photos")
 }
 
 /// Réservation d'un véhicule. Le prix est figé à la création ; aucun paiement en ligne.
@@ -424,6 +522,8 @@ model Booking {
   review         Review?
 
   @@index([agencyId, status])
+  @@index([agencyId, pickupAt])
+  @@index([agencyId, createdAt])
   @@index([vehicleId, pickupAt])
   @@index([customerId, createdAt])
   @@map("bookings")

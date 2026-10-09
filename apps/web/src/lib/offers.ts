@@ -12,6 +12,8 @@ const offerSearchResultSchema = z.object({
 
 export interface OfferQuery {
   location: string | null;
+  /** Code du gouvernorat, pris en compte quand aucun lieu n'est choisi. */
+  governorate: string | null;
   pickup: string | null;
   dropoff: string | null;
 }
@@ -21,6 +23,8 @@ export async function fetchOffers(query: OfferQuery): Promise<OfferSearchResult 
   const params = new URLSearchParams();
   if (query.location !== null) {
     params.set('location', query.location);
+  } else if (query.governorate !== null) {
+    params.set('governorate', query.governorate);
   }
   if (query.pickup !== null && query.dropoff !== null) {
     params.set('pickup', query.pickup);

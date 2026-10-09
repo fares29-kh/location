@@ -4,12 +4,7 @@ import type { BookingEvent } from './agency-portal';
 import { type BookingStatus, type PaymentMethod, rentalDays } from './booking';
 import { type DayKey, tunisDateTime } from './dates';
 import type { LocalizedText } from './location';
-import {
-  type FuelType,
-  type Transmission,
-  type VehicleCategory,
-  vehicleCategorySchema,
-} from './vehicle';
+import { type FuelType, slugSchema, type Transmission, type VehiclePhoto } from './vehicle';
 
 const dayKeySchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, { message: 'INVALID_DATE' });
 
@@ -38,9 +33,16 @@ export function rentalWindow(pickup: DayKey, dropoff: DayKey) {
 export const offerSearchSchema = z.object({
   /** Slug d'un lieu (aéroport, ville...) ; vide = toute la Tunisie. */
   location: z.string().trim().max(80).optional().catch(undefined),
+  /** Code d'un gouvernorat, utilisé quand aucun lieu précis n'est choisi. */
+  governorate: z
+    .string()
+    .regex(/^\d{2}$/)
+    .optional()
+    .catch(undefined),
   pickup: dayKeySchema.optional().catch(undefined),
   return: dayKeySchema.optional().catch(undefined),
-  category: vehicleCategorySchema.optional().catch(undefined),
+  /** Slug d'une catégorie. */
+  category: slugSchema.optional().catch(undefined),
 });
 
 export type OfferSearch = z.infer<typeof offerSearchSchema>;
@@ -48,6 +50,8 @@ export type OfferSearch = z.infer<typeof offerSearchSchema>;
 export interface OfferAgency {
   id: string;
   name: string;
+  /** URL publique du logo, `null` sans logo. */
+  logoUrl: string | null;
   governorateCode: string;
   address: string;
   /** Note moyenne sur 5, `null` sans avis. */
@@ -64,12 +68,15 @@ export interface Offer {
   brand: string;
   model: string;
   year: number;
-  category: VehicleCategory;
+  /** Slug de la catégorie. */
+  category: string;
   transmission: Transmission;
   fuel: FuelType;
   seats: number;
   airConditioning: boolean;
   color: string;
+  /** Dans l'ordre choisi par l'agence ; la première est la couverture. */
+  photos: VehiclePhoto[];
   dailyRateMillimes: number;
   depositMillimes: number;
   /** `null` : kilométrage illimité. */
@@ -81,6 +88,62 @@ export interface OfferSearchResult {
   offers: Offer[];
   /** Nombre de jours facturés si les deux dates sont fournies. */
   days: number | null;
+}
+
+// --- Annuaire public des agences --------------------------------------------------
+
+/** Agence active telle qu'affichée sur la carte publique du réseau. */
+export const publicAgencySchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  /** URL publique du logo, `null` sans logo. */
+  logoUrl: z.string().nullable(),
+  governorateCode: z.string(),
+  address: z.string(),
+  description: z.string(),
+  phone: z.string(),
+  whatsappPhone: z.string(),
+  /** Note moyenne sur 5, `null` sans avis. */
+  rating: z.number().min(0).max(5).nullable(),
+  reviewsCount: z.number().int().min(0),
+  vehiclesCount: z.number().int().min(0),
+  /** Tarif journalier le plus bas de la flotte active, `null` sans véhicule. */
+  fromDailyRateMillimes: z.number().int().min(0).nullable(),
+  /** Slugs des catégories de la flotte active, dans l'ordre du référentiel. */
+  categories: z.array(z.string()),
+  instantConfirmation: z.boolean(),
+  freeCancellationHours: z.number().int().min(0),
+  /** Les agences n'ont pas d'adresse géocodée : position du chef-lieu de leur gouvernorat. */
+  latitude: z.number().min(-90).max(90),
+  longitude: z.number().min(-180).max(180),
+});
+
+export type PublicAgency = z.infer<typeof publicAgencySchema>;
+
+export interface GeoPoint {
+  latitude: number;
+  longitude: number;
+}
+
+const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5));
+/** Écart entre deux agences voisines, environ 1 km. */
+const SPREAD_STEP_DEGREES = 0.009;
+
+/**
+ * Position du n-ième point autour d'un même centre, en spirale à angle d'or, pour que les
+ * agences d'une même ville ne se superposent pas sur la carte ; l'index 0 reste au centre.
+ */
+export function spreadAround(center: GeoPoint, index: number): GeoPoint {
+  if (index <= 0) {
+    return center;
+  }
+  const radius = SPREAD_STEP_DEGREES * Math.sqrt(index);
+  const angle = index * GOLDEN_ANGLE;
+  const longitudeScale = Math.cos((center.latitude * Math.PI) / 180);
+  return {
+    latitude: Number((center.latitude + radius * Math.sin(angle)).toFixed(5)),
+    longitude: Number((center.longitude + (radius * Math.cos(angle)) / longitudeScale).toFixed(5)),
+  };
 }
 
 // --- Réservations du client -----------------------------------------------------
@@ -131,13 +194,15 @@ export interface CustomerBooking {
   vehicle: {
     brand: string;
     model: string;
-    category: VehicleCategory;
+    /** Slug de la catégorie. */
+    category: string;
     transmission: Transmission;
     seats: number;
     color: string;
   };
   agency: {
     name: string;
+    logoUrl: string | null;
     phone: string;
     whatsappPhone: string;
     address: string;

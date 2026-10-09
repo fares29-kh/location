@@ -6,6 +6,7 @@ import type {
   RecordPaymentInput,
   RentalConditions,
   VehicleInput,
+  VehiclePhoto,
   VehicleStatus,
 } from '@drivetn/types';
 import {
@@ -24,8 +25,10 @@ import type {
   BookingView,
   CustomerQuery,
   PaymentQuery,
-  ReviewFilter,
+  ReviewQuery,
+  VehicleView,
 } from './types';
+import { type PhotoDraft, photoOrderToApply, planPhotoChanges } from './vehicle-photos';
 
 export const agencyKeys = {
   all: ['agency'] as const,
@@ -40,7 +43,7 @@ export const agencyKeys = {
   customerList: (query: CustomerQuery) => [...agencyKeys.customers(), 'list', query] as const,
   customer: (id: string) => [...agencyKeys.customers(), 'detail', id] as const,
   payments: (query: PaymentQuery) => [...agencyKeys.all, 'payments', query] as const,
-  reviews: (filter: ReviewFilter) => [...agencyKeys.all, 'reviews', filter] as const,
+  reviews: (query: ReviewQuery) => [...agencyKeys.all, 'reviews', query] as const,
   settings: () => [...agencyKeys.all, 'settings'] as const,
 };
 
@@ -109,12 +112,71 @@ export function useVehicles() {
   return useQuery({ queryKey: agencyKeys.vehicles(), queryFn: () => agencyApi.listVehicles() });
 }
 
+export interface SaveVehicleVariables {
+  id: string | null;
+  input: VehicleInput;
+  /** Photos telles qu'éditées ; omis pour ne pas y toucher. */
+  photos?: PhotoDraft[];
+  initialPhotos?: VehiclePhoto[];
+  onPhotoProgress?: (done: number, total: number) => void;
+}
+
+export interface SaveVehicleResult {
+  vehicle: VehicleView;
+  /** Opérations photo échouées alors que le véhicule, lui, est enregistré. */
+  photoFailures: number;
+}
+
+async function syncVehiclePhotos(
+  vehicleId: string,
+  { photos, initialPhotos = [], onPhotoProgress }: SaveVehicleVariables,
+): Promise<number> {
+  if (photos === undefined) {
+    return 0;
+  }
+  const plan = planPhotoChanges(initialPhotos, photos);
+  const settled = await Promise.allSettled(
+    plan.removedIds.map((photoId) => agencyApi.deleteVehiclePhoto(vehicleId, photoId)),
+  );
+  let failures = settled.filter((result) => result.status === 'rejected').length;
+
+  const uploaded = new Map<string, string>();
+  for (const [index, draft] of plan.uploads.entries()) {
+    onPhotoProgress?.(index, plan.uploads.length);
+    try {
+      const photo = await agencyApi.uploadVehiclePhoto(vehicleId, draft.file);
+      uploaded.set(draft.key, photo.id);
+    } catch {
+      failures += 1;
+    }
+  }
+  onPhotoProgress?.(plan.uploads.length, plan.uploads.length);
+
+  const order = failures === 0 ? photoOrderToApply(initialPhotos, photos, uploaded) : null;
+  if (order !== null) {
+    try {
+      await agencyApi.reorderVehiclePhotos(vehicleId, order);
+    } catch {
+      failures += 1;
+    }
+  }
+  return failures;
+}
+
+/** Enregistre le véhicule puis synchronise ses photos (suppressions, envois, ordre). */
 export function useSaveVehicle() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, input }: { id: string | null; input: VehicleInput }) =>
-      id === null ? agencyApi.createVehicle(input) : agencyApi.updateVehicle(id, input),
-    onSuccess: () => invalidateAgency(queryClient),
+    mutationFn: async (variables: SaveVehicleVariables): Promise<SaveVehicleResult> => {
+      const { id, input } = variables;
+      const vehicle =
+        id === null
+          ? await agencyApi.createVehicle(input)
+          : await agencyApi.updateVehicle(id, input);
+      const photoFailures = await syncVehiclePhotos(vehicle.id, variables);
+      return { vehicle, photoFailures };
+    },
+    onSettled: () => invalidateAgency(queryClient),
   });
 }
 
@@ -151,10 +213,10 @@ export function usePayments(query: PaymentQuery) {
   });
 }
 
-export function useReviews(filter: ReviewFilter) {
+export function useReviews(query: ReviewQuery) {
   return useQuery({
-    queryKey: agencyKeys.reviews(filter),
-    queryFn: () => agencyApi.listReviews(filter),
+    queryKey: agencyKeys.reviews(query),
+    queryFn: () => agencyApi.listReviews(query),
     placeholderData: keepPreviousData,
   });
 }
@@ -188,4 +250,12 @@ export function useUpdateProfile() {
 
 export function useUpdateConditions() {
   return useSettingsMutation((input: RentalConditions) => agencyApi.updateConditions(input));
+}
+
+export function useUploadLogo() {
+  return useSettingsMutation((file: File) => agencyApi.uploadLogo(file));
+}
+
+export function useRemoveLogo() {
+  return useSettingsMutation<undefined>(() => agencyApi.removeLogo());
 }

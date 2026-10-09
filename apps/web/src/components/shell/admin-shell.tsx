@@ -5,11 +5,13 @@ import {
   Building2,
   CalendarCheck,
   LayoutDashboard,
+  MapPinned,
   MessageSquareWarning,
   Palette,
   ReceiptText,
   ScrollText,
   Settings,
+  Tags,
   Users,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
@@ -71,6 +73,14 @@ export function AdminShell({
           count: flaggedReviews,
           countLabel: t('flaggedReviews', { count: flaggedReviews }),
         },
+      ],
+    },
+    {
+      id: 'referentials',
+      title: t('referentials'),
+      items: [
+        { id: 'catalog', label: t('catalog'), icon: Tags, href: '/catalog' },
+        { id: 'geography', label: t('geography'), icon: MapPinned, href: '/geography' },
       ],
     },
     {

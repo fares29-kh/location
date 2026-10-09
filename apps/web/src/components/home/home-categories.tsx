@@ -1,20 +1,25 @@
+import { pickLocalized, type VehicleCategoryInfo } from '@drivetn/types';
 import { Button } from '@drivetn/ui/button';
 import { cn } from '@drivetn/ui/lib/cn';
 import { Money } from '@drivetn/ui/money';
 import { ArrowRight, Briefcase, CarFront, Users } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
-import { CATEGORY_GRADIENTS, SAMPLE_OFFERS, VEHICLE_CATEGORIES } from '@/components/search/catalog';
+import { categoryGradient, SAMPLE_OFFERS } from '@/components/search/catalog';
 import { buildSearchHref } from '@/components/search/search-href';
 import { Link } from '@/i18n/navigation';
 
 import { SectionHeading } from './section-heading';
 
-export function HomeCategories() {
+/** Catégories de l'administration ; les repères (places, prix) viennent des modèles d'illustration. */
+export function HomeCategories({ categories }: { categories: readonly VehicleCategoryInfo[] }) {
   const t = useTranslations('client.home.categories');
-  const tCatalog = useTranslations('client.catalog');
   const locale = useLocale();
   const list = new Intl.ListFormat(locale, { style: 'long', type: 'conjunction' });
+
+  if (categories.length === 0) {
+    return null;
+  }
 
   return (
     <section
@@ -30,11 +35,13 @@ export function HomeCategories() {
         />
 
         <ul className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-5">
-          {VEHICLE_CATEGORIES.map((category) => {
+          {categories.map(({ slug: category, name, description }) => {
             const offers = SAMPLE_OFFERS.filter((offer) => offer.category === category);
+            const hasSamples = offers.length > 0;
             const seats = Math.max(...offers.map((offer) => offer.seats));
             const bags = Math.max(...offers.map((offer) => offer.bags));
             const fromPrice = Math.min(...offers.map((offer) => offer.pricePerDayMillimes));
+            const hint = pickLocalized(description, locale);
             return (
               <li key={category} className="reveal grid">
                 <Link
@@ -44,7 +51,7 @@ export function HomeCategories() {
                   <div
                     className={cn(
                       'relative flex h-28 items-center justify-between gap-4 overflow-hidden bg-gradient-to-br px-6',
-                      CATEGORY_GRADIENTS[category],
+                      categoryGradient(category),
                     )}
                   >
                     <div
@@ -52,7 +59,7 @@ export function HomeCategories() {
                       className="absolute inset-0 bg-[radial-gradient(circle_at_15%_0%,rgb(255_255_255/0.3),transparent_60%)]"
                     />
                     <h3 className="relative text-xl font-bold text-white">
-                      {tCatalog(`categories.${category}`)}
+                      {pickLocalized(name, locale)}
                     </h3>
                     <CarFront
                       aria-hidden="true"
@@ -61,30 +68,40 @@ export function HomeCategories() {
                     />
                   </div>
                   <div className="flex flex-1 flex-col gap-3 p-5">
-                    <p className="text-sm text-muted-foreground">{tCatalog(`hints.${category}`)}</p>
-                    <ul className="flex flex-wrap gap-x-4 gap-y-1 text-sm font-medium">
-                      <li className="flex items-center gap-1.5">
-                        <Users className="size-4 text-primary" aria-hidden="true" />
-                        {t('seats', { count: seats })}
-                      </li>
-                      <li className="flex items-center gap-1.5">
-                        <Briefcase className="size-4 text-primary" aria-hidden="true" />
-                        {t('bags', { count: bags })}
-                      </li>
-                    </ul>
-                    <p className="text-xs text-muted-foreground">
-                      {t('examples', { models: list.format(offers.map((offer) => offer.model)) })}
-                    </p>
+                    {hint.length > 0 && <p className="text-sm text-muted-foreground">{hint}</p>}
+                    {hasSamples && (
+                      <>
+                        <ul className="flex flex-wrap gap-x-4 gap-y-1 text-sm font-medium">
+                          <li className="flex items-center gap-1.5">
+                            <Users className="size-4 text-primary" aria-hidden="true" />
+                            {t('seats', { count: seats })}
+                          </li>
+                          <li className="flex items-center gap-1.5">
+                            <Briefcase className="size-4 text-primary" aria-hidden="true" />
+                            {t('bags', { count: bags })}
+                          </li>
+                        </ul>
+                        <p className="text-xs text-muted-foreground">
+                          {t('examples', {
+                            models: list.format(offers.map((offer) => offer.model)),
+                          })}
+                        </p>
+                      </>
+                    )}
                     <div className="mt-auto flex flex-wrap items-end justify-between gap-x-4 gap-y-2 border-t border-border pt-4">
-                      <p className="flex items-baseline gap-1 text-sm text-muted-foreground">
-                        {t('from')}
-                        <Money
-                          millimes={fromPrice}
-                          locale={locale}
-                          className="font-heading text-lg font-extrabold text-foreground"
-                        />
-                        {t('perDay')}
-                      </p>
+                      {hasSamples ? (
+                        <p className="flex items-baseline gap-1 text-sm text-muted-foreground">
+                          {t('from')}
+                          <Money
+                            millimes={fromPrice}
+                            locale={locale}
+                            className="font-heading text-lg font-extrabold text-foreground"
+                          />
+                          {t('perDay')}
+                        </p>
+                      ) : (
+                        <span />
+                      )}
                       <span className="flex items-center gap-1.5 text-sm font-semibold text-primary">
                         {t('explore')}
                         <ArrowRight

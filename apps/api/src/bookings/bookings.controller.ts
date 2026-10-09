@@ -7,6 +7,7 @@ import {
   type OfferSearch,
   offerSearchSchema,
   type OfferSearchResult,
+  type PublicAgency,
 } from '@drivetn/types';
 import { Body, Controller, Get, Header, Param, Post, Query, Req } from '@nestjs/common';
 import { ApiCookieAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -16,8 +17,23 @@ import type { AuthenticatedUser } from '../common/auth/authenticated-user';
 import { CurrentUser, Public, Roles } from '../common/auth/decorators';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
 import { RateLimit } from '../rate-limit/rate-limit.decorator';
+import { AgencyDirectoryService } from './agency-directory.service';
 import { CustomerBookingsService } from './customer-bookings.service';
 import { OffersService } from './offers.service';
+
+@ApiTags('agencies')
+@Public()
+@Controller({ path: 'agencies', version: '1' })
+export class AgencyDirectoryController {
+  constructor(private readonly directory: AgencyDirectoryService) {}
+
+  @Get()
+  @Header('Cache-Control', 'public, max-age=300')
+  @ApiOperation({ summary: 'Agences actives et leur position sur la carte du réseau' })
+  list(): Promise<PublicAgency[]> {
+    return this.directory.list();
+  }
+}
 
 @ApiTags('offers')
 @Public()

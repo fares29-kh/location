@@ -18,6 +18,9 @@ export const agencyProfileSchema = z.object({
 export type AgencyProfileInput = z.input<typeof agencyProfileSchema>;
 export type AgencyProfile = z.output<typeof agencyProfileSchema>;
 
+/** Logo de l'agence : JPG, PNG ou WebP (mêmes formats que les photos de véhicules). */
+export const AGENCY_LOGO_MAX_BYTES = 5 * 1024 * 1024;
+
 export const DRIVER_AGE_MIN = 18;
 export const DRIVER_AGE_MAX = 30;
 export const LICENSE_YEARS_MAX = 10;

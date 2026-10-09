@@ -18,6 +18,7 @@ import { Skeleton } from '@drivetn/ui/skeleton';
 import { toast } from '@drivetn/ui/toaster';
 import {
   CalendarRange,
+  Camera,
   CarFront,
   Cog,
   Fuel,
@@ -30,9 +31,11 @@ import {
 import { useTranslations } from 'next-intl';
 import { useCallback, useState } from 'react';
 
+import { useCategoryLabel } from '@/components/vehicle-categories';
 import { Link } from '@/i18n/navigation';
 import { useVehicles, useVehicleStatus } from '@/lib/agency/queries';
 import type { Vehicle, VehicleView } from '@/lib/agency/types';
+import { vehicleCoverUrl } from '@/lib/agency/vehicle-photos';
 
 import { FilterTabs } from '../filter-tabs';
 import { PageHeader } from '../page-header';
@@ -69,7 +72,7 @@ function matchesSearch(vehicle: VehicleView, search: string): boolean {
   const needle = normalize(search);
   return (
     needle.length === 0 ||
-    normalize(`${vehicle.brand}${vehicle.model}${vehicle.plateNumber}`).includes(needle)
+    normalize(`${vehicle.brand}${vehicle.model}${vehicle.plateNumber ?? ''}`).includes(needle)
   );
 }
 
@@ -169,6 +172,7 @@ function VehicleCard({
 }) {
   const t = useTranslations('agency.fleet');
   const format = useAgencyFormat();
+  const categoryLabel = useCategoryLabel();
   const availability = availabilityOf(vehicle);
   const booking = vehicle.currentBooking ?? vehicle.nextBooking;
   const specs = [
@@ -181,17 +185,31 @@ function VehicleCard({
   return (
     <Card className="group flex flex-col overflow-hidden p-0 transition-shadow hover:shadow-elevated">
       <div className="relative">
-        <VehicleThumb color={vehicle.color} size="lg" className="rounded-none" />
+        <VehicleThumb
+          color={vehicle.color}
+          photoUrl={vehicleCoverUrl(vehicle)}
+          size="lg"
+          className="h-40 rounded-none"
+        />
         <VehicleAvailabilityTag
           availability={availability}
           className="absolute start-3 top-3 shadow-sm"
         />
-        <span
-          className="absolute bottom-3 end-3 rounded-md bg-surface/90 px-2 py-0.5 font-mono text-xs font-semibold tracking-wide text-foreground shadow-sm backdrop-blur"
-          dir="ltr"
-        >
-          {vehicle.plateNumber}
-        </span>
+        {vehicle.photos.length > 1 && (
+          <span className="absolute bottom-3 start-3 inline-flex items-center gap-1 rounded-md bg-black/60 px-2 py-0.5 text-xs font-medium tabular-nums text-white backdrop-blur">
+            <Camera className="size-3.5" aria-hidden="true" />
+            <span className="sr-only">{t('photoCount', { count: vehicle.photos.length })}</span>
+            <span aria-hidden="true">{vehicle.photos.length}</span>
+          </span>
+        )}
+        {vehicle.plateNumber !== null && (
+          <span
+            className="absolute bottom-3 end-3 rounded-md bg-surface/90 px-2 py-0.5 font-mono text-xs font-semibold tracking-wide text-foreground shadow-sm backdrop-blur"
+            dir="ltr"
+          >
+            {vehicle.plateNumber}
+          </span>
+        )}
       </div>
 
       <div className="flex flex-1 flex-col gap-4 p-4">
@@ -201,7 +219,7 @@ function VehicleCard({
               {vehicle.brand} {vehicle.model}
             </h3>
             <p className="text-sm text-muted-foreground">
-              {t(`categories.${vehicle.category}`)} ·{' '}
+              {categoryLabel(vehicle.category)} ·{' '}
               <span className="tabular-nums">{vehicle.year}</span>
             </p>
           </div>

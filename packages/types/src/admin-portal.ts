@@ -148,7 +148,7 @@ export interface PlatformBooking {
   paymentStatus: PaymentStatus;
   agency: AgencyRef;
   customer: PersonRef;
-  vehicle: { brand: string; model: string; plateNumber: string };
+  vehicle: { brand: string; model: string; plateNumber: string | null };
   pickupAt: string;
   returnAt: string;
   pickupLocation: string;
@@ -319,6 +319,9 @@ export const AUDIT_ACTIONS = [
   'review.published',
   'review.hidden',
   'settings.updated',
+  'referential.created',
+  'referential.updated',
+  'referential.deleted',
 ] as const;
 export type AuditAction = (typeof AUDIT_ACTIONS)[number];
 
@@ -335,6 +338,7 @@ export const AUDIT_CATEGORIES = [
   'invoice',
   'review',
   'settings',
+  'referential',
 ] as const;
 export type AuditCategory = (typeof AUDIT_CATEGORIES)[number];
 

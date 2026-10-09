@@ -25,7 +25,15 @@ describe('parseEnv', () => {
       COOKIE_SECURE: false,
       MESSAGING_PROVIDER: 'console',
       SEED_DEMO_ACCOUNTS: false,
+      S3_BUCKET_PUBLIC: 'drivetn-public',
+      MEDIA_PUBLIC_URL: '/media',
     });
+    expect(env.S3_ENDPOINT).toBeUndefined();
+  });
+
+  it('retire la barre finale de l’URL publique des médias', () => {
+    const env = parseEnv({ ...validSource, MEDIA_PUBLIC_URL: 'https://cdn.example.tn/media/' });
+    expect(env.MEDIA_PUBLIC_URL).toBe('https://cdn.example.tn/media');
   });
 
   it('convertit les types', () => {

@@ -11,13 +11,15 @@ import { getServerEnv } from '@/env';
 const LOCATIONS_TIMEOUT_MS = 3_000;
 const LOCATIONS_REVALIDATE_SECONDS = 600;
 
-async function fetchReference<T extends z.ZodType>(
+/** Liste d'un référentiel public (mise en cache par Next.js) ; vide si l'API est injoignable. */
+export async function fetchReference<T extends z.ZodType>(
   path: string,
   schema: T,
+  revalidateSeconds = LOCATIONS_REVALIDATE_SECONDS,
 ): Promise<z.output<T>[]> {
   try {
     const response = await fetch(`${getServerEnv().API_INTERNAL_URL}/api/v1${path}`, {
-      next: { revalidate: LOCATIONS_REVALIDATE_SECONDS },
+      next: { revalidate: revalidateSeconds },
       signal: AbortSignal.timeout(LOCATIONS_TIMEOUT_MS),
     });
     if (!response.ok) {

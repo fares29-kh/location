@@ -20,31 +20,36 @@ import {
   RotateCcw,
   SearchX,
   SlidersHorizontal,
+  X,
 } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
-import { useEffect, useId, useMemo, useState } from 'react';
+import { useCallback, useEffect, useId, useMemo, useState } from 'react';
 
 import { PageHero } from '@/components/client/page-hero';
+import { useCategoryLabel, useVehicleCategories } from '@/components/vehicle-categories';
 import { Link, useRouter } from '@/i18n/navigation';
-
+import { ActiveFilters, activeFilterKey, useActiveFilterLabel } from './active-filters';
 import { BookingDialog } from './booking-dialog';
 import {
+  brandGroups,
   countActiveFilters,
   DEFAULT_FILTERS,
   filterOffers,
+  listActiveFilters,
   type OfferFilters,
+  removeFilter,
   type RentalDates,
   rentalDays,
   type SearchOffer,
   SORT_OPTIONS,
   type SortOption,
   sortOffers,
-  VEHICLE_CATEGORIES,
   type VehicleCategory,
+  writeSearchFilters,
 } from './catalog';
 import { OfferCard } from './offer-card';
-import { SearchFilters } from './search-filters';
-import { type LocationOption, SearchForm } from './search-form';
+import { type CountWith, SearchFilters } from './search-filters';
+import { type GovernorateOption, type LocationOption, SearchForm } from './search-form';
 
 function formatDate(value: string, locale: string): string {
   const date = new Date(`${value}T00:00:00Z`);
@@ -59,20 +64,26 @@ function formatDate(value: string, locale: string): string {
 
 export function SearchView({
   locationOptions,
+  governorateOptions,
+  initialGovernorate,
   initialLocation,
   initialPickup,
   initialReturn,
-  initialCategory,
+  initialFilters,
+  initialSort,
   initialBooking,
   offers,
   dates,
   signedIn,
 }: {
   locationOptions: readonly LocationOption[];
+  governorateOptions: readonly GovernorateOption[];
+  initialGovernorate: string | null;
   initialLocation: string | null;
   initialPickup: string | null;
   initialReturn: string | null;
-  initialCategory: VehicleCategory | null;
+  initialFilters: OfferFilters;
+  initialSort: SortOption;
   /** Offre à rouvrir après la connexion (paramètre `book`). */
   initialBooking: string | null;
   /** `null` si la recherche n'a pas pu joindre l'API. */
@@ -82,16 +93,15 @@ export function SearchView({
   signedIn: boolean;
 }) {
   const t = useTranslations('client.search');
-  const tCatalog = useTranslations('client.catalog');
+  const categories = useVehicleCategories();
+  const categoryLabel = useCategoryLabel();
   const tCommon = useTranslations('common');
   const locale = useLocale();
   const router = useRouter();
   const id = useId();
-  const [filters, setFilters] = useState<OfferFilters>({
-    ...DEFAULT_FILTERS,
-    categories: initialCategory === null ? [] : [initialCategory],
-  });
-  const [sort, setSort] = useState<SortOption>('recommended');
+  const filterLabel = useActiveFilterLabel();
+  const [filters, setFilters] = useState<OfferFilters>(initialFilters);
+  const [sort, setSort] = useState<SortOption>(initialSort);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [booking, setBooking] = useState<SearchOffer | null>(() =>
     signedIn ? (offers?.find((offer) => offer.id === initialBooking) ?? null) : null,
@@ -105,26 +115,50 @@ export function SearchView({
     }
   }, []);
 
-  const locationLabel =
-    locationOptions.find((option) => option.value === initialLocation)?.label ?? null;
+  // Les filtres vivent dans l'URL (partage, retour arrière, reprise après connexion) sans
+  // relancer la recherche côté serveur ; `offers` resynchronise après une nouvelle recherche.
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    writeSearchFilters(url.searchParams, filters, sort);
+    url.search = url.searchParams.toString().replaceAll('%2C', ',');
+    if (url.href !== window.location.href) {
+      window.history.replaceState(window.history.state, '', url);
+    }
+  }, [filters, sort, offers]);
+
+  const placeLabel =
+    locationOptions.find((option) => option.value === initialLocation)?.label ??
+    governorateOptions.find((option) => option.code === initialGovernorate)?.label ??
+    null;
   const days = dates === null ? null : rentalDays(dates.pickup, dates.dropoff);
   const activeFilters = countActiveFilters(filters);
   const available = useMemo(() => offers ?? [], [offers]);
+  const brands = useMemo(() => brandGroups(available), [available]);
 
   const results = useMemo(
     () => sortOffers(filterOffers(available, filters), sort),
     [available, filters, sort],
   );
 
-  const categoryCounts = useMemo(() => {
-    const withoutCategory = filterOffers(available, { ...filters, categories: [] });
-    return Object.fromEntries(
-      VEHICLE_CATEGORIES.map((category) => [
-        category,
-        withoutCategory.filter((offer) => offer.category === category).length,
-      ]),
-    ) as Record<VehicleCategory, number>;
-  }, [available, filters]);
+  const countWith = useCallback<CountWith>(
+    (patch) => filterOffers(available, { ...filters, ...patch }).length,
+    [available, filters],
+  );
+
+  const suggestions = useMemo(
+    () =>
+      results.length > 0
+        ? []
+        : listActiveFilters(filters)
+            .map((filter) => ({
+              filter,
+              count: filterOffers(available, removeFilter(filters, filter)).length,
+            }))
+            .filter((suggestion) => suggestion.count > 0)
+            .sort((a, b) => b.count - a.count)
+            .slice(0, 3),
+    [available, filters, results.length],
+  );
 
   const startBooking = (offer: SearchOffer) => {
     if (signedIn) {
@@ -160,6 +194,8 @@ export function SearchView({
       >
         <SearchForm
           options={locationOptions}
+          governorates={governorateOptions}
+          initialGovernorate={initialGovernorate}
           initialLocation={initialLocation}
           initialPickup={initialPickup}
           initialReturn={initialReturn}
@@ -168,7 +204,7 @@ export function SearchView({
 
       <div className="container grid gap-6 py-8 sm:py-10 lg:grid-cols-[17rem_minmax(0,1fr)] lg:gap-8">
         <aside aria-labelledby={`${id}-filters`} className="hidden lg:block">
-          <div className="sticky top-24 grid gap-4 rounded-panel border border-border bg-surface p-5 shadow-soft">
+          <div className="sticky top-24 grid max-h-[calc(100dvh-7rem)] gap-4 overflow-y-auto overscroll-contain rounded-panel border border-border bg-surface p-5 shadow-soft">
             <div className="flex items-center justify-between gap-2">
               <h2 id={`${id}-filters`} className="flex items-center gap-2 text-base font-bold">
                 <SlidersHorizontal className="size-4 text-primary" aria-hidden="true" />
@@ -183,7 +219,8 @@ export function SearchView({
             <SearchFilters
               filters={filters}
               onChange={setFilters}
-              categoryCounts={categoryCounts}
+              countWith={countWith}
+              brands={brands}
             />
           </div>
         </aside>
@@ -199,13 +236,22 @@ export function SearchView({
 
           <div className="flex flex-wrap items-center gap-3">
             <div className="grid min-w-0 flex-1 gap-1">
-              <h2 id={`${id}-results`} aria-live="polite" className="text-xl font-bold">
+              <h2
+                id={`${id}-results`}
+                aria-live="polite"
+                className="flex flex-wrap items-baseline gap-x-2 text-xl font-bold"
+              >
                 {t('results', { count: results.length })}
+                {activeFilters > 0 && available.length > 0 && (
+                  <span className="text-sm font-medium text-muted-foreground">
+                    {t('filteredFrom', { total: available.length })}
+                  </span>
+                )}
               </h2>
               <p className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
                 <span className="flex items-center gap-1.5">
                   <MapPin className="size-4 text-primary" aria-hidden="true" />
-                  {locationLabel ?? t('summary.anywhere')}
+                  {placeLabel ?? t('summary.anywhere')}
                 </span>
                 <span className="flex items-center gap-1.5">
                   <CalendarDays className="size-4 text-primary" aria-hidden="true" />
@@ -240,10 +286,11 @@ export function SearchView({
                 <SearchFilters
                   filters={filters}
                   onChange={setFilters}
-                  categoryCounts={categoryCounts}
+                  countWith={countWith}
+                  brands={brands}
                 />
-                <div className="sticky bottom-0 grid grid-cols-2 gap-2 border-t border-border bg-surface pt-4">
-                  <Button variant="secondary" onClick={resetFilters}>
+                <div className="sticky -bottom-[max(1.5rem,env(safe-area-inset-bottom))] -mx-6 -mb-[max(1.5rem,env(safe-area-inset-bottom))] grid grid-cols-2 gap-2 border-t border-border bg-surface px-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-4">
+                  <Button variant="secondary" onClick={resetFilters} disabled={activeFilters === 0}>
                     <RotateCcw aria-hidden="true" />
                     {t('filters.reset')}
                   </Button>
@@ -285,30 +332,36 @@ export function SearchView({
             aria-label={t('filters.quickLabel')}
             className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:px-0"
           >
-            {VEHICLE_CATEGORIES.map((category) => {
+            {categories.map(({ slug: category }) => {
               const active = filters.categories.includes(category);
+              const count = countWith({ categories: [category] });
               return (
                 <li key={category} className="shrink-0">
                   <button
                     type="button"
                     aria-pressed={active}
+                    disabled={count === 0 && !active}
                     onClick={() => {
                       toggleQuickCategory(category);
                     }}
                     className={cn(
-                      'h-9 rounded-full border px-4 text-sm font-medium transition-colors',
+                      'inline-flex h-9 items-center gap-2 rounded-full border px-4 text-sm font-medium transition-colors',
                       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                      'disabled:cursor-not-allowed disabled:opacity-50',
                       active
                         ? 'border-primary bg-primary-soft text-primary-soft-foreground'
-                        : 'border-border bg-surface text-muted-foreground hover:border-primary/40 hover:text-foreground',
+                        : 'border-border bg-surface text-muted-foreground enabled:hover:border-primary/40 enabled:hover:text-foreground',
                     )}
                   >
-                    {tCatalog(`categories.${category}`)}
+                    {categoryLabel(category)}
+                    <span className="text-xs tabular-nums opacity-70">{count}</span>
                   </button>
                 </li>
               );
             })}
           </ul>
+
+          <ActiveFilters filters={filters} onChange={setFilters} onReset={resetFilters} />
 
           {results.length > 0 ? (
             <ul className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
@@ -327,7 +380,7 @@ export function SearchView({
                 className="bg-surface py-16"
                 action={
                   <Button asChild variant="secondary">
-                    <Link href="/search">
+                    <Link href="/search" onClick={resetFilters}>
                       <RotateCcw aria-hidden="true" />
                       {t('noOffers.action')}
                     </Link>
@@ -342,10 +395,36 @@ export function SearchView({
               description={t('empty.text')}
               className="bg-surface py-16"
               action={
-                <Button variant="secondary" onClick={resetFilters}>
-                  <RotateCcw aria-hidden="true" />
-                  {t('empty.action')}
-                </Button>
+                <div className="grid justify-items-center gap-5">
+                  {suggestions.length > 0 && (
+                    <div className="grid justify-items-center gap-2">
+                      <p className="text-sm font-medium">{t('empty.tryWithout')}</p>
+                      <ul className="flex flex-wrap justify-center gap-2">
+                        {suggestions.map(({ filter, count }) => (
+                          <li key={activeFilterKey(filter)}>
+                            <Button
+                              variant="secondary"
+                              size="sm"
+                              onClick={() => {
+                                setFilters(removeFilter(filters, filter));
+                              }}
+                            >
+                              <X aria-hidden="true" />
+                              {filterLabel(filter)}
+                              <span className="text-xs font-semibold tabular-nums text-success">
+                                {t('empty.more', { count })}
+                              </span>
+                            </Button>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  <Button variant="link" size="sm" onClick={resetFilters}>
+                    <RotateCcw aria-hidden="true" />
+                    {t('empty.action')}
+                  </Button>
+                </div>
               }
             />
           )}

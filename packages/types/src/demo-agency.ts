@@ -12,30 +12,29 @@ import { rentalPriceMillimes } from './catalog';
 import { addDays, type DayKey, todayKey, tunisDateTime } from './dates';
 import type { LocalizedText } from './location';
 import { createRandom, type Random } from './random';
-import type { VehicleCategory } from './vehicle';
 
 const VEHICLE_SPECS: readonly Omit<
   Vehicle,
-  'id' | 'createdAt' | 'plateNumber' | 'status' | 'mileageKm'
+  'id' | 'createdAt' | 'plateNumber' | 'status' | 'mileageKm' | 'photos'
 >[] = [
-  vehicle('Kia', 'Picanto', 2023, 'ECONOMY', 'MANUAL', 'PETROL', 4, 70, 300, '#E11D48'),
-  vehicle('Hyundai', 'Grand i10', 2024, 'ECONOMY', 'MANUAL', 'PETROL', 5, 75, 300, '#F8FAFC'),
-  vehicle('Renault', 'Clio 5', 2023, 'COMPACT', 'MANUAL', 'DIESEL', 5, 95, 500, '#2563EB'),
-  vehicle('Peugeot', '208', 2024, 'COMPACT', 'AUTOMATIC', 'PETROL', 5, 110, 500, '#F59E0B'),
-  vehicle('Volkswagen', 'Polo', 2022, 'COMPACT', 'MANUAL', 'PETROL', 5, 95, 500, '#64748B'),
-  vehicle('Seat', 'Ibiza', 2023, 'COMPACT', 'MANUAL', 'PETROL', 5, 90, 500, '#DC2626'),
-  vehicle('Dacia', 'Logan', 2024, 'SEDAN', 'MANUAL', 'DIESEL', 5, 85, 400, '#E2E8F0'),
-  vehicle('Hyundai', 'Accent', 2023, 'SEDAN', 'AUTOMATIC', 'PETROL', 5, 120, 600, '#0F172A'),
-  vehicle('Peugeot', '301', 2022, 'SEDAN', 'MANUAL', 'DIESEL', 5, 100, 500, '#94A3B8'),
-  vehicle('Dacia', 'Duster', 2024, 'SUV', 'MANUAL', 'DIESEL', 5, 150, 800, '#B45309'),
-  vehicle('Hyundai', 'Tucson', 2023, 'SUV', 'AUTOMATIC', 'HYBRID', 5, 210, 1000, '#1E3A8A'),
-  vehicle('Peugeot', '3008', 2024, 'SUV', 'AUTOMATIC', 'DIESEL', 5, 230, 1200, '#334155'),
-  vehicle('Dacia', 'Jogger', 2023, 'MINIVAN', 'MANUAL', 'PETROL', 7, 160, 800, '#059669'),
+  vehicle('Kia', 'Picanto', 2023, 'city', 'MANUAL', 'PETROL', 4, 70, 300, '#E11D48'),
+  vehicle('Hyundai', 'Grand i10', 2024, 'city', 'MANUAL', 'PETROL', 5, 75, 300, '#F8FAFC'),
+  vehicle('Renault', 'Clio 5', 2023, 'compact', 'MANUAL', 'DIESEL', 5, 95, 500, '#2563EB'),
+  vehicle('Peugeot', '208', 2024, 'compact', 'AUTOMATIC', 'PETROL', 5, 110, 500, '#F59E0B'),
+  vehicle('Volkswagen', 'Polo', 2022, 'compact', 'MANUAL', 'PETROL', 5, 95, 500, '#64748B'),
+  vehicle('Seat', 'Ibiza', 2023, 'compact', 'MANUAL', 'PETROL', 5, 90, 500, '#DC2626'),
+  vehicle('Dacia', 'Logan', 2024, 'sedan', 'MANUAL', 'DIESEL', 5, 85, 400, '#E2E8F0'),
+  vehicle('Hyundai', 'Accent', 2023, 'sedan', 'AUTOMATIC', 'PETROL', 5, 120, 600, '#0F172A'),
+  vehicle('Peugeot', '301', 2022, 'sedan', 'MANUAL', 'DIESEL', 5, 100, 500, '#94A3B8'),
+  vehicle('Dacia', 'Duster', 2024, 'suv', 'MANUAL', 'DIESEL', 5, 150, 800, '#B45309'),
+  vehicle('Hyundai', 'Tucson', 2023, 'suv', 'AUTOMATIC', 'HYBRID', 5, 210, 1000, '#1E3A8A'),
+  vehicle('Peugeot', '3008', 2024, 'suv', 'AUTOMATIC', 'DIESEL', 5, 230, 1200, '#334155'),
+  vehicle('Dacia', 'Jogger', 2023, 'family', 'MANUAL', 'PETROL', 7, 160, 800, '#059669'),
   vehicle(
     'Mercedes-Benz',
     'Classe C',
     2023,
-    'LUXURY',
+    'premium',
     'AUTOMATIC',
     'DIESEL',
     5,
@@ -49,7 +48,8 @@ function vehicle(
   brand: string,
   model: string,
   year: number,
-  category: VehicleCategory,
+  /** Slug d'une des catégories d'origine du référentiel. */
+  category: string,
   transmission: Vehicle['transmission'],
   fuel: Vehicle['fuel'],
   seats: number,
@@ -69,7 +69,7 @@ function vehicle(
     airConditioning: true,
     dailyRateMillimes: dailyRateDinars * 1000,
     depositMillimes: depositDinars * 1000,
-    mileageLimitKm: category === 'LUXURY' ? 250 : null,
+    mileageLimitKm: category === 'premium' ? 250 : null,
   };
 }
 
@@ -241,6 +241,7 @@ export function createAgencyDataset(now: Date = new Date()): AgencyDataset {
     ...spec,
     id: `veh_${String(index + 1).padStart(2, '0')}`,
     plateNumber: plate(random),
+    photos: [],
     status: index === 9 ? 'MAINTENANCE' : index === 6 ? 'INACTIVE' : 'ACTIVE',
     mileageKm: random.int(8_000, 95_000),
     createdAt: tunisDateTime(addDays(historyStart, -random.int(10, 200)), 10).toISOString(),
@@ -571,6 +572,7 @@ export function createAgencyDataset(now: Date = new Date()): AgencyDataset {
         instantConfirmation: false,
         acceptedPaymentMethods: ['CASH', 'CARD_TPE', 'BANK_TRANSFER'],
       },
+      logoUrl: null,
     },
   };
 }

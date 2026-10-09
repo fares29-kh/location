@@ -29,6 +29,8 @@ import { SearchField } from '../search-field';
 import { BookingStatusTag, PaymentStatusTag } from '../status-tags';
 import { useAgencyFormat } from '../use-agency-format';
 import { useUrlState } from '../use-url-state';
+import { vehicleCoverUrl } from '@/lib/agency/vehicle-photos';
+
 import { VehicleThumb } from '../vehicle-thumb';
 
 const URL_DEFAULTS = { filter: 'all', q: '', sort: 'pickup_desc', page: '1' };
@@ -94,14 +96,19 @@ function BookingsTable({ bookings }: { bookings: BookingView[] }) {
             </TableCell>
             <TableCell>
               <span className="flex items-center gap-3">
-                <VehicleThumb color={booking.vehicle.color} />
+                <VehicleThumb
+                  color={booking.vehicle.color}
+                  photoUrl={vehicleCoverUrl(booking.vehicle)}
+                />
                 <span className="grid">
                   <span className="whitespace-nowrap font-medium">
                     {booking.vehicle.brand} {booking.vehicle.model}
                   </span>
-                  <span className="whitespace-nowrap text-xs text-muted-foreground tabular-nums">
-                    {booking.vehicle.plateNumber}
-                  </span>
+                  {booking.vehicle.plateNumber !== null && (
+                    <span className="whitespace-nowrap text-xs text-muted-foreground tabular-nums">
+                      {booking.vehicle.plateNumber}
+                    </span>
+                  )}
                 </span>
               </span>
             </TableCell>

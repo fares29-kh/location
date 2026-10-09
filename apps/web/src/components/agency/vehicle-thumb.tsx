@@ -18,13 +18,15 @@ const SIZES = {
   lg: 'h-32 w-full rounded-card [&_svg]:size-14',
 } as const;
 
-/** Vignette d'un véhicule, teintée de sa couleur de carrosserie (en attendant les photos). */
+/** Vignette d'un véhicule : sa photo de couverture, sinon un aplat de sa couleur de carrosserie. */
 export function VehicleThumb({
   color,
+  photoUrl,
   size = 'sm',
   className,
 }: {
   color: string;
+  photoUrl?: string | null;
   size?: keyof typeof SIZES;
   className?: string;
 }) {
@@ -45,6 +47,16 @@ export function VehicleThumb({
       }}
     >
       <CarFront strokeWidth={1.75} />
+      {photoUrl !== undefined && photoUrl !== null && (
+        // eslint-disable-next-line @next/next/no-img-element -- médias déjà redimensionnés en WebP
+        <img
+          src={photoUrl}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          className="absolute inset-0 size-full object-cover"
+        />
+      )}
     </span>
   );
 }

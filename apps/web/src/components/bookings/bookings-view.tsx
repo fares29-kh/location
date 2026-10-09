@@ -41,6 +41,7 @@ import {
 import { useLocale, useTranslations } from 'next-intl';
 import { useState } from 'react';
 
+import { AgencyLogo } from '@/components/agencies/agency-logo';
 import { PageHero } from '@/components/client/page-hero';
 import { Link } from '@/i18n/navigation';
 import { ApiError } from '@/lib/api/errors';
@@ -206,7 +207,15 @@ function BookingCard({
       <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border bg-surface-muted/30 px-5 py-4">
         <div className="grid min-w-0 gap-0.5 text-sm">
           <p className="flex items-center gap-2 font-medium">
-            <Building2 className="size-4 shrink-0 text-primary" aria-hidden="true" />
+            {booking.agency.logoUrl === null ? (
+              <Building2 className="size-4 shrink-0 text-primary" aria-hidden="true" />
+            ) : (
+              <AgencyLogo
+                name={booking.agency.name}
+                logoUrl={booking.agency.logoUrl}
+                className="size-7 rounded-md p-0.5 ring-1 ring-border"
+              />
+            )}
             <span className="truncate">{booking.agency.name}</span>
           </p>
           {booking.agency.address.length > 0 && (

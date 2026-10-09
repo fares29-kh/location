@@ -20,7 +20,7 @@ import {
   tunisDateTime,
 } from '@/lib/agency/dates';
 import { usePlanning } from '@/lib/agency/queries';
-import type { BookingView, PlanningData, Vehicle } from '@/lib/agency/types';
+import type { PlanningBooking, PlanningData, Vehicle } from '@/lib/agency/types';
 
 import { FilterTabs } from '../filter-tabs';
 import { PageHeader } from '../page-header';
@@ -29,6 +29,8 @@ import { QueryError } from '../query-states';
 import { type AgencyFormat, useAgencyFormat } from '../use-agency-format';
 import { useNow } from '../use-now';
 import { useUrlState } from '../use-url-state';
+import { vehicleCoverUrl } from '@/lib/agency/vehicle-photos';
+
 import { VehicleThumb } from '../vehicle-thumb';
 
 const SPANS = ['7', '14', '30'] as const;
@@ -64,7 +66,7 @@ interface Range {
   end: number;
 }
 
-function clampToRange(booking: BookingView, range: Range) {
+function clampToRange(booking: PlanningBooking, range: Range) {
   const pickup = new Date(booking.pickupAt).getTime();
   const dropoff = new Date(booking.returnAt).getTime();
   const start = Math.max(pickup, range.start);
@@ -77,7 +79,7 @@ function BookingBar({
   range,
   format,
 }: {
-  booking: BookingView;
+  booking: PlanningBooking;
   range: Range;
   format: AgencyFormat;
 }) {
@@ -126,7 +128,7 @@ function BookingBar({
   );
 }
 
-function plannedRate(vehicle: Vehicle, bookings: BookingView[], range: Range): number {
+function plannedRate(vehicle: Vehicle, bookings: PlanningBooking[], range: Range): number {
   const busy = bookings
     .filter(
       (booking) => booking.vehicleId === vehicle.id && PLANNED_STATUSES.includes(booking.status),
@@ -226,13 +228,18 @@ function Timeline({
                 role="rowheader"
                 className="sticky start-0 z-10 flex items-center gap-3 border-b border-border bg-surface px-4 py-3 group-last:border-b-0"
               >
-                <VehicleThumb color={vehicle.color} className="hidden sm:flex" />
+                <VehicleThumb
+                  color={vehicle.color}
+                  photoUrl={vehicleCoverUrl(vehicle)}
+                  className="hidden sm:flex"
+                />
                 <span className="grid min-w-0">
                   <span className="truncate text-sm font-medium">
                     {vehicle.brand} {vehicle.model}
                   </span>
                   <span className="truncate text-xs text-muted-foreground tabular-nums">
-                    {vehicle.plateNumber} · {t('fillRate', { value: format.percent(rate) })}
+                    {vehicle.plateNumber !== null && `${vehicle.plateNumber} · `}
+                    {t('fillRate', { value: format.percent(rate) })}
                   </span>
                 </span>
               </span>

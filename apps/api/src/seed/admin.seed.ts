@@ -25,11 +25,11 @@ import type {
   ReviewReportReason,
   SubscriptionPlan,
   Transmission,
-  VehicleCategory,
 } from '@prisma/client';
 
 import type { AuditEntityType } from '../audit/audit.service';
 import { invoiceNumber } from '../platform/invoicing.service';
+import { categoryIdsBySlug } from './categories';
 
 const DAY_MS = 86_400_000;
 const HOUR_MS = 3_600_000;
@@ -142,7 +142,8 @@ export const PARTNER_AGENCIES: readonly PartnerSpec[] = [
 interface FleetModel {
   brand: string;
   model: string;
-  category: VehicleCategory;
+  /** Slug d'une catégorie créée par la migration du référentiel. */
+  category: string;
   transmission: Transmission;
   fuel: FuelType;
   seats: number;
@@ -155,7 +156,7 @@ const FLEET: readonly FleetModel[] = [
   {
     brand: 'Kia',
     model: 'Picanto',
-    category: 'ECONOMY',
+    category: 'city',
     transmission: 'MANUAL',
     fuel: 'PETROL',
     seats: 4,
@@ -166,7 +167,7 @@ const FLEET: readonly FleetModel[] = [
   {
     brand: 'Renault',
     model: 'Clio 5',
-    category: 'COMPACT',
+    category: 'compact',
     transmission: 'MANUAL',
     fuel: 'DIESEL',
     seats: 5,
@@ -177,7 +178,7 @@ const FLEET: readonly FleetModel[] = [
   {
     brand: 'Hyundai',
     model: 'Tucson',
-    category: 'SUV',
+    category: 'suv',
     transmission: 'AUTOMATIC',
     fuel: 'DIESEL',
     seats: 5,
@@ -557,17 +558,19 @@ async function seedActivity(
   },
 ): Promise<number> {
   const { agencyId, agencyIndex, governorate, approvedAt, active, now } = context;
+  const categoryIds = await categoryIdsBySlug(tx);
   const vehicles = [];
-  for (const model of FLEET) {
+  for (const { category, ...model } of FLEET) {
     vehicles.push(
       await tx.vehicle.create({
         data: {
           agencyId,
           ...model,
+          categoryId: categoryIds(category),
           year: random.int(2021, 2025),
           plateNumber: `${String(random.int(180, 260))} TU ${String(random.int(1000, 9999))}`,
           airConditioning: true,
-          mileageLimitKm: model.category === 'SUV' ? null : 300,
+          mileageLimitKm: category === 'suv' ? null : 300,
           mileageKm: random.int(8_000, 90_000),
           createdAt: approvedAt,
         },
