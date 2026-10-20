@@ -13,11 +13,10 @@ x-logging: &logging
 
 services:
   traefik:
-    image: traefik:v3.5
+    # 3.5 fige l'API Docker 1.24, refusée par Docker 29 : aucun routeur, certificat par défaut.
+    # 3.7 négocie l'API et demande Let's Encrypt (renouvelé tout seul, stocké dans traefik_certs).
+    image: traefik:v3.7.15
     restart: unless-stopped
-    # Docker 29 refuse l'API 1.24 négociée par défaut. 1.44 est acceptée.
-    environment:
-      DOCKER_API_VERSION: '1.44'
     security_opt: ['no-new-privileges:true']
     mem_limit: 128m
     cpus: '0.25'
@@ -34,6 +33,9 @@ services:
       - --entrypoints.web.http.redirections.entrypoint.to=websecure
       - --entrypoints.web.http.redirections.entrypoint.scheme=https
       - --entrypoints.websecure.address=:443
+      - --entrypoints.websecure.http.tls.certresolver=le
+      - --entrypoints.websecure.http.tls.domains[0].main=${APP_DOMAIN:?APP_DOMAIN manquant}
+      - --entrypoints.websecure.http.tls.domains[0].sans=app.${APP_DOMAIN},agency.${APP_DOMAIN},admin.${APP_DOMAIN}
       - --certificatesresolvers.le.acme.email=${ACME_EMAIL:?ACME_EMAIL manquant}
       - --certificatesresolvers.le.acme.storage=/letsencrypt/acme.json
       - --certificatesresolvers.le.acme.httpchallenge.entrypoint=web
