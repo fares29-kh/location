@@ -5,7 +5,7 @@
   "description": "DriveTN - plateforme SaaS multi-tenant de location de voitures pour le marché tunisien",
   "packageManager": "pnpm@9.15.9",
   "engines": {
-    "node": ">=20.17",
+    "node": ">=22",
     "pnpm": ">=9.15"
   },
   "scripts": {

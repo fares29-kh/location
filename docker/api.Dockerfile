@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.7
 # Image de l'API NestJS et du worker BullMQ (même image, point d'entrée différent).
 
-ARG NODE_VERSION=20
+ARG NODE_VERSION=22
 ARG PNPM_VERSION=9.15.9
 
 FROM node:${NODE_VERSION}-alpine AS base

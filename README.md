@@ -95,7 +95,7 @@ docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build --rene
 
 `--renew-anon-volumes` recrée les volumes `node_modules` des conteneurs quand les dépendances changent. Sous Windows et macOS, la détection des changements utilise le polling (les événements fichiers ne traversent pas les montages).
 
-Développement hors Docker (Node 20.17+ ou 22, pnpm 9) :
+Développement hors Docker (Node 22, pnpm 9) :
 
 ```bash
 pnpm install
@@ -182,7 +182,7 @@ flowchart LR
 - **Santé** : `GET /api/v1/health` vérifie PostgreSQL, Redis et le battement du worker. Le statut vaut `ok`, `degraded` (worker arrêté) ou `error` (HTTP 503, dépendance critique indisponible).
 - **Worker** : même image que l'API, point d'entrée `dist/worker.js`. Il exécute les files BullMQ `maintenance` (job planifié de battement) et `messaging` (envoi des codes OTP par SMS ou WhatsApp). Les rappels et expirations arriveront dans les phases suivantes.
 - **Lieux** : `GET /api/v1/locations/governorates` et `GET /api/v1/locations` (filtres par gouvernorat et type), publics et mis en cache dans Redis.
-- **Images** : multi-stage, finales en `node:20-alpine`, utilisateur non-root `node`. L'image API ne contient que `dist/`, le schéma Prisma et les dépendances de production (`pnpm deploy --prod`).
+- **Images** : multi-stage, finales en `node:22-alpine`, utilisateur non-root `node`. L'image API ne contient que `dist/`, le schéma Prisma et les dépendances de production (`pnpm deploy --prod`).
 - **Données** : volumes nommés `pgdata`, `redisdata` et `miniodata`.
 
 ### Authentification et rôles
@@ -232,7 +232,7 @@ pnpm check     # codegen + lint + format + typecheck + tests
 - **`next build` / `next dev` hors Docker sous Windows** : le plugin `next-intl` charge `@swc/core` 1.16, qui copie son binaire natif dans `%LOCALAPPDATA%\swc`. Si les droits NTFS de ce dossier sont incorrects, le chargement échoue (« Failed to load native binding »). Utilisez Docker (`make dev`), ou corrigez les droits de `%LOCALAPPDATA%\swc` (propriétaire et contrôle total pour votre compte). Linux, macOS et la CI ne sont pas concernés.
 - **Pas de middleware `next-intl`** : un seul middleware résout portail et langue, puis transmet la langue au rendu serveur via l'en-tête interne `x-drivetn-locale`.
 - **Polices auto-hébergées** via `next/font` (aucune requête vers Google côté navigateur).
-- **`@node-rs/argon2` plutôt que `argon2`** : le paquet `argon2` n'a pas de binaire chargeable sur `node:20-alpine` et tente une compilation `node-gyp` sans Python. `@node-rs/argon2` fournit des binaires précompilés (dont musl).
+- **`@node-rs/argon2` plutôt que `argon2`** : le paquet `argon2` n'a pas de binaire chargeable sur `node:22-alpine` et tente une compilation `node-gyp` sans Python. `@node-rs/argon2` fournit des binaires précompilés (dont musl).
 - **Refresh token opaque plutôt que JWT** : il est stocké haché en base, ce qui permet la rotation, la révocation d'une famille de sessions en cas de réutilisation et la déconnexion de tous les appareils.
 - **Paramètres plateforme** : le modèle `PlatformSetting` stocke la TVA (19 %), le timbre fiscal (1 DT) et la commission par défaut. Les taux sont en points de base, les montants en millimes.
 

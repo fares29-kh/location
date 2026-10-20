@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.7
 # Image du front Next.js (les 3 portails sont servis par la même application).
 
-ARG NODE_VERSION=20
+ARG NODE_VERSION=22
 ARG PNPM_VERSION=9.15.9
 
 FROM node:${NODE_VERSION}-alpine AS base
