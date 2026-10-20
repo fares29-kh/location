@@ -19,6 +19,7 @@ test-results/
 .env
 .env.*
 !.env.example
+!.env.azure.example
 k8s.env
 
 # Logs
