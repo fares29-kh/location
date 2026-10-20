@@ -6,6 +6,7 @@ import type {
   RecordPaymentInput,
   RentalConditions,
   VehicleInput,
+  VehicleMaintenanceInput,
   VehiclePhoto,
   VehicleStatus,
 } from '@drivetn/types';
@@ -185,6 +186,24 @@ export function useVehicleStatus() {
   return useMutation({
     mutationFn: ({ id, status }: { id: string; status: VehicleStatus }) =>
       agencyApi.setVehicleStatus(id, status),
+    onSuccess: () => invalidateAgency(queryClient),
+  });
+}
+
+export function useAddMaintenance() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ vehicleId, input }: { vehicleId: string; input: VehicleMaintenanceInput }) =>
+      agencyApi.addMaintenance(vehicleId, input),
+    onSuccess: () => invalidateAgency(queryClient),
+  });
+}
+
+export function useRemoveMaintenance() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ vehicleId, maintenanceId }: { vehicleId: string; maintenanceId: string }) =>
+      agencyApi.removeMaintenance(vehicleId, maintenanceId),
     onSuccess: () => invalidateAgency(queryClient),
   });
 }

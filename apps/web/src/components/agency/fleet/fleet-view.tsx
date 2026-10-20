@@ -1,21 +1,16 @@
 'use client';
 
-import { VEHICLE_STATUSES, type VehicleStatus } from '@drivetn/types';
 import { Button } from '@drivetn/ui/button';
 import { Card } from '@drivetn/ui/card';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@drivetn/ui/dropdown-menu';
 import { EmptyState } from '@drivetn/ui/empty-state';
 import { Skeleton } from '@drivetn/ui/skeleton';
-import { toast } from '@drivetn/ui/toaster';
 import {
   CalendarRange,
   Camera,
@@ -33,7 +28,7 @@ import { useCallback, useState } from 'react';
 
 import { useCategoryLabel } from '@/components/vehicle-categories';
 import { Link } from '@/i18n/navigation';
-import { useVehicles, useVehicleStatus } from '@/lib/agency/queries';
+import { useVehicles } from '@/lib/agency/queries';
 import type { Vehicle, VehicleView } from '@/lib/agency/types';
 import { vehicleCoverUrl } from '@/lib/agency/vehicle-photos';
 
@@ -44,6 +39,8 @@ import { SearchField } from '../search-field';
 import { type VehicleAvailability, VehicleAvailabilityTag } from '../status-tags';
 import { useAgencyFormat } from '../use-agency-format';
 import { useUrlState } from '../use-url-state';
+import { matchesVehicleSearch } from '../vehicle-search';
+import { VehicleStatusItems } from '../vehicle-status-items';
 import { VehicleThumb } from '../vehicle-thumb';
 import { VehicleFormSheet } from './vehicle-form-sheet';
 
@@ -58,22 +55,6 @@ function isValidParam(key: keyof typeof URL_DEFAULTS, value: string): boolean {
 
 function availabilityOf(vehicle: VehicleView): VehicleAvailability {
   return vehicle.currentBooking === null ? vehicle.status : 'ON_RENT';
-}
-
-function normalize(value: string): string {
-  return value
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/\s+/g, '')
-    .toLowerCase();
-}
-
-function matchesSearch(vehicle: VehicleView, search: string): boolean {
-  const needle = normalize(search);
-  return (
-    needle.length === 0 ||
-    normalize(`${vehicle.brand}${vehicle.model}${vehicle.plateNumber ?? ''}`).includes(needle)
-  );
 }
 
 function OccupancyMeter({ rate }: { rate: number }) {
@@ -104,8 +85,6 @@ function OccupancyMeter({ rate }: { rate: number }) {
 
 function VehicleStatusMenu({ vehicle }: { vehicle: VehicleView }) {
   const t = useTranslations('agency.fleet');
-  const mutation = useVehicleStatus();
-  const onRent = vehicle.currentBooking !== null;
 
   return (
     <DropdownMenu>
@@ -119,38 +98,11 @@ function VehicleStatusMenu({ vehicle }: { vehicle: VehicleView }) {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-60">
-        <DropdownMenuLabel>{t('statusMenu.title')}</DropdownMenuLabel>
-        <DropdownMenuRadioGroup
-          value={vehicle.status}
-          onValueChange={(value) => {
-            const status = VEHICLE_STATUSES.find((candidate) => candidate === value);
-            if (status === undefined || status === vehicle.status) {
-              return;
-            }
-            mutation.mutate(
-              { id: vehicle.id, status },
-              {
-                onSuccess: () => toast.success(t(`statusMenu.success.${status}`)),
-                onError: () => toast.error(t('statusMenu.error')),
-              },
-            );
-          }}
-        >
-          {VEHICLE_STATUSES.map((status: VehicleStatus) => (
-            <DropdownMenuRadioItem
-              key={status}
-              value={status}
-              disabled={onRent || mutation.isPending}
-            >
-              {t(`statusMenu.options.${status}`)}
-            </DropdownMenuRadioItem>
-          ))}
-        </DropdownMenuRadioGroup>
-        {onRent && (
-          <p className="px-2 pb-2 pt-1 text-xs text-muted-foreground">
-            {t('statusMenu.onRentHint')}
-          </p>
-        )}
+        <VehicleStatusItems
+          vehicleId={vehicle.id}
+          status={vehicle.status}
+          onRent={vehicle.currentBooking !== null}
+        />
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
           <Link href="/calendar">
@@ -333,7 +285,7 @@ export function FleetView() {
     [setParams],
   );
 
-  const searched = (data ?? []).filter((vehicle) => matchesSearch(vehicle, params.q));
+  const searched = (data ?? []).filter((vehicle) => matchesVehicleSearch(vehicle, params.q));
   const counts = Object.fromEntries(
     FLEET_FILTERS.map((value) => [
       value,

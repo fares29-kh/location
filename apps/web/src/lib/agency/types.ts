@@ -32,5 +32,6 @@ export {
   type ReviewList,
   type ReviewQuery,
   type Vehicle,
+  type VehicleMaintenance,
   type VehicleView,
 } from '@drivetn/types';

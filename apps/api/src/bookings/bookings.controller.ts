@@ -28,7 +28,7 @@ export class AgencyDirectoryController {
   constructor(private readonly directory: AgencyDirectoryService) {}
 
   @Get()
-  @Header('Cache-Control', 'public, max-age=300')
+  @Header('Cache-Control', 'no-store')
   @ApiOperation({ summary: 'Agences actives et leur position sur la carte du réseau' })
   list(): Promise<PublicAgency[]> {
     return this.directory.list();

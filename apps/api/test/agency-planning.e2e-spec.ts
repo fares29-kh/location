@@ -1,4 +1,4 @@
-import type { BookingStatus, BookingView, PlanningData } from '@drivetn/types';
+import type { BookingStatus, BookingView, PlanningData, VehicleMaintenance } from '@drivetn/types';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
 import {
@@ -296,5 +296,50 @@ describe.skipIf(!e2eEnabled)('Portail agence : planning (e2e)', () => {
     expect(data.bookings.some((booking) => booking.id === 'b_inside')).toBe(false);
     expect(data.vehicles.some((vehicle) => vehicle.id === 'b_v1')).toBe(false);
     await asA.get('/bookings/b_inside').expect(404);
+  });
+
+  it('planifie un entretien sur des jours libres, refuse les chevauchements et le supprime', async () => {
+    const created = body<VehicleMaintenance>(
+      await asA
+        .post('/vehicles/a_inside_v/maintenances')
+        .send({ from: '2026-12-06', to: '2026-12-07', note: ' Vidange ' })
+        .expect(201),
+    );
+    expect(created).toMatchObject({
+      vehicleId: 'a_inside_v',
+      from: '2026-12-06',
+      to: '2026-12-07',
+      note: 'Vidange',
+    });
+    expect((await planning(`?from=${FROM}&to=${TO}`)).maintenances).toEqual([created]);
+    expect((await planning('?from=2026-12-08&days=3')).maintenances).toEqual([]);
+
+    // La location a_inside est rendue le 5 en milieu de journée.
+    const withBooking = await asA
+      .post('/vehicles/a_inside_v/maintenances')
+      .send({ from: '2026-12-05', to: '2026-12-05' })
+      .expect(409);
+    expect(withBooking.body).toMatchObject({
+      code: 'CONFLICT',
+      details: { reason: 'BOOKINGS_OVERLAP', bookings: [{ id: 'a_inside' }] },
+    });
+    await asA
+      .post('/vehicles/a_inside_v/maintenances')
+      .send({ from: '2026-12-07', to: '2026-12-09' })
+      .expect(409);
+
+    const inverted = await asA
+      .post('/vehicles/a_inside_v/maintenances')
+      .send({ from: '2026-12-09', to: '2026-12-08' })
+      .expect(400);
+    expect(inverted.body).toMatchObject({ details: [{ path: 'to', message: 'END_BEFORE_START' }] });
+    await asA
+      .post('/vehicles/b_v1/maintenances')
+      .send({ from: '2026-12-10', to: '2026-12-10' })
+      .expect(404);
+
+    await asA.delete(`/vehicles/a_inside_v/maintenances/${created.id}`).expect(204);
+    await asA.delete(`/vehicles/a_inside_v/maintenances/${created.id}`).expect(404);
+    expect((await planning(`?from=${FROM}&to=${TO}`)).maintenances).toEqual([]);
   });
 });

@@ -463,8 +463,9 @@ model Vehicle {
 
   agency   Agency          @relation(fields: [agencyId], references: [id], onDelete: Cascade)
   category VehicleCategory @relation(fields: [categoryId], references: [id], onDelete: Restrict)
-  bookings Booking[]
-  photos   VehiclePhoto[]
+  bookings     Booking[]
+  photos       VehiclePhoto[]
+  maintenances VehicleMaintenance[]
 
   @@unique([agencyId, plateNumber])
   @@index([agencyId, status])
@@ -490,6 +491,22 @@ model VehiclePhoto {
 
   @@index([vehicleId, position])
   @@map("vehicle_photos")
+}
+
+/// Entretien planifié : le véhicule n'est ni réservable ni proposé aux clients sur ces jours.
+/// Bornes [startsAt, endsAt[ à minuit, heure de Tunis.
+model VehicleMaintenance {
+  id        String   @id @default(cuid())
+  vehicleId String   @map("vehicle_id")
+  startsAt  DateTime @map("starts_at")
+  endsAt    DateTime @map("ends_at")
+  note      String   @default("")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  vehicle Vehicle @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+
+  @@index([vehicleId, startsAt])
+  @@map("vehicle_maintenances")
 }
 
 /// Réservation d'un véhicule. Le prix est figé à la création ; aucun paiement en ligne.

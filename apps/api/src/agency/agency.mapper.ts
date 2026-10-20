@@ -1,4 +1,5 @@
 import {
+  addDays,
   type AgencySettings,
   type BookingRef,
   type BookingView,
@@ -12,7 +13,9 @@ import {
   rentalDays,
   type Review,
   summarizePayments,
+  toDayKey,
   type Vehicle,
+  type VehicleMaintenance,
   type VehicleView,
 } from '@drivetn/types';
 import type { Prisma } from '@prisma/client';
@@ -165,6 +168,19 @@ export function toPlanningBooking(row: PlanningBookingRow): PlanningBooking {
     returnAt: row.returnAt.toISOString(),
     totalMillimes: row.totalMillimes,
     customer: row.customer,
+  };
+}
+
+/** Bornes [startsAt, endsAt[ à minuit (Tunis) → premier et dernier jour inclus. */
+export function toMaintenance(
+  row: Prisma.VehicleMaintenanceGetPayload<object>,
+): VehicleMaintenance {
+  return {
+    id: row.id,
+    vehicleId: row.vehicleId,
+    from: toDayKey(row.startsAt),
+    to: addDays(toDayKey(row.endsAt), -1),
+    note: row.note,
   };
 }
 

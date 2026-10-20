@@ -57,6 +57,9 @@ export class OffersService {
                 returnAt: { gt: window.pickupAt },
               },
             },
+            maintenances: {
+              none: { startsAt: { lt: window.returnAt }, endsAt: { gt: window.pickupAt } },
+            },
           }),
     };
 

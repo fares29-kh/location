@@ -126,12 +126,11 @@ function UnitInput({
   const message = validationMessage(form.formState.errors[name]?.message);
   return (
     <Field id={id} label={label} hint={hint} error={message}>
-      <div className="relative">
+      <div className="relative" dir="ltr">
         <Input
           {...controlProps(id, { error: message, hint })}
           inputMode="decimal"
-          dir="ltr"
-          className="pe-12 text-end tabular-nums rtl:text-start"
+          className="pe-12 text-end tabular-nums"
           {...form.register(name)}
         />
         <span className="pointer-events-none absolute inset-y-0 end-3 flex items-center text-sm text-muted-foreground">

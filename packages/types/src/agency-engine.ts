@@ -457,6 +457,7 @@ export function createAgencyQueries(data: AgencyDataset, now: Date = new Date())
               },
             };
           }),
+        maintenances: [],
       };
     },
 

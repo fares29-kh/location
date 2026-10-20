@@ -152,7 +152,10 @@ export class CustomerBookingsService {
               returnAt: { gt: pickupAt },
             },
           });
-          if (overlapping > 0) {
+          const maintenance = await tx.vehicleMaintenance.count({
+            where: { vehicleId: vehicle.id, startsAt: { lt: returnAt }, endsAt: { gt: pickupAt } },
+          });
+          if (overlapping > 0 || maintenance > 0) {
             throw unavailable();
           }
           const instant = vehicle.agency.instantConfirmation;

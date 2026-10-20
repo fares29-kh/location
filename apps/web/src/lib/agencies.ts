@@ -4,13 +4,15 @@ import { z } from 'zod';
 import { getServerEnv } from '@/env';
 
 const AGENCIES_TIMEOUT_MS = 3_000;
-const AGENCIES_REVALIDATE_SECONDS = 300;
 
-/** Agences actives de l'annuaire public ; `null` si l'API est injoignable. */
+/**
+ * Agences actives de l'annuaire public ; `null` si l'API est injoignable. Jamais mis en cache :
+ * un changement de nom, de logo ou de statut doit apparaître immédiatement.
+ */
 export async function fetchPublicAgencies(): Promise<PublicAgency[] | null> {
   try {
     const response = await fetch(`${getServerEnv().API_INTERNAL_URL}/api/v1/agencies`, {
-      next: { revalidate: AGENCIES_REVALIDATE_SECONDS },
+      cache: 'no-store',
       signal: AbortSignal.timeout(AGENCIES_TIMEOUT_MS),
     });
     if (!response.ok) {

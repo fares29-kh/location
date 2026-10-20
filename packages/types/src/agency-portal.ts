@@ -9,7 +9,7 @@ import {
   type PaymentMethod,
   type PaymentSummary,
 } from './booking';
-import { addDays, type DayKey, dayKeyToDate } from './dates';
+import { addDays, type DayKey, dayKeyToDate, diffInDays } from './dates';
 import type { LocalizedText } from './location';
 import {
   type VehicleInput,
@@ -184,13 +184,26 @@ export interface PlanningBooking {
   customer: Pick<Customer, 'id' | 'firstName' | 'lastName'>;
 }
 
-/** Fenêtre [from, to[ en jours de Tunis ; seules les réservations qui la chevauchent sont listées. */
+/** Entretien planifié, du premier au dernier jour inclus. */
+export interface VehicleMaintenance {
+  id: string;
+  vehicleId: string;
+  from: DayKey;
+  to: DayKey;
+  note: string;
+}
+
+/**
+ * Fenêtre [from, to[ en jours de Tunis ; seules les réservations et les entretiens qui la
+ * chevauchent sont listés.
+ */
 export interface PlanningData {
   from: DayKey;
   to: DayKey;
   days: number;
   vehicles: Vehicle[];
   bookings: PlanningBooking[];
+  maintenances: VehicleMaintenance[];
 }
 
 export interface CustomerQuery {
@@ -338,6 +351,31 @@ export const reviewReplySchema = z.object({
 });
 
 export const vehicleStatusInputSchema = z.object({ status: vehicleStatusSchema });
+
+export const MAINTENANCE_NOTE_MAX = 200;
+/** Un entretien planifié couvre au plus un an. */
+export const MAINTENANCE_DAYS_MAX = 366;
+
+/** Entretien du jour `from` au jour `to` inclus (jours de Tunis). */
+export const vehicleMaintenanceInputSchema = z
+  .object({
+    from: dayKeySchema,
+    to: dayKeySchema,
+    note: z
+      .string()
+      .trim()
+      .max(MAINTENANCE_NOTE_MAX, { message: 'TOO_LONG' })
+      .optional()
+      .default(''),
+  })
+  .refine((value) => value.to >= value.from, { path: ['to'], message: 'END_BEFORE_START' })
+  .refine((value) => diffInDays(value.from, value.to) < MAINTENANCE_DAYS_MAX, {
+    path: ['to'],
+    message: 'TOO_LONG',
+  });
+
+export type VehicleMaintenanceInput = z.input<typeof vehicleMaintenanceInputSchema>;
+export type VehicleMaintenanceRequest = z.output<typeof vehicleMaintenanceInputSchema>;
 
 export interface NavCounts {
   pendingBookings: number;

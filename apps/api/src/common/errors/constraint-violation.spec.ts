@@ -112,18 +112,18 @@ describe('violations de contraintes', () => {
     expect(normalizeException(clientError('23505', 'duplicate key')).status).toBe(500);
   });
 
-  it('associe chaque contrainte de la migration à un message', () => {
-    const migration = readFileSync(
-      join(
-        __dirname,
-        '../../../prisma/migrations/20261008060000_integrity_constraints/migration.sql',
+  it('associe chaque contrainte des migrations à un message', () => {
+    const migration = (name: string) =>
+      readFileSync(join(__dirname, `../../../prisma/migrations/${name}/migration.sql`), 'utf8');
+    const created = [
+      ...migration('20261008060000_integrity_constraints').matchAll(
+        /ADD CONSTRAINT "([a-z0-9_]+)"/g,
       ),
-      'utf8',
-    );
-    const created = [...migration.matchAll(/ADD CONSTRAINT "([a-z0-9_]+)"/g)].map(
-      (match) => match[1],
-    );
-    expect(created).toHaveLength(20);
+      ...migration('20261010010000_vehicle_maintenances').matchAll(
+        /CONSTRAINT "([a-z0-9_]+)"\s+(?:CHECK|EXCLUDE)/g,
+      ),
+    ].map((match) => match[1]);
+    expect(created).toHaveLength(22);
     expect(Object.keys(CONSTRAINT_MESSAGES).sort()).toEqual(created.sort());
   });
 });

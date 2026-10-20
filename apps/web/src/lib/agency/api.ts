@@ -4,6 +4,8 @@ import type {
   RecordPaymentInput,
   RentalConditions,
   VehicleInput,
+  VehicleMaintenance,
+  VehicleMaintenanceInput,
   VehiclePhoto,
   VehicleStatus,
 } from '@drivetn/types';
@@ -54,6 +56,8 @@ export interface AgencyApi {
   createVehicle(input: VehicleInput): Promise<VehicleView>;
   updateVehicle(id: string, input: VehicleInput): Promise<VehicleView>;
   setVehicleStatus(id: string, status: VehicleStatus): Promise<VehicleView>;
+  addMaintenance(vehicleId: string, input: VehicleMaintenanceInput): Promise<VehicleMaintenance>;
+  removeMaintenance(vehicleId: string, maintenanceId: string): Promise<void>;
   uploadVehiclePhoto(vehicleId: string, file: File): Promise<VehiclePhoto>;
   deleteVehiclePhoto(vehicleId: string, photoId: string): Promise<void>;
   reorderVehiclePhotos(vehicleId: string, photoIds: string[]): Promise<VehiclePhoto[]>;
@@ -130,6 +134,16 @@ function createHttpAgencyApi(): AgencyApi {
         method: 'PATCH',
         body: { status },
         schema: shape<VehicleView>(),
+      }),
+    addMaintenance: (vehicleId, input) =>
+      apiFetch(`/agency/vehicles/${segment(vehicleId)}/maintenances`, {
+        method: 'POST',
+        body: input,
+        schema: shape<VehicleMaintenance>(),
+      }),
+    removeMaintenance: (vehicleId, maintenanceId) =>
+      apiFetch(`/agency/vehicles/${segment(vehicleId)}/maintenances/${segment(maintenanceId)}`, {
+        method: 'DELETE',
       }),
     uploadVehiclePhoto: (vehicleId, file) => {
       const body = new FormData();

@@ -99,6 +99,14 @@ export const CONSTRAINT_MESSAGES: Readonly<Record<string, ConstraintRule>> = {
     code: 'CONFLICT',
     message: 'Le nombre de tentatives d’un code ne peut pas être négatif.',
   },
+  vehicle_maintenances_end_after_start_check: {
+    code: 'CONFLICT',
+    message: 'La fin de l’entretien doit être postérieure à son début.',
+  },
+  vehicle_maintenances_no_overlap: {
+    code: 'CONFLICT',
+    message: 'Un entretien est déjà planifié sur ces dates pour ce véhicule.',
+  },
 };
 
 const FALLBACK: Record<ConstraintViolation['sqlState'], ConstraintRule> = {

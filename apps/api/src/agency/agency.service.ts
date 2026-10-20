@@ -7,6 +7,7 @@ import {
   type AgencyProfile,
   type AgencySettings,
   applyBookingAction,
+  BLOCKING_BOOKING_STATUSES,
   BOOKING_FILTER_STATUSES,
   type BookingFilter,
   type BookingList,
@@ -33,7 +34,10 @@ import {
   type ReviewQuery,
   todayKey,
   toMonthKey,
+  tunisDateTime,
   type VehicleInput,
+  type VehicleMaintenance,
+  type VehicleMaintenanceRequest,
   type VehicleStatus,
   type VehicleView,
 } from '@drivetn/types';
@@ -53,6 +57,7 @@ import {
   toBookingView,
   toCustomer,
   toCustomerView,
+  toMaintenance,
   toPlanningBooking,
   toReview,
   toSettings,
@@ -502,7 +507,7 @@ export class AgencyService {
   /** Réservations qui chevauchent la fenêtre [start, end[ (minuits de Tunis), en version allégée. */
   async getPlanning(ownerId: string, window: PlanningWindow): Promise<PlanningData> {
     const agencyId = await this.agencyIdFor(ownerId);
-    const [vehicles, bookings] = await this.prisma.$transaction([
+    const [vehicles, bookings, maintenances] = await this.prisma.$transaction([
       this.prisma.vehicle.findMany({
         where: { agencyId, status: { not: 'INACTIVE' } },
         include: {
@@ -521,6 +526,14 @@ export class AgencyService {
         select: PLANNING_BOOKING_SELECT,
         orderBy: [{ pickupAt: 'asc' }, { id: 'asc' }],
       }),
+      this.prisma.vehicleMaintenance.findMany({
+        where: {
+          vehicle: { agencyId },
+          startsAt: { lt: window.end },
+          endsAt: { gt: window.start },
+        },
+        orderBy: [{ startsAt: 'asc' }, { id: 'asc' }],
+      }),
     ]);
     const publicUrl = this.publicUrl();
     return {
@@ -529,6 +542,7 @@ export class AgencyService {
       days: window.days,
       vehicles: vehicles.sort(byVehicleName).map((vehicle) => toVehicle(vehicle, publicUrl)),
       bookings: bookings.map(toPlanningBooking),
+      maintenances: maintenances.map(toMaintenance),
     };
   }
 
@@ -821,6 +835,60 @@ export class AgencyService {
     }
     await this.prisma.vehicle.update({ where: { id: vehicle.id }, data: { status } });
     return this.vehicleView(ownerId, vehicle.id);
+  }
+
+  /**
+   * Bloque le véhicule du premier au dernier jour inclus. Refusé si une demande ou une
+   * réservation active tombe sur ces jours : le verrou sur le véhicule, pris aussi par les
+   * réservations clients, empêche qu'une demande arrive entre la vérification et l'insertion.
+   */
+  async addMaintenance(
+    ownerId: string,
+    vehicleId: string,
+    input: VehicleMaintenanceRequest,
+  ): Promise<VehicleMaintenance> {
+    const vehicle = await this.ownedVehicle(ownerId, vehicleId);
+    const startsAt = tunisDateTime(input.from, 0);
+    const endsAt = tunisDateTime(addDays(input.to, 1), 0);
+    const maintenance = await this.prisma.$transaction(async (tx) => {
+      await tx.$queryRaw`SELECT id FROM vehicles WHERE id = ${vehicle.id} FOR UPDATE`;
+      const conflicts = await tx.booking.findMany({
+        where: {
+          vehicleId: vehicle.id,
+          status: { in: [...BLOCKING_BOOKING_STATUSES] },
+          pickupAt: { lt: endsAt },
+          returnAt: { gt: startsAt },
+        },
+        select: { id: true, reference: true },
+        orderBy: { pickupAt: 'asc' },
+      });
+      if (conflicts.length > 0) {
+        throw new AppException(
+          HttpStatus.CONFLICT,
+          'CONFLICT',
+          'Des réservations sont prévues sur ces dates : refusez-les ou déplacez l’entretien.',
+          { reason: 'BOOKINGS_OVERLAP', bookings: conflicts },
+        );
+      }
+      return tx.vehicleMaintenance.create({
+        data: { vehicleId: vehicle.id, startsAt, endsAt, note: input.note },
+      });
+    });
+    return toMaintenance(maintenance);
+  }
+
+  async removeMaintenance(
+    ownerId: string,
+    vehicleId: string,
+    maintenanceId: string,
+  ): Promise<void> {
+    const vehicle = await this.ownedVehicle(ownerId, vehicleId);
+    const { count } = await this.prisma.vehicleMaintenance.deleteMany({
+      where: { id: maintenanceId, vehicleId: vehicle.id },
+    });
+    if (count === 0) {
+      throw new NotFoundException('Entretien introuvable.');
+    }
   }
 
   // --- Avis et paramètres ---------------------------------------------------------

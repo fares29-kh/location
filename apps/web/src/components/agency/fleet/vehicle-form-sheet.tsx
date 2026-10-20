@@ -239,13 +239,12 @@ export function VehicleFormSheet({
         error={message}
         className={options.className}
       >
-        <div className="relative">
+        <div className="relative" dir={options.inputMode === undefined ? undefined : 'ltr'}>
           <Input
             {...controlProps(`${id}-${name}`, { error: message, hint: options.hint })}
             inputMode={options.inputMode}
             placeholder={options.placeholder}
             autoComplete="off"
-            dir={options.inputMode === undefined ? undefined : 'ltr'}
             className={cn(
               options.suffix !== undefined && 'pe-14',
               options.inputMode !== undefined && 'tabular-nums',

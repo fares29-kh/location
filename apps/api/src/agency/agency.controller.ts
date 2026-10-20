@@ -34,6 +34,9 @@ import {
   VEHICLE_PHOTO_MAX_BYTES,
   type VehicleInput,
   vehicleInputSchema,
+  type VehicleMaintenance,
+  vehicleMaintenanceInputSchema,
+  type VehicleMaintenanceRequest,
   type VehiclePhoto,
   type VehiclePhotoOrder,
   vehiclePhotoOrderSchema,
@@ -215,6 +218,27 @@ export class AgencyController {
     body: z.output<typeof vehicleStatusInputSchema>,
   ): Promise<VehicleView> {
     return this.agency.setVehicleStatus(user.id, id, body.status);
+  }
+
+  @Post('vehicles/:id/maintenances')
+  @ApiOperation({ summary: 'Planifier un entretien (jours inclus) ; 409 si des réservations' })
+  addMaintenance(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id') id: string,
+    @Body(new ZodValidationPipe(vehicleMaintenanceInputSchema)) body: VehicleMaintenanceRequest,
+  ): Promise<VehicleMaintenance> {
+    return this.agency.addMaintenance(user.id, id, body);
+  }
+
+  @Delete('vehicles/:id/maintenances/:maintenanceId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Supprimer un entretien planifié' })
+  removeMaintenance(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id') id: string,
+    @Param('maintenanceId') maintenanceId: string,
+  ): Promise<void> {
+    return this.agency.removeMaintenance(user.id, id, maintenanceId);
   }
 
   @Post('vehicles/:id/photos')

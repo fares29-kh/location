@@ -201,12 +201,11 @@ export function RecordPaymentDialog({
               hint={amountHint}
               error={amountError}
             >
-              <div className="relative">
+              <div className="relative" dir="ltr">
                 <Input
                   {...controlProps(`${id}-amount`, { error: amountError, hint: amountHint })}
                   inputMode="decimal"
                   autoComplete="off"
-                  dir="ltr"
                   className="pe-12 tabular-nums"
                   {...form.register('amount')}
                 />
