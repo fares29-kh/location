@@ -38,12 +38,16 @@ export const envSchema = z.object({
   COOKIE_SECURE: booleanString,
   MESSAGING_PROVIDER: z.enum(MESSAGING_PROVIDERS).default('console'),
   SEED_DEMO_ACCOUNTS: booleanString,
-  /** Stockage S3 (MinIO en local) ; sans point d'accès, l'envoi de photos est désactivé. */
+  /** Stockage S3 (MinIO en local, Object Storage Hetzner). Sans point d'accès, voir Azure. */
   S3_ENDPOINT: z.url({ protocol: /^https?$/ }).optional(),
   S3_REGION: z.string().min(1).default('us-east-1'),
   S3_ACCESS_KEY_ID: z.string().default(''),
   S3_SECRET_ACCESS_KEY: z.string().default(''),
   S3_BUCKET_PUBLIC: z.string().min(3).default('drivetn-public'),
+  /** Compte du stockage photos Azure. Vide : on reste sur S3. */
+  AZURE_STORAGE_ACCOUNT: z.string().default(''),
+  AZURE_STORAGE_ACCESS_KEY: z.string().default(''),
+  AZURE_STORAGE_CONTAINER: z.string().default(''),
   /** URL publique du bucket public (relative : servie par Traefik sur le même domaine). */
   MEDIA_PUBLIC_URL: z
     .string()
@@ -55,9 +59,22 @@ export const envSchema = z.object({
 export type Env = z.infer<typeof envSchema>;
 
 export function parseEnv(source: Record<string, string | undefined>): Env {
-  const result = envSchema.safeParse(source);
+  const normalized = { ...source };
+  if (normalized.S3_ENDPOINT === '') {
+    delete normalized.S3_ENDPOINT;
+  }
+  const result = envSchema.safeParse(normalized);
   if (!result.success) {
     throw new Error(`Configuration invalide :\n${z.prettifyError(result.error)}`);
   }
-  return result.data;
+  const env = result.data;
+  if (
+    env.AZURE_STORAGE_ACCOUNT !== '' &&
+    (env.AZURE_STORAGE_ACCESS_KEY === '' || env.AZURE_STORAGE_CONTAINER.length < 3)
+  ) {
+    throw new Error(
+      'Configuration invalide :\nAZURE_STORAGE_ACCESS_KEY et AZURE_STORAGE_CONTAINER sont requis avec AZURE_STORAGE_ACCOUNT',
+    );
+  }
+  return env;
 }

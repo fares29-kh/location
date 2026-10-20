@@ -29,6 +29,26 @@ describe('parseEnv', () => {
       MEDIA_PUBLIC_URL: '/media',
     });
     expect(env.S3_ENDPOINT).toBeUndefined();
+    expect(env.AZURE_STORAGE_ACCOUNT).toBe('');
+  });
+
+  it('accepte Azure Blob et ignore un endpoint S3 vide', () => {
+    const env = parseEnv({
+      ...validSource,
+      S3_ENDPOINT: '',
+      AZURE_STORAGE_ACCOUNT: 'drivetnmedia',
+      AZURE_STORAGE_ACCESS_KEY: 'key',
+      AZURE_STORAGE_CONTAINER: 'drivetn-public',
+    });
+    expect(env.S3_ENDPOINT).toBeUndefined();
+    expect(env.AZURE_STORAGE_ACCOUNT).toBe('drivetnmedia');
+    expect(env.AZURE_STORAGE_CONTAINER).toBe('drivetn-public');
+  });
+
+  it('refuse Azure sans clé ni conteneur', () => {
+    expect(() => parseEnv({ ...validSource, AZURE_STORAGE_ACCOUNT: 'drivetnmedia' })).toThrow(
+      /AZURE_STORAGE_ACCESS_KEY/,
+    );
   });
 
   it('retire la barre finale de l’URL publique des médias', () => {

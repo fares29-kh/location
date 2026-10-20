@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+# Écrit k8s.env (gitignoré) pour `kubectl create secret --from-env-file`.
+# Ne contient pas le mot de passe restic ni le préfixe WAL : ils restent sur le VPS.
+set -euo pipefail
+
+source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+
+out=${1:-$ROOT/k8s.env}
+umask 077
+cat >"$out" <<EOF
+NODE_ENV=production
+PORT=4000
+APP_NAME=${APP_NAME}
+APP_DOMAIN=${APP_DOMAIN}
+APP_TIMEZONE=${APP_TIMEZONE}
+DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=public
+REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379
+CORS_ORIGINS=${CORS_ORIGINS:-}
+SWAGGER_ENABLED=${SWAGGER_ENABLED:-false}
+JWT_ACCESS_SECRET=${JWT_ACCESS_SECRET}
+OTP_HASH_SECRET=${OTP_HASH_SECRET}
+ACCESS_TOKEN_TTL_SECONDS=${ACCESS_TOKEN_TTL_SECONDS:-900}
+REFRESH_TOKEN_TTL_DAYS=${REFRESH_TOKEN_TTL_DAYS:-30}
+COOKIE_SECURE=true
+MESSAGING_PROVIDER=${MESSAGING_PROVIDER:-console}
+S3_ENDPOINT=${S3_ENDPOINT:-}
+S3_REGION=${S3_REGION:-us-east-1}
+S3_ACCESS_KEY_ID=${S3_ACCESS_KEY_ID:-}
+S3_SECRET_ACCESS_KEY=${S3_SECRET_ACCESS_KEY:-}
+S3_BUCKET_PUBLIC=${S3_BUCKET_PUBLIC:-drivetn-public}
+MEDIA_PUBLIC_URL=${MEDIA_PUBLIC_URL}
+SEED_DEMO_ACCOUNTS=false
+DESIGN_PAGE_ENABLED=false
+DEMO_ACCOUNTS_ENABLED=false
+API_INTERNAL_URL=http://api:4000
+ADMIN_EMAIL=${ADMIN_EMAIL:-}
+ADMIN_PHONE=${ADMIN_PHONE:-}
+ADMIN_PASSWORD=${ADMIN_PASSWORD:-}
+ADMIN_FIRST_NAME=${ADMIN_FIRST_NAME:-}
+ADMIN_LAST_NAME=${ADMIN_LAST_NAME:-}
+EOF
+if is_azure; then
+  cat >>"$out" <<EOF
+AZURE_STORAGE_ACCOUNT=${AZURE_MEDIA_ACCOUNT}
+AZURE_STORAGE_ACCESS_KEY=${AZURE_MEDIA_KEY}
+AZURE_STORAGE_CONTAINER=${AZURE_MEDIA_CONTAINER}
+EOF
+fi
+chmod 600 "$out"
+echo "Écrit : $out"
+echo "Remplacez l'hôte postgres et redis par les services du cluster avant de créer le Secret."

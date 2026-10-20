@@ -1,0 +1,269 @@
+# DriveTN — production sur un seul VPS.
+# Développement local : docker-compose.yml (MinIO, HTTP, Mailpit).
+# Démarrage : bash deploy/scripts/up.sh
+# Procédure complète : deploy/README.md
+
+name: drivetn-prod
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: '10m'
+    max-file: '3'
+
+services:
+  traefik:
+    image: traefik:v3.5
+    restart: unless-stopped
+    security_opt: ['no-new-privileges:true']
+    mem_limit: 128m
+    cpus: '0.25'
+    logging: *logging
+    command:
+      - --ping=true
+      - --api.dashboard=false
+      - --log.level=INFO
+      - --accesslog=true
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --providers.docker.network=drivetn-prod
+      - --entrypoints.web.address=:80
+      - --entrypoints.web.http.redirections.entrypoint.to=websecure
+      - --entrypoints.web.http.redirections.entrypoint.scheme=https
+      - --entrypoints.websecure.address=:443
+      - --certificatesresolvers.le.acme.email=${ACME_EMAIL:?ACME_EMAIL manquant}
+      - --certificatesresolvers.le.acme.storage=/letsencrypt/acme.json
+      - --certificatesresolvers.le.acme.httpchallenge.entrypoint=web
+      - --certificatesresolvers.le.acme.caserver=${ACME_CA_SERVER:-https://acme-v02.api.letsencrypt.org/directory}
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - traefik_certs:/letsencrypt
+    healthcheck:
+      test: ['CMD', 'traefik', 'healthcheck', '--ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks: [drivetn]
+
+  postgres:
+    build:
+      context: .
+      dockerfile: deploy/postgres/Dockerfile
+    image: drivetn-postgres:16
+    restart: unless-stopped
+    shm_size: 256mb
+    stop_grace_period: 60s
+    mem_limit: 1536m
+    cpus: '1.5'
+    logging: *logging
+    environment:
+      TZ: UTC
+      PGTZ: UTC
+      POSTGRES_USER: ${POSTGRES_USER:-drivetn}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD manquant}
+      POSTGRES_DB: ${POSTGRES_DB:-drivetn}
+      AWS_ACCESS_KEY_ID: ${S3_ACCESS_KEY_ID:-}
+      AWS_SECRET_ACCESS_KEY: ${S3_SECRET_ACCESS_KEY:-}
+      AWS_ENDPOINT: ${BACKUP_S3_ENDPOINT:-}
+      AWS_REGION: ${BACKUP_S3_REGION:-us-east-1}
+      AWS_S3_FORCE_PATH_STYLE: 'true'
+      WALG_S3_PREFIX: ${WALG_S3_PREFIX:-}
+      WALG_AZ_PREFIX: ${WALG_AZ_PREFIX:-}
+      AZURE_STORAGE_ACCOUNT: ${AZURE_BACKUP_ACCOUNT:-}
+      AZURE_STORAGE_ACCESS_KEY: ${AZURE_BACKUP_KEY:-}
+      WALG_COMPRESSION_METHOD: lz4
+      WALG_PREVENT_WAL_OVERWRITE: 'true'
+    volumes:
+      - ${POSTGRES_DATA_DIR:-/var/lib/drivetn/postgres}:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"']
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+    networks: [drivetn]
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    mem_limit: 384m
+    cpus: '0.5'
+    logging: *logging
+    command:
+      - redis-server
+      - --appendonly
+      - 'yes'
+      - --requirepass
+      - ${REDIS_PASSWORD:?REDIS_PASSWORD manquant}
+      - --maxmemory
+      - 256mb
+      - --maxmemory-policy
+      - noeviction
+    environment:
+      TZ: UTC
+      REDISCLI_AUTH: ${REDIS_PASSWORD:?REDIS_PASSWORD manquant}
+    volumes:
+      - ${REDIS_DATA_DIR:-/var/lib/drivetn/redis}:/data
+    healthcheck:
+      test: ['CMD-SHELL', 'redis-cli ping | grep -q PONG']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks: [drivetn]
+
+  api:
+    build:
+      context: .
+      dockerfile: docker/api.Dockerfile
+      target: runner
+    image: drivetn-api:local
+    restart: unless-stopped
+    init: true
+    security_opt: ['no-new-privileges:true']
+    mem_limit: 1024m
+    cpus: '1.5'
+    logging: *logging
+    environment:
+      TZ: UTC
+      NODE_ENV: production
+      PORT: '4000'
+      APP_NAME: ${APP_NAME:-DriveTN}
+      APP_DOMAIN: ${APP_DOMAIN:?APP_DOMAIN manquant}
+      APP_TIMEZONE: ${APP_TIMEZONE:-Africa/Tunis}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-drivetn}:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD manquant}@postgres:5432/${POSTGRES_DB:-drivetn}?schema=public
+      REDIS_URL: redis://:${REDIS_PASSWORD:?REDIS_PASSWORD manquant}@redis:6379
+      CORS_ORIGINS: ${CORS_ORIGINS:-}
+      SWAGGER_ENABLED: ${SWAGGER_ENABLED:-false}
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:?JWT_ACCESS_SECRET manquant}
+      OTP_HASH_SECRET: ${OTP_HASH_SECRET:?OTP_HASH_SECRET manquant}
+      ACCESS_TOKEN_TTL_SECONDS: ${ACCESS_TOKEN_TTL_SECONDS:-900}
+      REFRESH_TOKEN_TTL_DAYS: ${REFRESH_TOKEN_TTL_DAYS:-30}
+      COOKIE_SECURE: 'true'
+      MESSAGING_PROVIDER: ${MESSAGING_PROVIDER:-console}
+      S3_ENDPOINT: ${S3_ENDPOINT:-}
+      S3_REGION: ${S3_REGION:-us-east-1}
+      S3_ACCESS_KEY_ID: ${S3_ACCESS_KEY_ID:-}
+      S3_SECRET_ACCESS_KEY: ${S3_SECRET_ACCESS_KEY:-}
+      S3_BUCKET_PUBLIC: ${S3_BUCKET_PUBLIC:-drivetn-public}
+      AZURE_STORAGE_ACCOUNT: ${AZURE_MEDIA_ACCOUNT:-}
+      AZURE_STORAGE_ACCESS_KEY: ${AZURE_MEDIA_KEY:-}
+      AZURE_STORAGE_CONTAINER: ${AZURE_MEDIA_CONTAINER:-}
+      MEDIA_PUBLIC_URL: ${MEDIA_PUBLIC_URL:?MEDIA_PUBLIC_URL manquant}
+      RUN_MIGRATIONS: 'true'
+      SEED_ON_START: ${SEED_ON_START:-true}
+      SEED_DEMO_ACCOUNTS: 'false'
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-}
+      ADMIN_PHONE: ${ADMIN_PHONE:-}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+      ADMIN_FIRST_NAME: ${ADMIN_FIRST_NAME:-}
+      ADMIN_LAST_NAME: ${ADMIN_LAST_NAME:-}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ['CMD-SHELL', 'wget -q -O /dev/null http://127.0.0.1:4000/api/v1/health']
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 40s
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.api.rule=(Host(`${APP_DOMAIN:?APP_DOMAIN manquant}`) || Host(`app.${APP_DOMAIN}`) || Host(`agency.${APP_DOMAIN}`) || Host(`admin.${APP_DOMAIN}`)) && PathPrefix(`/api`)
+      - traefik.http.routers.api.entrypoints=websecure
+      - traefik.http.routers.api.tls.certresolver=le
+      - traefik.http.routers.api.priority=100
+      - traefik.http.services.api.loadbalancer.server.port=4000
+    networks: [drivetn]
+
+  worker:
+    image: drivetn-api:local
+    pull_policy: never
+    restart: unless-stopped
+    init: true
+    security_opt: ['no-new-privileges:true']
+    mem_limit: 512m
+    cpus: '0.5'
+    logging: *logging
+    command: ['node', 'dist/worker.js']
+    environment:
+      TZ: UTC
+      NODE_ENV: production
+      PORT: '4000'
+      APP_NAME: ${APP_NAME:-DriveTN}
+      APP_DOMAIN: ${APP_DOMAIN:?APP_DOMAIN manquant}
+      APP_TIMEZONE: ${APP_TIMEZONE:-Africa/Tunis}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-drivetn}:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD manquant}@postgres:5432/${POSTGRES_DB:-drivetn}?schema=public
+      REDIS_URL: redis://:${REDIS_PASSWORD:?REDIS_PASSWORD manquant}@redis:6379
+      CORS_ORIGINS: ${CORS_ORIGINS:-}
+      SWAGGER_ENABLED: 'false'
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:?JWT_ACCESS_SECRET manquant}
+      OTP_HASH_SECRET: ${OTP_HASH_SECRET:?OTP_HASH_SECRET manquant}
+      ACCESS_TOKEN_TTL_SECONDS: ${ACCESS_TOKEN_TTL_SECONDS:-900}
+      REFRESH_TOKEN_TTL_DAYS: ${REFRESH_TOKEN_TTL_DAYS:-30}
+      COOKIE_SECURE: 'true'
+      MESSAGING_PROVIDER: ${MESSAGING_PROVIDER:-console}
+      S3_ENDPOINT: ${S3_ENDPOINT:-}
+      S3_REGION: ${S3_REGION:-us-east-1}
+      S3_ACCESS_KEY_ID: ${S3_ACCESS_KEY_ID:-}
+      S3_SECRET_ACCESS_KEY: ${S3_SECRET_ACCESS_KEY:-}
+      S3_BUCKET_PUBLIC: ${S3_BUCKET_PUBLIC:-drivetn-public}
+      AZURE_STORAGE_ACCOUNT: ${AZURE_MEDIA_ACCOUNT:-}
+      AZURE_STORAGE_ACCESS_KEY: ${AZURE_MEDIA_KEY:-}
+      AZURE_STORAGE_CONTAINER: ${AZURE_MEDIA_CONTAINER:-}
+      MEDIA_PUBLIC_URL: ${MEDIA_PUBLIC_URL:?MEDIA_PUBLIC_URL manquant}
+      RUN_MIGRATIONS: 'false'
+      SEED_ON_START: 'false'
+      SEED_DEMO_ACCOUNTS: 'false'
+    depends_on:
+      api:
+        condition: service_healthy
+    networks: [drivetn]
+
+  web:
+    build:
+      context: .
+      dockerfile: docker/web.Dockerfile
+      target: runner
+    image: drivetn-web:local
+    restart: unless-stopped
+    init: true
+    security_opt: ['no-new-privileges:true']
+    mem_limit: 1024m
+    cpus: '1.0'
+    logging: *logging
+    environment:
+      TZ: UTC
+      NODE_ENV: production
+      APP_NAME: ${APP_NAME:-DriveTN}
+      APP_DOMAIN: ${APP_DOMAIN:?APP_DOMAIN manquant}
+      API_INTERNAL_URL: http://api:4000
+      DESIGN_PAGE_ENABLED: ${DESIGN_PAGE_ENABLED:-false}
+      DEMO_ACCOUNTS_ENABLED: 'false'
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ['CMD-SHELL', 'wget -q -O /dev/null http://127.0.0.1:3000/healthz']
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 20s
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.web.rule=Host(`${APP_DOMAIN:?APP_DOMAIN manquant}`) || Host(`app.${APP_DOMAIN}`) || Host(`agency.${APP_DOMAIN}`) || Host(`admin.${APP_DOMAIN}`)
+      - traefik.http.routers.web.entrypoints=websecure
+      - traefik.http.routers.web.tls.certresolver=le
+      - traefik.http.services.web.loadbalancer.server.port=3000
+    networks: [drivetn]
+
+networks:
+  drivetn:
+    name: drivetn-prod
+
+volumes:
+  traefik_certs:

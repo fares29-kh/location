@@ -20,6 +20,7 @@ Plateforme SaaS multi-tenant de location de voitures pour le marché tunisien.
 - [Langues et design system](#langues-et-design-system)
 - [Qualité et tests](#qualité-et-tests)
 - [Choix techniques notables](#choix-techniques-notables)
+- [Production](#production)
 - [Avancement](#avancement)
 
 ## Démarrage rapide
@@ -235,6 +236,10 @@ pnpm check     # codegen + lint + format + typecheck + tests
 - **Refresh token opaque plutôt que JWT** : il est stocké haché en base, ce qui permet la rotation, la révocation d'une famille de sessions en cas de réutilisation et la déconnexion de tous les appareils.
 - **Paramètres plateforme** : le modèle `PlatformSetting` stocke la TVA (19 %), le timbre fiscal (1 DT) et la commission par défaut. Les taux sont en points de base, les montants en millimes.
 
+## Production
+
+`docker compose up` est la pile locale : PostgreSQL, Redis et MinIO sur la machine. Le déploiement pour les agences est un VPS Hetzner, les photos sur Object Storage et la base recopiée en continu hors du serveur. Mode d'emploi, budget et remontée après panne : [`deploy/README.md`](deploy/README.md).
+
 ## Avancement
 
 | Phase  | Contenu                                                                          | État     |
@@ -244,4 +249,4 @@ pnpm check     # codegen + lint + format + typecheck + tests
 | 3      | Authentification, OTP, rôles, seed (gouvernorats, aéroports, comptes de démo)    | Terminée |
 | 4 à 10 | Flotte, recherche, réservation, opérations agence, admin, finitions, déploiement | À venir  |
 
-Le guide de déploiement sur VPS (Traefik + HTTPS Let's Encrypt + sauvegardes PostgreSQL) sera rédigé en phase 10.
+Déploiement VPS : [`deploy/README.md`](deploy/README.md).

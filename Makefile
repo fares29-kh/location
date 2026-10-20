@@ -1,8 +1,9 @@
-COMPOSE     := docker compose
-COMPOSE_DEV := docker compose -f docker-compose.yml -f docker-compose.dev.yml
+COMPOSE      := docker compose
+COMPOSE_DEV  := docker compose -f docker-compose.yml -f docker-compose.dev.yml
+COMPOSE_PROD := docker compose -f docker-compose.prod.yml
 
 .DEFAULT_GOAL := help
-.PHONY: help env up dev down logs ps seed reset test lint typecheck check
+.PHONY: help env up dev down logs ps seed reset test lint typecheck check prod-up prod-ps prod-logs prod-down
 
 help: ## Affiche cette aide
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-10s\033[0m %s\n", $$1, $$2}'
@@ -43,3 +44,15 @@ typecheck: ## Vérification des types TypeScript
 
 check: ## Lint + typecheck + tests (identique à la CI)
 	pnpm check
+
+prod-up: ## Démarre la production (VPS). Après un git pull : bash deploy/scripts/up.sh --build
+	bash deploy/scripts/up.sh
+
+prod-ps: ## État de la pile de production
+	$(COMPOSE_PROD) ps
+
+prod-logs: ## Logs de la pile de production
+	$(COMPOSE_PROD) logs -f --tail=200
+
+prod-down: ## Arrête la production, sans effacer les données
+	$(COMPOSE_PROD) down --remove-orphans

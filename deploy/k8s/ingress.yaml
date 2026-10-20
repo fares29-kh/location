@@ -1,0 +1,42 @@
+# Remplacez example.tn par APP_DOMAIN avant d'appliquer.
+# Les annotations nginx fixent la taille des photos. Avec l'Ingress Traefik de k3s,
+# retirez-les : la limite se règle sur l'IngressRoute.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: drivetn
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: 20m
+spec:
+  ingressClassName: nginx
+  tls:
+    - secretName: drivetn-tls
+      hosts:
+        - example.tn
+        - app.example.tn
+        - agency.example.tn
+        - admin.example.tn
+  rules:
+    - host: example.tn
+      http: &paths
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: api
+                port:
+                  number: 4000
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: web
+                port:
+                  number: 3000
+    - host: app.example.tn
+      http: *paths
+    - host: agency.example.tn
+      http: *paths
+    - host: admin.example.tn
+      http: *paths

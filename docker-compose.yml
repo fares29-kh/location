@@ -1,6 +1,8 @@
-# DriveTN - pile complète "production-like".
+# DriveTN — pile locale (MinIO, HTTP, Mailpit).
 # Démarrage : cp .env.example .env && docker compose up --build
 # Développement (hot-reload) : voir docker-compose.dev.yml ou `make dev`.
+# Production (HTTPS, Object Storage, sauvegardes) : deploy/README.md
+# Ne pas utiliser ce fichier sur le VPS.
 
 name: drivetn
 

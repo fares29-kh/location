@@ -25,7 +25,9 @@ Scripts (dossier `apps/api/prisma/checks/`) :
 
 Dans les commandes ci-dessous, `$DATABASE_URL` est l'URL de la base de production. Depuis le
 serveur, `psql` peut aussi passer par le conteneur PostgreSQL :
-`docker compose exec -T postgres psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -v ON_ERROR_STOP=1 -f - < fichier.sql`.
+`docker compose -f docker-compose.prod.yml exec -T postgres psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -v ON_ERROR_STOP=1 -f - < fichier.sql`.
+Lancez `bash deploy/scripts/backup.sh` avant. La procédure de restauration est dans
+[`deploy/README.md`](../deploy/README.md).
 
 ## Prérequis
 
