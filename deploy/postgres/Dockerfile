@@ -12,8 +12,13 @@ RUN tar -xzf /tmp/wal-g.tar.gz -C /usr/local/bin \
  && rm /tmp/wal-g.tar.gz \
  && wal-g --version
 
-# Azure signe blob.core.windows.net avec Microsoft TLS RSA Root G2.
-# Debian Bookworm ne l'a pas dans son magasin Mozilla : wal-g refuse alors le TLS.
+# L'image postgres ne contient pas le paquet ca-certificates : wal-g n'a
+# aucune autorité à qui faire confiance. Debian n'a pas non plus la racine
+# Microsoft TLS RSA Root G2, qui signe les certificats Azure.
+USER root
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends ca-certificates \
+ && rm -rf /var/lib/apt/lists/*
 COPY deploy/postgres/certs/microsoft-tls-rsa-root-g2.crt /usr/local/share/ca-certificates/microsoft-tls-rsa-root-g2.crt
 RUN openssl x509 -in /usr/local/share/ca-certificates/microsoft-tls-rsa-root-g2.crt -noout -fingerprint -sha256 \
       | tr -d ':' | grep -qi '6A170583DB584151E1C454EECA2A64CC5D8E484A5BD1156E720B4458654EE9E5' \
