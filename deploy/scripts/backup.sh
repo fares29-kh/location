@@ -25,6 +25,9 @@ compose exec -T -u postgres postgres wal-g backup-push /var/lib/postgresql/data
 compose exec -T -u postgres postgres wal-g delete retain FULL 7 --confirm
 
 echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] Copie chiffrée de .env"
+# shellcheck disable=SC1091
+source "${_lib_dir}/ensure-restic.sh"
+ensure_restic
 export RESTIC_REPOSITORY RESTIC_PASSWORD
 restic_opts=()
 if is_azure; then

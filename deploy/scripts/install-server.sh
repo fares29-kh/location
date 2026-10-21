@@ -12,7 +12,7 @@ ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
 export DEBIAN_FRONTEND=noninteractive
 
 apt-get update
-apt-get install -y ca-certificates curl gnupg git ufw restic cron openssl
+apt-get install -y ca-certificates curl gnupg git ufw bzip2 cron openssl
 
 if ! command -v docker >/dev/null 2>&1; then
   install -m 0755 -d /etc/apt/keyrings
@@ -77,5 +77,9 @@ cat >/etc/logrotate.d/drivetn <<'EOF'
   copytruncate
 }
 EOF
+
+# shellcheck disable=SC1091
+source "$ROOT/deploy/scripts/ensure-restic.sh"
+ensure_restic
 
 echo "Serveur prêt. Suite : bash deploy/scripts/init-env.sh"
