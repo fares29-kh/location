@@ -296,6 +296,7 @@ export interface ModeratedReviewList extends Paginated<ModeratedReview> {
 export const AUDIT_ACTIONS = [
   'auth.signup',
   'auth.phone_verified',
+  'auth.email_verified',
   'auth.login',
   'auth.login_failed',
   'auth.logout',

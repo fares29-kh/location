@@ -78,12 +78,10 @@ describe.skipIf(databaseUrl === undefined || redisUrl === undefined)(
 
     const http = () => request(app.getHttpServer());
 
-    function lastCode(nationalPhone: string): string {
-      const job = sent.findLast(
-        (message) => message.template === 'otp' && message.to === toE164(nationalPhone),
-      );
+    function lastCode(to: string): string {
+      const job = sent.findLast((message) => message.template === 'otp' && message.to === to);
       if (job?.template !== 'otp') {
-        throw new Error(`Aucun code envoyé au ${nationalPhone}`);
+        throw new Error(`Aucun code envoyé à ${to}`);
       }
       return job.code;
     }
@@ -92,6 +90,7 @@ describe.skipIf(databaseUrl === undefined || redisUrl === undefined)(
       phone: string,
       role: 'CUSTOMER' | 'AGENCY_OWNER' | 'ADMIN',
       status: 'ACTIVE' | 'PENDING_VERIFICATION' = 'ACTIVE',
+      email?: string,
     ) {
       return prisma.user.create({
         data: {
@@ -101,8 +100,10 @@ describe.skipIf(databaseUrl === undefined || redisUrl === undefined)(
           status,
           firstName: 'Test',
           lastName: role,
+          email: email ?? null,
           passwordHash: await passwords.hash(PASSWORD),
           phoneVerifiedAt: status === 'ACTIVE' ? new Date() : null,
+          emailVerifiedAt: status === 'ACTIVE' && email !== undefined ? new Date() : null,
         },
       });
     }
@@ -152,18 +153,30 @@ describe.skipIf(databaseUrl === undefined || redisUrl === undefined)(
       );
     });
 
-    it('inscrit un client, vérifie son téléphone par OTP et ouvre la session', async () => {
+    it('inscrit un client, confirme son email par code et ouvre la session', async () => {
       const signup = await http()
         .post('/api/v1/auth/signup')
         .set('Host', CLIENT_HOST)
-        .send({ firstName: 'Amira', lastName: 'Trabelsi', phone: '98123456', password: PASSWORD })
+        .send({
+          firstName: 'Amira',
+          lastName: 'Trabelsi',
+          phone: '98123456',
+          email: 'Amira@Example.tn',
+          password: PASSWORD,
+        })
         .expect(201);
-      expect(signup.body).toMatchObject({ phone: '98123456', resendInSeconds: 60 });
+      expect(signup.body).toMatchObject({
+        phone: '98123456',
+        email: 'amira@example.tn',
+        expiresInSeconds: 600,
+        resendInSeconds: 60,
+      });
 
+      const code = lastCode('amira@example.tn');
       const wrong = await http()
         .post('/api/v1/auth/otp/verify')
         .set('Host', CLIENT_HOST)
-        .send({ phone: '98123456', code: lastCode('98123456') === '000000' ? '111111' : '000000' })
+        .send({ email: 'amira@example.tn', code: code === '000000' ? '111111' : '000000' })
         .expect(400);
       expect(errorResponseSchema.parse(wrong.body)).toMatchObject({
         code: 'OTP_INVALID',
@@ -173,7 +186,7 @@ describe.skipIf(databaseUrl === undefined || redisUrl === undefined)(
       const verified = await http()
         .post('/api/v1/auth/otp/verify')
         .set('Host', CLIENT_HOST)
-        .send({ phone: '98123456', code: lastCode('98123456') })
+        .send({ email: 'amira@example.tn', code })
         .expect(200);
       const result = authResultSchema.parse(verified.body);
       expect(result).toMatchObject({ status: 'authenticated', user: { role: 'CUSTOMER' } });
@@ -187,13 +200,15 @@ describe.skipIf(databaseUrl === undefined || redisUrl === undefined)(
         .expect(200);
       expect(currentUserSchema.parse(me.body)).toMatchObject({
         phone: '98123456',
-        phoneVerified: true,
+        email: 'amira@example.tn',
+        phoneVerified: false,
+        emailVerified: true,
         status: 'ACTIVE',
       });
 
       const audit = await prisma.auditLog.findMany({ select: { action: true } });
       expect(audit.map((entry) => entry.action)).toEqual(
-        expect.arrayContaining(['auth.signup', 'auth.phone_verified', 'auth.login']),
+        expect.arrayContaining(['auth.signup', 'auth.email_verified', 'auth.login']),
       );
     });
 
@@ -201,7 +216,13 @@ describe.skipIf(databaseUrl === undefined || redisUrl === undefined)(
       await http()
         .post('/api/v1/auth/signup')
         .set('Host', AGENCY_HOST)
-        .send({ firstName: 'Karim', lastName: 'Ben Ali', phone: '22123456', password: PASSWORD })
+        .send({
+          firstName: 'Karim',
+          lastName: 'Ben Ali',
+          phone: '22123456',
+          email: 'karim@example.tn',
+          password: PASSWORD,
+        })
         .expect(201);
       const user = await prisma.user.findUniqueOrThrow({ where: { phone: toE164('22123456') } });
       expect(user.role).toBe('AGENCY_OWNER');
@@ -209,7 +230,13 @@ describe.skipIf(databaseUrl === undefined || redisUrl === undefined)(
       await http()
         .post('/api/v1/auth/signup')
         .set('Host', ADMIN_HOST)
-        .send({ firstName: 'Eve', lastName: 'Admin', phone: '23123456', password: PASSWORD })
+        .send({
+          firstName: 'Eve',
+          lastName: 'Admin',
+          phone: '23123456',
+          email: 'eve@example.tn',
+          password: PASSWORD,
+        })
         .expect(403);
     });
 
@@ -218,20 +245,26 @@ describe.skipIf(databaseUrl === undefined || redisUrl === undefined)(
       const duplicate = await http()
         .post('/api/v1/auth/signup')
         .set('Host', CLIENT_HOST)
-        .send({ firstName: 'A', lastName: 'B', phone: '98000001', password: PASSWORD })
+        .send({
+          firstName: 'A',
+          lastName: 'B',
+          phone: '98000001',
+          email: 'autre@example.tn',
+          password: PASSWORD,
+        })
         .expect(409);
       expect(errorResponseSchema.parse(duplicate.body).code).toBe('PHONE_ALREADY_USED');
 
-      await createUser('98000002', 'CUSTOMER', 'PENDING_VERIFICATION');
+      await createUser('98000002', 'CUSTOMER', 'PENDING_VERIFICATION', 'pending@example.tn');
       await http()
         .post('/api/v1/auth/otp/request')
         .set('Host', CLIENT_HOST)
-        .send({ phone: '98000002', purpose: 'SIGNUP' })
+        .send({ email: 'pending@example.tn', purpose: 'SIGNUP' })
         .expect(202);
       const again = await http()
         .post('/api/v1/auth/otp/request')
         .set('Host', CLIENT_HOST)
-        .send({ phone: '98000002', purpose: 'SIGNUP' })
+        .send({ email: 'pending@example.tn', purpose: 'SIGNUP' })
         .expect(429);
       expect(errorResponseSchema.parse(again.body)).toMatchObject({
         code: 'TOO_MANY_REQUESTS',
@@ -249,37 +282,37 @@ describe.skipIf(databaseUrl === undefined || redisUrl === undefined)(
       expect(ok.status).toBe(200);
       expect(authResultSchema.parse(ok.body).status).toBe('authenticated');
 
-      await createUser('98000004', 'CUSTOMER', 'PENDING_VERIFICATION');
+      await createUser('98000004', 'CUSTOMER', 'PENDING_VERIFICATION', 'pending4@example.tn');
       const pending = await login(CLIENT_HOST, '98000004');
       expect(pending.status).toBe(403);
       expect(pending.body).toMatchObject({
-        code: 'PHONE_NOT_VERIFIED',
-        details: { phone: '98000004' },
+        code: 'EMAIL_NOT_VERIFIED',
+        details: { email: 'pending4@example.tn' },
       });
     });
 
-    it('connecte par code SMS sans révéler si le numéro est inscrit', async () => {
-      await createUser('98000005', 'CUSTOMER');
+    it('connecte par code email sans révéler si l’adresse est inscrite', async () => {
+      await createUser('98000005', 'CUSTOMER', 'ACTIVE', 'known@example.tn');
       const known = await http()
         .post('/api/v1/auth/otp/request')
         .set('Host', CLIENT_HOST)
-        .send({ phone: '98000005', purpose: 'LOGIN' })
+        .send({ email: 'known@example.tn', purpose: 'LOGIN' })
         .expect(202);
       const unknown = await http()
         .post('/api/v1/auth/otp/request')
         .set('Host', CLIENT_HOST)
-        .send({ phone: '98000099', purpose: 'LOGIN' })
+        .send({ email: 'unknown@example.tn', purpose: 'LOGIN' })
         .expect(202);
       expect(otpDispatchSchema.parse(unknown.body)).toEqual({
         ...otpDispatchSchema.parse(known.body),
-        phone: '98000099',
+        email: 'unknown@example.tn',
       });
-      expect(sent.map((job) => job.to)).toEqual([toE164('98000005')]);
+      expect(sent.map((job) => job.to)).toEqual(['known@example.tn']);
 
       const response = await http()
         .post('/api/v1/auth/login/otp')
         .set('Host', CLIENT_HOST)
-        .send({ phone: '98000005', code: lastCode('98000005') })
+        .send({ email: 'known@example.tn', code: lastCode('known@example.tn') })
         .expect(200);
       expect(authResultSchema.parse(response.body).status).toBe('authenticated');
     });
@@ -350,18 +383,22 @@ describe.skipIf(databaseUrl === undefined || redisUrl === undefined)(
     });
 
     it('déconnecte et ferme toutes les sessions après réinitialisation du mot de passe', async () => {
-      await createUser('98000007', 'CUSTOMER');
+      await createUser('98000007', 'CUSTOMER', 'ACTIVE', 'reset@example.tn');
       const session = cookiesFrom(await login(CLIENT_HOST, '98000007'));
 
       await http()
         .post('/api/v1/auth/password/forgot')
         .set('Host', CLIENT_HOST)
-        .send({ phone: '98000007' })
+        .send({ email: 'reset@example.tn' })
         .expect(202);
       await http()
         .post('/api/v1/auth/password/reset')
         .set('Host', CLIENT_HOST)
-        .send({ phone: '98000007', code: lastCode('98000007'), password: 'Nouveau2026' })
+        .send({
+          email: 'reset@example.tn',
+          code: lastCode('reset@example.tn'),
+          password: 'Nouveau2026',
+        })
         .expect(204);
 
       await http().post('/api/v1/auth/refresh').set('Cookie', cookieHeader(session)).expect(401);

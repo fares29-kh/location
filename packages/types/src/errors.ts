@@ -18,6 +18,7 @@ export const ERROR_CODES = [
   'PHONE_ALREADY_USED',
   'EMAIL_ALREADY_USED',
   'PHONE_NOT_VERIFIED',
+  'EMAIL_NOT_VERIFIED',
   'ACCOUNT_SUSPENDED',
   // Codes métier des réservations.
   'VEHICLE_UNAVAILABLE',

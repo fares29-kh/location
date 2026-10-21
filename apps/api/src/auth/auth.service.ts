@@ -5,12 +5,12 @@ import {
   buildPortalOrigin,
   type CurrentUser,
   DEFAULT_LOCALE,
+  type EmailOtpVerifyRequest,
   type ForgotPasswordRequest,
   type LoginRequest,
   normalizeTunisianPhone,
   type OtpDispatch,
   type OtpRequest,
-  type OtpVerifyRequest,
   type Portal,
   portalForRole,
   type ResetPasswordRequest,
@@ -81,8 +81,9 @@ export class AuthService {
   ) {}
 
   /**
-   * Crée (ou remplace, s'il n'a jamais été vérifié) un compte en attente de vérification
-   * du téléphone, puis envoie le code OTP d'inscription.
+   * Crée (ou reprend, s'il n'a jamais confirmé son email) un compte en attente,
+   * puis envoie un code à l'adresse indiquée. Le compte reste inactif tant que le code
+   * n'est pas saisi.
    */
   async signup(input: SignupRequest, context: RequestContext): Promise<OtpDispatch> {
     const role = context.portal === null ? undefined : SIGNUP_ROLES[context.portal];
@@ -90,22 +91,15 @@ export class AuthService {
       throw new ForbiddenException("L'inscription n'est pas ouverte sur ce portail.");
     }
     const phone = toE164(input.phone);
-    const existing = await this.prisma.user.findUnique({ where: { phone } });
-    if (existing !== null && existing.status !== 'PENDING_VERIFICATION') {
-      throw phoneAlreadyUsed();
-    }
-    if (input.email !== undefined) {
-      const emailOwner = await this.prisma.user.findUnique({ where: { email: input.email } });
-      if (emailOwner !== null && emailOwner.id !== existing?.id) {
-        throw emailAlreadyUsed();
-      }
-    }
+    const existing = await this.resolveSignupAccount(phone, input.email);
 
     const data = {
       role,
       firstName: input.firstName,
       lastName: input.lastName,
-      email: input.email ?? null,
+      phone,
+      email: input.email,
+      emailVerifiedAt: null,
       passwordHash: await this.passwords.hash(input.password),
       locale: input.locale ?? DEFAULT_LOCALE,
     };
@@ -113,7 +107,7 @@ export class AuthService {
     try {
       user =
         existing === null
-          ? await this.prisma.user.create({ data: { ...data, phone } })
+          ? await this.prisma.user.create({ data })
           : await this.prisma.user.update({ where: { id: existing.id }, data });
     } catch (error) {
       if (isUniqueViolation(error)) {
@@ -132,10 +126,10 @@ export class AuthService {
       metadata: { role },
       ip: context.ip,
     });
-    return this.otp.send({
+    return this.otp.sendEmail({
+      email: input.email,
       phone: input.phone,
       purpose: 'SIGNUP',
-      channel: input.channel,
       locale: user.locale,
       ip: context.ip,
       deliver: true,
@@ -144,36 +138,57 @@ export class AuthService {
 
   /** Renvoi du code d'inscription, ou code de connexion sans mot de passe. */
   async requestOtp(input: OtpRequest, context: RequestContext): Promise<OtpDispatch> {
-    const user = await this.findByPhone(input.phone);
-    const eligible =
-      input.purpose === 'SIGNUP'
-        ? user?.status === 'PENDING_VERIFICATION'
-        : user?.status === 'ACTIVE';
-    return this.otp.send({
-      phone: input.phone,
-      purpose: input.purpose,
-      channel: input.channel,
+    if (input.purpose === 'SIGNUP') {
+      const user = await this.prisma.user.findFirst({
+        where: { email: input.email, deletedAt: null },
+      });
+      return this.otp.sendEmail({
+        email: input.email,
+        phone: user === null ? null : normalizeTunisianPhone(user.phone),
+        purpose: 'SIGNUP',
+        locale: user?.locale ?? DEFAULT_LOCALE,
+        ip: context.ip,
+        deliver: user?.status === 'PENDING_VERIFICATION',
+      });
+    }
+
+    const user = await this.prisma.user.findFirst({
+      where: { email: input.email, deletedAt: null },
+    });
+    const dispatch = await this.otp.sendEmail({
+      email: input.email,
+      phone: user === null ? null : normalizeTunisianPhone(user.phone),
+      purpose: 'LOGIN',
       locale: user?.locale ?? DEFAULT_LOCALE,
       ip: context.ip,
-      deliver: eligible,
+      deliver: user?.status === 'ACTIVE',
     });
+    return { ...dispatch, phone: '' };
   }
 
-  async verifySignup(input: OtpVerifyRequest, context: RequestContext): Promise<LoginOutcome> {
-    await this.otp.verify(input.phone, 'SIGNUP', input.code);
-    const user = await this.findByPhone(input.phone);
+  async verifySignup(input: EmailOtpVerifyRequest, context: RequestContext): Promise<LoginOutcome> {
+    await this.otp.verifyEmail(input.email, 'SIGNUP', input.code);
+    const user = await this.prisma.user.findFirst({
+      where: { email: input.email, deletedAt: null },
+    });
     if (user === null) {
       throw new NotFoundException('Compte introuvable.');
     }
+    this.assertCanSignIn(user, { allowPending: true });
+    const pending = user.status === 'PENDING_VERIFICATION';
+    const confirmEmail = user.emailVerifiedAt === null;
     const activated =
-      user.status === 'PENDING_VERIFICATION'
+      pending || confirmEmail
         ? await this.prisma.user.update({
             where: { id: user.id },
-            data: { status: 'ACTIVE', phoneVerifiedAt: new Date() },
+            data: {
+              ...(pending ? { status: 'ACTIVE' as const } : {}),
+              ...(confirmEmail ? { emailVerifiedAt: new Date() } : {}),
+            },
           })
         : user;
     await this.audit.log({
-      action: 'auth.phone_verified',
+      action: 'auth.email_verified',
       actorId: user.id,
       entityType: 'user',
       entityId: user.id,
@@ -207,20 +222,14 @@ export class AuthService {
       });
       throw new AppException(HttpStatus.UNAUTHORIZED, 'INVALID_CREDENTIALS', INVALID_CREDENTIALS);
     }
-    if (user.status === 'PENDING_VERIFICATION') {
-      throw new AppException(
-        HttpStatus.FORBIDDEN,
-        'PHONE_NOT_VERIFIED',
-        'Vérifiez votre numéro de téléphone pour continuer.',
-        { phone: normalizeTunisianPhone(user.phone) },
-      );
-    }
     return this.completeLogin(user, context, 'password');
   }
 
-  async loginWithOtp(input: OtpVerifyRequest, context: RequestContext): Promise<LoginOutcome> {
-    await this.otp.verify(input.phone, 'LOGIN', input.code);
-    const user = await this.findByPhone(input.phone);
+  async loginWithOtp(input: EmailOtpVerifyRequest, context: RequestContext): Promise<LoginOutcome> {
+    await this.otp.verifyEmail(input.email, 'LOGIN', input.code);
+    const user = await this.prisma.user.findFirst({
+      where: { email: input.email, deletedAt: null },
+    });
     if (user === null) {
       throw new AppException(HttpStatus.UNAUTHORIZED, 'INVALID_CREDENTIALS', INVALID_CREDENTIALS);
     }
@@ -231,30 +240,34 @@ export class AuthService {
     input: ForgotPasswordRequest,
     context: RequestContext,
   ): Promise<OtpDispatch> {
-    const user = await this.findByPhone(input.phone);
-    return this.otp.send({
-      phone: input.phone,
+    const user = await this.prisma.user.findFirst({
+      where: { email: input.email, deletedAt: null },
+    });
+    const dispatch = await this.otp.sendEmail({
+      email: input.email,
+      phone: user === null ? null : normalizeTunisianPhone(user.phone),
       purpose: 'PASSWORD_RESET',
-      channel: input.channel,
       locale: user?.locale ?? DEFAULT_LOCALE,
       ip: context.ip,
-      deliver: user !== null && user.status !== 'SUSPENDED',
+      deliver: user?.status === 'ACTIVE',
     });
+    return { ...dispatch, phone: '' };
   }
 
-  /** Nouveau mot de passe après preuve de possession du téléphone ; ferme toutes les sessions. */
+  /** Nouveau mot de passe après preuve de possession de l'email ; ferme toutes les sessions. */
   async resetPassword(input: ResetPasswordRequest, context: RequestContext): Promise<void> {
-    await this.otp.verify(input.phone, 'PASSWORD_RESET', input.code);
-    const user = await this.findByPhone(input.phone);
-    if (user === null) {
+    await this.otp.verifyEmail(input.email, 'PASSWORD_RESET', input.code);
+    const user = await this.prisma.user.findFirst({
+      where: { email: input.email, deletedAt: null },
+    });
+    if (user?.status !== 'ACTIVE') {
       throw new NotFoundException('Compte introuvable.');
     }
-    const verifiesPhone = user.status === 'PENDING_VERIFICATION';
     await this.prisma.user.update({
       where: { id: user.id },
       data: {
         passwordHash: await this.passwords.hash(input.password),
-        ...(verifiesPhone ? { status: 'ACTIVE', phoneVerifiedAt: new Date() } : {}),
+        ...(user.emailVerifiedAt === null ? { emailVerifiedAt: new Date() } : {}),
       },
     });
     await this.tokens.revokeAllForUser(user.id);
@@ -277,7 +290,7 @@ export class AuthService {
     if (user === null || context.portal !== portalForRole(user.role)) {
       throw new UnauthorizedException('Lien de connexion invalide.');
     }
-    this.assertCanSignIn(user);
+    this.assertCanSignIn(user, { allowPending: false });
     return {
       status: 'authenticated',
       user: toCurrentUser(user),
@@ -320,7 +333,7 @@ export class AuthService {
     context: RequestContext,
     method: 'password' | 'otp',
   ): Promise<LoginOutcome> {
-    this.assertCanSignIn(user);
+    this.assertCanSignIn(user, { allowPending: false });
     await this.prisma.user.update({ where: { id: user.id }, data: { lastLoginAt: new Date() } });
     await this.audit.log({
       action: 'auth.login',
@@ -350,7 +363,11 @@ export class AuthService {
     return { status: 'redirect', portal: target, redirectUrl: redirectUrl.toString() };
   }
 
-  private assertCanSignIn(user: User): void {
+  /**
+   * Un compte en attente de confirmation email peut quand même saisir son code (`allowPending`).
+   * Toute autre connexion exige un compte actif.
+   */
+  private assertCanSignIn(user: User, options: { allowPending: boolean }): void {
     if (user.status === 'SUSPENDED') {
       throw new AppException(
         HttpStatus.FORBIDDEN,
@@ -358,13 +375,37 @@ export class AuthService {
         'Ce compte est suspendu. Contactez le support.',
       );
     }
-    if (user.status !== 'ACTIVE') {
-      throw new AppException(
-        HttpStatus.FORBIDDEN,
-        'PHONE_NOT_VERIFIED',
-        'Vérifiez votre numéro de téléphone pour continuer.',
-      );
+    if (user.status === 'ACTIVE' || options.allowPending) {
+      return;
     }
+    throw new AppException(
+      HttpStatus.FORBIDDEN,
+      'EMAIL_NOT_VERIFIED',
+      'Confirmez votre adresse email pour continuer.',
+      { email: user.email },
+    );
+  }
+
+  /**
+   * Reprend un compte jamais confirmé. Deux comptes en attente distincts (même email ou
+   * même téléphone) ne sont pas fusionnés.
+   */
+  private async resolveSignupAccount(phone: string, email: string): Promise<User | null> {
+    const [phoneOwner, emailOwner] = await Promise.all([
+      this.prisma.user.findUnique({ where: { phone } }),
+      this.prisma.user.findUnique({ where: { email } }),
+    ]);
+    if (phoneOwner !== null && emailOwner !== null && phoneOwner.id !== emailOwner.id) {
+      if (phoneOwner.status !== 'PENDING_VERIFICATION') {
+        throw phoneAlreadyUsed();
+      }
+      throw emailAlreadyUsed();
+    }
+    const existing = phoneOwner ?? emailOwner;
+    if (existing !== null && existing.status !== 'PENDING_VERIFICATION') {
+      throw existing.phone === phone ? phoneAlreadyUsed() : emailAlreadyUsed();
+    }
+    return existing;
   }
 
   private findByPhone(nationalPhone: string): Promise<User | null> {

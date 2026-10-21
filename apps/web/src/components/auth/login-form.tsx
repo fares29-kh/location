@@ -2,29 +2,27 @@
 
 import {
   type AuthResult,
+  loginOtpRequestSchema,
   loginSchema,
   type OtpDispatch,
-  otpRequestSchema,
   type Portal,
 } from '@drivetn/types';
 import { Alert } from '@drivetn/ui/alert';
 import { Button } from '@drivetn/ui/button';
 import { Field } from '@drivetn/ui/field';
 import { Input } from '@drivetn/ui/input';
-import { PhoneInput } from '@drivetn/ui/phone-input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@drivetn/ui/tabs';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
-import { KeyRound, MessageSquareText } from 'lucide-react';
+import { KeyRound, Mail } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useId, useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 
 import { Link } from '@/i18n/navigation';
 import { authApi } from '@/lib/api/auth';
 import { ApiError } from '@/lib/api/errors';
 
-import { ChannelPicker } from './channel-picker';
 import { controlProps } from './control-props';
 import { type DemoCredentials, DemoAccounts } from './demo-accounts';
 import { PasswordInput } from './password-input';
@@ -33,7 +31,8 @@ import { applyServerIssues, useAuthMessages } from './use-auth-messages';
 import { useCompleteAuth } from './use-complete-auth';
 
 type PasswordLoginOutcome =
-  { kind: 'authenticated'; result: AuthResult } | { kind: 'verify'; dispatch: OtpDispatch };
+  | { kind: 'authenticated'; result: AuthResult }
+  | { kind: 'verify'; dispatch: OtpDispatch & { email: string } };
 
 interface PasswordCredentials {
   identifier: string;
@@ -66,15 +65,18 @@ function PasswordLogin({
         const result = await authApi.login(values);
         return { kind: 'authenticated', result } satisfies PasswordLoginOutcome;
       } catch (error) {
-        const phone =
-          error instanceof ApiError && error.code === 'PHONE_NOT_VERIFIED'
-            ? error.detailString('phone')
+        const email =
+          error instanceof ApiError && error.code === 'EMAIL_NOT_VERIFIED'
+            ? error.detailString('email')
             : undefined;
-        if (phone === undefined) {
+        if (email === undefined) {
           throw error;
         }
-        const dispatch = await authApi.requestOtp({ phone, purpose: 'SIGNUP', channel: 'SMS' });
-        return { kind: 'verify', dispatch } satisfies PasswordLoginOutcome;
+        const dispatch = await authApi.requestOtp({ email, purpose: 'SIGNUP' });
+        return {
+          kind: 'verify',
+          dispatch: { ...dispatch, email },
+        } satisfies PasswordLoginOutcome;
       }
     },
     onMutate: () => {
@@ -84,7 +86,7 @@ function PasswordLogin({
       if (outcome.kind === 'authenticated') {
         onAuthenticated(outcome.result);
       } else {
-        onVerificationRequired({ flow: 'signup', channel: 'SMS', dispatch: outcome.dispatch });
+        onVerificationRequired({ flow: 'signup', dispatch: outcome.dispatch });
       }
     },
     onError: (error) => {
@@ -140,7 +142,7 @@ function PasswordLogin({
   );
 }
 
-const otpLoginSchema = otpRequestSchema.omit({ purpose: true });
+const otpLoginSchema = loginOtpRequestSchema.omit({ purpose: true });
 
 function OtpLogin({ onCodeSent }: { onCodeSent: (verification: PendingVerification) => void }) {
   const t = useTranslations('auth');
@@ -148,20 +150,20 @@ function OtpLogin({ onCodeSent }: { onCodeSent: (verification: PendingVerificati
   const id = useId();
   const form = useForm({
     resolver: zodResolver(otpLoginSchema, undefined, { raw: true }),
-    defaultValues: { phone: '', channel: 'SMS' as const },
+    defaultValues: { email: '' },
   });
 
   const request = useMutation({
-    mutationFn: authApi.requestOtp,
-    onSuccess: (dispatch, variables) => {
-      onCodeSent({ flow: 'login', channel: variables.channel ?? 'SMS', dispatch });
+    mutationFn: (email: string) => authApi.requestOtp({ purpose: 'LOGIN', email }),
+    onSuccess: (dispatch, email) => {
+      onCodeSent({ flow: 'login', dispatch: { ...dispatch, email } });
     },
     onError: (error) => {
-      applyServerIssues(error, form.setError, ['phone']);
+      applyServerIssues(error, form.setError, ['email']);
     },
   });
 
-  const phoneError = validationMessage(form.formState.errors.phone?.message);
+  const emailError = validationMessage(form.formState.errors.email?.message);
   const requestError =
     request.isError &&
     !(request.error instanceof ApiError && request.error.code === 'VALIDATION_ERROR')
@@ -174,35 +176,21 @@ function OtpLogin({ onCodeSent }: { onCodeSent: (verification: PendingVerificati
       className="grid gap-4"
       onSubmit={(event) => {
         void form.handleSubmit((values) => {
-          request.mutate({ ...values, purpose: 'LOGIN' });
+          request.mutate(values.email);
         })(event);
       }}
     >
       <p className="text-sm text-muted-foreground">{t('login.otpHint')}</p>
       {requestError !== null && <Alert tone="danger">{requestError}</Alert>}
-      <Field id={`${id}-phone`} label={t('fields.phone')} error={phoneError}>
-        <Controller
-          control={form.control}
-          name="phone"
-          render={({ field }) => (
-            <PhoneInput
-              {...controlProps(`${id}-phone`, { error: phoneError })}
-              ref={field.ref}
-              name={field.name}
-              value={field.value}
-              onValueChange={field.onChange}
-              onBlur={field.onBlur}
-            />
-          )}
+      <Field id={`${id}-email`} label={t('fields.email')} error={emailError}>
+        <Input
+          {...controlProps(`${id}-email`, { error: emailError })}
+          type="email"
+          autoComplete="email"
+          dir="ltr"
+          {...form.register('email')}
         />
       </Field>
-      <Controller
-        control={form.control}
-        name="channel"
-        render={({ field }) => (
-          <ChannelPicker value={field.value ?? 'SMS'} onValueChange={field.onChange} />
-        )}
-      />
       <Button type="submit" size="lg" loading={request.isPending}>
         {t('login.sendCode')}
       </Button>
@@ -210,7 +198,7 @@ function OtpLogin({ onCodeSent }: { onCodeSent: (verification: PendingVerificati
   );
 }
 
-/** Connexion par mot de passe ou par code à usage unique, puis vérification du téléphone si besoin. */
+/** Connexion par mot de passe ou par code à usage unique, puis confirmation de l'email si besoin. */
 export function LoginForm({
   portal,
   nextPath,
@@ -251,7 +239,7 @@ export function LoginForm({
             {t('login.methodPassword')}
           </TabsTrigger>
           <TabsTrigger value="otp">
-            <MessageSquareText className="size-4" aria-hidden="true" />
+            <Mail className="size-4" aria-hidden="true" />
             {t('login.methodOtp')}
           </TabsTrigger>
         </TabsList>

@@ -16,7 +16,6 @@ import { Link } from '@/i18n/navigation';
 import { authApi } from '@/lib/api/auth';
 import { ApiError } from '@/lib/api/errors';
 
-import { ChannelPicker } from './channel-picker';
 import { controlProps } from './control-props';
 import { PasswordInput } from './password-input';
 import { type PendingVerification, PhoneVerification } from './phone-verification';
@@ -25,7 +24,7 @@ import { useCompleteAuth } from './use-complete-auth';
 
 const SIGNUP_FIELDS = ['firstName', 'lastName', 'phone', 'email', 'password'] as const;
 
-/** Inscription (client ou gérant d'agence selon le portail), puis vérification du téléphone. */
+/** Inscription (client ou gérant d'agence selon le portail), puis confirmation de l'email. */
 export function SignupForm({ nextPath }: { nextPath: string | null }) {
   const t = useTranslations('auth');
   const locale = useLocale();
@@ -43,7 +42,6 @@ export function SignupForm({ nextPath }: { nextPath: string | null }) {
       phone: '',
       email: '',
       password: '',
-      channel: 'SMS' as const,
     },
   });
 
@@ -52,8 +50,12 @@ export function SignupForm({ nextPath }: { nextPath: string | null }) {
     onMutate: () => {
       setFormError(null);
     },
-    onSuccess: (dispatch, values) => {
-      setVerification({ flow: 'signup', channel: values.channel ?? 'SMS', dispatch });
+    onSuccess: (dispatch) => {
+      if (dispatch.email === undefined) {
+        setFormError(t('errors.generic'));
+        return;
+      }
+      setVerification({ flow: 'signup', dispatch: { ...dispatch, email: dispatch.email } });
     },
     onError: (error) => {
       if (error instanceof ApiError && error.code === 'PHONE_ALREADY_USED') {
@@ -86,6 +88,8 @@ export function SignupForm({ nextPath }: { nextPath: string | null }) {
   const emailError = validationMessage(errors.email?.message);
   const passwordError = validationMessage(errors.password?.message);
   const passwordHint = t('passwordHint');
+  const emailHint = t('signup.emailHint');
+  const phoneHint = t('signup.phoneHint');
 
   return (
     <div className="grid gap-6">
@@ -115,13 +119,22 @@ export function SignupForm({ nextPath }: { nextPath: string | null }) {
             />
           </Field>
         </div>
-        <Field id={`${id}-phone`} label={t('fields.phone')} error={phoneError}>
+        <Field id={`${id}-email`} label={t('fields.email')} hint={emailHint} error={emailError}>
+          <Input
+            {...controlProps(`${id}-email`, { error: emailError, hint: emailHint })}
+            type="email"
+            autoComplete="email"
+            dir="ltr"
+            {...form.register('email')}
+          />
+        </Field>
+        <Field id={`${id}-phone`} label={t('fields.phone')} hint={phoneHint} error={phoneError}>
           <Controller
             control={form.control}
             name="phone"
             render={({ field }) => (
               <PhoneInput
-                {...controlProps(`${id}-phone`, { error: phoneError })}
+                {...controlProps(`${id}-phone`, { error: phoneError, hint: phoneHint })}
                 ref={field.ref}
                 name={field.name}
                 value={field.value}
@@ -129,15 +142,6 @@ export function SignupForm({ nextPath }: { nextPath: string | null }) {
                 onBlur={field.onBlur}
               />
             )}
-          />
-        </Field>
-        <Field id={`${id}-email`} label={t('fields.emailOptional')} error={emailError}>
-          <Input
-            {...controlProps(`${id}-email`, { error: emailError })}
-            type="email"
-            autoComplete="email"
-            dir="ltr"
-            {...form.register('email')}
           />
         </Field>
         <Field
@@ -152,13 +156,6 @@ export function SignupForm({ nextPath }: { nextPath: string | null }) {
             {...form.register('password')}
           />
         </Field>
-        <Controller
-          control={form.control}
-          name="channel"
-          render={({ field }) => (
-            <ChannelPicker value={field.value ?? 'SMS'} onValueChange={field.onChange} />
-          )}
-        />
         <p className="text-xs text-muted-foreground">{t('signup.terms')}</p>
         <Button type="submit" size="lg" loading={signup.isPending}>
           {t('signup.submit')}

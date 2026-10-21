@@ -20,11 +20,34 @@ import { RateLimitService, tooManyRequests } from '../rate-limit/rate-limit.serv
 import { REDIS_CLIENT } from '../redis/redis.constants';
 
 export const OTP_TTL_SECONDS = 5 * 60;
+/** Un email met plus de temps à arriver qu'un SMS. */
+export const EMAIL_OTP_TTL_SECONDS = 10 * 60;
 export const OTP_RESEND_COOLDOWN_SECONDS = 60;
 export const OTP_MAX_ATTEMPTS = 5;
 /** Plafonds anti-spam (et anti-coûts SMS) : par numéro et par adresse IP. */
 export const OTP_PHONE_LIMIT = { limit: 5, windowSeconds: 60 * 60 };
 export const OTP_IP_LIMIT = { limit: 20, windowSeconds: 60 * 60 };
+
+export interface SendEmailOtpParams {
+  email: string;
+  /** Numéro national du compte. Ignoré quand rien n'est envoyé. */
+  phone: string | null;
+  purpose: OtpPurpose;
+  locale: Locale;
+  ip: string | null;
+  /**
+   * `false` quand aucun compte en attente ne correspond : mêmes délais, aucun email
+   * (on ne révèle pas si l'adresse est inscrite).
+   */
+  deliver: boolean;
+}
+
+interface StoredOtp {
+  id: string;
+  codeHash: string;
+  attempts: number;
+  expiresAt: Date;
+}
 
 export interface SendOtpParams {
   /** Numéro national à 8 chiffres. */
@@ -87,6 +110,54 @@ export class OtpService {
     };
   }
 
+  /**
+   * Code de confirmation d'email. Un seul code reste valable : les précédents, non consommés,
+   * sont invalidés. Le code n'est jamais renvoyé au client, seulement son empreinte est stockée.
+   */
+  async sendEmail(params: SendEmailOtpParams): Promise<OtpDispatch> {
+    const email = params.email.trim().toLowerCase();
+    await this.applyCooldown(`email:${email}`, params.purpose);
+    await this.rateLimit.consume(`otp:email:${email}`, OTP_PHONE_LIMIT);
+    await this.rateLimit.consume(`otp:ip:${params.ip ?? 'unknown'}`, OTP_IP_LIMIT);
+
+    const phone = params.phone;
+    if (params.deliver && phone !== null) {
+      const code = randomInt(0, 10 ** OTP_LENGTH)
+        .toString()
+        .padStart(OTP_LENGTH, '0');
+      await this.prisma.otpCode.updateMany({
+        where: { email, purpose: params.purpose, consumedAt: null },
+        data: { consumedAt: new Date() },
+      });
+      await this.prisma.otpCode.create({
+        data: {
+          phone: toE164(phone),
+          email,
+          purpose: params.purpose,
+          channel: 'EMAIL',
+          codeHash: this.hashEmailCode(email, params.purpose, code),
+          expiresAt: new Date(Date.now() + EMAIL_OTP_TTL_SECONDS * 1000),
+        },
+      });
+      await this.messaging.enqueue({
+        template: 'otp',
+        channel: 'EMAIL',
+        to: email,
+        locale: params.locale,
+        code,
+        purpose: params.purpose,
+        expiresInMinutes: EMAIL_OTP_TTL_SECONDS / 60,
+      });
+    }
+
+    return {
+      phone: params.phone ?? '',
+      email,
+      expiresInSeconds: EMAIL_OTP_TTL_SECONDS,
+      resendInSeconds: OTP_RESEND_COOLDOWN_SECONDS,
+    };
+  }
+
   /** Vérifie le dernier code envoyé pour ce numéro et cet usage, puis le consomme. */
   async verify(nationalPhone: string, purpose: OtpPurpose, code: string): Promise<void> {
     const phone = toE164(nationalPhone);
@@ -94,6 +165,20 @@ export class OtpService {
       where: { phone, purpose, consumedAt: null },
       orderBy: { createdAt: 'desc' },
     });
+    await this.consume(otp, this.hashCode(phone, purpose, code));
+  }
+
+  /** Vérifie le dernier code envoyé à cette adresse pour cet usage, puis le consomme. */
+  async verifyEmail(email: string, purpose: OtpPurpose, code: string): Promise<void> {
+    const normalized = email.trim().toLowerCase();
+    const otp = await this.prisma.otpCode.findFirst({
+      where: { email: normalized, purpose, consumedAt: null },
+      orderBy: { createdAt: 'desc' },
+    });
+    await this.consume(otp, this.hashEmailCode(normalized, purpose, code));
+  }
+
+  private async consume(otp: StoredOtp | null, expectedHash: string): Promise<void> {
     if (otp === null || otp.expiresAt.getTime() <= Date.now()) {
       throw new AppException(
         HttpStatus.BAD_REQUEST,
@@ -105,7 +190,7 @@ export class OtpService {
       throw tooManyAttempts();
     }
 
-    if (!this.matches(otp.codeHash, this.hashCode(phone, purpose, code))) {
+    if (!this.matches(otp.codeHash, expectedHash)) {
       const updated = await this.prisma.otpCode.update({
         where: { id: otp.id },
         data: { attempts: { increment: 1 } },
@@ -141,6 +226,13 @@ export class OtpService {
   private hashCode(phone: string, purpose: OtpPurpose, code: string): string {
     return createHmac('sha256', this.config.OTP_HASH_SECRET)
       .update(`${phone}:${purpose}:${code}`)
+      .digest('hex');
+  }
+
+  /** Préfixe distinct du hash téléphone, pour qu'un code ne puisse pas servir sur l'autre canal. */
+  private hashEmailCode(email: string, purpose: OtpPurpose, code: string): string {
+    return createHmac('sha256', this.config.OTP_HASH_SECRET)
+      .update(`email:${email}:${purpose}:${code}`)
       .digest('hex');
   }
 

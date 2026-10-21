@@ -7,11 +7,11 @@ import {
   type HandoffRequest,
   loginSchema,
   type LoginRequest,
+  emailOtpVerifySchema,
+  type EmailOtpVerifyRequest,
   type OtpDispatch,
   type OtpRequest,
   otpRequestSchema,
-  otpVerifySchema,
-  type OtpVerifyRequest,
   resetPasswordSchema,
   type ResetPasswordRequest,
   signupSchema,
@@ -57,7 +57,7 @@ import {
   LoginDto,
   OtpDispatchDto,
   OtpRequestDto,
-  OtpVerifyDto,
+  EmailOtpVerifyDto,
   ResetPasswordDto,
   SignupDto,
 } from './auth.dto';
@@ -77,7 +77,9 @@ export class AuthController {
   @Public()
   @Post('signup')
   @RateLimit({ name: 'signup', limit: 10, windowSeconds: 60 * 60 })
-  @ApiOperation({ summary: 'Inscription (client ou gérant d’agence selon le portail) + envoi OTP' })
+  @ApiOperation({
+    summary: 'Inscription (client ou gérant d’agence selon le portail) et envoi du code email',
+  })
   @ApiBody({ type: SignupDto })
   @ApiCreatedResponse({ type: OtpDispatchDto })
   signup(
@@ -91,7 +93,9 @@ export class AuthController {
   @Post('otp/request')
   @HttpCode(HttpStatus.ACCEPTED)
   @RateLimit({ name: 'otp', ...OTP_ROUTE_LIMIT })
-  @ApiOperation({ summary: 'Renvoi du code d’inscription ou code de connexion sans mot de passe' })
+  @ApiOperation({
+    summary: 'Renvoi du code de confirmation email, ou code de connexion sans mot de passe',
+  })
   @ApiBody({ type: OtpRequestDto })
   @ApiAcceptedResponse({ type: OtpDispatchDto })
   requestOtp(
@@ -105,11 +109,11 @@ export class AuthController {
   @Post('otp/verify')
   @HttpCode(HttpStatus.OK)
   @RateLimit({ name: 'otp-verify', limit: 30, windowSeconds: 15 * 60 })
-  @ApiOperation({ summary: 'Vérifie le téléphone après inscription et ouvre la session' })
-  @ApiBody({ type: OtpVerifyDto })
+  @ApiOperation({ summary: 'Confirme l’email après inscription et ouvre la session' })
+  @ApiBody({ type: EmailOtpVerifyDto })
   @ApiOkResponse({ type: AuthResultDto })
   async verifySignup(
-    @Body(new ZodValidationPipe(otpVerifySchema)) body: OtpVerifyRequest,
+    @Body(new ZodValidationPipe(emailOtpVerifySchema)) body: EmailOtpVerifyRequest,
     @Req() request: Request,
     @Res({ passthrough: true }) response: Response,
   ): Promise<AuthResult> {
@@ -135,11 +139,11 @@ export class AuthController {
   @Post('login/otp')
   @HttpCode(HttpStatus.OK)
   @RateLimit({ name: 'login', ...LOGIN_ROUTE_LIMIT })
-  @ApiOperation({ summary: 'Connexion par code SMS / WhatsApp' })
-  @ApiBody({ type: OtpVerifyDto })
+  @ApiOperation({ summary: 'Connexion par code envoyé par email' })
+  @ApiBody({ type: EmailOtpVerifyDto })
   @ApiOkResponse({ type: AuthResultDto })
   async loginWithOtp(
-    @Body(new ZodValidationPipe(otpVerifySchema)) body: OtpVerifyRequest,
+    @Body(new ZodValidationPipe(emailOtpVerifySchema)) body: EmailOtpVerifyRequest,
     @Req() request: Request,
     @Res({ passthrough: true }) response: Response,
   ): Promise<AuthResult> {

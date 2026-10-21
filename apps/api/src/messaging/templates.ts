@@ -26,6 +26,13 @@ const OTP_FOOTER: Record<Locale, string> = {
   en: 'Valid for {minutes} min. Never share it with anyone.',
 };
 
+/** Corps d'email. Le code reste dans le corps, jamais dans l'objet. */
+const EMAIL_OTP_BODY: Record<Locale, string> = {
+  fr: '{intro}\n\n{code}\n\nCe code est valable {minutes} minutes. Ne le communiquez à personne.\n\nSi vous n’êtes pas à l’origine de cette demande, ignorez cet email.',
+  ar: '{intro}\n\n{code}\n\nهذا الرمز صالح لمدة {minutes} دقائق. لا تشاركه مع أي شخص.\n\nإذا لم تطلب هذا الرمز، تجاهل هذه الرسالة.',
+  en: '{intro}\n\n{code}\n\nThis code is valid for {minutes} minutes. Never share it with anyone.\n\nIf you did not request this code, ignore this email.',
+};
+
 const INVOICE_REMINDER: Record<'upcoming' | 'overdue', Record<Locale, string>> = {
   upcoming: {
     fr: '{app} : la facture {number} ({amount}) arrive à échéance le {due}. Merci de procéder au règlement ou de contacter le support.',
@@ -50,8 +57,20 @@ function formatDay(day: string): string {
 
 function renderOtp(job: OtpMessageJob, appName: string): string {
   const intro = fill(OTP_INTRO[job.locale][job.purpose], { app: appName });
-  const footer = fill(OTP_FOOTER[job.locale], { minutes: String(job.expiresInMinutes) });
+  const minutes = String(job.expiresInMinutes);
+  if (job.channel === 'EMAIL') {
+    return fill(EMAIL_OTP_BODY[job.locale], { intro, code: job.code, minutes });
+  }
+  const footer = fill(OTP_FOOTER[job.locale], { minutes });
   return `${intro} : ${job.code}. ${footer}`;
+}
+
+/** Objet d'un email de code. Le code lui-même n'y figure pas (aperçu de notification). */
+export function renderEmailSubject(job: MessageJob, appName: string): string | undefined {
+  if (job.template !== 'otp' || job.channel !== 'EMAIL') {
+    return undefined;
+  }
+  return fill(OTP_INTRO[job.locale][job.purpose], { app: appName });
 }
 
 function renderInvoiceReminder(job: InvoiceReminderJob, appName: string): string {

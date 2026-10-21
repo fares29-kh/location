@@ -1,7 +1,7 @@
 import { LOCALES, OTP_PURPOSES } from '@drivetn/types';
 import { describe, expect, it } from 'vitest';
 
-import { renderMessage } from './templates';
+import { renderEmailSubject, renderMessage } from './templates';
 
 describe('renderMessage', () => {
   it('rend un message complet dans chaque langue et pour chaque usage', () => {
@@ -63,5 +63,22 @@ describe('renderMessage', () => {
     } as const;
     expect(renderMessage({ ...base, overdue: false }, 'DriveTN')).toContain('arrive à échéance');
     expect(renderMessage({ ...base, overdue: true }, 'DriveTN')).toContain('reste impayée');
+  });
+
+  it('met le code dans le corps de l’email et pas dans l’objet', () => {
+    const job = {
+      template: 'otp',
+      channel: 'EMAIL',
+      to: 'amira@example.tn',
+      locale: 'fr',
+      purpose: 'SIGNUP',
+      code: '482915',
+      expiresInMinutes: 10,
+    } as const;
+    const text = renderMessage(job, 'DriveTN');
+    expect(text).toContain('482915');
+    expect(text).toContain('ignorez cet email');
+    expect(renderEmailSubject(job, 'DriveTN')).toBe('Votre code de vérification DriveTN');
+    expect(renderEmailSubject(job, 'DriveTN')).not.toContain('482915');
   });
 });

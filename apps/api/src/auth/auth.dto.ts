@@ -4,8 +4,6 @@ import {
   type CurrentUser,
   type Locale,
   LOCALES,
-  OTP_CHANNELS,
-  type OtpChannel,
   type OtpDispatch,
   type Portal,
   PORTALS,
@@ -30,17 +28,14 @@ export class SignupDto {
   @ApiProperty({ example: PHONE_EXAMPLE, description: 'Numéro tunisien (+216, 8 chiffres)' })
   phone: string;
 
-  @ApiPropertyOptional({ example: 'amira@example.tn' })
-  email?: string;
+  @ApiProperty({ example: 'amira@example.tn', description: 'Adresse à confirmer par code' })
+  email: string;
 
   @ApiProperty({ minLength: 8, description: 'Au moins une lettre et un chiffre' })
   password: string;
 
   @ApiPropertyOptional({ enum: LOCALES })
   locale?: Locale;
-
-  @ApiPropertyOptional({ enum: OTP_CHANNELS, default: 'SMS' })
-  channel?: OtpChannel;
 }
 
 export class LoginDto {
@@ -52,33 +47,27 @@ export class LoginDto {
 }
 
 export class OtpRequestDto {
-  @ApiProperty({ example: PHONE_EXAMPLE })
-  phone: string;
-
   @ApiProperty({ enum: ['SIGNUP', 'LOGIN'] })
   purpose: 'SIGNUP' | 'LOGIN';
 
-  @ApiPropertyOptional({ enum: OTP_CHANNELS, default: 'SMS' })
-  channel?: OtpChannel;
+  @ApiProperty({ example: 'amira@example.tn' })
+  email: string;
 }
 
-export class OtpVerifyDto {
-  @ApiProperty({ example: PHONE_EXAMPLE })
-  phone: string;
+export class EmailOtpVerifyDto {
+  @ApiProperty({ example: 'amira@example.tn' })
+  email: string;
 
   @ApiProperty({ example: '123456' })
   code: string;
 }
 
 export class ForgotPasswordDto {
-  @ApiProperty({ example: PHONE_EXAMPLE })
-  phone: string;
-
-  @ApiPropertyOptional({ enum: OTP_CHANNELS, default: 'SMS' })
-  channel?: OtpChannel;
+  @ApiProperty({ example: 'amira@example.tn' })
+  email: string;
 }
 
-export class ResetPasswordDto extends OtpVerifyDto {
+export class ResetPasswordDto extends EmailOtpVerifyDto {
   @ApiProperty({ minLength: 8 })
   password: string;
 }
@@ -138,6 +127,9 @@ export class CurrentUserDto implements CurrentUser {
   @ApiProperty({ nullable: true, type: String })
   email: string | null;
 
+  @ApiProperty()
+  emailVerified: boolean;
+
   @ApiProperty({ enum: LOCALES })
   locale: Locale;
 }
@@ -145,6 +137,9 @@ export class CurrentUserDto implements CurrentUser {
 export class OtpDispatchDto implements OtpDispatch {
   @ApiProperty({ example: '98123456' })
   phone: string;
+
+  @ApiPropertyOptional({ example: 'amira@example.tn' })
+  email?: string;
 
   @ApiProperty({ example: 300 })
   expiresInSeconds: number;

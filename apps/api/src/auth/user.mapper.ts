@@ -12,6 +12,7 @@ export function toCurrentUser(user: User): CurrentUser {
     phone: normalizeTunisianPhone(user.phone),
     phoneVerified: user.phoneVerifiedAt !== null,
     email: user.email,
+    emailVerified: user.emailVerifiedAt !== null,
     locale: user.locale,
   };
 }

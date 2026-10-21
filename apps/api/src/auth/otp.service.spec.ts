@@ -106,6 +106,53 @@ describe('OtpService', () => {
     expect(context.consume).toHaveBeenCalledTimes(2);
   });
 
+  it('envoie un code email lié à l’adresse, sans le stocker en clair', async () => {
+    const dispatch = await context.service.sendEmail({
+      email: 'Amira@Example.tn',
+      phone: '98123456',
+      purpose: 'SIGNUP',
+      locale: 'fr',
+      ip: '10.0.0.1',
+      deliver: true,
+    });
+    expect(dispatch).toEqual({
+      phone: '98123456',
+      email: 'amira@example.tn',
+      expiresInSeconds: 600,
+      resendInSeconds: 60,
+    });
+    expect(context.otpCode.updateMany).toHaveBeenCalledOnce();
+    const job = context.enqueue.mock.calls[0]?.[0];
+    expect(job).toMatchObject({ to: 'amira@example.tn', channel: 'EMAIL', purpose: 'SIGNUP' });
+    expect(job?.code).toMatch(/^\d{6}$/);
+    const stored = context.otpCode.create.mock.calls[0]?.[0].data;
+    expect(stored?.codeHash).not.toContain(job?.code);
+
+    context.otpCode.findFirst.mockResolvedValue({
+      id: 'otp-email',
+      codeHash: stored?.codeHash ?? '',
+      attempts: 0,
+      expiresAt: new Date(Date.now() + 60_000),
+    });
+    await expect(
+      context.service.verifyEmail('amira@example.tn', 'SIGNUP', job?.code ?? ''),
+    ).resolves.toBeUndefined();
+  });
+
+  it('n’envoie rien pour une adresse non éligible, avec la même réponse', async () => {
+    const dispatch = await context.service.sendEmail({
+      email: 'inconnu@example.tn',
+      phone: null,
+      purpose: 'SIGNUP',
+      locale: 'fr',
+      ip: '10.0.0.1',
+      deliver: false,
+    });
+    expect(dispatch.email).toBe('inconnu@example.tn');
+    expect(context.enqueue).not.toHaveBeenCalled();
+    expect(context.otpCode.create).not.toHaveBeenCalled();
+  });
+
   it('applique les limites sans rien envoyer à un numéro non éligible', async () => {
     const dispatch = await context.service.send({ ...SEND, deliver: false });
     expect(dispatch.resendInSeconds).toBe(60);

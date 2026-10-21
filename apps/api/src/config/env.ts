@@ -37,6 +37,14 @@ export const envSchema = z.object({
   /** Cookies `Secure` : à activer dès que la plateforme est servie en HTTPS. */
   COOKIE_SECURE: booleanString,
   MESSAGING_PROVIDER: z.enum(MESSAGING_PROVIDERS).default('console'),
+  /** SMTP pour les codes de confirmation email. Vide : le code est seulement journalisé. */
+  SMTP_HOST: z.string().default(''),
+  SMTP_PORT: z.coerce.number().int().min(1).max(65535).default(587),
+  /** true pour le TLS implicite (port 465). false pour STARTTLS (port 587). */
+  SMTP_SECURE: booleanString,
+  SMTP_USER: z.string().default(''),
+  SMTP_PASSWORD: z.string().default(''),
+  SMTP_FROM: z.string().default('DriveTN <noreply@localhost>'),
   SEED_DEMO_ACCOUNTS: booleanString,
   /** Stockage S3 (MinIO en local, Object Storage Hetzner). Sans point d'accès, voir Azure. */
   S3_ENDPOINT: z.url({ protocol: /^https?$/ }).optional(),
@@ -74,6 +82,11 @@ export function parseEnv(source: Record<string, string | undefined>): Env {
   ) {
     throw new Error(
       'Configuration invalide :\nAZURE_STORAGE_ACCESS_KEY et AZURE_STORAGE_CONTAINER sont requis avec AZURE_STORAGE_ACCOUNT',
+    );
+  }
+  if (env.SMTP_HOST !== '' && !env.SMTP_FROM.includes('@')) {
+    throw new Error(
+      'Configuration invalide :\nSMTP_FROM doit contenir une adresse email lorsque SMTP_HOST est défini',
     );
   }
   return env;

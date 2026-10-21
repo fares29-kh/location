@@ -1870,6 +1870,7 @@
           "password_reset": "Mot de passe réinitialisé",
           "password_changed": "Mot de passe modifié",
           "phone_verified": "Téléphone vérifié",
+          "email_verified": "Email confirmé",
           "logout": "Déconnexion",
           "refresh_token_reused": "Réutilisation suspecte d’une session"
         },
@@ -1998,7 +1999,7 @@
       "notes": "Remarques",
       "notesPlaceholder": "Heure d’arrivée, numéro de vol…",
       "otp": "Code de vérification",
-      "otpHint": "Saisissez le code reçu par SMS.",
+      "otpHint": "Saisissez le code reçu par email.",
       "otpDigit": "Chiffre {index} sur {length}",
       "transmission": "Boîte de vitesses",
       "manual": "Manuelle",
@@ -2111,11 +2112,6 @@
     "passwordHint": "8 caractères minimum, avec au moins une lettre et un chiffre.",
     "showPassword": "Afficher le mot de passe",
     "hidePassword": "Masquer le mot de passe",
-    "channel": {
-      "label": "Recevoir le code par",
-      "SMS": "SMS",
-      "WHATSAPP": "WhatsApp"
-    },
     "login": {
       "title": "Connexion",
       "subtitle": {
@@ -2125,8 +2121,8 @@
       },
       "methodsLabel": "Méthode de connexion",
       "methodPassword": "Mot de passe",
-      "methodOtp": "Code par SMS",
-      "otpHint": "Nous vous envoyons un code à usage unique, sans mot de passe.",
+      "methodOtp": "Code par email",
+      "otpHint": "Nous envoyons un code à usage unique à votre adresse email.",
       "submit": "Se connecter",
       "sendCode": "Recevoir un code",
       "forgotPassword": "Mot de passe oublié ?",
@@ -2156,6 +2152,8 @@
         "client": "Un compte gratuit pour réserver sans carte bancaire et suivre vos locations.",
         "agency": "Commencez par votre compte gérant : vous configurerez ensuite votre agence et votre flotte."
       },
+      "emailHint": "Un code de confirmation sera envoyé à cette adresse.",
+      "phoneHint": "Numéro transmis à l'agence. Le code n'est pas envoyé par SMS.",
       "submit": "Créer mon compte",
       "terms": "En créant un compte, vous acceptez les conditions d'utilisation et la politique de confidentialité de la plateforme.",
       "hasAccount": "Déjà un compte ?",
@@ -2163,20 +2161,23 @@
     },
     "otp": {
       "title": "Vérifiez votre téléphone",
+      "emailTitle": "Vérifiez votre email",
       "description": "Saisissez le code à 6 chiffres envoyé au {phone}.",
+      "emailDescription": "Saisissez le code à 6 chiffres envoyé à {email}.",
       "digitLabel": "Chiffre {index} sur {length}",
       "verify": "Valider le code",
       "resend": "Renvoyer le code",
       "resendIn": "Renvoyer le code dans {seconds} s",
       "resent": "Un nouveau code vous a été envoyé.",
-      "back": "Modifier le numéro"
+      "back": "Modifier le numéro",
+      "backEmail": "Modifier l'adresse email"
     },
     "forgot": {
       "title": "Mot de passe oublié",
-      "subtitle": "Indiquez votre numéro : nous vous enverrons un code pour choisir un nouveau mot de passe.",
+      "subtitle": "Indiquez votre email : nous vous enverrons un code pour choisir un nouveau mot de passe.",
       "sendCode": "Envoyer le code",
       "resetTitle": "Nouveau mot de passe",
-      "resetSubtitle": "Saisissez le code reçu au {phone} et votre nouveau mot de passe.",
+      "resetSubtitle": "Saisissez le code reçu à {email} et votre nouveau mot de passe.",
       "submit": "Enregistrer le mot de passe",
       "successTitle": "Mot de passe modifié",
       "successText": "Vous pouvez maintenant vous connecter avec votre nouveau mot de passe.",
@@ -2233,6 +2234,7 @@
       "PHONE_ALREADY_USED": "Ce numéro est déjà associé à un compte. Connectez-vous.",
       "EMAIL_ALREADY_USED": "Cet email est déjà associé à un compte.",
       "PHONE_NOT_VERIFIED": "Vérifiez votre numéro de téléphone pour continuer.",
+      "EMAIL_NOT_VERIFIED": "Confirmez votre adresse email pour continuer.",
       "ACCOUNT_SUSPENDED": "Ce compte est suspendu. Contactez le support.",
       "TOO_MANY_REQUESTS": "Trop de tentatives. Réessayez dans {seconds} s.",
       "FORBIDDEN": "Action non autorisée sur cet espace.",

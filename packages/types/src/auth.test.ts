@@ -74,22 +74,22 @@ describe('signupSchema', () => {
     firstName: ' Amira ',
     lastName: 'Ben Salah',
     phone: '98 123 456',
-    email: '',
+    email: ' Amira@Example.TN ',
     password: 'voiture2026',
   };
 
-  it('normalise les champs et ignore un email vide', () => {
+  it('normalise le nom, le téléphone et l’email', () => {
     expect(signupSchema.parse(valid)).toEqual({
       firstName: 'Amira',
       lastName: 'Ben Salah',
       phone: '98123456',
-      email: undefined,
+      email: 'amira@example.tn',
       password: 'voiture2026',
-      channel: 'SMS',
     });
   });
 
-  it('refuse un email invalide', () => {
+  it('refuse un email vide ou invalide', () => {
+    expect(firstMessage(signupSchema.safeParse({ ...valid, email: ' ' }))).toBe('REQUIRED');
     expect(firstMessage(signupSchema.safeParse({ ...valid, email: 'faux' }))).toBe('INVALID_EMAIL');
   });
 

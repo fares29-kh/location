@@ -1870,6 +1870,7 @@
           "password_reset": "Password reset",
           "password_changed": "Password changed",
           "phone_verified": "Phone verified",
+          "email_verified": "Email confirmed",
           "logout": "Sign-out",
           "refresh_token_reused": "Suspicious session reuse"
         },
@@ -1998,7 +1999,7 @@
       "notes": "Notes",
       "notesPlaceholder": "Arrival time, flight number…",
       "otp": "Verification code",
-      "otpHint": "Enter the code you received by SMS.",
+      "otpHint": "Enter the code you received by email.",
       "otpDigit": "Digit {index} of {length}",
       "transmission": "Transmission",
       "manual": "Manual",
@@ -2111,11 +2112,6 @@
     "passwordHint": "At least 8 characters, with at least one letter and one digit.",
     "showPassword": "Show password",
     "hidePassword": "Hide password",
-    "channel": {
-      "label": "Receive the code by",
-      "SMS": "SMS",
-      "WHATSAPP": "WhatsApp"
-    },
     "login": {
       "title": "Sign in",
       "subtitle": {
@@ -2125,8 +2121,8 @@
       },
       "methodsLabel": "Sign-in method",
       "methodPassword": "Password",
-      "methodOtp": "Code by SMS",
-      "otpHint": "We send you a one-time code, no password needed.",
+      "methodOtp": "Email code",
+      "otpHint": "We send a one-time code to your email address.",
       "submit": "Sign in",
       "sendCode": "Get a code",
       "forgotPassword": "Forgot your password?",
@@ -2156,6 +2152,8 @@
         "client": "A free account to book without a credit card and track your rentals.",
         "agency": "Start with your manager account: you will then set up your agency and fleet."
       },
+      "emailHint": "A confirmation code will be sent to this address.",
+      "phoneHint": "Number shared with the agency. The code is not sent by SMS.",
       "submit": "Create my account",
       "terms": "By creating an account, you accept the platform's terms of use and privacy policy.",
       "hasAccount": "Already have an account?",
@@ -2163,20 +2161,23 @@
     },
     "otp": {
       "title": "Verify your phone",
+      "emailTitle": "Check your email",
       "description": "Enter the 6-digit code sent to {phone}.",
+      "emailDescription": "Enter the 6-digit code sent to {email}.",
       "digitLabel": "Digit {index} of {length}",
       "verify": "Verify code",
       "resend": "Resend code",
       "resendIn": "Resend code in {seconds} s",
       "resent": "A new code has been sent.",
-      "back": "Change number"
+      "back": "Change number",
+      "backEmail": "Change email address"
     },
     "forgot": {
       "title": "Forgot password",
-      "subtitle": "Enter your number: we will send you a code to choose a new password.",
+      "subtitle": "Enter your email: we will send you a code to choose a new password.",
       "sendCode": "Send code",
       "resetTitle": "New password",
-      "resetSubtitle": "Enter the code sent to {phone} and your new password.",
+      "resetSubtitle": "Enter the code sent to {email} and your new password.",
       "submit": "Save password",
       "successTitle": "Password changed",
       "successText": "You can now sign in with your new password.",
@@ -2233,6 +2234,7 @@
       "PHONE_ALREADY_USED": "This number is already linked to an account. Please sign in.",
       "EMAIL_ALREADY_USED": "This email is already linked to an account.",
       "PHONE_NOT_VERIFIED": "Verify your phone number to continue.",
+      "EMAIL_NOT_VERIFIED": "Confirm your email address to continue.",
       "ACCOUNT_SUSPENDED": "This account is suspended. Contact support.",
       "TOO_MANY_REQUESTS": "Too many attempts. Try again in {seconds} s.",
       "FORBIDDEN": "This action is not allowed on this workspace.",

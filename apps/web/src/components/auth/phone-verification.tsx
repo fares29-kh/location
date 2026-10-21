@@ -1,6 +1,6 @@
 'use client';
 
-import type { AuthResult, OtpChannel, OtpDispatch } from '@drivetn/types';
+import type { AuthResult, OtpDispatch } from '@drivetn/types';
 import { useMutation } from '@tanstack/react-query';
 
 import { authApi } from '@/lib/api/auth';
@@ -8,11 +8,10 @@ import { authApi } from '@/lib/api/auth';
 import { OtpStep } from './otp-step';
 import { useAuthMessages } from './use-auth-messages';
 
-/** Code envoyé, en attente de saisie : vérification d'inscription ou connexion sans mot de passe. */
+/** Code envoyé, en attente de saisie : confirmation d'email ou connexion sans mot de passe. */
 export interface PendingVerification {
   flow: 'signup' | 'login';
-  channel: OtpChannel;
-  dispatch: OtpDispatch;
+  dispatch: OtpDispatch & { email: string };
 }
 
 export function PhoneVerification({
@@ -27,13 +26,13 @@ export function PhoneVerification({
   onBack: () => void;
 }) {
   const { errorMessage } = useAuthMessages();
-  const { flow, channel, dispatch } = verification;
+  const { flow, dispatch } = verification;
 
   const verify = useMutation({
     mutationFn: (code: string) =>
       flow === 'signup'
-        ? authApi.verifySignup({ phone: dispatch.phone, code })
-        : authApi.loginWithOtp({ phone: dispatch.phone, code }),
+        ? authApi.verifySignup({ email: dispatch.email, code })
+        : authApi.loginWithOtp({ email: dispatch.email, code }),
     onSuccess: onAuthenticated,
   });
 
@@ -47,9 +46,8 @@ export function PhoneVerification({
       }}
       onResend={() =>
         authApi.requestOtp({
-          phone: dispatch.phone,
           purpose: flow === 'signup' ? 'SIGNUP' : 'LOGIN',
-          channel,
+          email: dispatch.email,
         })
       }
       onBack={onBack}

@@ -30,11 +30,17 @@ export function displayPhone(nationalPhone: string): string {
   return `\u2066+${TUNISIA_DIAL_CODE} ${formatNationalPhone(nationalPhone)}\u2069`;
 }
 
-/** Saisie du code reçu par SMS / WhatsApp, avec renvoi et retour au numéro. */
+/** Adresse isolée (LRI … PDI) pour rester lisible de gauche à droite dans une phrase en arabe. */
+export function displayEmail(email: string): string {
+  return `\u2066${email}\u2069`;
+}
+
+/** Saisie du code reçu par email, avec renvoi. */
 export function OtpStep({ dispatch, pending, error, onVerify, onResend, onBack }: OtpStepProps) {
   const t = useTranslations('auth.otp');
   const [code, setCode] = useState('');
   const complete = code.length === OTP_LENGTH;
+  const email = dispatch.email ?? '';
 
   function submit(event: SyntheticEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -46,9 +52,9 @@ export function OtpStep({ dispatch, pending, error, onVerify, onResend, onBack }
   return (
     <form onSubmit={submit} className="grid gap-5" noValidate>
       <div className="grid gap-1">
-        <h2 className="font-heading text-lg font-semibold">{t('title')}</h2>
+        <h2 className="font-heading text-lg font-semibold">{t('emailTitle')}</h2>
         <p className="text-sm text-muted-foreground">
-          {t('description', { phone: displayPhone(dispatch.phone) })}
+          {t('emailDescription', { email: displayEmail(email) })}
         </p>
       </div>
 
@@ -76,7 +82,7 @@ export function OtpStep({ dispatch, pending, error, onVerify, onResend, onBack }
           onClick={onBack}
         >
           <ArrowLeft className="rtl:rotate-180" aria-hidden="true" />
-          {t('back')}
+          {t('backEmail')}
         </Button>
         <ResendCode initialSeconds={dispatch.resendInSeconds} onResend={onResend} />
       </div>

@@ -118,13 +118,16 @@ enum OtpPurpose {
 enum OtpChannel {
   SMS
   WHATSAPP
+  EMAIL
 }
 
-/// Code à usage unique envoyé par SMS ou WhatsApp, stocké haché (HMAC-SHA-256).
+/// Code à usage unique envoyé par email, SMS ou WhatsApp, stocké haché (HMAC-SHA-256).
 model OtpCode {
   id         String     @id @default(cuid())
-  /// Format E.164.
+  /// Format E.164. Renseigné aussi pour un code email, afin de rattacher l'envoi au compte.
   phone      String
+  /// Adresse en minuscules. Null pour un code SMS ou WhatsApp.
+  email      String?
   purpose    OtpPurpose
   channel    OtpChannel
   codeHash   String     @map("code_hash")
@@ -135,6 +138,7 @@ model OtpCode {
   updatedAt  DateTime   @updatedAt @map("updated_at")
 
   @@index([phone, purpose, createdAt])
+  @@index([email, purpose, createdAt])
   @@map("otp_codes")
 }
 

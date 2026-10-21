@@ -1,19 +1,21 @@
-import type { Locale, OtpChannel, OtpPurpose } from '@drivetn/types';
+import type { DeliveryChannel, Locale, OtpChannel, OtpPurpose } from '@drivetn/types';
 
 export const MESSAGING_QUEUE = 'messaging';
 export const SEND_MESSAGE_JOB = 'send';
 
 /** Message prêt à être remis par un fournisseur SMS ou WhatsApp. */
 export interface OutboundMessage {
-  channel: OtpChannel;
-  /** Destinataire au format E.164. */
+  channel: DeliveryChannel;
+  /** Numéro E.164, ou adresse email pour un code de confirmation. */
   to: string;
   body: string;
+  /** Objet, uniquement pour un email. Le code n'y figure pas. */
+  subject?: string;
 }
 
 export interface OtpMessageJob {
   template: 'otp';
-  channel: OtpChannel;
+  channel: DeliveryChannel;
   to: string;
   locale: Locale;
   code: string;

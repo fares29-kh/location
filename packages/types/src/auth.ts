@@ -13,7 +13,7 @@ export const ADMIN_ROLES = ['SUPER_ADMIN', 'SUPPORT', 'FINANCE'] as const;
 export const adminRoleSchema = z.enum(ADMIN_ROLES);
 export type AdminRole = z.infer<typeof adminRoleSchema>;
 
-/** `PENDING_VERIFICATION` : compte créé, téléphone pas encore vérifié par OTP. */
+/** `PENDING_VERIFICATION` : compte créé, email pas encore confirmé par code. */
 export const USER_STATUSES = ['PENDING_VERIFICATION', 'ACTIVE', 'SUSPENDED'] as const;
 export const userStatusSchema = z.enum(USER_STATUSES);
 export type UserStatus = z.infer<typeof userStatusSchema>;
@@ -22,9 +22,15 @@ export const OTP_PURPOSES = ['SIGNUP', 'LOGIN', 'PASSWORD_RESET'] as const;
 export const otpPurposeSchema = z.enum(OTP_PURPOSES);
 export type OtpPurpose = z.infer<typeof otpPurposeSchema>;
 
+/** Canal SMS ou WhatsApp des relances (factures). Les codes de compte passent par email. */
 export const OTP_CHANNELS = ['SMS', 'WHATSAPP'] as const;
 export const otpChannelSchema = z.enum(OTP_CHANNELS);
 export type OtpChannel = z.infer<typeof otpChannelSchema>;
+
+/** Canal de remise, email compris. L'email n'est pas proposé dans le choix SMS / WhatsApp. */
+export const DELIVERY_CHANNELS = ['SMS', 'WHATSAPP', 'EMAIL'] as const;
+export const deliveryChannelSchema = z.enum(DELIVERY_CHANNELS);
+export type DeliveryChannel = z.infer<typeof deliveryChannelSchema>;
 
 export const OTP_LENGTH = 6;
 
@@ -66,6 +72,13 @@ export const emailSchema = z
   .max(254, { message: 'INVALID_EMAIL' })
   .pipe(z.email({ message: 'INVALID_EMAIL' }));
 
+/** Email obligatoire : une chaîne vide est un champ manquant, pas une adresse invalide. */
+export const requiredEmailSchema = z
+  .string()
+  .trim()
+  .min(1, { message: 'REQUIRED' })
+  .pipe(emailSchema);
+
 /** Email facultatif dans un formulaire : une chaîne vide vaut « non renseigné ». */
 export const optionalEmailSchema = z
   .union([z.literal(''), emailSchema])
@@ -105,10 +118,9 @@ export const signupSchema = z.object({
   firstName: personNameSchema,
   lastName: personNameSchema,
   phone: tunisianPhoneSchema,
-  email: optionalEmailSchema,
+  email: requiredEmailSchema,
   password: passwordSchema,
   locale: localeSchema.optional(),
-  channel: otpChannelSchema.default('SMS'),
 });
 export type SignupInput = z.input<typeof signupSchema>;
 export type SignupRequest = z.output<typeof signupSchema>;
@@ -120,31 +132,42 @@ export const loginSchema = z.object({
 export type LoginInput = z.input<typeof loginSchema>;
 export type LoginRequest = z.output<typeof loginSchema>;
 
-/** Demande (ou renvoi) d'un code : vérification d'inscription ou connexion sans mot de passe. */
-export const otpRequestSchema = z.object({
-  phone: tunisianPhoneSchema,
-  purpose: z.enum(['SIGNUP', 'LOGIN']),
-  channel: otpChannelSchema.default('SMS'),
+/** Renvoi du code de confirmation d'email après inscription. */
+export const signupOtpRequestSchema = z.object({
+  purpose: z.literal('SIGNUP'),
+  email: emailSchema,
 });
+
+/** Code de connexion sans mot de passe, envoyé par email. */
+export const loginOtpRequestSchema = z.object({
+  purpose: z.literal('LOGIN'),
+  email: emailSchema,
+});
+
+/** Demande (ou renvoi) d'un code : confirmation d'inscription ou connexion sans mot de passe. */
+export const otpRequestSchema = z.discriminatedUnion('purpose', [
+  signupOtpRequestSchema,
+  loginOtpRequestSchema,
+]);
 export type OtpRequestInput = z.input<typeof otpRequestSchema>;
 export type OtpRequest = z.output<typeof otpRequestSchema>;
 
-export const otpVerifySchema = z.object({
-  phone: tunisianPhoneSchema,
+/** Code reçu par email : confirmation d'inscription, connexion ou nouveau mot de passe. */
+export const emailOtpVerifySchema = z.object({
+  email: emailSchema,
   code: otpCodeSchema,
 });
-export type OtpVerifyInput = z.input<typeof otpVerifySchema>;
-export type OtpVerifyRequest = z.output<typeof otpVerifySchema>;
+export type EmailOtpVerifyInput = z.input<typeof emailOtpVerifySchema>;
+export type EmailOtpVerifyRequest = z.output<typeof emailOtpVerifySchema>;
 
 export const forgotPasswordSchema = z.object({
-  phone: tunisianPhoneSchema,
-  channel: otpChannelSchema.default('SMS'),
+  email: emailSchema,
 });
 export type ForgotPasswordInput = z.input<typeof forgotPasswordSchema>;
 export type ForgotPasswordRequest = z.output<typeof forgotPasswordSchema>;
 
 export const resetPasswordSchema = z.object({
-  phone: tunisianPhoneSchema,
+  email: emailSchema,
   code: otpCodeSchema,
   password: passwordSchema,
 });
@@ -183,6 +206,7 @@ export const currentUserSchema = z.object({
   phone: z.string(),
   phoneVerified: z.boolean(),
   email: z.string().nullable(),
+  emailVerified: z.boolean(),
   locale: localeSchema,
 });
 export type CurrentUser = z.infer<typeof currentUserSchema>;
@@ -190,6 +214,8 @@ export type CurrentUser = z.infer<typeof currentUserSchema>;
 /** Délais renvoyés après l'envoi d'un code. */
 export const otpDispatchSchema = z.object({
   phone: z.string(),
+  /** Présent quand le code a été adressé à un email (confirmation d'inscription). */
+  email: z.string().optional(),
   expiresInSeconds: z.number().int().positive(),
   resendInSeconds: z.number().int().nonnegative(),
 });
