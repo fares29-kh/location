@@ -21,7 +21,11 @@ source "$ROOT/.env"
 set +a
 
 compose() {
-  docker compose -f "$ROOT/docker-compose.prod.yml" --env-file "$ROOT/.env" "$@"
+  docker compose \
+    -f "$ROOT/docker-compose.prod.yml" \
+    -f "$ROOT/docker-compose.monitoring.yml" \
+    --env-file "$ROOT/.env" \
+    "$@"
 }
 
 # s3 <répertoire monté sur /work> <arguments aws>

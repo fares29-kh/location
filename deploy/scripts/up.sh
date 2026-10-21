@@ -34,6 +34,14 @@ if grep -q '__' "$ROOT/.env"; then
   echo ".env contient encore des marqueurs __ non remplacés." >&2
   exit 1
 fi
+if [[ -z "${GRAFANA_ADMIN_PASSWORD:-}" || ${#GRAFANA_ADMIN_PASSWORD} -lt 16 ]]; then
+  echo 'GRAFANA_ADMIN_PASSWORD est obligatoire (16 caractères minimum, sans $).' >&2
+  exit 1
+fi
+if [[ "$GRAFANA_ADMIN_PASSWORD" == *'$'* ]]; then
+  echo 'GRAFANA_ADMIN_PASSWORD ne doit pas contenir $.' >&2
+  exit 1
+fi
 if [[ -z "${ADMIN_EMAIL:-}" || -z "${ADMIN_PHONE:-}" || -z "${ADMIN_PASSWORD:-}" ]]; then
   echo "Avertissement : ADMIN_EMAIL, ADMIN_PHONE ou ADMIN_PASSWORD est vide. Aucun super-administrateur ne sera créé."
 fi
@@ -52,6 +60,19 @@ if ((build == 1)); then
   compose build postgres
   compose build api
   compose build web
+fi
+
+if [[ "$(id -u)" -eq 0 ]]; then
+  mkdir -p /var/lib/drivetn/metrics
+  chmod 755 /var/lib/drivetn/metrics
+  cat >/etc/cron.d/drivetn <<EOF
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+15 2 * * * root /usr/bin/bash ${ROOT}/deploy/scripts/backup.sh >> /var/log/drivetn-backup.log 2>&1
+20 * * * * root /usr/bin/bash ${ROOT}/deploy/scripts/check-archive.sh >> /var/log/drivetn-backup.log 2>&1
+*/5 * * * * root /usr/bin/bash ${ROOT}/deploy/scripts/write-metrics.sh >> /var/log/drivetn-backup.log 2>&1
+EOF
+  chmod 644 /etc/cron.d/drivetn
 fi
 
 compose up -d

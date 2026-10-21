@@ -21,6 +21,7 @@ redis=$(openssl rand -hex 24)
 jwt=$(openssl rand -hex 32)
 otp=$(openssl rand -hex 32)
 restic=$(openssl rand -hex 32)
+grafana=$(openssl rand -hex 24)
 
 target=${1:-hetzner}
 case "$target" in
@@ -40,6 +41,7 @@ sed \
   -e "s/__JWT_ACCESS_SECRET__/${jwt}/g" \
   -e "s/__OTP_HASH_SECRET__/${otp}/g" \
   -e "s/__RESTIC_PASSWORD__/${restic}/g" \
+  -e "s/__GRAFANA_ADMIN_PASSWORD__/${grafana}/g" \
   "$template" >.env
 chmod 600 .env
 
@@ -47,6 +49,7 @@ echo ".env créé pour ${target} (droits 600)."
 echo "Copiez-le maintenant dans votre gestionnaire de mots de passe, en particulier RESTIC_PASSWORD."
 if [[ "$target" == "azure" ]]; then
   echo "Puis renseignez APP_DOMAIN, ACME_EMAIL, les deux clés Azure et le compte administrateur."
+  echo "GRAFANA_ADMIN_PASSWORD est déjà généré : c'est le mot de passe du tableau de bord."
 else
   echo "Puis renseignez APP_DOMAIN, ACME_EMAIL, les clés S3 et le compte administrateur."
 fi

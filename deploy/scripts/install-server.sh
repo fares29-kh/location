@@ -37,7 +37,8 @@ if [[ ! -f /swapfile ]]; then
 fi
 grep -q '/swapfile' /etc/fstab || echo '/swapfile none swap sw 0 0' >>/etc/fstab
 
-mkdir -p /var/lib/drivetn/postgres /var/lib/drivetn/redis /var/log
+mkdir -p /var/lib/drivetn/postgres /var/lib/drivetn/redis /var/lib/drivetn/metrics /var/log
+chmod 755 /var/lib/drivetn/metrics
 # uid 999 = utilisateur postgres de l'image officielle, et utilisateur redis.
 chown 999:999 /var/lib/drivetn/postgres /var/lib/drivetn/redis
 chmod 700 /var/lib/drivetn/postgres /var/lib/drivetn/redis
@@ -62,6 +63,7 @@ SHELL=/bin/bash
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 15 2 * * * root /usr/bin/bash ${ROOT}/deploy/scripts/backup.sh >> /var/log/drivetn-backup.log 2>&1
 20 * * * * root /usr/bin/bash ${ROOT}/deploy/scripts/check-archive.sh >> /var/log/drivetn-backup.log 2>&1
+*/5 * * * * root /usr/bin/bash ${ROOT}/deploy/scripts/write-metrics.sh >> /var/log/drivetn-backup.log 2>&1
 EOF
 chmod 644 /etc/cron.d/drivetn
 

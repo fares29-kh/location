@@ -1,0 +1,118 @@
+# Mesures de production. Démarré avec la pile : bash deploy/scripts/up.sh
+# Grafana : https://admin.<domaine>/monitoring  (identifiants GRAFANA_ADMIN_* du .env)
+# Prometheus et les exporteurs ne sont pas publiés sur l'hôte.
+
+services:
+  prometheus:
+    image: prom/prometheus:v2.55.1
+    restart: unless-stopped
+    mem_limit: 256m
+    cpus: '0.25'
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: '2'
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=15d
+      - --storage.tsdb.retention.size=512MB
+    volumes:
+      - ./deploy/monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    networks: [drivetn]
+
+  grafana:
+    image: grafana/grafana:11.5.2
+    restart: unless-stopped
+    mem_limit: 192m
+    cpus: '0.25'
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: '2'
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-}
+      GF_USERS_ALLOW_SIGN_UP: 'false'
+      GF_AUTH_ANONYMOUS_ENABLED: 'false'
+      GF_ANALYTICS_REPORTING_ENABLED: 'false'
+      GF_ANALYTICS_CHECK_FOR_UPDATES: 'false'
+      GF_SERVER_ROOT_URL: https://admin.${APP_DOMAIN}/monitoring/
+      GF_SERVER_SERVE_FROM_SUB_PATH: 'true'
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./deploy/monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./deploy/monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.grafana.rule=Host(`admin.${APP_DOMAIN}`) && PathPrefix(`/monitoring`)
+      - traefik.http.routers.grafana.entrypoints=websecure
+      - traefik.http.routers.grafana.tls=true
+      - traefik.http.routers.grafana.priority=500
+      - traefik.http.services.grafana.loadbalancer.server.port=3000
+    depends_on: [prometheus]
+    networks: [drivetn]
+
+  node-exporter:
+    image: prom/node-exporter:v1.8.2
+    restart: unless-stopped
+    mem_limit: 64m
+    cpus: '0.10'
+    pid: host
+    command:
+      - --path.rootfs=/host
+      - --collector.textfile.directory=/textfile
+      - --collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)
+    volumes:
+      - type: bind
+        source: /
+        target: /host
+        read_only: true
+        bind:
+          propagation: rslave
+      - /var/lib/drivetn/metrics:/textfile:ro
+    networks: [drivetn]
+
+  cadvisor:
+    image: ghcr.io/google/cadvisor:v0.51.0
+    restart: unless-stopped
+    mem_limit: 128m
+    cpus: '0.20'
+    privileged: true
+    command:
+      - --housekeeping_interval=30s
+      - --docker_only=true
+      - --store_container_labels=true
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+    networks: [drivetn]
+
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter:v0.16.0
+    restart: unless-stopped
+    mem_limit: 64m
+    cpus: '0.10'
+    environment:
+      DATA_SOURCE_NAME: postgresql://${POSTGRES_USER:-drivetn}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-drivetn}?sslmode=disable
+    networks: [drivetn]
+
+  redis-exporter:
+    image: oliver006/redis_exporter:v1.66.0
+    restart: unless-stopped
+    mem_limit: 64m
+    cpus: '0.10'
+    environment:
+      REDIS_ADDR: redis://redis:6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+    networks: [drivetn]
+
+volumes:
+  prometheus_data:
+  grafana_data:

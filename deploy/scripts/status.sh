@@ -16,5 +16,8 @@ echo "Archives WAL :"
 compose exec -T postgres psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c \
   "SELECT last_archived_time, last_failed_time, failed_count FROM pg_stat_archiver;"
 echo
+echo "Tableau de bord : https://admin.${APP_DOMAIN}/monitoring"
+echo "Identifiant Grafana : ${GRAFANA_ADMIN_USER:-admin}"
+echo
 echo "Sauvegardes de base :"
 compose exec -T -u postgres postgres wal-g backup-list || true

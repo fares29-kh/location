@@ -1,67 +1,95 @@
-# Déployer DriveTN sur Azure
+# Premier setup et relance de DriveTN sur Azure
 
-Même pile que sur Hetzner : une machine, Docker Compose, les photos hors du disque, les journaux de la base dans une autre région. Ici les crédits Azure paient la machine et le stockage Blob.
+Une machine Ubuntu, Docker Compose, les photos hors du disque, la base recopiée dans une autre région. Les crédits Azure paient la machine et le stockage Blob.
 
-Le serveur est en **France Central** (Paris, le plus proche de la Tunisie). Les sauvegardes sont en **West Europe**. Un disque de données séparé porte PostgreSQL : s'il est encore là, on le branche sur une machine neuve et rien de commité n'est perdu. S'il a disparu, la restauration perd au plus une minute de transactions.
+Le dépôt à cloner est `https://github.com/fares29-kh/location.git`. Sur le serveur on utilise `docker-compose.prod.yml`. Le fichier `docker-compose.yml` à la racine reste la pile locale (MinIO, HTTP).
 
-Poussez d'abord le dépôt (cette version, avec `DEPLOY_TARGET=azure`) vers Git. Le serveur le clone.
+Installation en service :
+
+| Élément              | Valeur                                                 |
+| -------------------- | ------------------------------------------------------ |
+| Groupe de ressources | `drivetn`, France Central                              |
+| Machine              | `Standard_B2ms`, Ubuntu 24.04, utilisateur `azureuser` |
+| IP publique statique | `20.199.16.4`                                          |
+| Domaine              | `madrasti.dev`                                         |
+| Photos               | compte `drivetnmedia29ba25`, France Central            |
+| Sauvegardes          | compte `drivetnbackup29ba25`, Germany West Central     |
+| Disque de données    | 32 Go, monté sur `/var/lib/drivetn`                    |
+| Code                 | `/opt/drivetn`                                         |
+
+## Ce qui survit à la perte de la machine
+
+| Donnée                           | Où elle vit                                                                  | Si la machine disparaît                                                           |
+| -------------------------------- | ---------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| Réservations, comptes, paiements | PostgreSQL sur le disque de 32 Go, journaux copiés au plus toutes les 60 s   | Disque encore là : rien de commité n'est perdu. Disque perdu : au plus une minute |
+| Photos et documents              | Blob `drivetnmedia29ba25`                                                    | Toujours là                                                                       |
+| Fichier `.env`                   | Gestionnaire de mots de passe, et copie chiffrée sur le compte de sauvegarde | À reprendre depuis le gestionnaire                                                |
+| Images Docker                    | Copie sur le compte de sauvegarde après `save-images.sh`                     | On les recharge, on ne recompile pas                                              |
+| Certificat HTTPS                 | Recréé par Let's Encrypt au démarrage de Traefik                             | Quelques minutes                                                                  |
+| Redis                            | Disque de données, jetable                                                   | Un SMS pas encore parti ne part pas. Les codes OTP déjà en base restent           |
+
+La sauvegarde de nuit part à 02:15 UTC. Elle n'existe qu'après le premier `backup.sh` de l'étape 9.
 
 ## 1. Groupe de ressources
 
 Portail Azure, **Groupes de ressources**, créer `drivetn`, région **France Central**.
 
-Tout se crée dans ce groupe. Un compte de stockage peut être dans une autre région que son groupe.
+Un compte de stockage peut être dans une autre région que son groupe.
 
 ## 2. Machine virtuelle
 
 - Image : **Ubuntu Server 24.04 LTS**
-- Taille : **Standard_B2ms** (2 vCPU, 8 Go). Une B2s à 4 Go sature à la compilation.
-- Région : **France Central**. Ne choisissez pas de zone de disponibilité : le disque de données doit pouvoir se rebrancher sur une autre machine de la région.
-- Authentification : clé SSH. L'utilisateur sera `azureuser`.
+- Taille : **Standard_B2ms** (2 vCPU, 8 Go). Une machine à 4 Go sature à la compilation.
+- Région : **France Central**. Pas de zone de disponibilité : le disque de données doit pouvoir se rebrancher sur une autre machine de la région.
+- Authentification : clé SSH. L'utilisateur est `azureuser`. Il n'a pas de mot de passe root : tout se fait avec `sudo`.
 - Disque du système : 64 Go suffisent.
-- **Disque de données** : créer et attacher un disque **SSD standard de 32 Go**. Notez son nom.
-- Réseau : IP publique **statique**. Ports entrants : SSH 22. Après la création, dans le groupe de sécurité réseau, ajoutez **80** et **443**.
+- **Disque de données** : SSD standard de **32 Go**, créé et attaché à la machine.
+- Réseau : IP publique **statique**. Ports entrants : 22, puis 80 et 443 dans le groupe de sécurité réseau.
 
-Notez l'adresse IP publique statique.
+Notez l'adresse IP. Ici : `20.199.16.4`.
 
 ## 3. DNS
 
-Quatre enregistrements **A** vers cette IP statique :
+Chez le registrar (Name.com : **My Domains**, le domaine, **Manage DNS Records**), quatre enregistrements **A** vers l'IP statique. Type **A**, TTL **300**.
 
-| Nom      | Exemple             |
-| -------- | ------------------- |
-| apex     | `drivetn.tn`        |
-| `app`    | `app.drivetn.tn`    |
-| `agency` | `agency.drivetn.tn` |
-| `admin`  | `admin.drivetn.tn`  |
+| Host     | Exemple               | Answer        |
+| -------- | --------------------- | ------------- |
+| vide     | `madrasti.dev`        | `20.199.16.4` |
+| `app`    | `app.madrasti.dev`    | `20.199.16.4` |
+| `agency` | `agency.madrasti.dev` | `20.199.16.4` |
+| `admin`  | `admin.madrasti.dev`  | `20.199.16.4` |
 
-Le DNS doit répondre avant le premier démarrage.
+S'il existe déjà une ligne A de parking, modifiez son Answer au lieu d'en ajouter une seconde. Le DNS doit répondre avant le premier démarrage HTTPS.
 
-## 4. Préparer la machine
+## 4. Disque, code, Docker
 
 ```bash
-ssh azureuser@<ip-statique>
+ssh azureuser@20.199.16.4
 sudo -i
+lsblk
 ```
 
-Le disque de données est `/dev/disk/azure/scsi1/lun0`. Vérifiez avec `ls -l /dev/disk/azure/scsi1/` avant de formater. Ce n'est pas le disque du système.
+Le disque du système est celui monté sur `/` (souvent `sda`, environ 30 Go). Le disque temporaire Azure est monté sur `/mnt` (souvent `sdb`) : on ne le formate jamais. Le disque de données de 32 Go apparaît comme `sdc`, et son chemin stable est `/dev/disk/azure/scsi1/lun0`. On ne formate que celui-là, et une seule fois.
 
 ```bash
 mkfs.ext4 /dev/disk/azure/scsi1/lun0
 mkdir -p /var/lib/drivetn
 echo '/dev/disk/azure/scsi1/lun0 /var/lib/drivetn ext4 defaults,nofail 0 2' >> /etc/fstab
+systemctl daemon-reload
 mount /var/lib/drivetn
 findmnt /var/lib/drivetn
 
 apt-get update && apt-get install -y git
-git clone <url-du-depot> /opt/drivetn
+git clone https://github.com/fares29-kh/location.git /opt/drivetn
 cd /opt/drivetn
 bash deploy/scripts/install-server.sh
 ```
 
-`mkfs` efface le disque. On ne le relance jamais. `install-server.sh` installe Docker, un swap de 2 Go, le pare-feu et la sauvegarde de nuit.
+`findmnt` doit montrer `/var/lib/drivetn` sur le disque de 32 Go. `install-server.sh` installe Docker, un swap de 2 Go, le pare-feu (22, 80, 443) et la sauvegarde de nuit.
 
-## 5. Secrets, comptes de stockage, conteneurs
+## 5. Noms des comptes de stockage
+
+Les noms sont choisis sur le serveur, avant le portail. Ils sont uniques dans tout Azure.
 
 ```bash
 cd /opt/drivetn
@@ -69,90 +97,170 @@ bash deploy/scripts/init-env.sh azure
 grep AZURE_ /opt/drivetn/.env
 ```
 
-Le script choisit deux noms uniques, du type `drivetnmedia1a2b3c` et `drivetnbackup1a2b3c`. Créez **ces** comptes dans le portail, dans le groupe `drivetn` :
+Créez **ces** deux comptes dans le groupe `drivetn`. Performance **Standard**, redondance **LRS**. **Déployer sur une zone étendue Azure** : Non. **Service principal** : **Objets blob Azure**. Laissez l'espace de noms hiérarchique désactivé.
 
-| Compte                 | Région         | Accès anonyme aux blobs |
-| ---------------------- | -------------- | ----------------------- |
-| `AZURE_MEDIA_ACCOUNT`  | France Central | Activé                  |
-| `AZURE_BACKUP_ACCOUNT` | West Europe    | Désactivé               |
+| Compte                           | Région         | Accès anonyme |
+| -------------------------------- | -------------- | ------------- |
+| valeur de `AZURE_MEDIA_ACCOUNT`  | France Central | Activé        |
+| valeur de `AZURE_BACKUP_ACCOUNT` | West Europe    | Désactivé     |
 
-Standard, redondance LRS. Copiez la clé d'accès de chacun (Clés d'accès, key1).
+Sur cette installation : `drivetnmedia29ba25` et `drivetnbackup29ba25`. West Europe a refusé les nouveaux comptes : le compte de sauvegarde est en **Germany West Central**. Sweden Central ou Poland Central conviennent aussi. Le compte photos reste en France Central.
 
-Copiez aussi tout le `.env` dans un gestionnaire de mots de passe, surtout `RESTIC_PASSWORD`.
+L'accès anonyme n'est pas sur le premier écran. Onglet **Avancé**, case **Autoriser l'accès anonyme aux objets blob** : cochée pour les photos, décochée pour les sauvegardes. Si le compte existe déjà : **Paramètres**, **Configuration**, le même interrupteur, **Enregistrer**.
 
-Éditez `/opt/drivetn/.env` :
+Pour chaque compte : **Clés d'accès**, **key1**.
 
-- `APP_DOMAIN` : le domaine, sans `https://`
-- `ACME_EMAIL`
-- `AZURE_MEDIA_KEY="..."` et `AZURE_BACKUP_KEY="..."` : une clé par compte, entre guillemets doubles
-- `ADMIN_EMAIL`, `ADMIN_PHONE` (8 chiffres), `ADMIN_PASSWORD`
+## 6. Remplir le fichier d'environnement
 
-Pas de `$` dans les valeurs que vous tapez vous-même.
+Copiez tout `/opt/drivetn/.env` dans un gestionnaire de mots de passe, surtout `RESTIC_PASSWORD`.
 
 ```bash
+nano /opt/drivetn/.env
+```
+
+À renseigner :
+
+- `APP_DOMAIN` : le domaine seul, ici `madrasti.dev`. Pas de `https://`, pas de `agency.`
+- `ACME_EMAIL` : une boîte lue, pour les avis Let's Encrypt
+- `AZURE_MEDIA_KEY="clé du compte photos"`
+- `AZURE_BACKUP_KEY="clé du compte de sauvegarde"`
+- `ADMIN_EMAIL`, `ADMIN_PHONE` (8 chiffres), `ADMIN_PASSWORD`
+
+Les clés restent entre guillemets doubles. Aucune valeur tapée à la main ne contient `$`. Enregistrez avec `Ctrl+O`, puis `Ctrl+X`.
+
+## 7. Conteneurs Blob
+
+```bash
+cd /opt/drivetn
 bash deploy/scripts/init-buckets.sh
 ```
 
-Trois conteneurs : `drivetn-public` (lecture anonyme), `drivetn-private`, et `drivetn-backups` en West Europe.
+Le script crée `drivetn-public` (lecture anonyme), `drivetn-private`, et `drivetn-backups`. La commande se termine par `Conteneurs prêts.` Si le conteneur public échoue, activez l'accès anonyme sur le compte photos et relancez la même commande.
 
-## 6. Démarrer
+## 8. Démarrer
 
 ```bash
 cd /opt/drivetn
 bash deploy/scripts/up.sh --build
+```
+
+La première compilation dure plusieurs minutes. Ensuite `https://agency.madrasti.dev` répond. Le certificat est demandé à Let's Encrypt pour `madrasti.dev`, `app`, `agency` et `admin`, puis renouvelé tout seul. Le HTTP est redirigé vers le HTTPS.
+
+Les codes de connexion ne partent pas par SMS. Ils s'affichent ici :
+
+```bash
+docker compose -f docker-compose.prod.yml logs -f worker
+```
+
+Le compte administrateur est celui de `ADMIN_EMAIL` et `ADMIN_PASSWORD`.
+
+## 9. Première sauvegarde
+
+À lancer une fois le site démarré, avant de considérer la machine remplaçable :
+
+```bash
+cd /opt/drivetn
 bash deploy/scripts/backup.sh
 bash deploy/scripts/verify-backup.sh
 bash deploy/scripts/save-images.sh
 bash deploy/scripts/status.sh
 ```
 
-La première compilation est longue. Puis ouvrez `https://agency.<domaine>`.
+`backup.sh` envoie une base PostgreSQL et une copie chiffrée du `.env`. `save-images.sh` garde les images Docker pour éviter une recompilation le jour d'une panne. La même sauvegarde de base repart chaque nuit à 02:15 UTC. Les journaux de la base partent au plus toutes les 60 secondes.
 
-Les codes OTP ne partent pas par SMS. Ils sont dans :
+## 10. Tableau de bord
+
+Le suivi démarre avec la pile. Il montre la charge de la machine, l'état de chaque conteneur, PostgreSQL, Redis, l'âge de la dernière sauvegarde et si les journaux de la base partent encore.
+
+Sur une installation déjà créée, ajoutez dans `/opt/drivetn/.env` un mot de passe d'au moins 16 caractères, sans `$` :
 
 ```bash
-docker compose -f docker-compose.prod.yml logs -f worker
+GRAFANA_ADMIN_USER=admin
+GRAFANA_ADMIN_PASSWORD=<mot de passe>
 ```
 
-La base est recopiée vers West Europe chaque nuit à 02:15 UTC, et ses journaux partent au plus toutes les 60 secondes.
+Puis :
 
-## Si la machine tombe
+```bash
+cd /opt/drivetn
+bash deploy/scripts/up.sh
+```
 
-**Le disque de données est encore là.** Arrêtez l'ancienne machine si elle existe. Créez une B2ms Ubuntu 24.04 en France Central, sans zone. Détachez le disque de données et attachez-le à la nouvelle. Dans le portail, détachez l'IP publique statique de l'ancienne carte réseau et attachez-la à la nouvelle : le DNS ne change pas. Ne formatez pas le disque.
+Ouvrez `https://admin.<domaine>/monitoring`. Ici : `https://admin.madrasti.dev/monitoring`. L'identifiant est `admin`, le mot de passe est `GRAFANA_ADMIN_PASSWORD`.
+
+Prometheus et les collecteurs ne sont pas exposés sur Internet. Seul Grafana l'est, en HTTPS, sur le sous-domaine `admin`. Les mesures de sauvegarde sont réécrites toutes les cinq minutes, et juste après chaque `backup.sh`.
+
+## Arrêter et relancer sans changer de machine
+
+Arrêter les conteneurs en gardant les données :
+
+```bash
+cd /opt/drivetn
+docker compose -f docker-compose.prod.yml down
+```
+
+Relancer, sans recompiler :
+
+```bash
+cd /opt/drivetn
+bash deploy/scripts/up.sh
+```
+
+Après un redémarrage de la VM, Docker relance les conteneurs si `/var/lib/drivetn` est monté. Vérifiez avec `findmnt /var/lib/drivetn`, puis `bash deploy/scripts/status.sh`.
+
+`down -v` efface le volume du certificat. Let's Encrypt le refera, mais ce n'est pas une commande de routine. Le `mkfs` de l'étape 4 ne se relance jamais sur un disque qui contient déjà la base.
+
+## Relancer sur une machine neuve
+
+Deux cas. Dans les deux, la nouvelle machine est une B2ms Ubuntu 24.04 en France Central, sans zone de disponibilité. Dans le portail, détachez l'IP `20.199.16.4` de l'ancienne carte réseau et attachez-la à la nouvelle : les enregistrements DNS ne changent pas. Arrêtez l'ancienne machine si elle répond encore.
+
+### Le disque de 32 Go est encore là
+
+Détachez-le de l'ancienne machine et attachez-le à la nouvelle. Ne le formatez pas.
 
 ```bash
 sudo -i
 mkdir -p /var/lib/drivetn
 mount /dev/disk/azure/scsi1/lun0 /var/lib/drivetn
-echo '/dev/disk/azure/scsi1/lun0 /var/lib/drivetn ext4 defaults,nofail 0 2' >> /etc/fstab
-git clone <url-du-depot> /opt/drivetn
-# remettez le .env (gestionnaire de mots de passe), chmod 600
+grep -q '/var/lib/drivetn' /etc/fstab || echo '/dev/disk/azure/scsi1/lun0 /var/lib/drivetn ext4 defaults,nofail 0 2' >> /etc/fstab
+systemctl daemon-reload
+git clone https://github.com/fares29-kh/location.git /opt/drivetn
+```
+
+Remettez le `.env` du gestionnaire de mots de passe dans `/opt/drivetn/.env`, puis :
+
+```bash
+chmod 600 /opt/drivetn/.env
 cd /opt/drivetn
 bash deploy/scripts/install-server.sh
 bash deploy/scripts/restore-images.sh
 bash deploy/scripts/up.sh
 ```
 
-Ne lancez pas `restore-postgres.sh` : le disque est plus récent que la sauvegarde.
+Le disque contient déjà la base, plus récente que la sauvegarde. On ne lance pas `restore-postgres.sh`.
 
-**Le disque est perdu.** Nouvelle machine, nouveau disque de 32 Go, même montage que l'étape 4, même IP statique déplacée. Restaurez le `.env`, puis :
+### Le disque est perdu
+
+Créez un disque neuf de 32 Go, attachez-le, et refaites le formatage et le montage de l'étape 4. Clonez le dépôt, remettez le `.env`, puis :
 
 ```bash
+chmod 600 /opt/drivetn/.env
+cd /opt/drivetn
 bash deploy/scripts/install-server.sh
 bash deploy/scripts/restore-images.sh
 bash deploy/scripts/restore-postgres.sh LATEST
 ```
 
-Pas de `up.sh` avant `restore-postgres.sh` : un PostgreSQL vide écrirait dans les sauvegardes. Le script demande de retaper le domaine, rejoue les journaux, vide Redis et démarre le site. Les photos en France Central restent en place.
+`up.sh` ne se lance pas avant `restore-postgres.sh` : un PostgreSQL vide écrirait dans les sauvegardes. Le script demande de retaper `madrasti.dev`, recharge la dernière base, rejoue les journaux, vide Redis et démarre le site. Les photos dans `drivetnmedia29ba25` restent en place.
 
-Pour sortir le `.env` du Blob si le gestionnaire de mots de passe n'est pas sous la main, sur une machine qui a restic :
+Si le gestionnaire de mots de passe n'a pas le `.env`, une machine qui a `restic` le sort du compte de sauvegarde :
 
 ```bash
-export AZURE_ACCOUNT_NAME=<compte backup>
-export AZURE_ACCOUNT_KEY=<clé backup>
+export AZURE_ACCOUNT_NAME=drivetnbackup29ba25
+export AZURE_ACCOUNT_KEY=<clé du compte de sauvegarde>
 export RESTIC_REPOSITORY=azure:drivetn-backups:/restic
-export RESTIC_PASSWORD=<mot de passe restic>
+export RESTIC_PASSWORD=<mot de passe restic du .env>
 restic restore latest --target /tmp/drivetn-env
 ```
 
-Le fichier est sous `/tmp/drivetn-env/opt/drivetn/.env`.
+Le fichier est `/tmp/drivetn-env/opt/drivetn/.env`. Cette copie n'existe qu'après le premier `backup.sh`.

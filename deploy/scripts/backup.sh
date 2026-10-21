@@ -45,6 +45,7 @@ restic "${restic_opts[@]}" forget --keep-daily 14 --keep-weekly 8 --keep-monthly
 bash "${_lib_dir}/check-archive.sh" --locked
 
 date -u +%Y-%m-%dT%H:%M:%SZ >/var/lib/drivetn/last-backup-ok
+bash "${_lib_dir}/write-metrics.sh" || true
 echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] Sauvegarde terminée"
 if [[ -n "${HEALTHCHECKS_URL:-}" ]]; then
   curl -fsS -m 10 --retry 2 "$HEALTHCHECKS_URL" || true
