@@ -75,5 +75,88 @@ EOF
   chmod 644 /etc/cron.d/drivetn
 fi
 
+# Contrôles HTTPS : Traefik est joint sur le réseau Docker, avec le nom du certificat.
+# Évite le retour par l'adresse publique, qui échoue souvent depuis la VM elle-même.
+if [[ ! "$APP_DOMAIN" =~ ^[A-Za-z0-9.-]+$ ]]; then
+  echo "APP_DOMAIN ne contient pas un nom de domaine utilisable." >&2
+  exit 1
+fi
+mkdir -p /var/lib/drivetn/monitoring
+if [[ -d /var/lib/drivetn/monitoring/https.yml || -d /var/lib/drivetn/monitoring/blackbox.yml ]]; then
+  echo "Un démarrage précédent a créé un dossier à la place du fichier de sondes." >&2
+  echo "Supprimez-le, puis relancez : rm -rf /var/lib/drivetn/monitoring/https.yml /var/lib/drivetn/monitoring/blackbox.yml" >&2
+  exit 1
+fi
+cat >/var/lib/drivetn/monitoring/https.yml <<EOF
+- targets: ['https://traefik:443']
+  labels:
+    module: https_agency
+    site: https://agency.${APP_DOMAIN}/
+- targets: ['https://traefik:443']
+  labels:
+    module: https_app
+    site: https://app.${APP_DOMAIN}/
+- targets: ['https://traefik:443']
+  labels:
+    module: https_admin
+    site: https://admin.${APP_DOMAIN}/
+- targets: ['https://traefik:443']
+  labels:
+    module: https_apex
+    site: https://${APP_DOMAIN}/
+EOF
+cat >/var/lib/drivetn/monitoring/blackbox.yml <<EOF
+modules:
+  https_agency:
+    prober: http
+    timeout: 10s
+    http:
+      valid_status_codes: [200, 301, 302, 307, 308]
+      method: GET
+      follow_redirects: false
+      fail_if_not_ssl: true
+      headers:
+        Host: agency.${APP_DOMAIN}
+      tls_config:
+        server_name: agency.${APP_DOMAIN}
+  https_app:
+    prober: http
+    timeout: 10s
+    http:
+      valid_status_codes: [200, 301, 302, 307, 308]
+      method: GET
+      follow_redirects: false
+      fail_if_not_ssl: true
+      headers:
+        Host: app.${APP_DOMAIN}
+      tls_config:
+        server_name: app.${APP_DOMAIN}
+  https_admin:
+    prober: http
+    timeout: 10s
+    http:
+      valid_status_codes: [200, 301, 302, 307, 308]
+      method: GET
+      follow_redirects: false
+      fail_if_not_ssl: true
+      headers:
+        Host: admin.${APP_DOMAIN}
+      tls_config:
+        server_name: admin.${APP_DOMAIN}
+  https_apex:
+    prober: http
+    timeout: 10s
+    http:
+      valid_status_codes: [200, 301, 302, 307, 308]
+      method: GET
+      follow_redirects: false
+      fail_if_not_ssl: true
+      headers:
+        Host: ${APP_DOMAIN}
+      tls_config:
+        server_name: ${APP_DOMAIN}
+EOF
+chmod 644 /var/lib/drivetn/monitoring/https.yml /var/lib/drivetn/monitoring/blackbox.yml
+
 compose up -d
 compose ps

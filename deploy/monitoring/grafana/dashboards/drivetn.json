@@ -263,6 +263,78 @@
       "fieldConfig": { "defaults": { "unit": "short", "decimals": 2 } }
     },
     {
+      "id": 16,
+      "type": "stat",
+      "title": "Alertes en cours",
+      "gridPos": { "h": 6, "w": 4, "x": 0, "y": 28 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "count(ALERTS{alertstate=\"firing\"}) or vector(0)"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 1 }
+            ]
+          }
+        }
+      },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "reduceOptions": { "calcs": ["lastNotNull"] }
+      }
+    },
+    {
+      "id": 17,
+      "type": "table",
+      "title": "Détail des alertes",
+      "gridPos": { "h": 6, "w": 20, "x": 4, "y": 28 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "ALERTS{alertstate=\"firing\"}",
+          "instant": true,
+          "format": "table"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "Value": true,
+              "__name__": true,
+              "alertstate": true,
+              "job": true,
+              "module": true
+            },
+            "renameByName": {
+              "severity": "Niveau",
+              "alertname": "Alerte",
+              "message": "Quoi faire",
+              "instance": "Cible"
+            },
+            "indexByName": {
+              "severity": 0,
+              "alertname": 1,
+              "message": 2,
+              "instance": 3
+            }
+          }
+        }
+      ],
+      "options": { "showHeader": true, "cellHeight": "sm" }
+    },
+    {
       "id": 12,
       "type": "timeseries",
       "title": "Mémoire des conteneurs",

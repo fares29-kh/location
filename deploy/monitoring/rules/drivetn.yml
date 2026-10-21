@@ -1,0 +1,158 @@
+groups:
+  - name: drivetn
+    interval: 30s
+    rules:
+      - alert: DisqueDonneesPlein
+        expr: |
+          (
+            node_filesystem_avail_bytes{mountpoint=~"/var/lib/drivetn|/host/var/lib/drivetn",fstype!~"tmpfs|overlay"}
+            / node_filesystem_size_bytes{mountpoint=~"/var/lib/drivetn|/host/var/lib/drivetn",fstype!~"tmpfs|overlay"}
+          ) < 0.15
+        for: 10m
+        labels:
+          severity: critical
+          message: 'Moins de 15 % de libre sur le disque des données. Agrandissez le disque Azure. Ne lancez pas mkfs.'
+        annotations:
+          summary: 'Disque des données presque plein ({{ $value | humanizePercentage }} libre)'
+          description: 'Depuis 10 minutes, /var/lib/drivetn a moins de 15 % de libre. PostgreSQL va refuser les écritures, et les sauvegardes peuvent échouer. Dans le portail Azure, agrandissez le disque de données, puis étendez la partition. Ne reformatez pas ce disque.'
+
+      - alert: MemoireVmSaturee
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) > 0.90
+        for: 15m
+        labels:
+          severity: warning
+          message: 'La VM utilise plus de 90 % de sa mémoire. Regardez quel conteneur grossit.'
+        annotations:
+          summary: 'Mémoire de la VM au-dessus de 90 % depuis 15 minutes'
+          description: 'Il reste très peu de mémoire libre. Linux peut arrêter un conteneur. Ouvrez le tableau de bord, panneau Mémoire des conteneurs, et identifiez celui qui grossit.'
+
+      - alert: ProcesseurSature
+        expr: (100 - (avg(rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)) > 90
+        for: 15m
+        labels:
+          severity: warning
+          message: 'Le processeur reste au-dessus de 90 %. Regardez le panneau CPU des conteneurs.'
+        annotations:
+          summary: 'Processeur au-dessus de 90 % depuis 15 minutes'
+          description: 'La machine est saturée. Les pages vont répondre lentement. Le panneau CPU des conteneurs montre lequel consomme le processeur.'
+
+      - alert: SauvegardeEnRetard
+        expr: |
+          (time() - drivetn_backup_last_success_timestamp_seconds > 26 * 3600)
+          and drivetn_backup_last_success_timestamp_seconds > 0
+        for: 15m
+        labels:
+          severity: critical
+          message: "La sauvegarde de nuit n'a pas réussi. Lancez backup.sh et lisez le journal."
+        annotations:
+          summary: 'Dernière sauvegarde réussie il y a plus de 26 heures'
+          description: 'Sans sauvegarde récente, une panne de disque perd les réservations. Sur la VM : cd /opt/drivetn && bash deploy/scripts/backup.sh. Le détail est dans /var/log/drivetn-backup.log.'
+
+      - alert: AucuneSauvegarde
+        expr: |
+          drivetn_backup_last_success_timestamp_seconds == 0
+          and drivetn_postgres_up == 1
+        for: 6h
+        labels:
+          severity: critical
+          message: "Aucune sauvegarde complète n'a encore réussi. Lancez backup.sh."
+        annotations:
+          summary: "Aucune sauvegarde complète n'a encore réussi"
+          description: 'La base tourne, mais le fichier /var/lib/drivetn/last-backup-ok est absent. Les journaux seuls ne suffisent pas à restaurer. Lancez : cd /opt/drivetn && bash deploy/scripts/backup.sh.'
+
+      - alert: ArchiveWalEnEchec
+        expr: drivetn_wal_archive_ok == 0 and drivetn_postgres_up == 1
+        for: 20m
+        labels:
+          severity: critical
+          message: 'Les journaux PostgreSQL ne partent plus vers Azure. Le disque peut se remplir.'
+        annotations:
+          summary: "L'envoi des journaux PostgreSQL vers Azure échoue"
+          description: "Le dossier pg_wal grossit tant que l'archive échoue. Lancez bash deploy/scripts/check-archive.sh et vérifiez le compte de stockage des sauvegardes."
+
+      - alert: PostgresArrete
+        expr: pg_up == 0 or up{job="postgres"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          message: 'PostgreSQL ne répond plus. Les portails ne peuvent plus lire ni écrire.'
+        annotations:
+          summary: 'PostgreSQL ne répond plus'
+          description: "L'application est coupée de sa base. Commande : docker compose -f docker-compose.prod.yml -f docker-compose.monitoring.yml logs --tail 100 postgres."
+
+      - alert: RedisArrete
+        expr: redis_up == 0 or up{job="redis"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          message: "Redis ne répond plus. Sessions, files d'attente et codes de connexion sont arrêtés."
+        annotations:
+          summary: 'Redis ne répond plus'
+          description: 'Commande : docker compose -f docker-compose.prod.yml -f docker-compose.monitoring.yml logs --tail 100 redis.'
+
+      - alert: WorkerSansBattement
+        expr: |
+          (redis_up == 1)
+          unless on (job)
+          (redis_key_size{key="drivetn:worker:heartbeat"} > 0)
+        for: 3m
+        labels:
+          severity: warning
+          message: "Le worker ne prouve plus qu'il tourne. Les tâches planifiées sont arrêtées."
+        annotations:
+          summary: "Le worker n'écrit plus son battement de cœur"
+          description: 'La clé Redis drivetn:worker:heartbeat devrait être renouvelée toutes les 15 secondes. Commande : docker compose -f docker-compose.prod.yml -f docker-compose.monitoring.yml logs --tail 100 worker.'
+
+      - alert: FileAttenteBloquee
+        expr: redis_key_size{key=~"bull:(maintenance|platform|messaging):wait"} > 50
+        for: 15m
+        labels:
+          severity: warning
+          message: "Une file d'attente a plus de 50 tâches en attente depuis 15 minutes."
+        annotations:
+          summary: 'File {{ $labels.key }} : plus de 50 tâches en attente'
+          description: 'Le worker ne vide plus cette file. Regardez ses logs : docker compose -f docker-compose.prod.yml -f docker-compose.monitoring.yml logs --tail 100 worker.'
+
+      - alert: ConteneurRedemarreEnBoucle
+        expr: |
+          changes(container_start_time_seconds{
+            container_label_com_docker_compose_project="drivetn-prod",
+            container_label_com_docker_compose_service=~"api|worker|web|postgres|redis|traefik"
+          }[15m]) > 2
+        for: 2m
+        labels:
+          severity: warning
+          message: 'Un conteneur a redémarré plus de deux fois en 15 minutes.'
+        annotations:
+          summary: '{{ $labels.container_label_com_docker_compose_service }} redémarre en boucle'
+          description: 'Ce conteneur ne reste pas démarré. Lisez ses logs avant que Docker cesse de le relancer.'
+
+      - alert: SiteInjoignable
+        expr: probe_success{job="https"} == 0
+        for: 5m
+        labels:
+          severity: critical
+          message: 'Cette adresse HTTPS ne répond plus. Vérifiez Traefik, le certificat, et les ports 80 et 443.'
+        annotations:
+          summary: '{{ $labels.instance }} ne répond plus en HTTPS'
+          description: 'Le contrôle interne échoue depuis 5 minutes. Si le certificat est encore celui par défaut de Traefik, redémarrez Traefik une fois le port 80 ouvert : docker restart drivetn-prod-traefik-1.'
+
+      - alert: CertificatExpireBientot
+        expr: (probe_ssl_earliest_cert_expiry{job="https"} - time()) / 86400 < 14
+        for: 1h
+        labels:
+          severity: warning
+          message: 'Le certificat HTTPS expire dans moins de 14 jours. Le port 80 doit rester ouvert.'
+        annotations:
+          summary: 'Certificat de {{ $labels.instance }} : moins de 14 jours restants'
+          description: "Let's Encrypt n'a pas renouvelé. Le port 80 doit être ouvert dans le pare-feu Azure. Puis : docker restart drivetn-prod-traefik-1 et docker logs --since 5m drivetn-prod-traefik-1."
+
+      - alert: CollecteInterrompue
+        expr: up{job!~"postgres|redis"} == 0
+        for: 5m
+        labels:
+          severity: warning
+          message: 'Une sonde ne répond plus. Une panne peut alors passer inaperçue.'
+        annotations:
+          summary: 'La collecte {{ $labels.job }} est arrêtée'
+          description: 'Prometheus ne reçoit plus les mesures de {{ $labels.job }} ({{ $labels.instance }}). Relancez la pile : cd /opt/drivetn && bash deploy/scripts/up.sh.'

@@ -190,6 +190,12 @@ Ouvrez `https://admin.<domaine>/monitoring`. Ici : `https://admin.madrasti.dev/m
 
 Prometheus et les collecteurs ne sont pas exposés sur Internet. Seul Grafana l'est, en HTTPS, sur le sous-domaine `admin`. Les mesures de sauvegarde sont réécrites toutes les cinq minutes, et juste après chaque `backup.sh`.
 
+Les alertes sont évaluées par Prometheus. Le tableau de bord affiche en bas le nombre d'alertes en cours et, pour chacune, une phrase qui dit quoi faire. Le détail est dans Grafana, menu Alerting, règles de la source Prometheus. Une alerte ne part que si la condition dure assez longtemps pour écarter un à-coup : 2 minutes pour une base arrêtée, 10 à 15 minutes pour un disque ou une mémoire saturés, 26 heures pour une sauvegarde manquée.
+
+Deux niveaux : `critical` coupe le service ou les données (disque, base, Redis, site, sauvegarde, journaux). `warning` se dégrade sans tout couper (mémoire, processeur, worker, file d'attente, certificat, redémarrages). Tant que la VM est arrêtée, elle ne peut pas s'alerter elle-même : ces règles couvrent les pannes des services, pas la disparition de la machine.
+
+La première sauvegarde absente déclenche une alerte au bout de 6 heures. Lancez `bash deploy/scripts/backup.sh` le jour de l'installation pour l'éteindre. Le contrôle HTTPS interroge Traefik depuis le réseau Docker. Tant que le certificat est encore celui par défaut de Traefik, les quatre adresses restent en alerte.
+
 ## Arrêter et relancer sans changer de machine
 
 Arrêter les conteneurs en gardant les données :

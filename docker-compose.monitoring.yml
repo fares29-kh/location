@@ -20,7 +20,26 @@ services:
       - --storage.tsdb.retention.size=512MB
     volumes:
       - ./deploy/monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./deploy/monitoring/rules:/etc/prometheus/rules:ro
+      - /var/lib/drivetn/monitoring/https.yml:/etc/prometheus/targets/https.yml:ro
       - prometheus_data:/prometheus
+    depends_on: [blackbox]
+    networks: [drivetn]
+
+  blackbox:
+    image: prom/blackbox-exporter:v0.26.0
+    restart: unless-stopped
+    mem_limit: 32m
+    cpus: '0.05'
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: '2'
+    command:
+      - --config.file=/etc/blackbox/blackbox.yml
+    volumes:
+      - /var/lib/drivetn/monitoring/blackbox.yml:/etc/blackbox/blackbox.yml:ro
     networks: [drivetn]
 
   grafana:
@@ -111,6 +130,7 @@ services:
     environment:
       REDIS_ADDR: redis://redis:6379
       REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+      REDIS_EXPORTER_CHECK_SINGLE_KEYS: drivetn:worker:heartbeat,bull:maintenance:wait,bull:platform:wait,bull:messaging:wait
     networks: [drivetn]
 
 volumes:
