@@ -222,10 +222,28 @@ describe.skipIf(databaseUrl === undefined || redisUrl === undefined)(
           phone: '22123456',
           email: 'karim@example.tn',
           password: PASSWORD,
+          portal: 'agency',
         })
         .expect(201);
       const user = await prisma.user.findUniqueOrThrow({ where: { phone: toE164('22123456') } });
       expect(user.role).toBe('AGENCY_OWNER');
+
+      await http()
+        .post('/api/v1/auth/signup')
+        .set('Host', CLIENT_HOST)
+        .send({
+          firstName: 'Sami',
+          lastName: 'Agence',
+          phone: '22123457',
+          email: 'sami.agence@example.tn',
+          password: PASSWORD,
+          portal: 'agency',
+        })
+        .expect(201);
+      const fromClientHost = await prisma.user.findUniqueOrThrow({
+        where: { phone: toE164('22123457') },
+      });
+      expect(fromClientHost.role).toBe('AGENCY_OWNER');
 
       await http()
         .post('/api/v1/auth/signup')

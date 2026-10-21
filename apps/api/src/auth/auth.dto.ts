@@ -36,6 +36,9 @@ export class SignupDto {
 
   @ApiPropertyOptional({ enum: LOCALES })
   locale?: Locale;
+
+  @ApiPropertyOptional({ enum: ['client', 'agency'], description: 'Agence : compte gérant' })
+  portal?: 'client' | 'agency';
 }
 
 export class LoginDto {

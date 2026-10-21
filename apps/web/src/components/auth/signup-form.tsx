@@ -24,8 +24,14 @@ import { useCompleteAuth } from './use-complete-auth';
 
 const SIGNUP_FIELDS = ['firstName', 'lastName', 'phone', 'email', 'password'] as const;
 
-/** Inscription (client ou gérant d'agence selon le portail), puis confirmation de l'email. */
-export function SignupForm({ nextPath }: { nextPath: string | null }) {
+/** Inscription (client ou gérant d'agence selon le formulaire), puis confirmation de l'email. */
+export function SignupForm({
+  portal,
+  nextPath,
+}: {
+  portal: 'client' | 'agency';
+  nextPath: string | null;
+}) {
   const t = useTranslations('auth');
   const locale = useLocale();
   const { validationMessage, errorMessage } = useAuthMessages();
@@ -46,7 +52,7 @@ export function SignupForm({ nextPath }: { nextPath: string | null }) {
   });
 
   const signup = useMutation({
-    mutationFn: (values: SignupInput) => authApi.signup({ ...values, locale }),
+    mutationFn: (values: SignupInput) => authApi.signup({ ...values, locale, portal }),
     onMutate: () => {
       setFormError(null);
     },

@@ -121,6 +121,11 @@ export const signupSchema = z.object({
   email: requiredEmailSchema,
   password: passwordSchema,
   locale: localeSchema.optional(),
+  /**
+   * Portail du formulaire. « agency » crée un gérant. Absent : le rôle suit le domaine
+   * de la requête (compatibilité).
+   */
+  portal: z.enum(['client', 'agency']).optional(),
 });
 export type SignupInput = z.input<typeof signupSchema>;
 export type SignupRequest = z.output<typeof signupSchema>;

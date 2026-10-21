@@ -83,7 +83,7 @@ export function createSignupPage(portal: SignupPortal) {
     return (
       <AuthPageFrame portal={portal}>
         <AuthCard title={t(`signup.title.${portal}`)} description={t(`signup.subtitle.${portal}`)}>
-          <SignupForm nextPath={await nextPathFrom(searchParams)} />
+          <SignupForm portal={portal} nextPath={await nextPathFrom(searchParams)} />
         </AuthCard>
       </AuthPageFrame>
     );

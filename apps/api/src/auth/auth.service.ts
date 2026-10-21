@@ -86,7 +86,13 @@ export class AuthService {
    * n'est pas saisi.
    */
   async signup(input: SignupRequest, context: RequestContext): Promise<OtpDispatch> {
-    const role = context.portal === null ? undefined : SIGNUP_ROLES[context.portal];
+    if (context.portal === 'admin') {
+      throw new ForbiddenException("L'inscription n'est pas ouverte sur ce portail.");
+    }
+    const role =
+      input.portal === 'agency' || (input.portal === undefined && context.portal === 'agency')
+        ? SIGNUP_ROLES.agency
+        : SIGNUP_ROLES.client;
     if (role === undefined) {
       throw new ForbiddenException("L'inscription n'est pas ouverte sur ce portail.");
     }

@@ -31,7 +31,7 @@ export function AgencyCta({ agencyUrl }: { agencyUrl: string }) {
             size="lg"
             className="w-full bg-white text-emerald-800 shadow-lg hover:bg-emerald-50 sm:w-fit"
           >
-            <a href={agencyUrl}>
+            <a href={`${agencyUrl}/signup`}>
               {t('action')}
               <ArrowRight className="rtl:rotate-180" aria-hidden="true" />
             </a>
