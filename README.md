@@ -238,7 +238,7 @@ pnpm check     # codegen + lint + format + typecheck + tests
 
 ## Production
 
-`docker compose up` est la pile locale : PostgreSQL, Redis et MinIO sur la machine. Le déploiement pour les agences est un VPS Hetzner, les photos sur Object Storage et la base recopiée en continu hors du serveur. Mode d'emploi, budget et remontée après panne : [`deploy/README.md`](deploy/README.md).
+`docker compose up` est la pile locale : PostgreSQL, Redis et MinIO sur la machine. Le premier déploiement Azure, et la remise en route si la machine tombe, sont dans [`deploy/azure.md`](deploy/azure.md). L'option Hetzner reste décrite dans [`deploy/README.md`](deploy/README.md).
 
 ## Avancement
 
@@ -249,4 +249,4 @@ pnpm check     # codegen + lint + format + typecheck + tests
 | 3      | Authentification, OTP, rôles, seed (gouvernorats, aéroports, comptes de démo)    | Terminée |
 | 4 à 10 | Flotte, recherche, réservation, opérations agence, admin, finitions, déploiement | À venir  |
 
-Déploiement VPS : [`deploy/README.md`](deploy/README.md).
+Déploiement Azure et relance : [`deploy/azure.md`](deploy/azure.md).

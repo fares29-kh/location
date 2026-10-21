@@ -4,7 +4,7 @@ Pile de production pour quelques agences : un VPS, Docker Compose, les photos ho
 
 Le fichier `docker-compose.yml` à la racine reste la pile locale (MinIO, HTTP, Mailpit). Sur le serveur, on utilise `docker-compose.prod.yml`.
 
-Avec des crédits Azure, suivez [azure.md](azure.md). Hetzner reste possible ensuite : même Compose, autre fichier `.env`.
+Le premier setup sur Azure et la relance après panne sont dans [azure.md](azure.md). Hetzner reste possible ensuite : même Compose, autre fichier `.env`.
 
 ## Fournisseur
 
