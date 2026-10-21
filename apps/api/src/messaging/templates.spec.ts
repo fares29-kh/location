@@ -1,7 +1,7 @@
 import { LOCALES, OTP_PURPOSES } from '@drivetn/types';
 import { describe, expect, it } from 'vitest';
 
-import { renderEmailSubject, renderMessage } from './templates';
+import { renderEmailHtml, renderEmailSubject, renderMessage } from './templates';
 
 describe('renderMessage', () => {
   it('rend un message complet dans chaque langue et pour chaque usage', () => {
@@ -80,5 +80,49 @@ describe('renderMessage', () => {
     expect(text).toContain('ignorez cet email');
     expect(renderEmailSubject(job, 'DriveTN')).toBe('Votre code de vérification DriveTN');
     expect(renderEmailSubject(job, 'DriveTN')).not.toContain('482915');
+  });
+
+  it('habille le code email aux couleurs du site, sans le mettre dans l’aperçu', () => {
+    const job = {
+      template: 'otp',
+      channel: 'EMAIL',
+      to: 'amira@example.tn',
+      locale: 'fr',
+      purpose: 'LOGIN',
+      code: '482915',
+      expiresInMinutes: 10,
+    } as const;
+    const html = renderEmailHtml(job, 'DriveTN') ?? '';
+    expect(html).toContain('#E60013');
+    expect(html).toContain('Drive<span style="color:#E60013;">Tn</span>');
+    expect(html).toContain('cid:drivetn-logo');
+    expect(html).toContain('>4<');
+    expect(html).toContain('>8<');
+    expect(html).toContain('>2<');
+    expect(html).toContain('>9<');
+    expect(html).toContain('>1<');
+    expect(html).toContain('>5<');
+    expect(html).not.toMatch(/\{\w+\}/);
+    const preview = html.slice(html.indexOf('display:none'), html.indexOf('</div>'));
+    expect(preview).not.toContain('482915');
+    expect(renderEmailHtml({ ...job, channel: 'SMS' }, 'DriveTN')).toBeUndefined();
+  });
+
+  it('écrit l’email arabe de droite à gauche', () => {
+    const html =
+      renderEmailHtml(
+        {
+          template: 'otp',
+          channel: 'EMAIL',
+          to: 'amira@example.tn',
+          locale: 'ar',
+          purpose: 'SIGNUP',
+          code: '482915',
+          expiresInMinutes: 10,
+        },
+        'DriveTN',
+      ) ?? '';
+    expect(html).toContain('dir="rtl"');
+    expect(html).toContain('أكّد بريدك الإلكتروني');
   });
 });

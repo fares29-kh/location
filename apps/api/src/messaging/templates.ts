@@ -1,5 +1,6 @@
 import { formatMillimes, type Locale, type OtpPurpose } from '@drivetn/types';
 
+import { renderOtpEmailHtml } from './email-otp';
 import type { InvoiceReminderJob, MessageJob, OtpMessageJob } from './messaging.types';
 
 const OTP_INTRO: Record<Locale, Record<OtpPurpose, string>> = {
@@ -63,6 +64,14 @@ function renderOtp(job: OtpMessageJob, appName: string): string {
   }
   const footer = fill(OTP_FOOTER[job.locale], { minutes });
   return `${intro} : ${job.code}. ${footer}`;
+}
+
+/** Version HTML d'un code email. Les SMS et WhatsApp restent en texte. */
+export function renderEmailHtml(job: MessageJob, appName: string): string | undefined {
+  if (job.template !== 'otp' || job.channel !== 'EMAIL') {
+    return undefined;
+  }
+  return renderOtpEmailHtml(job, appName);
 }
 
 /** Objet d'un email de code. Le code lui-même n'y figure pas (aperçu de notification). */

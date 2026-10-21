@@ -17,7 +17,7 @@ import {
   type MessagingProvider,
 } from '../messaging/messaging.types';
 import { sendSmtpEmail } from '../messaging/smtp-mailer';
-import { renderEmailSubject, renderMessage } from '../messaging/templates';
+import { renderEmailHtml, renderEmailSubject, renderMessage } from '../messaging/templates';
 
 /** Consomme la file `messaging` (OTP, puis confirmations et rappels) et délègue au fournisseur. */
 @Injectable()
@@ -61,11 +61,13 @@ export class MessagingProcessor implements OnApplicationBootstrap, OnApplication
   async process(job: Job<MessageJob>): Promise<void> {
     const body = renderMessage(job.data, this.config.APP_NAME);
     const subject = renderEmailSubject(job.data, this.config.APP_NAME);
+    const html = renderEmailHtml(job.data, this.config.APP_NAME);
     if (job.data.channel === 'EMAIL' && this.config.SMTP_HOST !== '') {
       await sendSmtpEmail(this.config, {
         to: job.data.to,
         subject: subject ?? this.config.APP_NAME,
         text: body,
+        html,
       });
       return;
     }
