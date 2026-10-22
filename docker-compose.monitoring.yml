@@ -23,7 +23,25 @@ services:
       - ./deploy/monitoring/rules:/etc/prometheus/rules:ro
       - /var/lib/drivetn/monitoring/https.yml:/etc/prometheus/targets/https.yml:ro
       - prometheus_data:/prometheus
-    depends_on: [blackbox]
+    depends_on: [blackbox, alertmanager]
+    networks: [drivetn]
+
+  alertmanager:
+    image: prom/alertmanager:v0.27.0
+    restart: unless-stopped
+    mem_limit: 48m
+    cpus: '0.05'
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: '2'
+    command:
+      - --config.file=/etc/alertmanager/alertmanager.yml
+      - --storage.path=/alertmanager
+    volumes:
+      - /var/lib/drivetn/monitoring/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+      - alertmanager_data:/alertmanager
     networks: [drivetn]
 
   blackbox:
@@ -136,3 +154,4 @@ services:
 volumes:
   prometheus_data:
   grafana_data:
+  alertmanager_data:

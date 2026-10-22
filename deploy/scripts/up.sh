@@ -82,9 +82,9 @@ if [[ ! "$APP_DOMAIN" =~ ^[A-Za-z0-9.-]+$ ]]; then
   exit 1
 fi
 mkdir -p /var/lib/drivetn/monitoring
-if [[ -d /var/lib/drivetn/monitoring/https.yml || -d /var/lib/drivetn/monitoring/blackbox.yml ]]; then
+if [[ -d /var/lib/drivetn/monitoring/https.yml || -d /var/lib/drivetn/monitoring/blackbox.yml || -d /var/lib/drivetn/monitoring/alertmanager.yml ]]; then
   echo "Un démarrage précédent a créé un dossier à la place du fichier de sondes." >&2
-  echo "Supprimez-le, puis relancez : rm -rf /var/lib/drivetn/monitoring/https.yml /var/lib/drivetn/monitoring/blackbox.yml" >&2
+  echo "Supprimez-le, puis relancez : rm -rf /var/lib/drivetn/monitoring/https.yml /var/lib/drivetn/monitoring/blackbox.yml /var/lib/drivetn/monitoring/alertmanager.yml" >&2
   exit 1
 fi
 cat >/var/lib/drivetn/monitoring/https.yml <<EOF
@@ -157,6 +157,31 @@ modules:
         server_name: ${APP_DOMAIN}
 EOF
 chmod 644 /var/lib/drivetn/monitoring/https.yml /var/lib/drivetn/monitoring/blackbox.yml
+
+# Les alertes partent par le SMTP du .env. Le mot de passe n'est pas dans le dépôt.
+if [[ -n "${SMTP_USER:-}" && -n "${SMTP_PASSWORD:-}" ]]; then
+  smtp_pass=${SMTP_PASSWORD//\\/\\\\}
+  smtp_pass=${smtp_pass//\"/\\\"}
+  {
+    printf '%s\n' 'global:' '  resolve_timeout: 5m'
+    printf '  smtp_smarthost: "%s:%s"\n' "${SMTP_HOST:-smtp.gmail.com}" "${SMTP_PORT:-587}"
+    printf '  smtp_from: "%s"\n' "$SMTP_USER"
+    printf '  smtp_auth_username: "%s"\n' "$SMTP_USER"
+    printf '  smtp_auth_password: "%s"\n' "$smtp_pass"
+    printf '%s\n' '  smtp_require_tls: true' 'route:' '  receiver: gmail' "  group_by: ['alertname']" '  group_wait: 30s' '  group_interval: 5m' '  repeat_interval: 4h' 'receivers:' '  - name: gmail' '    email_configs:'
+    printf '      - to: "%s"\n' "$SMTP_USER"
+    printf '%s\n' '        send_resolved: true'
+  } >/var/lib/drivetn/monitoring/alertmanager.yml
+else
+  echo "SMTP_USER ou SMTP_PASSWORD est vide : les alertes restent dans Grafana, aucun e-mail." >&2
+  cat >/var/lib/drivetn/monitoring/alertmanager.yml <<'EOF'
+route:
+  receiver: vide
+receivers:
+  - name: vide
+EOF
+fi
+chmod 644 /var/lib/drivetn/monitoring/alertmanager.yml
 
 compose up -d
 compose ps

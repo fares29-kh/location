@@ -190,7 +190,7 @@ Ouvrez `https://admin.<domaine>/monitoring`. Ici : `https://admin.madrasti.dev/m
 
 Prometheus et les collecteurs ne sont pas exposés sur Internet. Seul Grafana l'est, en HTTPS, sur le sous-domaine `admin`. Les mesures de sauvegarde sont réécrites toutes les cinq minutes, et juste après chaque `backup.sh`.
 
-Les alertes sont évaluées par Prometheus. Le tableau de bord affiche en bas le nombre d'alertes en cours et, pour chacune, une phrase qui dit quoi faire. Le détail est dans Grafana, menu Alerting, règles de la source Prometheus. Une alerte ne part que si la condition dure assez longtemps pour écarter un à-coup : 2 minutes pour une base arrêtée, 10 à 15 minutes pour un disque ou une mémoire saturés, 26 heures pour une sauvegarde manquée.
+Les alertes sont évaluées par Prometheus. Le tableau DriveTN production affiche en bas le nombre d'alertes en cours. Le tableau DriveTN services détaille chaque service. Un e-mail part vers `SMTP_USER` (le Gmail du `.env`) quand une alerte commence, et un autre quand elle se termine. Le même message est renvoyé au plus toutes les 4 heures tant que la panne dure. Le détail est aussi dans Grafana, menu Alerting. Une alerte ne part que si la condition dure assez longtemps pour écarter un à-coup : 2 minutes pour une base arrêtée, 10 à 15 minutes pour un disque ou une mémoire saturés, 26 heures pour une sauvegarde manquée.
 
 Deux niveaux : `critical` coupe le service ou les données (disque, base, Redis, site, sauvegarde, journaux). `warning` se dégrade sans tout couper (mémoire, processeur, worker, file d'attente, certificat, redémarrages). Tant que la VM est arrêtée, elle ne peut pas s'alerter elle-même : ces règles couvrent les pannes des services, pas la disparition de la machine.
 
