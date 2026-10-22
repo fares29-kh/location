@@ -6,9 +6,9 @@ import { EmptyState } from '@drivetn/ui/empty-state';
 import { cn } from '@drivetn/ui/lib/cn';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@drivetn/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@drivetn/ui/table';
-import { CalendarSearch, ChevronRight } from 'lucide-react';
+import { CalendarSearch, ChevronRight, Plus } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 
 import { Link } from '@/i18n/navigation';
 import { useBookings } from '@/lib/agency/queries';
@@ -32,8 +32,19 @@ import { useUrlState } from '../use-url-state';
 import { vehicleCoverUrl } from '@/lib/agency/vehicle-photos';
 
 import { VehicleThumb } from '../vehicle-thumb';
+import { DeskBookingSheet } from './desk-booking-sheet';
 
 const URL_DEFAULTS = { filter: 'all', q: '', sort: 'pickup_desc', page: '1' };
+
+function NewBookingButton({ onClick }: { onClick: () => void }) {
+  const t = useTranslations('agency.bookings.create');
+  return (
+    <Button onClick={onClick}>
+      <Plus className="size-4" aria-hidden="true" />
+      {t('open')}
+    </Button>
+  );
+}
 
 function isValidParam(key: keyof typeof URL_DEFAULTS, value: string): boolean {
   switch (key) {
@@ -197,10 +208,19 @@ export function BookingsView() {
   );
 
   const hasFilters = query.filter !== 'all' || query.search.length > 0;
+  const [deskOpen, setDeskOpen] = useState(false);
+  const openDesk = () => {
+    setDeskOpen(true);
+  };
 
   return (
     <div className="grid gap-6">
-      <PageHeader title={t('title')} description={t('subtitle')} />
+      <PageHeader
+        title={t('title')}
+        description={t('subtitle')}
+        actions={<NewBookingButton onClick={openDesk} />}
+      />
+      <DeskBookingSheet open={deskOpen} onOpenChange={setDeskOpen} />
 
       <div className="grid gap-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -261,7 +281,9 @@ export function BookingsView() {
               >
                 {t('clearFilters')}
               </Button>
-            ) : undefined
+            ) : (
+              <NewBookingButton onClick={openDesk} />
+            )
           }
         />
       ) : (

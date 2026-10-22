@@ -1,4 +1,4 @@
-import { randomUUID } from 'node:crypto';
+import { randomInt, randomUUID } from 'node:crypto';
 
 import {
   addDays,
@@ -14,6 +14,7 @@ import {
   type BookingQuery,
   type BookingTransitionInput,
   type BookingView,
+  type DeskBookingInput,
   canApplyBookingAction,
   type CustomerDetail,
   type CustomerQuery,
@@ -27,12 +28,15 @@ import {
   type PaymentMethod,
   type PaymentQuery,
   type PlanningData,
+  rentalPriceMillimes,
+  rentalWindow,
   type RecordPaymentInput,
   type RentalConditions,
   type Review,
   type ReviewList,
   type ReviewQuery,
   todayKey,
+  toE164,
   toMonthKey,
   tunisDateTime,
   type VehicleInput,
@@ -42,7 +46,7 @@ import {
   type VehicleView,
 } from '@drivetn/types';
 import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Prisma, type User } from '@prisma/client';
 
 import { AuditService } from '../audit/audit.service';
 import { CatalogService } from '../catalog/catalog.service';
@@ -115,6 +119,12 @@ const REVENUE_MONTHS = 6;
 
 function isUniqueViolation(error: unknown): boolean {
   return error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002';
+}
+
+const REFERENCE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+
+function newReference(): string {
+  return `DTN-${Array.from({ length: 6 }, () => REFERENCE_ALPHABET.charAt(randomInt(REFERENCE_ALPHABET.length))).join('')}`;
 }
 
 function plateAlreadyUsed(): AppException {
@@ -709,6 +719,153 @@ export class AgencyService {
   }
 
   // --- Réservations et encaissements ----------------------------------------------
+
+  /**
+   * Réservation prise au comptoir. Confirmée immédiatement : elle bloque le véhicule
+   * comme une demande en ligne. Un numéro déjà client est repris ; un numéro nouveau
+   * crée un compte client que la personne pourra terminer plus tard.
+   */
+  async createDeskBooking(
+    ownerId: string,
+    input: DeskBookingInput,
+    ip: string | null,
+  ): Promise<BookingView> {
+    if (input.pickup < todayKey()) {
+      throw new AppException(HttpStatus.BAD_REQUEST, 'VALIDATION_ERROR', 'Date passée.', [
+        { path: 'pickup', message: 'PAST_DATE' },
+      ]);
+    }
+    const agencyId = await this.agencyIdFor(ownerId);
+    const agency = await this.prisma.agency.findUniqueOrThrow({
+      where: { id: agencyId },
+      select: { id: true, address: true, status: true },
+    });
+    const customer = await this.deskCustomer(input);
+    const place = { fr: agency.address, ar: agency.address, en: agency.address };
+    const { pickupAt, returnAt, days } = rentalWindow(input.pickup, input.return);
+
+    for (let attempt = 1; ; attempt += 1) {
+      try {
+        const booking = await this.prisma.$transaction(async (tx) => {
+          await tx.$queryRaw`SELECT id FROM vehicles WHERE id = ${input.vehicleId} FOR UPDATE`;
+          const vehicle = await tx.vehicle.findFirst({
+            where: { id: input.vehicleId, agencyId: agency.id },
+          });
+          if (vehicle?.status !== 'ACTIVE' || agency.status !== 'ACTIVE') {
+            throw new AppException(
+              HttpStatus.CONFLICT,
+              'VEHICLE_UNAVAILABLE',
+              'Ce véhicule n’est plus disponible sur ces dates.',
+            );
+          }
+          const overlapping = await tx.booking.count({
+            where: {
+              vehicleId: vehicle.id,
+              status: { in: [...BLOCKING_BOOKING_STATUSES] },
+              pickupAt: { lt: returnAt },
+              returnAt: { gt: pickupAt },
+            },
+          });
+          const maintenance = await tx.vehicleMaintenance.count({
+            where: { vehicleId: vehicle.id, startsAt: { lt: returnAt }, endsAt: { gt: pickupAt } },
+          });
+          if (overlapping > 0 || maintenance > 0) {
+            throw new AppException(
+              HttpStatus.CONFLICT,
+              'VEHICLE_UNAVAILABLE',
+              'Ce véhicule n’est plus disponible sur ces dates.',
+            );
+          }
+          return tx.booking.create({
+            data: {
+              reference: newReference(),
+              agencyId: agency.id,
+              vehicleId: vehicle.id,
+              customerId: customer.id,
+              pickupAt,
+              returnAt,
+              pickupPlace: place,
+              returnPlace: place,
+              status: 'CONFIRMED',
+              dailyRateMillimes: vehicle.dailyRateMillimes,
+              totalMillimes: rentalPriceMillimes(vehicle.dailyRateMillimes, days),
+              depositMillimes: vehicle.depositMillimes,
+              customerNote: input.note === undefined || input.note.length === 0 ? null : input.note,
+              events: { create: [{ status: 'CONFIRMED', reason: null }] },
+            },
+            select: { id: true },
+          });
+        });
+        await this.audit.log({
+          action: 'booking.created',
+          actorId: ownerId,
+          entityType: 'booking',
+          entityId: booking.id,
+          metadata: { vehicleId: input.vehicleId, status: 'CONFIRMED', source: 'desk' },
+          ip,
+        });
+        return await this.bookingView(ownerId, booking.id);
+      } catch (error) {
+        if (isUniqueViolation(error) && attempt < 5) {
+          continue;
+        }
+        throw error;
+      }
+    }
+  }
+
+  /** Client du comptoir : fiche existante, ou compte à terminer plus tard par la personne. */
+  private async deskCustomer(input: DeskBookingInput) {
+    const phone = toE164(input.phone);
+    const existing = await this.prisma.user.findUnique({ where: { phone } });
+    if (existing !== null) {
+      this.assertDeskCustomer(existing);
+      return existing;
+    }
+    try {
+      return await this.prisma.user.create({
+        data: {
+          role: 'CUSTOMER',
+          status: 'PENDING_VERIFICATION',
+          firstName: input.firstName,
+          lastName: input.lastName,
+          phone,
+          locale: 'fr',
+        },
+      });
+    } catch (error) {
+      if (!isUniqueViolation(error)) {
+        throw error;
+      }
+      const raced = await this.prisma.user.findUnique({ where: { phone } });
+      if (raced === null) {
+        throw new AppException(
+          HttpStatus.CONFLICT,
+          'CONFLICT',
+          'Ce numéro ne correspond pas à un client.',
+          [{ path: 'phone', message: 'PHONE_NOT_CUSTOMER' }],
+        );
+      }
+      this.assertDeskCustomer(raced);
+      return raced;
+    }
+  }
+
+  private assertDeskCustomer(existing: User) {
+    if (existing.deletedAt !== null || existing.role !== 'CUSTOMER') {
+      throw new AppException(
+        HttpStatus.CONFLICT,
+        'CONFLICT',
+        'Ce numéro ne correspond pas à un client.',
+        [{ path: 'phone', message: 'PHONE_NOT_CUSTOMER' }],
+      );
+    }
+    if (existing.status === 'SUSPENDED') {
+      throw new AppException(HttpStatus.CONFLICT, 'CONFLICT', 'Ce compte client est suspendu.', [
+        { path: 'phone', message: 'ACCOUNT_SUSPENDED' },
+      ]);
+    }
+  }
 
   async transitionBooking(
     ownerId: string,

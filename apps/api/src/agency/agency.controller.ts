@@ -8,6 +8,8 @@ import {
   type BookingTransitionInput,
   bookingTransitionSchema,
   type BookingView,
+  type DeskBookingInput,
+  deskBookingSchema,
   type CustomerDetail,
   type CustomerQuery,
   customerQuerySchema,
@@ -143,6 +145,16 @@ export class AgencyController {
     @Query(new ZodValidationPipe(bookingQuerySchema)) query: BookingQuery,
   ): Promise<BookingList> {
     return this.agency.listBookings(user.id, query);
+  }
+
+  @Post('bookings')
+  @ApiOperation({ summary: 'Enregistrer une réservation prise au comptoir (confirmée)' })
+  createBooking(
+    @CurrentUser() user: AuthenticatedUser,
+    @Body(new ZodValidationPipe(deskBookingSchema)) body: DeskBookingInput,
+    @Req() request: Request,
+  ): Promise<BookingView> {
+    return this.agency.createDeskBooking(user.id, body, request.ip ?? null);
   }
 
   @Get('bookings/:id')

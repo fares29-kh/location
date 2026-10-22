@@ -10,6 +10,7 @@ import {
   type PaymentSummary,
 } from './booking';
 import { addDays, type DayKey, dayKeyToDate, diffInDays } from './dates';
+import { tunisianPhoneSchema } from './phone';
 import type { LocalizedText } from './location';
 import {
   type VehicleInput,
@@ -292,6 +293,27 @@ const limitSchema = z.coerce
   .min(1)
   .catch(AGENCY_LIST_LIMIT_DEFAULT)
   .transform((value) => Math.min(value, AGENCY_LIST_LIMIT_MAX));
+
+const deskDay = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, { message: 'INVALID_DATE' });
+const deskName = z.string().trim().min(1, { message: 'REQUIRED' }).max(60, { message: 'TOO_LONG' });
+
+/** Réservation saisie au comptoir : le client est présent, la voiture est confirmée tout de suite. */
+export const deskBookingSchema = z
+  .object({
+    vehicleId: z.string().trim().min(1, { message: 'REQUIRED' }),
+    pickup: deskDay,
+    return: deskDay,
+    phone: tunisianPhoneSchema,
+    firstName: deskName,
+    lastName: deskName,
+    note: z.string().trim().max(300, { message: 'TOO_LONG' }).optional(),
+  })
+  .refine((value) => value.return > value.pickup, {
+    message: 'RETURN_BEFORE_PICKUP',
+    path: ['return'],
+  });
+
+export type DeskBookingInput = z.infer<typeof deskBookingSchema>;
 
 export const bookingQuerySchema = z.object({
   filter: z.enum(BOOKING_FILTERS).catch('all'),

@@ -1,6 +1,7 @@
 import type {
   AgencyProfileInput,
   BookingTransitionInput,
+  DeskBookingInput,
   RecordPaymentInput,
   RentalConditions,
   VehicleInput,
@@ -46,6 +47,7 @@ export interface AgencyApi {
   getNavCounts(): Promise<NavCounts>;
 
   listBookings(query: BookingQuery): Promise<BookingList>;
+  createBooking(input: DeskBookingInput): Promise<BookingView>;
   getBooking(id: string): Promise<BookingView>;
   transitionBooking(id: string, input: BookingTransitionInput): Promise<BookingView>;
   recordPayment(bookingId: string, input: RecordPaymentInput): Promise<BookingView>;
@@ -102,6 +104,8 @@ function createHttpAgencyApi(): AgencyApi {
 
     listBookings: (query) =>
       apiFetch(withQuery('/agency/bookings', { ...query }), { schema: shape<BookingList>() }),
+    createBooking: (input) =>
+      apiFetch('/agency/bookings', { method: 'POST', body: input, schema: shape<BookingView>() }),
     getBooking: (id) =>
       apiFetch(`/agency/bookings/${segment(id)}`, { schema: shape<BookingView>() }),
     transitionBooking: (id, input) =>

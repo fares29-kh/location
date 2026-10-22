@@ -5,6 +5,7 @@ import {
   AGENCY_LIST_LIMIT_MAX,
   bookingQuerySchema,
   customerQuerySchema,
+  deskBookingSchema,
   paymentQuerySchema,
 } from './agency-portal';
 
@@ -33,5 +34,30 @@ describe('limite des listes du portail agence', () => {
       page: 3,
       limit: 40,
     });
+  });
+});
+
+describe('réservation au comptoir', () => {
+  const valid = {
+    vehicleId: 'veh_1',
+    pickup: '2026-10-25',
+    return: '2026-10-28',
+    phone: '20 123 456',
+    firstName: 'Amine',
+    lastName: 'Ben Ali',
+    note: '  Vol TU 704  ',
+  };
+
+  it('normalise le téléphone et la note', () => {
+    expect(deskBookingSchema.parse(valid)).toEqual({
+      ...valid,
+      phone: '20123456',
+      note: 'Vol TU 704',
+    });
+  });
+
+  it('refuse un retour le jour du départ', () => {
+    const result = deskBookingSchema.safeParse({ ...valid, return: valid.pickup });
+    expect(result.success).toBe(false);
   });
 });

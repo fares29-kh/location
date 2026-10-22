@@ -3,6 +3,7 @@
 import type {
   AgencyProfileInput,
   BookingTransitionInput,
+  DeskBookingInput,
   RecordPaymentInput,
   RentalConditions,
   VehicleInput,
@@ -70,6 +71,17 @@ export function useBookings(query: BookingQuery) {
     queryKey: agencyKeys.bookingList(query),
     queryFn: () => agencyApi.listBookings(query),
     placeholderData: keepPreviousData,
+  });
+}
+
+export function useCreateDeskBooking() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (input: DeskBookingInput) => agencyApi.createBooking(input),
+    onSuccess: (booking: BookingView) => {
+      queryClient.setQueryData(agencyKeys.booking(booking.id), booking);
+      return invalidateAgency(queryClient);
+    },
   });
 }
 

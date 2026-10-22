@@ -23,6 +23,7 @@ export function useVehicleAvailability(vehicleId: string) {
         schema: availabilitySchema,
         signal,
       }),
+    enabled: vehicleId.length > 0,
     staleTime: 0,
   });
 }
