@@ -1,5 +1,6 @@
 'use client';
 
+import { REVIEW_REPORT_REASONS, type ReviewReportReason } from '@drivetn/types';
 import { Avatar, AvatarFallback, getInitials } from '@drivetn/ui/avatar';
 import { Button } from '@drivetn/ui/button';
 import { Card } from '@drivetn/ui/card';
@@ -9,12 +10,13 @@ import { Rating } from '@drivetn/ui/rating';
 import { Skeleton } from '@drivetn/ui/skeleton';
 import { Textarea } from '@drivetn/ui/textarea';
 import { toast } from '@drivetn/ui/toaster';
-import { MessageSquareReply, MessagesSquare, Pencil, Star } from 'lucide-react';
+import { Flag, MessageSquareReply, MessagesSquare, Pencil, Star } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useId, useState } from 'react';
 
 import { Link } from '@/i18n/navigation';
-import { useReplyToReview, useReviews } from '@/lib/agency/queries';
+import { useReplyToReview, useReportReview, useReviews } from '@/lib/agency/queries';
+import { ApiError } from '@/lib/api/errors';
 import {
   REVIEW_FILTERS,
   type Review,
@@ -204,10 +206,76 @@ function ReplyForm({ review, onDone }: { review: Review; onDone: () => void }) {
   );
 }
 
+function ReportForm({ review, onDone }: { review: Review; onDone: () => void }) {
+  const t = useTranslations('agency.reviews.report');
+  const id = useId();
+  const report = useReportReview();
+  const [reason, setReason] = useState<ReviewReportReason>('OFFENSIVE');
+  const [error, setError] = useState<string | null>(null);
+
+  return (
+    <form
+      className="grid gap-3 rounded-control border border-border p-4"
+      onSubmit={(event) => {
+        event.preventDefault();
+        setError(null);
+        report.mutate(
+          { id: review.id, reason },
+          {
+            onSuccess: () => {
+              toast.success(t('success'));
+              onDone();
+            },
+            onError: (caught) => {
+              const locked =
+                caught instanceof ApiError &&
+                caught.validationIssues.some((issue) => issue.message === 'ALREADY_REPORTED');
+              setError(locked ? t('already') : t('error'));
+            },
+          },
+        );
+      }}
+    >
+      <fieldset className="grid gap-2">
+        <legend className="text-sm font-medium">{t('label')}</legend>
+        {REVIEW_REPORT_REASONS.map((value) => (
+          <label key={value} className="flex items-center gap-2 text-sm">
+            <input
+              type="radio"
+              name={`${id}-reason`}
+              value={value}
+              checked={reason === value}
+              onChange={() => {
+                setReason(value);
+              }}
+            />
+            {t(`reasons.${value}`)}
+          </label>
+        ))}
+      </fieldset>
+      <p className="text-xs text-muted-foreground">{t('hint')}</p>
+      {error !== null && (
+        <p className="text-sm text-destructive" role="alert">
+          {error}
+        </p>
+      )}
+      <div className="flex justify-end gap-2">
+        <Button type="button" variant="ghost" size="sm" onClick={onDone}>
+          {t('cancel')}
+        </Button>
+        <Button type="submit" size="sm" variant="secondary" loading={report.isPending}>
+          {t('submit')}
+        </Button>
+      </div>
+    </form>
+  );
+}
+
 function ReviewCard({ review }: { review: Review }) {
   const t = useTranslations('agency.reviews');
   const format = useAgencyFormat();
   const [editing, setEditing] = useState(false);
+  const [reporting, setReporting] = useState(false);
 
   return (
     <Card className="grid gap-4 p-5">
@@ -233,6 +301,29 @@ function ReviewCard({ review }: { review: Review }) {
       </div>
 
       <p className="text-pretty leading-relaxed">{review.comment}</p>
+
+      {reporting ? (
+        <ReportForm
+          review={review}
+          onDone={() => {
+            setReporting(false);
+          }}
+        />
+      ) : (
+        <div className="flex justify-end">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              setReporting(true);
+              setEditing(false);
+            }}
+          >
+            <Flag aria-hidden="true" />
+            {t('report.open')}
+          </Button>
+        </div>
+      )}
 
       {editing ? (
         <ReplyForm

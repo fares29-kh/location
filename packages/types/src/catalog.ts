@@ -4,6 +4,7 @@ import type { BookingEvent } from './agency-portal';
 import { type BookingStatus, type PaymentMethod, rentalDays } from './booking';
 import { addDays, type DayKey, tunisDateTime } from './dates';
 import type { LocalizedText } from './location';
+import type { ReviewModerationStatus } from './platform';
 import { type FuelType, slugSchema, type Transmission, type VehiclePhoto } from './vehicle';
 
 const dayKeySchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, { message: 'INVALID_DATE' });
@@ -242,6 +243,64 @@ export const cancelBookingSchema = z.object({
 
 export type CancelBookingInput = z.infer<typeof cancelBookingSchema>;
 
+export const REVIEW_COMMENT_MIN = 10;
+export const REVIEW_COMMENT_MAX = 1000;
+
+/** Un avis par location, une fois le véhicule rendu. */
+export const createReviewSchema = z.object({
+  rating: z
+    .number({ message: 'REQUIRED' })
+    .int({ message: 'OUT_OF_RANGE' })
+    .min(1, { message: 'REQUIRED' })
+    .max(5, { message: 'OUT_OF_RANGE' }),
+  comment: z
+    .string()
+    .trim()
+    .min(REVIEW_COMMENT_MIN, { message: 'TOO_SHORT' })
+    .max(REVIEW_COMMENT_MAX, { message: 'TOO_LONG' }),
+});
+
+export type CreateReviewInput = z.infer<typeof createReviewSchema>;
+
+/** Avis laissé par le client sur sa propre réservation, y compris s'il a été masqué. */
+export interface CustomerReview {
+  id: string;
+  rating: number;
+  comment: string;
+  createdAt: string;
+  reply: string | null;
+  repliedAt: string | null;
+  moderationStatus: ReviewModerationStatus;
+}
+
+/** Avis publié, sans le nom complet du client. */
+export interface PublicReview {
+  id: string;
+  rating: number;
+  comment: string;
+  author: string;
+  createdAt: string;
+  reply: string | null;
+  repliedAt: string | null;
+}
+
+export function canCustomerReview(status: BookingStatus): boolean {
+  return status === 'RETURNED' || status === 'COMPLETED';
+}
+
+/** Modifiable tant que l'agence n'a pas répondu et que l'avis n'est pas en modération. */
+export function canEditCustomerReview(review: CustomerReview): boolean {
+  return review.reply === null && review.moderationStatus === 'PUBLISHED';
+}
+
+/** « Amine B. » : le nom de famille complet ne sort pas de l'agence. */
+export function publicReviewAuthor(firstName: string, lastName: string): string {
+  const initial = lastName.trim().charAt(0);
+  return initial.length === 0
+    ? firstName.trim()
+    : `${firstName.trim()} ${initial.toLocaleUpperCase('fr')}.`;
+}
+
 /** Le client peut annuler une demande ou une réservation confirmée tant qu'il n'a pas pris la voiture. */
 export function canCustomerCancel(status: BookingStatus, pickupAt: Date, now: Date): boolean {
   return (status === 'PENDING' || status === 'CONFIRMED') && pickupAt.getTime() > now.getTime();
@@ -261,6 +320,7 @@ export interface CustomerBooking {
   customerNote: string | null;
   createdAt: string;
   canCancel: boolean;
+  review: CustomerReview | null;
   history: BookingEvent[];
   vehicle: {
     brand: string;

@@ -31,7 +31,9 @@ import {
   type ReviewList,
   type ReviewQuery,
   reviewQuerySchema,
+  type ReviewReportInput,
   reviewReplySchema,
+  reviewReportSchema,
   isVehiclePhotoType,
   VEHICLE_PHOTO_MAX_BYTES,
   type VehicleInput,
@@ -329,8 +331,20 @@ export class AgencyController {
     @CurrentUser() user: AuthenticatedUser,
     @Param('id') id: string,
     @Body(new ZodValidationPipe(reviewReplySchema)) body: z.output<typeof reviewReplySchema>,
+    @Req() request: Request,
   ): Promise<Review> {
-    return this.agency.replyToReview(user.id, id, body.reply);
+    return this.agency.replyToReview(user.id, id, body.reply, request.ip ?? null);
+  }
+
+  @Post('reviews/:id/report')
+  @ApiOperation({ summary: 'Signaler un avis à la modération, sans le masquer' })
+  report(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id') id: string,
+    @Body(new ZodValidationPipe(reviewReportSchema)) body: ReviewReportInput,
+    @Req() request: Request,
+  ): Promise<Review> {
+    return this.agency.reportReview(user.id, id, body, request.ip ?? null);
   }
 
   @Get('settings')

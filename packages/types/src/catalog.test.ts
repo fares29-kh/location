@@ -1,9 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  canCustomerReview,
+  canEditCustomerReview,
+  createReviewSchema,
   isDayOccupied,
   mergeUnavailableRanges,
   publicAgencySchema,
+  publicReviewAuthor,
   rangesOverlap,
   selectRentalDay,
   spreadAround,
@@ -111,5 +115,41 @@ describe('publicAgencySchema', () => {
         ...SOUSSE,
       }).success,
     ).toBe(true);
+  });
+});
+
+describe('avis client', () => {
+  it('n’accepte une note qu’après le retour du véhicule', () => {
+    expect(canCustomerReview('COMPLETED')).toBe(true);
+    expect(canCustomerReview('RETURNED')).toBe(true);
+    expect(canCustomerReview('PICKED_UP')).toBe(false);
+    expect(canCustomerReview('CANCELLED')).toBe(false);
+  });
+
+  it('abrège le nom publié', () => {
+    expect(publicReviewAuthor('Amine', 'Ben Ali')).toBe('Amine B.');
+    expect(publicReviewAuthor('Amine', '  ')).toBe('Amine');
+  });
+
+  it('exige une note et un commentaire', () => {
+    expect(createReviewSchema.safeParse({ rating: 5, comment: '  Court ' }).success).toBe(false);
+    expect(
+      createReviewSchema.parse({ rating: 4, comment: '  Voiture propre, accueil correct.  ' }),
+    ).toEqual({ rating: 4, comment: 'Voiture propre, accueil correct.' });
+  });
+
+  it('bloque la modification dès qu’une réponse ou une modération existe', () => {
+    const review = {
+      id: 'rev',
+      rating: 5,
+      comment: 'Très bonne location, je recommande.',
+      createdAt: '2026-10-22T10:00:00.000Z',
+      reply: null,
+      repliedAt: null,
+      moderationStatus: 'PUBLISHED' as const,
+    };
+    expect(canEditCustomerReview(review)).toBe(true);
+    expect(canEditCustomerReview({ ...review, reply: 'Merci' })).toBe(false);
+    expect(canEditCustomerReview({ ...review, moderationStatus: 'FLAGGED' })).toBe(false);
   });
 });

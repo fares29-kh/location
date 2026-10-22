@@ -27,6 +27,7 @@ const AGENCY_VALIDATION_CODES = [
   'PAST_DATE',
   'PHONE_NOT_CUSTOMER',
   'ACCOUNT_SUSPENDED',
+  'ALREADY_REPORTED',
 ] as const;
 type AgencyValidationCode = (typeof AGENCY_VALIDATION_CODES)[number];
 

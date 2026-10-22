@@ -11,6 +11,7 @@ import {
 } from './booking';
 import { addDays, type DayKey, dayKeyToDate, diffInDays } from './dates';
 import { tunisianPhoneSchema } from './phone';
+import { REVIEW_REPORT_REASONS } from './platform';
 import type { LocalizedText } from './location';
 import {
   type VehicleInput,
@@ -371,6 +372,12 @@ export type PlanningQuery = z.output<typeof planningQuerySchema>;
 export const reviewReplySchema = z.object({
   reply: z.string().trim().min(1, { message: 'REQUIRED' }).max(1000, { message: 'TOO_LONG' }),
 });
+
+export const reviewReportSchema = z.object({
+  reason: z.enum(REVIEW_REPORT_REASONS),
+});
+
+export type ReviewReportInput = z.infer<typeof reviewReportSchema>;
 
 export const vehicleStatusInputSchema = z.object({ status: vehicleStatusSchema });
 

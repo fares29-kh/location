@@ -3,6 +3,8 @@
 import {
   AGENCY_TIME_ZONE,
   type BookingStatus,
+  canCustomerReview,
+  canEditCustomerReview,
   type CustomerBooking,
   pickLocalized,
 } from '@drivetn/types';
@@ -20,6 +22,7 @@ import {
 import { EmptyState } from '@drivetn/ui/empty-state';
 import { ErrorState } from '@drivetn/ui/error-state';
 import { Money } from '@drivetn/ui/money';
+import { Rating } from '@drivetn/ui/rating';
 import { Skeleton } from '@drivetn/ui/skeleton';
 import { BookingStatusBadge } from '@drivetn/ui/status-badges';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@drivetn/ui/tabs';
@@ -46,6 +49,8 @@ import { PageHero } from '@/components/client/page-hero';
 import { Link } from '@/i18n/navigation';
 import { ApiError } from '@/lib/api/errors';
 import { useCancelBooking, useMyBookings } from '@/lib/bookings';
+
+import { ReviewDialog } from './review-dialog';
 
 const TABS = [
   { id: 'upcoming', icon: CalendarClock, statuses: ['PENDING', 'CONFIRMED'] },
@@ -141,9 +146,11 @@ function CancelDialog({
 function BookingCard({
   booking,
   onCancel,
+  onReview,
 }: {
   booking: CustomerBooking;
   onCancel: (booking: CustomerBooking) => void;
+  onReview: (booking: CustomerBooking) => void;
 }) {
   const t = useTranslations('client.bookings');
   const tStatus = useTranslations('status.booking');
@@ -202,6 +209,30 @@ function BookingCard({
           </div>
           <p className="text-xs text-muted-foreground">{t('card.payAtAgency')}</p>
         </dl>
+        {booking.review !== null && (
+          <div className="grid gap-2 rounded-control border border-border bg-surface-muted/40 p-3 text-sm sm:col-span-2">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="font-medium">{t('review.yours')}</p>
+              <Rating
+                value={booking.review.rating}
+                label={t('review.ratingValue', { rating: booking.review.rating })}
+              />
+            </div>
+            <p className="text-pretty text-muted-foreground">{booking.review.comment}</p>
+            {booking.review.moderationStatus === 'HIDDEN' && (
+              <p className="text-xs text-muted-foreground">{t('review.hidden')}</p>
+            )}
+            {booking.review.moderationStatus === 'FLAGGED' && (
+              <p className="text-xs text-muted-foreground">{t('review.flagged')}</p>
+            )}
+            {booking.review.reply !== null && (
+              <p className="border-s-2 border-primary ps-3 text-muted-foreground">
+                <span className="font-medium text-foreground">{t('review.agencyReply')} </span>
+                {booking.review.reply}
+              </p>
+            )}
+          </div>
+        )}
       </div>
 
       <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border bg-surface-muted/30 px-5 py-4">
@@ -240,6 +271,18 @@ function BookingCard({
               WhatsApp
             </WhatsAppButton>
           )}
+          {canCustomerReview(booking.status) &&
+            (booking.review === null || canEditCustomerReview(booking.review)) && (
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => {
+                  onReview(booking);
+                }}
+              >
+                {booking.review === null ? t('review.write') : t('review.edit')}
+              </Button>
+            )}
           {booking.canCancel && (
             <Button
               variant="ghost"
@@ -279,6 +322,7 @@ export function BookingsView({ firstName }: { firstName: string }) {
   const bookings = useMyBookings();
   const [selectedTab, setSelectedTab] = useState<TabId | null>(null);
   const [cancelling, setCancelling] = useState<CustomerBooking | null>(null);
+  const [reviewing, setReviewing] = useState<CustomerBooking | null>(null);
 
   const list = bookings.data ?? [];
   const byTab = Object.fromEntries(
@@ -352,7 +396,11 @@ export function BookingsView({ firstName }: { firstName: string }) {
                 <ul className="grid gap-4">
                   {byTab[item.id].map((booking) => (
                     <li key={booking.id}>
-                      <BookingCard booking={booking} onCancel={setCancelling} />
+                      <BookingCard
+                        booking={booking}
+                        onCancel={setCancelling}
+                        onReview={setReviewing}
+                      />
                     </li>
                   ))}
                 </ul>
@@ -423,6 +471,18 @@ export function BookingsView({ firstName }: { firstName: string }) {
           </Card>
         </aside>
       </div>
+
+      {reviewing !== null && (
+        <ReviewDialog
+          key={reviewing.id}
+          booking={reviewing}
+          onOpenChange={(open) => {
+            if (!open) {
+              setReviewing(null);
+            }
+          }}
+        />
+      )}
 
       {cancelling !== null && (
         <CancelDialog

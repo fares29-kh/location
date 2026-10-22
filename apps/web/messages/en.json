@@ -449,6 +449,34 @@
         "done": "Booking cancelled",
         "notCancellable": "This booking can no longer be cancelled.",
         "error": "Cancellation failed. Please try again."
+      },
+      "review": {
+        "write": "Leave a review",
+        "edit": "Edit my review",
+        "yours": "Your review",
+        "title": "Rate this rental",
+        "editTitle": "Edit your review",
+        "text": "Your review of {agency} (booking {reference}) will be visible to future customers.",
+        "rating": "Rating",
+        "ratingValue": "{rating} out of 5",
+        "stars": "{count, plural, one {# star} other {# stars}}",
+        "comment": "Comment",
+        "placeholder": "Welcome, car condition, punctuality…",
+        "cancel": "Cancel",
+        "submit": "Publish review",
+        "created": "Review published.",
+        "updated": "Review updated.",
+        "error": "The review could not be saved.",
+        "hidden": "This review was removed by moderation. It is no longer visible.",
+        "flagged": "This review is being checked.",
+        "agencyReply": "Agency reply:",
+        "validation": {
+          "REQUIRED": "Choose a rating from 1 to 5.",
+          "TOO_SHORT": "Write at least 10 characters.",
+          "TOO_LONG": "1000 characters maximum.",
+          "OUT_OF_RANGE": "Choose a rating from 1 to 5.",
+          "REVIEW_LOCKED": "This review can no longer be edited."
+        }
       }
     },
     "booking": {
@@ -502,6 +530,11 @@
       "sentTitle": "Request sent",
       "sentText": "Reference {reference}: {agency} will confirm your request.",
       "error": "The booking couldn’t be sent. Please try again.",
+      "publicReviews": {
+        "title": "Reviews of this agency",
+        "rating": "{rating} out of 5",
+        "reply": "Agency reply:"
+      },
       "validation": {
         "REQUIRED": "This field is required.",
         "TOO_LONG": "Text too long.",
@@ -594,6 +627,7 @@
       "PAST_DATE": "Choose today or a later date.",
       "PHONE_NOT_CUSTOMER": "This number already belongs to an account that is not a customer.",
       "ACCOUNT_SUSPENDED": "This customer account is suspended.",
+      "ALREADY_REPORTED": "You have already reported this review.",
       "generic": "Invalid value."
     },
     "dashboard": {
@@ -1158,6 +1192,22 @@
       "replyAction": "Reply",
       "yourReply": "Your reply",
       "editReply": "Edit reply",
+      "report": {
+        "open": "Report",
+        "label": "Reason for the report",
+        "hint": "The review stays visible while an administrator checks it. Reporting it does not hide it.",
+        "cancel": "Cancel",
+        "submit": "Send report",
+        "success": "Report sent to moderation.",
+        "already": "You have already reported this review.",
+        "error": "The report could not be sent.",
+        "reasons": {
+          "OFFENSIVE": "Offensive language",
+          "SPAM": "Advertising or spam",
+          "PERSONAL_DATA": "Personal data",
+          "OFF_TOPIC": "Off topic"
+        }
+      },
       "emptyTitle": "No reviews yet",
       "emptyText": "Customers can rate their rental once the vehicle is returned.",
       "emptyFilteredTitle": "No reviews in this category",
@@ -1165,7 +1215,7 @@
       "reply": {
         "label": "Your public reply",
         "placeholder": "Thank the customer, respond to their comments…",
-        "hint": "Visible to everyone on your agency profile",
+        "hint": "Visible to customers looking at your agency",
         "required": "Write a reply before publishing.",
         "tooLong": "{max} characters maximum.",
         "cancel": "Cancel",
@@ -1959,6 +2009,10 @@
           "reminder_sent": "Payment reminder"
         },
         "review": {
+          "created": "Review published by a customer",
+          "updated": "Review edited by the customer",
+          "replied": "Reply to a review",
+          "reported": "Review reported",
           "published": "Review published",
           "hidden": "Review hidden"
         },

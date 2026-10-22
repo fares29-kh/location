@@ -10,6 +10,7 @@ import {
   normalizeTunisianPhone,
   type PaymentRecord,
   type PlanningBooking,
+  publicReviewAuthor,
   rentalDays,
   type Review,
   summarizePayments,
@@ -222,7 +223,7 @@ export function toReview(row: ReviewRow): Review {
   return {
     id: row.id,
     bookingId: row.bookingId,
-    customerName: `${customer.firstName} ${customer.lastName.charAt(0)}.`,
+    customerName: publicReviewAuthor(customer.firstName, customer.lastName),
     vehicleName: `${vehicle.brand} ${vehicle.model}`,
     rating: row.rating,
     comment: row.comment,

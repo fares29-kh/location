@@ -3,11 +3,14 @@ import {
   cancelBookingSchema,
   type CreateBookingInput,
   createBookingSchema,
+  type CreateReviewInput,
+  createReviewSchema,
   type CustomerBooking,
   type OfferSearch,
   offerSearchSchema,
   type OfferSearchResult,
   type PublicAgency,
+  type PublicReview,
 } from '@drivetn/types';
 import { Body, Controller, Get, Header, Param, Post, Query, Req } from '@nestjs/common';
 import { ApiCookieAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -32,6 +35,13 @@ export class AgencyDirectoryController {
   @ApiOperation({ summary: 'Agences actives et leur position sur la carte du réseau' })
   list(): Promise<PublicAgency[]> {
     return this.directory.list();
+  }
+
+  @Get(':id/reviews')
+  @Header('Cache-Control', 'no-store')
+  @ApiOperation({ summary: 'Avis publiés d’une agence, sans le nom complet des clients' })
+  reviews(@Param('id') id: string): Promise<PublicReview[]> {
+    return this.directory.reviews(id);
   }
 }
 
@@ -80,6 +90,18 @@ export class BookingsController {
     @Req() request: Request,
   ): Promise<CustomerBooking> {
     return this.bookings.create(user.id, body, request.ip ?? null);
+  }
+
+  @Post(':id/review')
+  @RateLimit({ name: 'create-review', limit: 10, windowSeconds: 60 * 60 })
+  @ApiOperation({ summary: 'Noter une location après le retour du véhicule' })
+  review(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id') id: string,
+    @Body(new ZodValidationPipe(createReviewSchema)) body: CreateReviewInput,
+    @Req() request: Request,
+  ): Promise<CustomerBooking> {
+    return this.bookings.submitReview(user.id, id, body, request.ip ?? null);
   }
 
   @Post(':id/cancel')

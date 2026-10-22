@@ -1,5 +1,11 @@
-import { type GeoPoint, type PublicAgency, spreadAround } from '@drivetn/types';
-import { Injectable } from '@nestjs/common';
+import {
+  type GeoPoint,
+  type PublicAgency,
+  type PublicReview,
+  publicReviewAuthor,
+  spreadAround,
+} from '@drivetn/types';
+import { Injectable, NotFoundException } from '@nestjs/common';
 
 import { CATEGORY_ORDER } from '../catalog/catalog.mapper';
 import { PrismaService } from '../prisma/prisma.service';
@@ -121,5 +127,31 @@ export class AgencyDirectoryService {
       });
     }
     return directory;
+  }
+
+  /** Derniers avis publiés d'une agence active. Le nom de famille est abrégé. */
+  async reviews(agencyId: string): Promise<PublicReview[]> {
+    const agency = await this.prisma.agency.findFirst({
+      where: { id: agencyId, status: 'ACTIVE' },
+      select: { id: true },
+    });
+    if (agency === null) {
+      throw new NotFoundException('Agence introuvable.');
+    }
+    const rows = await this.prisma.review.findMany({
+      where: { agencyId: agency.id, moderationStatus: { not: 'HIDDEN' } },
+      include: { customer: { select: { firstName: true, lastName: true } } },
+      orderBy: [{ createdAt: 'desc' }, { id: 'asc' }],
+      take: 8,
+    });
+    return rows.map((row) => ({
+      id: row.id,
+      rating: row.rating,
+      comment: row.comment,
+      author: publicReviewAuthor(row.customer.firstName, row.customer.lastName),
+      createdAt: row.createdAt.toISOString(),
+      reply: row.reply,
+      repliedAt: row.repliedAt?.toISOString() ?? null,
+    }));
   }
 }

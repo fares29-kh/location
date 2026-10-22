@@ -449,6 +449,34 @@
         "done": "Réservation annulée",
         "notCancellable": "Cette réservation ne peut plus être annulée.",
         "error": "L’annulation a échoué. Réessayez."
+      },
+      "review": {
+        "write": "Laisser un avis",
+        "edit": "Modifier mon avis",
+        "yours": "Votre avis",
+        "title": "Noter cette location",
+        "editTitle": "Modifier votre avis",
+        "text": "Votre avis sur {agency} (réservation {reference}) sera visible par les futurs clients.",
+        "rating": "Note",
+        "ratingValue": "{rating} sur 5",
+        "stars": "{count, plural, one {# étoile} other {# étoiles}}",
+        "comment": "Commentaire",
+        "placeholder": "Accueil, état de la voiture, ponctualité…",
+        "cancel": "Annuler",
+        "submit": "Publier l’avis",
+        "created": "Avis publié.",
+        "updated": "Avis mis à jour.",
+        "error": "L’avis n’a pas pu être enregistré.",
+        "hidden": "Cet avis a été retiré par la modération. Il n’est plus visible.",
+        "flagged": "Cet avis est en cours de vérification.",
+        "agencyReply": "Réponse de l’agence :",
+        "validation": {
+          "REQUIRED": "Choisissez une note de 1 à 5.",
+          "TOO_SHORT": "Écrivez au moins 10 caractères.",
+          "TOO_LONG": "1000 caractères maximum.",
+          "OUT_OF_RANGE": "Choisissez une note de 1 à 5.",
+          "REVIEW_LOCKED": "Cet avis ne peut plus être modifié."
+        }
       }
     },
     "booking": {
@@ -502,6 +530,11 @@
       "sentTitle": "Demande envoyée",
       "sentText": "Référence {reference} : {agency} va confirmer votre demande.",
       "error": "La réservation n’a pas pu être envoyée. Réessayez.",
+      "publicReviews": {
+        "title": "Avis sur cette agence",
+        "rating": "{rating} sur 5",
+        "reply": "Réponse de l’agence :"
+      },
       "validation": {
         "REQUIRED": "Ce champ est obligatoire.",
         "TOO_LONG": "Texte trop long.",
@@ -594,6 +627,7 @@
       "PAST_DATE": "Choisissez aujourd’hui ou une date à venir.",
       "PHONE_NOT_CUSTOMER": "Ce numéro appartient déjà à un compte qui n’est pas un client.",
       "ACCOUNT_SUSPENDED": "Ce compte client est suspendu.",
+      "ALREADY_REPORTED": "Vous avez déjà signalé cet avis.",
       "generic": "Valeur invalide."
     },
     "dashboard": {
@@ -1158,6 +1192,22 @@
       "replyAction": "Répondre",
       "yourReply": "Votre réponse",
       "editReply": "Modifier la réponse",
+      "report": {
+        "open": "Signaler",
+        "label": "Motif du signalement",
+        "hint": "L’avis reste visible le temps qu’un administrateur le vérifie. Le signaler ne le masque pas.",
+        "cancel": "Annuler",
+        "submit": "Envoyer le signalement",
+        "success": "Signalement envoyé à la modération.",
+        "already": "Vous avez déjà signalé cet avis.",
+        "error": "Le signalement n’a pas pu être envoyé.",
+        "reasons": {
+          "OFFENSIVE": "Propos injurieux",
+          "SPAM": "Publicité ou spam",
+          "PERSONAL_DATA": "Données personnelles",
+          "OFF_TOPIC": "Hors sujet"
+        }
+      },
       "emptyTitle": "Aucun avis pour l’instant",
       "emptyText": "Les clients peuvent noter leur location une fois le véhicule rendu.",
       "emptyFilteredTitle": "Aucun avis dans cette catégorie",
@@ -1165,7 +1215,7 @@
       "reply": {
         "label": "Votre réponse publique",
         "placeholder": "Remerciez le client, répondez à ses remarques…",
-        "hint": "Visible par tous sur votre fiche agence",
+        "hint": "Visible par les clients qui consultent votre agence",
         "required": "Écrivez une réponse avant de publier.",
         "tooLong": "{max} caractères maximum.",
         "cancel": "Annuler",
@@ -1959,6 +2009,10 @@
           "reminder_sent": "Relance de paiement"
         },
         "review": {
+          "created": "Avis publié par un client",
+          "updated": "Avis modifié par le client",
+          "replied": "Réponse à un avis",
+          "reported": "Avis signalé",
           "published": "Avis publié",
           "hidden": "Avis masqué"
         },

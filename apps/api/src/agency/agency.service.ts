@@ -34,6 +34,7 @@ import {
   type RentalConditions,
   type Review,
   type ReviewList,
+  type ReviewReportInput,
   type ReviewQuery,
   todayKey,
   toE164,
@@ -1050,7 +1051,12 @@ export class AgencyService {
 
   // --- Avis et paramètres ---------------------------------------------------------
 
-  async replyToReview(ownerId: string, reviewId: string, reply: string): Promise<Review> {
+  async replyToReview(
+    ownerId: string,
+    reviewId: string,
+    reply: string,
+    ip: string | null,
+  ): Promise<Review> {
     const agencyId = await this.agencyIdFor(ownerId);
     const review = await this.prisma.review.findFirst({
       where: { id: reviewId, agencyId, ...VISIBLE_REVIEW },
@@ -1059,10 +1065,71 @@ export class AgencyService {
     if (review === null) {
       throw new NotFoundException('Avis introuvable.');
     }
+    const updated = await this.prisma.review.update({
+      where: { id: review.id },
+      data: { reply, repliedAt: new Date() },
+      include: REVIEW_INCLUDE,
+    });
+    await this.audit.log({
+      action: 'review.replied',
+      actorId: ownerId,
+      entityType: 'review',
+      entityId: review.id,
+      metadata: { agencyId },
+      ip,
+    });
+    return toReview(updated);
+  }
+
+  /**
+   * Signale un avis visible. Il reste affiché tant qu'un administrateur ne le masque pas,
+   * pour qu'une agence ne puisse pas faire disparaître une mauvaise note toute seule.
+   */
+  async reportReview(
+    ownerId: string,
+    reviewId: string,
+    input: ReviewReportInput,
+    ip: string | null,
+  ): Promise<Review> {
+    const agencyId = await this.agencyIdFor(ownerId);
+    const review = await this.prisma.review.findFirst({
+      where: { id: reviewId, agencyId, ...VISIBLE_REVIEW },
+      select: { id: true, moderationStatus: true },
+    });
+    if (review === null) {
+      throw new NotFoundException('Avis introuvable.');
+    }
+    const already = await this.prisma.reviewReport.findFirst({
+      where: { reviewId: review.id, reporterId: ownerId },
+      select: { id: true },
+    });
+    if (already !== null) {
+      throw new AppException(HttpStatus.CONFLICT, 'CONFLICT', 'Cet avis a déjà été signalé.', [
+        { path: 'reason', message: 'ALREADY_REPORTED' },
+      ]);
+    }
+    await this.prisma.$transaction(async (tx) => {
+      await tx.reviewReport.create({
+        data: { reviewId: review.id, reason: input.reason, reporterId: ownerId },
+      });
+      if (review.moderationStatus === 'PUBLISHED') {
+        await tx.review.updateMany({
+          where: { id: review.id, moderationStatus: 'PUBLISHED' },
+          data: { moderationStatus: 'FLAGGED', moderatedAt: new Date() },
+        });
+      }
+    });
+    await this.audit.log({
+      action: 'review.reported',
+      actorId: ownerId,
+      entityType: 'review',
+      entityId: review.id,
+      metadata: { agencyId, reason: input.reason },
+      ip,
+    });
     return toReview(
-      await this.prisma.review.update({
+      await this.prisma.review.findUniqueOrThrow({
         where: { id: review.id },
-        data: { reply, repliedAt: new Date() },
         include: REVIEW_INCLUDE,
       }),
     );

@@ -39,6 +39,7 @@ import { useVehicleAvailability } from '@/lib/availability';
 import { useCreateBooking } from '@/lib/bookings';
 
 import { AvailabilityCalendar, lastOccupiedDay } from './availability-calendar';
+import { PublicReviews } from './public-reviews';
 import { type RentalDates, rentalDays, type SearchOffer } from './catalog';
 import type { LocationOption } from './search-form';
 
@@ -217,6 +218,8 @@ export function BookingDialog({
             <DialogTitle>{t('title', { vehicle: `${offer.brand} ${offer.model}` })}</DialogTitle>
             <DialogDescription>{t('description', { agency: offer.agency.name })}</DialogDescription>
           </DialogHeader>
+
+          <PublicReviews agencyId={offer.agency.id} />
 
           {(unavailable || datesTaken || vehicleGone) && (
             <Alert tone="danger" title={t('unavailableTitle')}>

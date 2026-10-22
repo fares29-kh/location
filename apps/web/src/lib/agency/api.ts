@@ -3,6 +3,7 @@ import type {
   BookingTransitionInput,
   DeskBookingInput,
   RecordPaymentInput,
+  ReviewReportInput,
   RentalConditions,
   VehicleInput,
   VehicleMaintenance,
@@ -71,6 +72,7 @@ export interface AgencyApi {
 
   listReviews(query: ReviewQuery): Promise<ReviewList>;
   replyToReview(id: string, reply: string): Promise<Review>;
+  reportReview(id: string, reason: ReviewReportInput['reason']): Promise<Review>;
 
   getSettings(): Promise<AgencySettings>;
   updateProfile(input: AgencyProfileInput): Promise<AgencySettings>;
@@ -186,6 +188,12 @@ function createHttpAgencyApi(): AgencyApi {
       apiFetch(`/agency/reviews/${segment(id)}/reply`, {
         method: 'POST',
         body: { reply },
+        schema: shape<Review>(),
+      }),
+    reportReview: (id, reason) =>
+      apiFetch(`/agency/reviews/${segment(id)}/report`, {
+        method: 'POST',
+        body: { reason },
         schema: shape<Review>(),
       }),
 

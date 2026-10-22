@@ -4,8 +4,12 @@ import {
   BLOCKING_BOOKING_STATUSES,
   type CancelBookingInput,
   canCustomerCancel,
+  canCustomerReview,
+  canEditCustomerReview,
   type CreateBookingInput,
+  type CreateReviewInput,
   type CustomerBooking,
+  type CustomerReview,
   type LocalizedText,
   rentalDays,
   rentalPriceMillimes,
@@ -27,6 +31,7 @@ const REFERENCE_ATTEMPTS = 5;
 const CUSTOMER_BOOKING_INCLUDE = {
   vehicle: { include: { category: { select: { slug: true } } } },
   agency: true,
+  review: true,
   events: { orderBy: { createdAt: 'asc' } },
 } satisfies Prisma.BookingInclude;
 
@@ -48,6 +53,18 @@ function unavailable(): AppException {
   );
 }
 
+function toCustomerReview(review: NonNullable<CustomerBookingRow['review']>): CustomerReview {
+  return {
+    id: review.id,
+    rating: review.rating,
+    comment: review.comment,
+    createdAt: review.createdAt.toISOString(),
+    reply: review.reply,
+    repliedAt: review.repliedAt?.toISOString() ?? null,
+    moderationStatus: review.moderationStatus,
+  };
+}
+
 function toCustomerBooking(
   row: CustomerBookingRow,
   now: Date,
@@ -67,6 +84,7 @@ function toCustomerBooking(
     customerNote: row.customerNote,
     createdAt: row.createdAt.toISOString(),
     canCancel: canCustomerCancel(row.status, row.pickupAt, now),
+    review: row.review === null ? null : toCustomerReview(row.review),
     history: row.events.map((event) => ({
       status: event.status,
       at: event.createdAt.toISOString(),
@@ -247,6 +265,85 @@ export class CustomerBookingsService {
       entityId: booking.id,
       ip,
     });
+    const row = await this.prisma.booking.findUniqueOrThrow({
+      where: { id: booking.id },
+      include: CUSTOMER_BOOKING_INCLUDE,
+    });
+    return toCustomerBooking(row, new Date(), this.publicUrl);
+  }
+
+  /**
+   * Un avis par location rendue. Le client peut le corriger tant que l'agence n'a pas
+   * répondu et qu'il n'a pas été signalé ou masqué.
+   */
+  async submitReview(
+    customerId: string,
+    bookingId: string,
+    input: CreateReviewInput,
+    ip: string | null,
+  ): Promise<CustomerBooking> {
+    const booking = await this.prisma.booking.findFirst({
+      where: { id: bookingId, customerId },
+      include: { review: true },
+    });
+    if (booking === null) {
+      throw new NotFoundException('Réservation introuvable.');
+    }
+    if (!canCustomerReview(booking.status)) {
+      throw new AppException(
+        HttpStatus.CONFLICT,
+        'CONFLICT',
+        'Cette location ne peut pas encore être notée.',
+      );
+    }
+    if (booking.review !== null && !canEditCustomerReview(toCustomerReview(booking.review))) {
+      throw new AppException(
+        HttpStatus.CONFLICT,
+        'CONFLICT',
+        'Cet avis ne peut plus être modifié.',
+        [{ path: 'comment', message: 'REVIEW_LOCKED' }],
+      );
+    }
+
+    const existing = booking.review;
+    let reviewId: string;
+    try {
+      const saved =
+        existing === null
+          ? await this.prisma.review.create({
+              data: {
+                bookingId: booking.id,
+                agencyId: booking.agencyId,
+                customerId,
+                rating: input.rating,
+                comment: input.comment,
+              },
+              select: { id: true },
+            })
+          : await this.prisma.review.update({
+              where: { id: existing.id },
+              data: { rating: input.rating, comment: input.comment },
+              select: { id: true },
+            });
+      reviewId = saved.id;
+    } catch (error) {
+      if (isUniqueViolation(error)) {
+        throw new AppException(HttpStatus.CONFLICT, 'CONFLICT', 'Un avis existe déjà.', [
+          { path: 'comment', message: 'REVIEW_LOCKED' },
+        ]);
+      }
+      throw error;
+    }
+
+    await this.audit.log({
+      action: existing === null ? 'review.created' : 'review.updated',
+      actorId: customerId,
+      entityType: 'review',
+      entityId: reviewId,
+      metadata: { bookingId: booking.id, rating: input.rating },
+      ip,
+    });
+
     const row = await this.prisma.booking.findUniqueOrThrow({
       where: { id: booking.id },
       include: CUSTOMER_BOOKING_INCLUDE,

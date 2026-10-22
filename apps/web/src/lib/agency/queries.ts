@@ -5,6 +5,7 @@ import type {
   BookingTransitionInput,
   DeskBookingInput,
   RecordPaymentInput,
+  ReviewReportReason,
   RentalConditions,
   VehicleInput,
   VehicleMaintenanceInput,
@@ -249,6 +250,15 @@ export function useReviews(query: ReviewQuery) {
     queryKey: agencyKeys.reviews(query),
     queryFn: () => agencyApi.listReviews(query),
     placeholderData: keepPreviousData,
+  });
+}
+
+export function useReportReview() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, reason }: { id: string; reason: ReviewReportReason }) =>
+      agencyApi.reportReview(id, reason),
+    onSuccess: () => invalidateAgency(queryClient),
   });
 }
 
