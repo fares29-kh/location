@@ -1,6 +1,7 @@
 'use client';
 
 import {
+  dayKeyToDate,
   type DeskBookingInput,
   isValidTunisianPhone,
   rangesOverlap,
@@ -16,12 +17,13 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '
 import { Textarea } from '@drivetn/ui/textarea';
 import { toast } from '@drivetn/ui/toaster';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useId, useMemo, useState } from 'react';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 import { z } from 'zod';
 
 import { controlProps } from '@/components/auth/control-props';
+import { AvailabilityCalendar, lastOccupiedDay } from '@/components/search/availability-calendar';
 import { useRouter } from '@/i18n/navigation';
 import { ApiError } from '@/lib/api/errors';
 import { useVehicleAvailability } from '@/lib/availability';
@@ -74,6 +76,7 @@ export function DeskBookingSheet({
 }) {
   const t = useTranslations('agency.bookings.create');
   const tCommon = useTranslations('common');
+  const locale = useLocale();
   const format = useAgencyFormat();
   const router = useRouter();
   const id = useId();
@@ -83,6 +86,7 @@ export function DeskBookingSheet({
   const create = useCreateDeskBooking();
   const validationMessage = useValidationMessage();
   const [formError, setFormError] = useState<string | null>(null);
+  const [overlapWarning, setOverlapWarning] = useState(false);
   const activeVehicles = (vehicles.data ?? []).filter((vehicle) => vehicle.status === 'ACTIVE');
 
   const form = useForm<DeskFormValues>({
@@ -102,8 +106,10 @@ export function DeskBookingSheet({
   const dropoff = useWatch({ control: form.control, name: 'return' });
   const availability = useVehicleAvailability(vehicleId);
   const selected = activeVehicles.find((vehicle) => vehicle.id === vehicleId) ?? null;
+  const ranges = availability.data?.unavailable ?? [];
   const datesValid = /^\d{4}-\d{2}-\d{2}$/.test(pickup) && dropoff > pickup;
-  const taken = datesValid && rangesOverlap(pickup, dropoff, availability.data?.unavailable ?? []);
+  const taken = datesValid && rangesOverlap(pickup, dropoff, ranges);
+  const formatDay = (day: string) => format.date(dayKeyToDate(day));
   const quote =
     selected !== null && datesValid
       ? rentalPriceMillimes(selected.dailyRateMillimes, rentalWindow(pickup, dropoff).days)
@@ -116,6 +122,7 @@ export function DeskBookingSheet({
     if (!next) {
       form.reset();
       setFormError(null);
+      setOverlapWarning(false);
     }
     onOpenChange(next);
   };
@@ -125,7 +132,7 @@ export function DeskBookingSheet({
       <SheetContent
         side="end"
         closeLabel={tCommon('close')}
-        className="w-full max-w-full gap-0 p-0 sm:max-w-xl"
+        className="w-full max-w-full gap-0 p-0 sm:max-w-2xl"
       >
         <form
           noValidate
@@ -133,9 +140,7 @@ export function DeskBookingSheet({
           onSubmit={(event) => {
             void form.handleSubmit(async (values) => {
               setFormError(null);
-              if (
-                rangesOverlap(values.pickup, values.return, availability.data?.unavailable ?? [])
-              ) {
+              if (rangesOverlap(values.pickup, values.return, ranges)) {
                 setFormError(t('unavailable'));
                 return;
               }
@@ -187,7 +192,16 @@ export function DeskBookingSheet({
                   control={form.control}
                   name="vehicleId"
                   render={({ field }) => (
-                    <Select value={field.value} onValueChange={field.onChange}>
+                    <Select
+                      value={field.value}
+                      onValueChange={(value) => {
+                        field.onChange(value);
+                        form.setValue('pickup', '');
+                        form.setValue('return', '');
+                        setOverlapWarning(false);
+                        setFormError(null);
+                      }}
+                    >
                       <SelectTrigger
                         id={`${id}-vehicle`}
                         aria-invalid={error('vehicleId') !== undefined}
@@ -208,30 +222,91 @@ export function DeskBookingSheet({
                 />
               </Field>
             )}
-            <div className="grid gap-4 sm:grid-cols-2">
-              <Field id={`${id}-pickup`} label={t('pickup')} error={error('pickup')}>
-                <Input
-                  {...controlProps(`${id}-pickup`, { error: error('pickup') })}
-                  type="date"
-                  min={today}
-                  dir="ltr"
-                  {...form.register('pickup')}
+            {vehicleId.length === 0 ? (
+              <p className="text-sm text-muted-foreground">{t('calendar.chooseVehicle')}</p>
+            ) : availability.isPending ? (
+              <p className="text-sm text-muted-foreground">{t('calendar.loading')}</p>
+            ) : availability.isError ? (
+              <div className="grid gap-2">
+                <p className="text-sm text-destructive" role="alert">
+                  {t('calendar.loadError')}
+                </p>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => {
+                    void availability.refetch();
+                  }}
+                >
+                  {tCommon('retry')}
+                </Button>
+              </div>
+            ) : (
+              <div className="grid gap-3">
+                {ranges.length > 0 && (
+                  <div className="grid gap-1 text-sm">
+                    <p className="font-medium">{t('calendar.takenTitle')}</p>
+                    <ul className="grid gap-0.5 text-muted-foreground">
+                      {ranges.map((range) => {
+                        const until = lastOccupiedDay(range);
+                        return (
+                          <li key={`${range.pickup}-${range.return}`}>
+                            {until === range.pickup
+                              ? t('calendar.takenOne', { day: formatDay(range.pickup) })
+                              : t('calendar.takenRange', {
+                                  from: formatDay(range.pickup),
+                                  until: formatDay(until),
+                                })}
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                )}
+                <AvailabilityCalendar
+                  key={vehicleId}
+                  pickup={pickup}
+                  dropoff={dropoff}
+                  ranges={ranges}
+                  today={today}
+                  locale={locale}
+                  labels={{
+                    label: t('calendar.label'),
+                    previous: t('calendar.previous'),
+                    next: t('calendar.next'),
+                    occupied: t('calendar.occupied'),
+                  }}
+                  onSelect={(nextPickup, nextReturn) => {
+                    setOverlapWarning(false);
+                    setFormError(null);
+                    form.setValue('pickup', nextPickup, { shouldValidate: true });
+                    form.setValue('return', nextReturn, { shouldValidate: nextReturn.length > 0 });
+                  }}
+                  onOverlap={() => {
+                    setOverlapWarning(true);
+                  }}
                 />
-              </Field>
-              <Field id={`${id}-return`} label={t('return')} error={error('return')}>
-                <Input
-                  {...controlProps(`${id}-return`, { error: error('return') })}
-                  type="date"
-                  min={pickup.length > 0 ? pickup : today}
-                  dir="ltr"
-                  {...form.register('return')}
-                />
-              </Field>
-            </div>
-            {taken && (
-              <p className="text-sm text-destructive" role="alert">
-                {t('unavailable')}
-              </p>
+                <p className="text-sm text-muted-foreground">
+                  {datesValid
+                    ? t('calendar.chosen', {
+                        pickup: formatDay(pickup),
+                        return: formatDay(dropoff),
+                      })
+                    : pickup.length > 0
+                      ? t('calendar.chooseReturn')
+                      : t('calendar.choosePickup')}
+                </p>
+                {(taken || overlapWarning) && (
+                  <p className="text-sm text-destructive" role="alert">
+                    {t('calendar.overlap')}
+                  </p>
+                )}
+                {(error('pickup') !== undefined || error('return') !== undefined) && (
+                  <p className="text-sm text-destructive" role="alert">
+                    {error('return') ?? error('pickup')}
+                  </p>
+                )}
+              </div>
             )}
             <Field
               id={`${id}-phone`}
@@ -297,7 +372,7 @@ export function DeskBookingSheet({
             </Button>
             <Button
               type="submit"
-              disabled={create.isPending || activeVehicles.length === 0 || taken}
+              disabled={create.isPending || activeVehicles.length === 0 || !datesValid || taken}
             >
               {t('submit')}
             </Button>
