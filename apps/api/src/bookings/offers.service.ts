@@ -1,11 +1,14 @@
 import {
   BLOCKING_BOOKING_STATUSES,
+  mergeUnavailableRanges,
   type Offer,
   type OfferSearch,
   type OfferSearchResult,
   rentalWindow,
+  toDayKey,
+  type UnavailableRange,
 } from '@drivetn/types';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import type { Prisma } from '@prisma/client';
 
 import { PrismaService } from '../prisma/prisma.service';
@@ -73,6 +76,9 @@ export class OffersService {
       orderBy: [{ dailyRateMillimes: 'asc' }, { id: 'asc' }],
       take: OFFERS_LIMIT,
     });
+    const unavailableByVehicle = await this.unavailableByVehicle(
+      vehicles.map((vehicle) => vehicle.id),
+    );
 
     const agencyIds = [...new Set(vehicles.map((vehicle) => vehicle.agencyId))];
     const ratings = await this.prisma.review.groupBy({
@@ -116,9 +122,73 @@ export class OffersService {
           minDriverAge: vehicle.agency.minDriverAge,
           acceptedPaymentMethods: vehicle.agency.acceptedPaymentMethods,
         },
+        unavailable: unavailableByVehicle.get(vehicle.id) ?? [],
       };
     });
 
     return { offers, days: window?.days ?? null };
+  }
+
+  /** Demandes, réservations confirmées et entretiens encore en cours, par véhicule. */
+  private async unavailableByVehicle(
+    vehicleIds: readonly string[],
+  ): Promise<Map<string, UnavailableRange[]>> {
+    const grouped = new Map<string, UnavailableRange[]>();
+    if (vehicleIds.length === 0) {
+      return grouped;
+    }
+    const now = new Date();
+    const horizon = new Date(now.getTime() + 366 * 24 * 60 * 60 * 1000);
+    const [bookings, maintenances] = await Promise.all([
+      this.prisma.booking.findMany({
+        where: {
+          vehicleId: { in: [...vehicleIds] },
+          status: { in: [...BLOCKING_BOOKING_STATUSES] },
+          returnAt: { gt: now },
+          pickupAt: { lt: horizon },
+        },
+        select: { vehicleId: true, pickupAt: true, returnAt: true },
+      }),
+      this.prisma.vehicleMaintenance.findMany({
+        where: {
+          vehicleId: { in: [...vehicleIds] },
+          endsAt: { gt: now },
+          startsAt: { lt: horizon },
+        },
+        select: { vehicleId: true, startsAt: true, endsAt: true },
+      }),
+    ]);
+    for (const row of bookings) {
+      const ranges = grouped.get(row.vehicleId) ?? [];
+      ranges.push({ pickup: toDayKey(row.pickupAt), return: toDayKey(row.returnAt) });
+      grouped.set(row.vehicleId, ranges);
+    }
+    for (const row of maintenances) {
+      const ranges = grouped.get(row.vehicleId) ?? [];
+      ranges.push({ pickup: toDayKey(row.startsAt), return: toDayKey(row.endsAt) });
+      grouped.set(row.vehicleId, ranges);
+    }
+    for (const [vehicleId, ranges] of grouped) {
+      grouped.set(vehicleId, mergeUnavailableRanges(ranges));
+    }
+    return grouped;
+  }
+
+  /**
+   * Jours déjà pris sur un an : demandes en attente, réservations confirmées ou en cours,
+   * et entretiens. Aucun nom de client. Le matin du retour reste libre.
+   */
+  async availability(
+    vehicleId: string,
+  ): Promise<{ vehicleId: string; unavailable: UnavailableRange[] }> {
+    const vehicle = await this.prisma.vehicle.findFirst({
+      where: { id: vehicleId, status: 'ACTIVE', agency: { status: 'ACTIVE' } },
+      select: { id: true },
+    });
+    if (vehicle === null) {
+      throw new NotFoundException('Véhicule introuvable.');
+    }
+    const unavailable = (await this.unavailableByVehicle([vehicle.id])).get(vehicle.id) ?? [];
+    return { vehicleId, unavailable };
   }
 }

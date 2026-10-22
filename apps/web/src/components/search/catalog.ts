@@ -7,6 +7,7 @@ import {
   pickLocalized,
   SLUG_MAX,
   SLUG_PATTERN,
+  type UnavailableRange,
   type VehicleCategoryInfo,
   type VehiclePhoto,
 } from '@drivetn/types';
@@ -116,6 +117,8 @@ export interface SearchOffer extends FilterableOffer {
   agency: OfferAgency;
   /** Photos de l'agence, la première sert de couverture. */
   photos: VehiclePhoto[];
+  /** Créneaux déjà pris. Le jour de retour est libre à 10 h. */
+  unavailable: UnavailableRange[];
 }
 
 export function toSearchOffer(offer: Offer): SearchOffer {
@@ -138,6 +141,7 @@ export function toSearchOffer(offer: Offer): SearchOffer {
     reviews: offer.agency.reviewsCount,
     agency: offer.agency,
     photos: offer.photos,
+    unavailable: offer.unavailable,
   };
 }
 

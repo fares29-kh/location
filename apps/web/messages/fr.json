@@ -282,7 +282,9 @@
         "perDay": "/ jour",
         "total": "Total pour {count, plural, one {# jour} other {# jours}} :",
         "deposit": "Caution :",
-        "book": "Réserver"
+        "book": "Réserver",
+        "takenOne": "Déjà réservée le {day}",
+        "takenRange": "Déjà réservée du {from} au {until}"
       }
     },
     "agencies": {
@@ -461,6 +463,21 @@
         "note": "Message à l’agence (facultatif)"
       },
       "locationHint": "Prise en charge et retour à 10 h, au même endroit.",
+      "calendar": {
+        "label": "Dates de location",
+        "previous": "Mois précédent",
+        "next": "Mois suivant",
+        "occupied": "déjà réservée",
+        "choosePickup": "Choisissez le jour de départ. Les jours barrés sont déjà réservés.",
+        "chooseReturn": "Choisissez le jour de retour.",
+        "chosen": "Départ le {pickup}, retour le {return}, à 10 h.",
+        "takenTitle": "Dates déjà prises",
+        "takenOne": "Le {day}",
+        "takenRange": "Du {from} au {until}",
+        "takenHint": "La voiture est de nouveau libre le matin du retour, à 10 h.",
+        "overlap": "Ces dates croisent une réservation déjà confirmée. Choisissez un autre créneau : les jours barrés ne sont pas libres.",
+        "loading": "Vérification des dates déjà réservées…"
+      },
       "locationPlaceholder": "Choisissez un lieu",
       "notePlaceholder": "Ex. : numéro de vol, siège enfant, heure d’arrivée…",
       "summary": {

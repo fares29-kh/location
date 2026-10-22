@@ -282,7 +282,9 @@
         "perDay": "/ day",
         "total": "Total for {count, plural, one {# day} other {# days}}:",
         "deposit": "Deposit:",
-        "book": "Book"
+        "book": "Book",
+        "takenOne": "Already booked on {day}",
+        "takenRange": "Already booked from {from} to {until}"
       }
     },
     "agencies": {
@@ -461,6 +463,21 @@
         "note": "Message to the agency (optional)"
       },
       "locationHint": "Pick-up and return at 10 am, at the same place.",
+      "calendar": {
+        "label": "Rental dates",
+        "previous": "Previous month",
+        "next": "Next month",
+        "occupied": "already booked",
+        "choosePickup": "Choose the pick-up day. Crossed-out days are already booked.",
+        "chooseReturn": "Choose the return day.",
+        "chosen": "Pick-up on {pickup}, return on {return}, at 10 am.",
+        "takenTitle": "Dates already booked",
+        "takenOne": "{day}",
+        "takenRange": "{from} to {until}",
+        "takenHint": "The car is free again on the morning of the return day, at 10 am.",
+        "overlap": "These dates overlap a booking that is already confirmed. Choose another period: crossed-out days are not free.",
+        "loading": "Checking dates that are already booked…"
+      },
       "locationPlaceholder": "Choose a location",
       "notePlaceholder": "E.g. flight number, child seat, arrival time…",
       "summary": {

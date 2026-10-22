@@ -1,5 +1,6 @@
 'use client';
 
+import { rangesOverlap } from '@drivetn/types';
 import { Alert } from '@drivetn/ui/alert';
 import { Button } from '@drivetn/ui/button';
 import { EmptyState } from '@drivetn/ui/empty-state';
@@ -132,7 +133,13 @@ export function SearchView({
     null;
   const days = dates === null ? null : rentalDays(dates.pickup, dates.dropoff);
   const activeFilters = countActiveFilters(filters);
-  const available = useMemo(() => offers ?? [], [offers]);
+  const available = useMemo(() => {
+    const list = offers ?? [];
+    if (dates === null) {
+      return list;
+    }
+    return list.filter((offer) => !rangesOverlap(dates.pickup, dates.dropoff, offer.unavailable));
+  }, [offers, dates]);
   const brands = useMemo(() => brandGroups(available), [available]);
 
   const results = useMemo(

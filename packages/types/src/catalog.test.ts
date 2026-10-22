@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
-import { publicAgencySchema, spreadAround } from './catalog';
+import {
+  isDayOccupied,
+  mergeUnavailableRanges,
+  publicAgencySchema,
+  rangesOverlap,
+  selectRentalDay,
+  spreadAround,
+} from './catalog';
 
 const SOUSSE = { latitude: 35.8256, longitude: 10.636 };
 
@@ -31,6 +38,54 @@ describe('spreadAround', () => {
 
   it('est déterministe', () => {
     expect(spreadAround(SOUSSE, 5)).toEqual(spreadAround(SOUSSE, 5));
+  });
+});
+
+describe('dates déjà réservées', () => {
+  const taken = [{ pickup: '2026-10-25', return: '2026-10-28' }];
+
+  it('bloque le créneau confirmé et laisse libre le matin du retour', () => {
+    expect(rangesOverlap('2026-10-25', '2026-10-28', taken)).toBe(true);
+    expect(rangesOverlap('2026-10-26', '2026-10-27', taken)).toBe(true);
+    expect(rangesOverlap('2026-10-20', '2026-10-25', taken)).toBe(false);
+    expect(rangesOverlap('2026-10-28', '2026-10-30', taken)).toBe(false);
+    expect(isDayOccupied('2026-10-27', taken)).toBe(true);
+    expect(isDayOccupied('2026-10-28', taken)).toBe(false);
+  });
+
+  it('fusionne les absences qui se suivent', () => {
+    expect(
+      mergeUnavailableRanges([
+        { pickup: '2026-11-10', return: '2026-11-12' },
+        { pickup: '2026-11-12', return: '2026-11-14' },
+        { pickup: '2026-12-01', return: '2026-12-03' },
+      ]),
+    ).toEqual([
+      { pickup: '2026-11-10', return: '2026-11-14' },
+      { pickup: '2026-12-01', return: '2026-12-03' },
+    ]);
+  });
+
+  it('refuse un retour qui traverse une réservation confirmée', () => {
+    expect(
+      selectRentalDay({ pickup: '2026-10-24', return: null }, '2026-10-29', taken, '2026-10-22'),
+    ).toEqual({
+      kind: 'rejected',
+      reason: 'overlap',
+    });
+    expect(
+      selectRentalDay({ pickup: null, return: null }, '2026-10-28', taken, '2026-10-22'),
+    ).toEqual({
+      kind: 'range',
+      pickup: '2026-10-28',
+      return: null,
+    });
+    expect(
+      selectRentalDay({ pickup: null, return: null }, '2026-10-26', taken, '2026-10-22'),
+    ).toEqual({
+      kind: 'rejected',
+      reason: 'unavailable',
+    });
   });
 });
 

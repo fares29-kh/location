@@ -1,8 +1,9 @@
 'use client';
 
 import {
-  addDays,
   BOOKING_NOTE_MAX,
+  dayKeyToDate,
+  rangesOverlap,
   rentalPriceMillimes,
   todayKey,
   WEEKLY_DISCOUNT_DAYS,
@@ -19,7 +20,6 @@ import {
   DialogTitle,
 } from '@drivetn/ui/dialog';
 import { Field } from '@drivetn/ui/field';
-import { inputClassName } from '@drivetn/ui/input';
 import { Money } from '@drivetn/ui/money';
 import { PaymentMethodBadges } from '@drivetn/ui/payment-method-badges';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@drivetn/ui/select';
@@ -28,15 +28,17 @@ import { toast } from '@drivetn/ui/toaster';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CalendarClock, ShieldCheck, UserRound, Zap } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
-import { useId, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 import { z } from 'zod';
 
 import { controlProps } from '@/components/auth/control-props';
 import { useRouter } from '@/i18n/navigation';
 import { ApiError } from '@/lib/api/errors';
+import { useVehicleAvailability } from '@/lib/availability';
 import { useCreateBooking } from '@/lib/bookings';
 
+import { AvailabilityCalendar, lastOccupiedDay } from './availability-calendar';
 import { type RentalDates, rentalDays, type SearchOffer } from './catalog';
 import type { LocationOption } from './search-form';
 
@@ -94,7 +96,11 @@ export function BookingDialog({
   const id = useId();
   const [today] = useState(todayKey);
   const [unavailable, setUnavailable] = useState(false);
+  const [overlapWarning, setOverlapWarning] = useState(false);
   const createBooking = useCreateBooking();
+  const availability = useVehicleAvailability(offer.id);
+  const ranges = availability.data?.unavailable ?? [];
+  const vehicleGone = availability.error instanceof ApiError && availability.error.status === 404;
 
   const places = agencyLocations(locationOptions, offer.agency.governorateCode);
   const form = useForm<BookingFormValues>({
@@ -113,6 +119,32 @@ export function BookingDialog({
   const { errors } = form.formState;
   const [pickup, dropoff] = useWatch({ control: form.control, name: ['pickup', 'return'] });
   const days = dropoff > pickup ? rentalDays(pickup, dropoff) : null;
+  const datesTaken =
+    overlapWarning ||
+    (ISO_DATE.test(pickup) &&
+      ISO_DATE.test(dropoff) &&
+      dropoff > pickup &&
+      rangesOverlap(pickup, dropoff, ranges));
+  const refreshedSearch = useRef(false);
+  useEffect(() => {
+    if (
+      refreshedSearch.current ||
+      !availability.isSuccess ||
+      dates === null ||
+      !rangesOverlap(dates.pickup, dates.dropoff, availability.data.unavailable)
+    ) {
+      return;
+    }
+    refreshedSearch.current = true;
+    router.refresh();
+  }, [availability.isSuccess, availability.data, dates, router]);
+
+  const formatDay = (day: string) =>
+    new Intl.DateTimeFormat(`${locale}-TN-u-nu-latn`, {
+      day: 'numeric',
+      month: 'long',
+      timeZone: 'Africa/Tunis',
+    }).format(dayKeyToDate(day));
 
   const message = (code: string | undefined) =>
     code === undefined
@@ -120,13 +152,15 @@ export function BookingDialog({
       : isValidationCode(code)
         ? t(`validation.${code}`)
         : t('validation.generic');
-  const pickupError = message(errors.pickup?.message);
-  const returnError = message(errors.return?.message);
   const locationError = message(errors.location?.message);
   const noteError = message(errors.note?.message);
 
   const submit = form.handleSubmit(async (values) => {
     setUnavailable(false);
+    if (rangesOverlap(values.pickup, values.return, ranges)) {
+      setOverlapWarning(true);
+      return;
+    }
     try {
       const booking = await createBooking.mutateAsync({
         vehicleId: offer.id,
@@ -149,6 +183,8 @@ export function BookingDialog({
     } catch (error) {
       if (error instanceof ApiError && error.code === 'VEHICLE_UNAVAILABLE') {
         setUnavailable(true);
+        void availability.refetch();
+        router.refresh();
         return;
       }
       if (error instanceof ApiError && error.validationIssues.length > 0) {
@@ -182,40 +218,71 @@ export function BookingDialog({
             <DialogDescription>{t('description', { agency: offer.agency.name })}</DialogDescription>
           </DialogHeader>
 
-          {unavailable && (
+          {(unavailable || datesTaken || vehicleGone) && (
             <Alert tone="danger" title={t('unavailableTitle')}>
-              {t('unavailableText')}
+              {datesTaken ? t('calendar.overlap') : t('unavailableText')}
             </Alert>
           )}
 
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Field id={`${id}-pickup`} label={t('fields.pickup')} error={pickupError}>
-              <input
-                {...controlProps(`${id}-pickup`, { error: pickupError })}
-                type="date"
-                min={today}
-                className={inputClassName}
-                {...form.register('pickup', {
-                  onChange: () => {
-                    setUnavailable(false);
-                  },
+          {ranges.length > 0 && (
+            <div className="grid gap-2 rounded-card border border-border bg-surface-muted/60 p-4 text-sm">
+              <p className="font-semibold">{t('calendar.takenTitle')}</p>
+              <ul className="grid gap-1 text-muted-foreground">
+                {ranges.map((range) => {
+                  const until = lastOccupiedDay(range);
+                  return (
+                    <li key={`${range.pickup}-${range.return}`}>
+                      {until === range.pickup
+                        ? t('calendar.takenOne', { day: formatDay(range.pickup) })
+                        : t('calendar.takenRange', {
+                            from: formatDay(range.pickup),
+                            until: formatDay(until),
+                          })}
+                    </li>
+                  );
                 })}
-              />
-            </Field>
-            <Field id={`${id}-return`} label={t('fields.return')} error={returnError}>
-              <input
-                {...controlProps(`${id}-return`, { error: returnError })}
-                type="date"
-                min={ISO_DATE.test(pickup) ? addDays(pickup, 1) : today}
-                className={inputClassName}
-                {...form.register('return', {
-                  onChange: () => {
-                    setUnavailable(false);
-                  },
+              </ul>
+              <p className="text-muted-foreground">{t('calendar.takenHint')}</p>
+            </div>
+          )}
+
+          {availability.isLoading ? (
+            <p className="text-sm text-muted-foreground">{t('calendar.loading')}</p>
+          ) : vehicleGone ? null : (
+            <AvailabilityCalendar
+              pickup={pickup}
+              dropoff={dropoff}
+              ranges={ranges}
+              today={today}
+              locale={locale}
+              labels={{
+                label: t('calendar.label'),
+                previous: t('calendar.previous'),
+                next: t('calendar.next'),
+                occupied: t('calendar.occupied'),
+              }}
+              onSelect={(nextPickup, nextReturn) => {
+                setOverlapWarning(false);
+                setUnavailable(false);
+                form.setValue('pickup', nextPickup, { shouldValidate: true });
+                form.setValue('return', nextReturn, { shouldValidate: true });
+              }}
+              onOverlap={() => {
+                setOverlapWarning(true);
+              }}
+            />
+          )}
+
+          <p className="text-sm text-muted-foreground">
+            {days === null
+              ? pickup.length > 0
+                ? t('calendar.chooseReturn')
+                : t('calendar.choosePickup')
+              : t('calendar.chosen', {
+                  pickup: formatDay(pickup),
+                  return: formatDay(dropoff),
                 })}
-              />
-            </Field>
-          </div>
+          </p>
 
           <Field
             id={`${id}-location`}
@@ -350,6 +417,7 @@ export function BookingDialog({
               type="submit"
               variant="cta"
               loading={createBooking.isPending}
+              disabled={days === null || datesTaken || availability.isLoading || vehicleGone}
               className="shadow-md shadow-cta/20"
             >
               {offer.agency.instantConfirmation ? t('submitInstant') : t('submit')}

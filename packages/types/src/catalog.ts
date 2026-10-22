@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 import type { BookingEvent } from './agency-portal';
 import { type BookingStatus, type PaymentMethod, rentalDays } from './booking';
-import { type DayKey, tunisDateTime } from './dates';
+import { addDays, type DayKey, tunisDateTime } from './dates';
 import type { LocalizedText } from './location';
 import { type FuelType, slugSchema, type Transmission, type VehiclePhoto } from './vehicle';
 
@@ -26,6 +26,75 @@ export function rentalWindow(pickup: DayKey, dropoff: DayKey) {
   const pickupAt = tunisDateTime(pickup, DEFAULT_PICKUP_HOUR);
   const returnAt = tunisDateTime(dropoff, DEFAULT_PICKUP_HOUR);
   return { pickupAt, returnAt, days: rentalDays(pickupAt, returnAt) };
+}
+
+/**
+ * Créneau déjà pris. `pickup` est inclus, `return` est le matin où la voiture est de nouveau
+ * libre (exclu), à la même heure que le départ.
+ */
+export interface UnavailableRange {
+  pickup: DayKey;
+  return: DayKey;
+}
+
+/** Deux créneaux [départ, retour[ se chevauchent. Le retour et le départ suivant au même matin sont libres. */
+export function rangesOverlap(
+  pickup: DayKey,
+  dropoff: DayKey,
+  ranges: readonly UnavailableRange[],
+): boolean {
+  return ranges.some((range) => pickup < range.return && dropoff > range.pickup);
+}
+
+/** Le véhicule est sorti ce jour-là : on ne peut pas le prendre, ni le rendre après l'avoir inclus. */
+export function isDayOccupied(day: DayKey, ranges: readonly UnavailableRange[]): boolean {
+  return rangesOverlap(day, addDays(day, 1), ranges);
+}
+
+/** Fusionne les créneaux qui se touchent pour n'afficher qu'une période par absence. */
+export function mergeUnavailableRanges(ranges: readonly UnavailableRange[]): UnavailableRange[] {
+  const sorted = ranges
+    .filter((range) => range.return > range.pickup)
+    .sort((a, b) => a.pickup.localeCompare(b.pickup) || a.return.localeCompare(b.return));
+  const merged: UnavailableRange[] = [];
+  for (const range of sorted) {
+    const last = merged.at(-1);
+    if (last !== undefined && range.pickup <= last.return) {
+      merged[merged.length - 1] = {
+        pickup: last.pickup,
+        return: range.return > last.return ? range.return : last.return,
+      };
+    } else {
+      merged.push({ pickup: range.pickup, return: range.return });
+    }
+  }
+  return merged;
+}
+
+export type RentalDayChoice =
+  | { kind: 'range'; pickup: DayKey; return: DayKey | null }
+  | { kind: 'rejected'; reason: 'unavailable' | 'overlap' };
+
+/**
+ * Clic sur un jour du calendrier. Un jour passé ou déjà pris est refusé. Un retour qui
+ * traverserait une réservation confirmée est refusé sans changer le départ déjà choisi.
+ */
+export function selectRentalDay(
+  current: { pickup: DayKey | null; return: DayKey | null },
+  day: DayKey,
+  ranges: readonly UnavailableRange[],
+  today: DayKey,
+): RentalDayChoice {
+  if (day < today || isDayOccupied(day, ranges)) {
+    return { kind: 'rejected', reason: 'unavailable' };
+  }
+  if (current.pickup === null || current.return !== null || day <= current.pickup) {
+    return { kind: 'range', pickup: day, return: null };
+  }
+  if (rangesOverlap(current.pickup, day, ranges)) {
+    return { kind: 'rejected', reason: 'overlap' };
+  }
+  return { kind: 'range', pickup: current.pickup, return: day };
 }
 
 // --- Recherche publique ----------------------------------------------------------
@@ -82,6 +151,8 @@ export interface Offer {
   /** `null` : kilométrage illimité. */
   mileageLimitKm: number | null;
   agency: OfferAgency;
+  /** Créneaux déjà pris. Le jour `return` est libre à 10 h. */
+  unavailable: UnavailableRange[];
 }
 
 export interface OfferSearchResult {

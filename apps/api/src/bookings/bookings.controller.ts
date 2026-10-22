@@ -49,6 +49,13 @@ export class OffersController {
   ): Promise<OfferSearchResult> {
     return this.offers.search(query);
   }
+
+  @Get(':vehicleId/availability')
+  @Header('Cache-Control', 'no-store')
+  @ApiOperation({ summary: 'Dates déjà prises pour un véhicule, sans identité des clients' })
+  availability(@Param('vehicleId') vehicleId: string) {
+    return this.offers.availability(vehicleId);
+  }
 }
 
 @ApiTags('bookings')

@@ -1,6 +1,6 @@
 'use client';
 
-import { type Locale, rentalPriceMillimes } from '@drivetn/types';
+import { addDays, dayKeyToDate, type Locale, rentalPriceMillimes } from '@drivetn/types';
 import { Badge } from '@drivetn/ui/badge';
 import { Button } from '@drivetn/ui/button';
 import { cn } from '@drivetn/ui/lib/cn';
@@ -157,6 +157,27 @@ export function OfferCard({
           <Spec icon={Fuel} label={tCatalog(`fuel.${offer.fuel}`)} />
           {offer.airConditioning && <Spec icon={Snowflake} label={t('airConditioning')} />}
         </ul>
+
+        {offer.unavailable.length > 0 && (
+          <ul className="grid gap-1 text-sm font-medium text-danger">
+            {offer.unavailable.map((range) => {
+              const until = addDays(range.return, -1);
+              const formatDay = (day: string) =>
+                new Intl.DateTimeFormat(`${locale}-TN-u-nu-latn`, {
+                  day: 'numeric',
+                  month: 'short',
+                  timeZone: 'Africa/Tunis',
+                }).format(dayKeyToDate(day));
+              return (
+                <li key={`${range.pickup}-${range.return}`}>
+                  {until === range.pickup
+                    ? t('takenOne', { day: formatDay(range.pickup) })
+                    : t('takenRange', { from: formatDay(range.pickup), until: formatDay(until) })}
+                </li>
+              );
+            })}
+          </ul>
+        )}
 
         <div className="flex flex-wrap gap-2">
           <Badge tone={offer.unlimitedMileage ? 'success' : 'neutral'}>
