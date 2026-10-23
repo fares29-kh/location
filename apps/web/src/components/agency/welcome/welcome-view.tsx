@@ -7,9 +7,22 @@ import {
 } from '@drivetn/types';
 import { Button } from '@drivetn/ui/button';
 import { cn } from '@drivetn/ui/lib/cn';
-import { CircleCheck } from 'lucide-react';
+import {
+  Banknote,
+  CalendarDays,
+  Car,
+  ChartColumn,
+  CircleCheck,
+  KeyRound,
+  MapPin,
+  Receipt,
+  Search,
+  Star,
+  type LucideIcon,
+} from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
 
+import { SectionHeading } from '@/components/home/section-heading';
 import { Link } from '@/i18n/navigation';
 
 const FEATURES = [
@@ -25,6 +38,36 @@ const FEATURES = [
   'reviews',
   'map',
 ] as const;
+
+const PILLARS = ['find', 'book', 'run'] as const;
+
+const SERVICES = [
+  'fleet',
+  'planning',
+  'bookings',
+  'payments',
+  'expenses',
+  'stats',
+  'reviews',
+  'visibility',
+] as const;
+
+const SERVICE_ICONS: Record<(typeof SERVICES)[number], LucideIcon> = {
+  fleet: Car,
+  planning: CalendarDays,
+  bookings: KeyRound,
+  payments: Banknote,
+  expenses: Receipt,
+  stats: ChartColumn,
+  reviews: Star,
+  visibility: MapPin,
+};
+
+const PILLAR_ICONS: Record<(typeof PILLARS)[number], LucideIcon> = {
+  find: Search,
+  book: KeyRound,
+  run: ChartColumn,
+};
 
 function priceAmount(millimes: number, locale: Locale): { amount: string; currency: string } {
   const exact = formatMillimes(millimes, locale);
@@ -116,13 +159,13 @@ export async function AgencyWelcome({ locale, clientUrl }: { locale: Locale; cli
   const features = FEATURES.map((id) => t(`feature.${id}`));
 
   return (
-    <div className="pb-20">
+    <div>
       <section className="relative isolate overflow-hidden" aria-labelledby="agency-welcome-title">
         <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(16,185,129,0.16),transparent_55%)]" />
           <div className="absolute -end-24 top-10 size-80 rounded-full bg-primary/10 blur-3xl" />
         </div>
-        <div className="container grid items-end gap-10 py-14 sm:py-20 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
+        <div className="container grid items-center gap-12 py-16 sm:py-24 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]">
           <div className="grid max-w-2xl gap-5">
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-primary">
               {t('eyebrow')}
@@ -133,7 +176,7 @@ export async function AgencyWelcome({ locale, clientUrl }: { locale: Locale; cli
             >
               {t('title')}
             </h1>
-            <p className="text-lg text-muted-foreground">{t('lead')}</p>
+            <p className="text-lg leading-relaxed text-muted-foreground">{t('lead')}</p>
             <div className="flex flex-wrap gap-3">
               <Button asChild size="lg">
                 <Link href="/signup">{t('signup')}</Link>
@@ -144,28 +187,24 @@ export async function AgencyWelcome({ locale, clientUrl }: { locale: Locale; cli
             </div>
           </div>
           <ul className="grid gap-3">
-            {SUBSCRIPTION_PLANS.map((plan) => {
-              const price = priceAmount(
-                SUBSCRIPTION_PLAN_DEFINITIONS[plan].monthlyPriceMillimes,
-                locale,
-              );
+            {PILLARS.map((id) => {
+              const Icon = PILLAR_ICONS[id];
               return (
-                <li key={plan}>
-                  <a
-                    href="#formules"
-                    className="flex items-center justify-between gap-4 rounded-2xl border border-border bg-surface/80 px-5 py-4 shadow-soft backdrop-blur transition-colors hover:border-primary"
-                  >
-                    <span>
-                      <span className="block text-sm text-muted-foreground">
-                        {t(`planRole.${plan}`)}
-                      </span>
-                      <span className="font-heading text-lg font-bold">{t(`plans.${plan}`)}</span>
+                <li
+                  key={id}
+                  className="flex items-start gap-4 rounded-[1.5rem] border border-border bg-surface/80 p-5 shadow-soft backdrop-blur"
+                >
+                  <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-primary-soft text-primary">
+                    <Icon className="size-5" aria-hidden="true" />
+                  </span>
+                  <span className="grid gap-1">
+                    <span className="font-heading text-base font-semibold">
+                      {t(`pillar.${id}.title`)}
                     </span>
-                    <span className="font-heading text-2xl font-extrabold tabular-nums">
-                      {price.amount}{' '}
-                      <span className="text-base font-semibold">{price.currency}</span>
+                    <span className="text-sm leading-relaxed text-muted-foreground">
+                      {t(`pillar.${id}.text`)}
                     </span>
-                  </a>
+                  </span>
                 </li>
               );
             })}
@@ -174,47 +213,61 @@ export async function AgencyWelcome({ locale, clientUrl }: { locale: Locale; cli
       </section>
 
       <section
-        id="formules"
-        className="container scroll-mt-24 grid gap-8 pt-4"
-        aria-labelledby="agency-plans-title"
+        id="service"
+        className="scroll-mt-24 border-y border-border bg-surface-muted/50 py-16 sm:py-24"
+        aria-labelledby="agency-definition-title"
       >
-        <div className="mx-auto grid max-w-2xl gap-3 text-center">
-          <h2 id="agency-plans-title" className="font-heading text-3xl font-extrabold">
-            {t('plansTitle')}
-          </h2>
-          <p className="text-muted-foreground">{t('plansLead')}</p>
-        </div>
-        <div className="grid items-stretch gap-5 lg:grid-cols-3">
-          {SUBSCRIPTION_PLANS.map((plan) => {
-            const definition = SUBSCRIPTION_PLAN_DEFINITIONS[plan];
-            return (
-              <PlanColumn
-                key={plan}
-                plan={plan}
-                locale={locale}
-                name={t(`plans.${plan}`)}
-                role={t(`planRole.${plan}`)}
-                perMonth={t('perMonth')}
-                limit={
-                  definition.vehicleLimit === null
-                    ? t('unlimited')
-                    : t('vehicleLimit', { count: definition.vehicleLimit })
-                }
-                difference={t('difference')}
-                allFeatures={t('allFeatures')}
-                includedTitle={t('includedTitle')}
-                features={features}
-                signup={t('signup')}
-              />
-            );
-          })}
+        <div className="container grid gap-10">
+          <SectionHeading
+            id="agency-definition-title"
+            eyebrow={t('definitionEyebrow')}
+            title={t('definitionTitle')}
+            align="start"
+          />
+          <p className="max-w-3xl text-lg leading-relaxed text-muted-foreground">
+            {t('definitionText')}
+          </p>
+          <div className="grid gap-4">
+            <div className="grid max-w-2xl gap-3">
+              <h3 className="font-heading text-2xl font-bold">{t('servicesTitle')}</h3>
+              <p className="text-muted-foreground">{t('servicesLead')}</p>
+            </div>
+            <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {SERVICES.map((id) => {
+                const Icon = SERVICE_ICONS[id];
+                return (
+                  <li
+                    key={id}
+                    className="grid content-start gap-3 rounded-panel border border-border bg-surface p-5 shadow-soft"
+                  >
+                    <span className="flex size-11 items-center justify-center rounded-2xl bg-primary-soft text-primary">
+                      <Icon className="size-5" aria-hidden="true" />
+                    </span>
+                    <h4 className="font-heading text-base font-semibold">
+                      {t(`services.${id}.title`)}
+                    </h4>
+                    <p className="text-sm leading-relaxed text-muted-foreground">
+                      {t(`services.${id}.text`)}
+                    </p>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
         </div>
       </section>
 
-      <section className="container grid gap-6 pt-20" aria-labelledby="agency-steps-title">
-        <h2 id="agency-steps-title" className="font-heading text-2xl font-bold">
-          {t('stepsTitle')}
-        </h2>
+      <section
+        id="parcours"
+        className="container scroll-mt-24 grid gap-10 py-16 sm:py-24"
+        aria-labelledby="agency-steps-title"
+      >
+        <SectionHeading
+          id="agency-steps-title"
+          eyebrow={t('navSteps')}
+          title={t('stepsTitle')}
+          align="start"
+        />
         <ol className="grid gap-4 md:grid-cols-4">
           {(['account', 'setup', 'review', 'rent'] as const).map((step, index) => (
             <li
@@ -225,19 +278,74 @@ export async function AgencyWelcome({ locale, clientUrl }: { locale: Locale; cli
                 {String(index + 1).padStart(2, '0')}
               </span>
               <h3 className="font-heading text-base font-semibold">{t(`steps.${step}.title`)}</h3>
-              <p className="text-sm text-muted-foreground">{t(`steps.${step}.text`)}</p>
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                {t(`steps.${step}.text`)}
+              </p>
             </li>
           ))}
         </ol>
       </section>
 
-      <section className="container pt-12">
-        <a
-          href={clientUrl}
-          className="text-sm font-medium text-foreground underline decoration-dotted underline-offset-4"
-        >
-          {t('clientSite')}
-        </a>
+      <section
+        id="formules"
+        className="scroll-mt-24 border-t border-border bg-surface-muted/40 py-16 sm:py-24"
+        aria-labelledby="agency-plans-title"
+      >
+        <div className="container grid gap-10">
+          <SectionHeading
+            id="agency-plans-title"
+            eyebrow={t('plansEyebrow')}
+            title={t('plansTitle')}
+            text={t('plansLead')}
+          />
+          <div className="grid items-stretch gap-5 lg:grid-cols-3">
+            {SUBSCRIPTION_PLANS.map((plan) => {
+              const definition = SUBSCRIPTION_PLAN_DEFINITIONS[plan];
+              return (
+                <PlanColumn
+                  key={plan}
+                  plan={plan}
+                  locale={locale}
+                  name={t(`plans.${plan}`)}
+                  role={t(`planRole.${plan}`)}
+                  perMonth={t('perMonth')}
+                  limit={
+                    definition.vehicleLimit === null
+                      ? t('unlimited')
+                      : t('vehicleLimit', { count: definition.vehicleLimit })
+                  }
+                  difference={t('difference')}
+                  allFeatures={t('allFeatures')}
+                  includedTitle={t('includedTitle')}
+                  features={features}
+                  signup={t('signup')}
+                />
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      <section className="container py-16 sm:py-20" aria-labelledby="agency-closing-title">
+        <div className="grid gap-6 rounded-[2rem] bg-zinc-950 px-6 py-12 text-white sm:px-12 sm:py-16 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+          <div className="grid max-w-2xl gap-3">
+            <h2 id="agency-closing-title" className="font-heading text-3xl font-extrabold">
+              {t('closingTitle')}
+            </h2>
+            <p className="text-base leading-relaxed text-white/75">{t('closingText')}</p>
+          </div>
+          <div className="flex flex-wrap items-center gap-4">
+            <Button asChild size="lg">
+              <Link href="/signup">{t('signup')}</Link>
+            </Button>
+            <a
+              href={clientUrl}
+              className="text-sm font-medium text-white underline decoration-dotted underline-offset-4"
+            >
+              {t('clientSite')}
+            </a>
+          </div>
+        </div>
       </section>
     </div>
   );

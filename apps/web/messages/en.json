@@ -566,7 +566,7 @@
   "agency": {
     "welcome": {
       "metaTitle": "Agency space",
-      "metaDescription": "List your fleet, receive bookings and track what you collect. Three plans, one workspace.",
+      "metaDescription": "DriveTN shows your agency to clients. You run the fleet, the bookings and the costs in one workspace.",
       "eyebrow": "For rental agencies",
       "title": "Your agency online, from the booking to the costs",
       "lead": "Clients find you on DriveTN, book without paying online, and pay when you hand over the keys. You keep the fleet, the schedule, the collections and the costs in one place.",
@@ -575,6 +575,64 @@
       "headerSignup": "Sign up",
       "headerLogin": "Log in",
       "clientSite": "See the client site",
+      "navService": "The service",
+      "navSteps": "How it works",
+      "definitionEyebrow": "The site",
+      "definitionTitle": "DriveTN connects clients with your agency",
+      "definitionText": "DriveTN is the site where someone in Tunisia looks for a car to rent. Your agency lists its fleet there. The client picks the dates and books without paying online. You confirm, hand over the keys, and record the payment you received. The schedule, the collections and the costs stay in the same workspace.",
+      "pillar": {
+        "find": {
+          "title": "Clients find you",
+          "text": "Once the file is accepted, the agency and the cars appear in search and on the map."
+        },
+        "book": {
+          "title": "They book and pay on site",
+          "text": "No card payment on the site. The client pays when you hand over the keys."
+        },
+        "run": {
+          "title": "You follow the rental",
+          "text": "Requests, the schedule, collections, costs and figures sit in the manager account."
+        }
+      },
+      "servicesTitle": "What the workspace lets you do",
+      "servicesLead": "All three plans open the same tools. Only the monthly price and the number of listed cars change.",
+      "services": {
+        "fleet": {
+          "title": "Fleet",
+          "text": "Records, photos, prices and the condition of each car."
+        },
+        "planning": {
+          "title": "Schedule",
+          "text": "The days already taken, and the servicing that blocks a car."
+        },
+        "bookings": {
+          "title": "Bookings",
+          "text": "Requests received on the site, and rentals taken at the counter."
+        },
+        "payments": {
+          "title": "Collections",
+          "text": "Money received on site. The client never pays online."
+        },
+        "expenses": {
+          "title": "Costs",
+          "text": "Fuel, oil changes, servicing and the other costs, per car or for the whole agency."
+        },
+        "stats": {
+          "title": "Figures",
+          "text": "Collections, costs and result, by day, week, month, year, or since opening. PDF export."
+        },
+        "reviews": {
+          "title": "Reviews",
+          "text": "Client ratings after a returned rental, and your replies."
+        },
+        "visibility": {
+          "title": "Visibility",
+          "text": "Your agency and your cars appear in search and on the map."
+        }
+      },
+      "plansEyebrow": "Pricing",
+      "closingTitle": "Open your agency workspace",
+      "closingText": "Create the manager account. The agency stays hidden from clients until DriveTN accepts the file. A new agency starts on Essential.",
       "allFeatures": "Every feature",
       "difference": "What changes",
       "includedTitle": "Included in all three plans",

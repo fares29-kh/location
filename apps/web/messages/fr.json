@@ -566,7 +566,7 @@
   "agency": {
     "welcome": {
       "metaTitle": "Espace agence",
-      "metaDescription": "Publiez votre flotte, recevez des réservations et suivez vos encaissements. Trois formules, un seul espace.",
+      "metaDescription": "DriveTN publie votre agence auprès des clients. Vous gérez la flotte, les réservations et les frais dans un seul espace.",
       "eyebrow": "Pour les agences de location",
       "title": "Votre agence en ligne, de la réservation jusqu’aux frais",
       "lead": "Les clients vous trouvent sur DriveTN, réservent sans payer en ligne, et règlent à la remise des clés. Vous gardez la flotte, le planning, les encaissements et les dépenses au même endroit.",
@@ -575,6 +575,64 @@
       "headerSignup": "S’inscrire",
       "headerLogin": "Connexion",
       "clientSite": "Voir le site des clients",
+      "navService": "Le service",
+      "navSteps": "Parcours",
+      "definitionEyebrow": "Le site",
+      "definitionTitle": "DriveTN relie les clients et votre agence",
+      "definitionText": "DriveTN est le site où un particulier cherche une voiture à louer en Tunisie. Votre agence y publie sa flotte. Le client choisit les dates et réserve sans payer en ligne. Vous confirmez, vous remettez les clés, et vous notez le règlement reçu. Le planning, les encaissements et les dépenses restent dans le même espace.",
+      "pillar": {
+        "find": {
+          "title": "Les clients vous trouvent",
+          "text": "Une fois le dossier accepté, l’agence et les voitures apparaissent dans la recherche et sur la carte."
+        },
+        "book": {
+          "title": "Ils réservent, ils paient sur place",
+          "text": "Aucune carte bancaire sur le site. Le client règle à la remise des clés."
+        },
+        "run": {
+          "title": "Vous suivez la location",
+          "text": "Demandes, planning, encaissements, dépenses et chiffres sont dans le compte gérant."
+        }
+      },
+      "servicesTitle": "Ce que l’espace vous permet de faire",
+      "servicesLead": "Les trois formules ouvrent les mêmes outils. Seuls le prix mensuel et le nombre de voitures publiées changent.",
+      "services": {
+        "fleet": {
+          "title": "Flotte",
+          "text": "Fiches, photos, prix et état de chaque voiture."
+        },
+        "planning": {
+          "title": "Planning",
+          "text": "Les jours déjà pris, et les entretiens qui bloquent une voiture."
+        },
+        "bookings": {
+          "title": "Réservations",
+          "text": "Les demandes reçues sur le site, et les locations prises au comptoir."
+        },
+        "payments": {
+          "title": "Encaissements",
+          "text": "L’argent reçu sur place. Aucun paiement en ligne du client."
+        },
+        "expenses": {
+          "title": "Dépenses",
+          "text": "Essence, vidange, entretien et les autres frais, par voiture ou pour toute l’agence."
+        },
+        "stats": {
+          "title": "Chiffres",
+          "text": "Encaissements, dépenses et résultat, par jour, semaine, mois, année, ou depuis l’ouverture. Export PDF."
+        },
+        "reviews": {
+          "title": "Avis",
+          "text": "Les notes des clients après une location rendue, et vos réponses."
+        },
+        "visibility": {
+          "title": "Visibilité",
+          "text": "Votre agence et vos voitures apparaissent dans la recherche et sur la carte."
+        }
+      },
+      "plansEyebrow": "Tarifs",
+      "closingTitle": "Ouvrez l’espace de votre agence",
+      "closingText": "Créez le compte gérant. L’agence reste invisible aux clients tant que DriveTN n’a pas accepté le dossier. À l’inscription, la formule est Essentiel.",
       "allFeatures": "Toutes les fonctionnalités",
       "difference": "Ce qui change",
       "includedTitle": "Inclus dans les trois formules",

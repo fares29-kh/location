@@ -20,12 +20,23 @@ export function AgencyWelcomeHeader() {
         >
           <BrandLogo />
         </Link>
-        <a
-          href="#formules"
-          className="hidden rounded-sm text-sm font-medium text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring md:inline"
-        >
-          {t('plansTitle')}
-        </a>
+        <nav className="hidden items-center gap-5 lg:flex" aria-label={t('eyebrow')}>
+          {(
+            [
+              ['#service', 'navService'],
+              ['#parcours', 'navSteps'],
+              ['#formules', 'plansTitle'],
+            ] as const
+          ).map(([href, key]) => (
+            <a
+              key={href}
+              href={href}
+              className="rounded-sm text-sm font-medium text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              {t(key)}
+            </a>
+          ))}
+        </nav>
         <div className="ms-auto flex items-center gap-1">
           <LocaleSwitcher />
           <ThemeToggle />
