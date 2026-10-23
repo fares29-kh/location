@@ -431,6 +431,98 @@ export function activityRevenueQuery(
       AND ${within(recordedAt, span)}`;
 }
 
+export interface ActivityExpenseRow {
+  amount: bigint;
+  previous: bigint;
+  agency: bigint;
+}
+
+/** Dépenses de la période, de la période précédente, et la part « toute l'agence ». */
+export function activityExpenseQuery(
+  agencyId: string,
+  current: Period,
+  previous: Period,
+): Prisma.Sql {
+  const spentOn = Prisma.sql`e.spent_on`;
+  const span = { start: previous.start, end: current.end };
+  return Prisma.sql`
+    SELECT
+      COALESCE(SUM(e.amount_millimes) FILTER (WHERE ${within(spentOn, current)}), 0)::bigint AS amount,
+      COALESCE(SUM(e.amount_millimes) FILTER (WHERE ${within(spentOn, previous)}), 0)::bigint AS previous,
+      COALESCE(SUM(e.amount_millimes) FILTER (
+        WHERE e.vehicle_id IS NULL AND ${within(spentOn, current)}
+      ), 0)::bigint AS agency
+    FROM agency_expenses e
+    WHERE e.agency_id = ${agencyId}
+      AND ${within(spentOn, span)}`;
+}
+
+export interface ActivityVehicleSqlRow {
+  id: string;
+  brand: string;
+  model: string;
+  plate: string | null;
+  archived: boolean;
+  revenue: bigint;
+  expenses: bigint;
+  rented_seconds: number;
+}
+
+/**
+ * Chaque voiture encore en flotte, plus celles retirées qui ont un encaissement, une dépense
+ * ou du temps loué sur la période.
+ */
+export function activityVehiclesQuery(agencyId: string, period: Period): Prisma.Sql {
+  return Prisma.sql`
+    SELECT
+      v.id,
+      v.brand,
+      v.model,
+      COALESCE(v.plate_number, v.retired_plate_number) AS plate,
+      (v.deleted_at IS NOT NULL) AS archived,
+      COALESCE(pay.revenue, 0)::bigint AS revenue,
+      COALESCE(cost.expenses, 0)::bigint AS expenses,
+      COALESCE(use.rented_seconds, 0)::float8 AS rented_seconds
+    FROM vehicles v
+    LEFT JOIN (
+      SELECT b.vehicle_id, SUM(${NET_RENTAL}) AS revenue
+      FROM payments p
+      JOIN bookings b ON b.id = p.booking_id
+      WHERE b.agency_id = ${agencyId}
+        AND p.kind IN ('RENTAL', 'REFUND')
+        AND ${within(Prisma.sql`p.recorded_at`, period)}
+      GROUP BY b.vehicle_id
+    ) pay ON pay.vehicle_id = v.id
+    LEFT JOIN (
+      SELECT e.vehicle_id, SUM(e.amount_millimes) AS expenses
+      FROM agency_expenses e
+      WHERE e.agency_id = ${agencyId}
+        AND e.vehicle_id IS NOT NULL
+        AND ${within(Prisma.sql`e.spent_on`, period)}
+      GROUP BY e.vehicle_id
+    ) cost ON cost.vehicle_id = v.id
+    LEFT JOIN (
+      SELECT
+        b.vehicle_id,
+        SUM(EXTRACT(EPOCH FROM (
+          LEAST(b.return_at, ${at(period.end)}) - GREATEST(b.pickup_at, ${at(period.start)})
+        ))) AS rented_seconds
+      FROM bookings b
+      WHERE b.agency_id = ${agencyId}
+        AND ${statusIn(Prisma.sql`b.status`, RENTED_STATUSES)}
+        AND b.return_at > ${at(period.start)}
+        AND b.pickup_at < ${at(period.end)}
+      GROUP BY b.vehicle_id
+    ) use ON use.vehicle_id = v.id
+    WHERE v.agency_id = ${agencyId}
+      AND (
+        v.deleted_at IS NULL
+        OR pay.vehicle_id IS NOT NULL
+        OR cost.vehicle_id IS NOT NULL
+        OR use.vehicle_id IS NOT NULL
+      )`;
+}
+
 /** Nombre de départs par tranche, et total de la période précédente. */
 export function activityBookingQuery(
   agencyId: string,

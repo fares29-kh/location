@@ -764,7 +764,7 @@
       },
       "report": {
         "title": "Chiffres de la période",
-        "subtitle": "Les trois totaux et le graphique mesurent le même argent encaissé. La liste, en dessous, compte les locations qui commencent.",
+        "subtitle": "L’argent reçu, l’argent dépensé, et ce qu’il reste. Le graphique montre seulement les encaissements. Chaque voiture est détaillée ensuite.",
         "periodLabel": "Choisir la période",
         "grains": {
           "day": "Jour",
@@ -773,10 +773,10 @@
           "year": "Année"
         },
         "grainHint": {
-          "day": "Les encaissements de cette journée, heure par heure.",
-          "week": "Les encaissements de la semaine, du lundi au dimanche.",
-          "month": "Les encaissements de chaque jour du mois.",
-          "year": "Les encaissements de chaque mois de l’année."
+          "day": "Cette journée : encaissements heure par heure, dépenses du jour, et chaque voiture.",
+          "week": "Cette semaine, du lundi au dimanche : encaissements, dépenses, et chaque voiture.",
+          "month": "Ce mois : encaissements de chaque jour, dépenses, et chaque voiture.",
+          "year": "Cette année : encaissements de chaque mois, dépenses, et chaque voiture."
         },
         "previous": "Période précédente",
         "next": "Période suivante",
@@ -787,6 +787,11 @@
         "departuresHint": "Réservations dont le jour de départ tombe dans cette période.",
         "average": "Panier moyen",
         "averageHint": "Encaissements divisés par le nombre de locations commencées.",
+        "expenses": "Dépenses",
+        "expensesHint": "Essence, vidange, entretien et les autres frais enregistrés sur cette période.",
+        "result": "Résultat",
+        "resultHint": "Encaissements moins les dépenses. Un nombre négatif veut dire que les frais dépassent l’argent reçu.",
+        "openExpenses": "Voir les dépenses",
         "versus": "{value} par rapport à la période précédente",
         "noComparison": "Pas de période précédente à comparer",
         "chartTitle": {
@@ -823,7 +828,26 @@
         "documentTitle": "Rapport d’activité",
         "truncated": "Le rapport détaille les {count} premières locations. Les totaux couvrent toute la période.",
         "totals": "Total",
-        "fileName": "DriveTN-rapport-{period}"
+        "fileName": "DriveTN-rapport-{period}",
+        "vehicles": {
+          "title": "Chaque voiture",
+          "hint": "L’encaissé est l’argent reçu pour les locations de cette voiture. Le dépensé est le frais noté sur elle. L’occupation est le temps passé chez un client.",
+          "use": "Occupation",
+          "useHint": "Part du temps où la voiture était chez un client pendant cette période.",
+          "revenue": "Encaissé",
+          "revenueHint": "Argent reçu pour les locations de cette voiture, sans les cautions.",
+          "expenses": "Dépensé",
+          "expensesHint": "Frais notés sur cette voiture pendant cette période.",
+          "result": "Résultat",
+          "resultHint": "Encaissé moins dépensé, pour cette voiture.",
+          "agency": "Toute l’agence",
+          "agencyHint": "Frais qui ne concernent pas une seule voiture. Ils entrent dans le total des dépenses.",
+          "archived": "retirée",
+          "empty": "Aucune voiture dans la flotte.",
+          "manage": "Gérer la flotte",
+          "hours": "{count, plural, one {# heure} other {# heures}}",
+          "days": "{count, plural, one {# jour} other {# jours}}"
+        }
       }
     },
     "bookings": {

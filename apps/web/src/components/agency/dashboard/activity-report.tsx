@@ -1,15 +1,17 @@
 'use client';
 
-import type { ActivityReport, ReportGrain } from '@drivetn/types';
+import type { ActivityReport, ActivityVehicle, ReportGrain } from '@drivetn/types';
 import { Button } from '@drivetn/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@drivetn/ui/card';
 import { cn } from '@drivetn/ui/lib/cn';
 import { Skeleton } from '@drivetn/ui/skeleton';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@drivetn/ui/table';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@drivetn/ui/tooltip';
 import { ChevronLeft, ChevronRight, Download } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useState } from 'react';
 
+import { Link } from '@/i18n/navigation';
 import {
   addDays,
   addMonths,
@@ -127,6 +129,32 @@ function periodSlug(grain: ReportGrain, anchor: DayKey): string {
   return anchor;
 }
 
+function vehicleTitle(vehicle: Pick<ActivityVehicle, 'brand' | 'model' | 'plateNumber'>): string {
+  return vehicle.plateNumber === null
+    ? `${vehicle.brand} ${vehicle.model}`
+    : `${vehicle.brand} ${vehicle.model} · ${vehicle.plateNumber}`;
+}
+
+function rentedText(
+  grain: ReportGrain,
+  millis: number,
+  hours: (count: number) => string,
+  days: (count: number) => string,
+): string {
+  if (grain === 'day') {
+    return hours(Math.round(millis / 3_600_000));
+  }
+  return days(Math.round(millis / 86_400_000));
+}
+
+function occupancy(report: ActivityReport, millis: number): number {
+  const span = new Date(report.to).getTime() - new Date(report.from).getTime();
+  if (span <= 0) {
+    return 0;
+  }
+  return Math.min(1, Math.max(0, millis / span));
+}
+
 function pointLabel(
   grain: ReportGrain,
   key: string,
@@ -151,6 +179,10 @@ interface ReportCopy {
   generated: string;
   revenueLabel: string;
   revenue: string;
+  expensesLabel: string;
+  expenses: string;
+  resultLabel: string;
+  result: string;
   departuresLabel: string;
   departures: string;
   averageLabel: string;
@@ -161,6 +193,11 @@ interface ReportCopy {
   linesHint: string;
   seriesHeaders: readonly [string, string, string];
   series: readonly { label: string; revenue: string; departures: string }[];
+  vehiclesTitle: string;
+  vehiclesHint: string;
+  vehicleHeaders: readonly [string, string, string, string, string];
+  vehicleRows: readonly (readonly [string, string, string, string, string])[];
+  vehicleEmpty: string;
   preview: string;
   lineHeaders: readonly [string, string, string, string, string, string, string];
   lines: readonly (readonly [string, string, string, string, string, string, string])[];
@@ -180,6 +217,19 @@ function reportHtml(copy: ReportCopy): string {
         `<tr>${cell(row.label)}<td class="num">${escapeHtml(row.revenue)}</td><td class="num">${escapeHtml(row.departures)}</td></tr>`,
     )
     .join('');
+  const vehicleRows =
+    copy.vehicleRows.length === 0
+      ? `<tr><td colspan="5" class="empty">${escapeHtml(copy.vehicleEmpty)}</td></tr>`
+      : copy.vehicleRows
+          .map(
+            (row) =>
+              `<tr>${row
+                .map((value, index) =>
+                  index === 0 ? cell(value) : `<td class="num">${escapeHtml(value)}</td>`,
+                )
+                .join('')}</tr>`,
+          )
+          .join('');
   const lineRows =
     copy.lines.length === 0
       ? `<tr><td colspan="7" class="empty">${escapeHtml(copy.empty)}</td></tr>`
@@ -236,6 +286,8 @@ function reportHtml(copy: ReportCopy): string {
 </header>
 <section class="kpis">
   <div class="kpi"><span>${escapeHtml(copy.revenueLabel)}</span><strong>${escapeHtml(copy.revenue)}</strong></div>
+  <div class="kpi"><span>${escapeHtml(copy.expensesLabel)}</span><strong>${escapeHtml(copy.expenses)}</strong></div>
+  <div class="kpi"><span>${escapeHtml(copy.resultLabel)}</span><strong>${escapeHtml(copy.result)}</strong></div>
   <div class="kpi"><span>${escapeHtml(copy.departuresLabel)}</span><strong>${escapeHtml(copy.departures)}</strong></div>
   <div class="kpi"><span>${escapeHtml(copy.averageLabel)}</span><strong>${escapeHtml(copy.average)}</strong></div>
 </section>
@@ -246,6 +298,12 @@ function reportHtml(copy: ReportCopy): string {
   <thead><tr>${copy.seriesHeaders.map((header, index) => (index === 0 ? head(header) : `<th class="num">${escapeHtml(header)}</th>`)).join('')}</tr></thead>
   <tbody>${seriesRows}</tbody>
   <tfoot>${totalRow}</tfoot>
+</table>
+<h2>${escapeHtml(copy.vehiclesTitle)}</h2>
+<p class="meta">${escapeHtml(copy.vehiclesHint)}</p>
+<table>
+  <thead><tr>${copy.vehicleHeaders.map((header, index) => (index === 0 ? head(header) : `<th class="num">${escapeHtml(header)}</th>`)).join('')}</tr></thead>
+  <tbody>${vehicleRows}</tbody>
 </table>
 <h2>${escapeHtml(copy.preview)}</h2>
 <p class="meta">${escapeHtml(copy.linesHint)}</p>
@@ -444,6 +502,10 @@ export function ActivityReportCard() {
       generated: t('generated', { date: format.dateTime(new Date()) }),
       revenueLabel: t('revenue'),
       revenue: format.money(report.revenueMillimes),
+      expensesLabel: t('expenses'),
+      expenses: format.money(report.expenseMillimes),
+      resultLabel: t('result'),
+      result: format.money(report.revenueMillimes - report.expenseMillimes),
       departuresLabel: t('departures'),
       departures: format.integer(report.bookings),
       averageLabel: t('average'),
@@ -462,6 +524,46 @@ export function ActivityReportCard() {
         revenue: format.money(point.revenueMillimes),
         departures: format.integer(point.bookings),
       })),
+      vehiclesTitle: t('vehicles.title'),
+      vehiclesHint: t('vehicles.hint'),
+      vehicleHeaders: [
+        t('columns.vehicle'),
+        t('vehicles.use'),
+        t('vehicles.revenue'),
+        t('vehicles.expenses'),
+        t('vehicles.result'),
+      ],
+      vehicleRows: [
+        ...report.vehicles.map(
+          (vehicle) =>
+            [
+              vehicle.archived
+                ? `${vehicleTitle(vehicle)} (${t('vehicles.archived')})`
+                : vehicleTitle(vehicle),
+              `${rentedText(
+                report.grain,
+                vehicle.rentedMillis,
+                (count) => t('vehicles.hours', { count }),
+                (count) => t('vehicles.days', { count }),
+              )} · ${format.percent(occupancy(report, vehicle.rentedMillis))}`,
+              format.money(vehicle.revenueMillimes),
+              format.money(vehicle.expenseMillimes),
+              format.money(vehicle.revenueMillimes - vehicle.expenseMillimes),
+            ] as const,
+        ),
+        ...(report.agencyExpenseMillimes > 0
+          ? [
+              [
+                t('vehicles.agency'),
+                '—',
+                '—',
+                format.money(report.agencyExpenseMillimes),
+                format.money(-report.agencyExpenseMillimes),
+              ] as const,
+            ]
+          : []),
+      ],
+      vehicleEmpty: t('vehicles.empty'),
       preview: t('preview'),
       lineHeaders: [
         t('columns.reference'),
@@ -592,6 +694,238 @@ export function ActivityReportCard() {
   );
 }
 
+function MoneyStat({
+  label,
+  hint,
+  value,
+  note,
+  negative = false,
+}: {
+  label: string;
+  hint: string;
+  value: string;
+  note?: string;
+  negative?: boolean;
+}) {
+  return (
+    <div className="rounded-control bg-surface-muted px-4 py-3">
+      <dt className="text-sm font-medium">
+        <HoverHint hint={hint}>{label}</HoverHint>
+      </dt>
+      <dd
+        className={cn(
+          'mt-1 font-heading text-xl font-bold tabular-nums',
+          negative && 'text-danger',
+        )}
+      >
+        {value}
+      </dd>
+      {note === undefined ? null : <dd className="text-xs text-muted-foreground">{note}</dd>}
+    </div>
+  );
+}
+
+function UseMeter({ ratio, label }: { ratio: number; label: string }) {
+  return (
+    <div className="grid min-w-28 gap-1">
+      <span className="text-sm tabular-nums">{label}</span>
+      <span className="h-1.5 overflow-hidden rounded-full bg-surface-muted" aria-hidden="true">
+        <span
+          className="block h-full rounded-full bg-primary"
+          style={{ width: ratio > 0 ? `${String(Math.round(ratio * 100))}%` : '0%' }}
+        />
+      </span>
+    </div>
+  );
+}
+
+function ActivityVehicles({
+  report,
+  format,
+  anchor,
+}: {
+  report: ActivityReport;
+  format: AgencyFormat;
+  anchor: DayKey;
+}) {
+  const t = useTranslations('agency.dashboard.report');
+  const expenseHref =
+    report.grain === 'month' ? `/expenses?month=${anchor.slice(0, 7)}` : '/expenses';
+  const formatUse = (millis: number) =>
+    `${rentedText(
+      report.grain,
+      millis,
+      (count) => t('vehicles.hours', { count }),
+      (count) => t('vehicles.days', { count }),
+    )} · ${format.percent(occupancy(report, millis))}`;
+
+  return (
+    <section className="grid gap-3" aria-labelledby="activity-vehicles">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h3 id="activity-vehicles" className="text-sm font-medium">
+          <HoverHint hint={t('vehicles.hint')}>{t('vehicles.title')}</HoverHint>
+        </h3>
+        <div className="flex flex-wrap gap-2">
+          <Button asChild variant="ghost" size="sm">
+            <Link href={expenseHref}>{t('openExpenses')}</Link>
+          </Button>
+          <Button asChild variant="secondary" size="sm">
+            <Link href="/fleet">{t('vehicles.manage')}</Link>
+          </Button>
+        </div>
+      </div>
+      {report.vehicles.length === 0 && report.agencyExpenseMillimes === 0 ? (
+        <p className="text-sm text-muted-foreground">{t('vehicles.empty')}</p>
+      ) : (
+        <>
+          <div className="hidden md:block">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>{t('columns.vehicle')}</TableHead>
+                  <TableHead>
+                    <HoverHint hint={t('vehicles.useHint')}>{t('vehicles.use')}</HoverHint>
+                  </TableHead>
+                  <TableHead className="text-end">
+                    <HoverHint hint={t('vehicles.revenueHint')}>{t('vehicles.revenue')}</HoverHint>
+                  </TableHead>
+                  <TableHead className="text-end">
+                    <HoverHint hint={t('vehicles.expensesHint')}>
+                      {t('vehicles.expenses')}
+                    </HoverHint>
+                  </TableHead>
+                  <TableHead className="text-end">
+                    <HoverHint hint={t('vehicles.resultHint')}>{t('vehicles.result')}</HoverHint>
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {report.vehicles.map((vehicle) => {
+                  const result = vehicle.revenueMillimes - vehicle.expenseMillimes;
+                  return (
+                    <TableRow key={vehicle.id}>
+                      <TableCell>
+                        <span className="font-medium">{vehicleTitle(vehicle)}</span>
+                        {vehicle.archived ? (
+                          <span className="ms-2 text-xs text-muted-foreground">
+                            {t('vehicles.archived')}
+                          </span>
+                        ) : null}
+                      </TableCell>
+                      <TableCell>
+                        <UseMeter
+                          ratio={occupancy(report, vehicle.rentedMillis)}
+                          label={formatUse(vehicle.rentedMillis)}
+                        />
+                      </TableCell>
+                      <TableCell className="text-end tabular-nums">
+                        {format.money(vehicle.revenueMillimes)}
+                      </TableCell>
+                      <TableCell className="text-end tabular-nums">
+                        {format.money(vehicle.expenseMillimes)}
+                      </TableCell>
+                      <TableCell
+                        className={cn(
+                          'text-end font-semibold tabular-nums',
+                          result < 0 && 'text-danger',
+                        )}
+                      >
+                        {format.money(result)}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+                {report.agencyExpenseMillimes > 0 ? (
+                  <TableRow>
+                    <TableCell>
+                      <HoverHint hint={t('vehicles.agencyHint')}>{t('vehicles.agency')}</HoverHint>
+                    </TableCell>
+                    <TableCell>—</TableCell>
+                    <TableCell className="text-end">—</TableCell>
+                    <TableCell className="text-end tabular-nums">
+                      {format.money(report.agencyExpenseMillimes)}
+                    </TableCell>
+                    <TableCell className="text-end font-semibold tabular-nums text-danger">
+                      {format.money(-report.agencyExpenseMillimes)}
+                    </TableCell>
+                  </TableRow>
+                ) : null}
+                <TableRow>
+                  <TableCell className="font-medium">{t('totals')}</TableCell>
+                  <TableCell />
+                  <TableCell className="text-end font-medium tabular-nums">
+                    {format.money(report.revenueMillimes)}
+                  </TableCell>
+                  <TableCell className="text-end font-medium tabular-nums">
+                    {format.money(report.expenseMillimes)}
+                  </TableCell>
+                  <TableCell
+                    className={cn(
+                      'text-end font-semibold tabular-nums',
+                      report.revenueMillimes - report.expenseMillimes < 0 && 'text-danger',
+                    )}
+                  >
+                    {format.money(report.revenueMillimes - report.expenseMillimes)}
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </div>
+          <ul className="grid gap-3 md:hidden">
+            {report.vehicles.map((vehicle) => {
+              const result = vehicle.revenueMillimes - vehicle.expenseMillimes;
+              return (
+                <li key={vehicle.id}>
+                  <Card className="grid gap-3 p-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <p className="font-medium">
+                        {vehicleTitle(vehicle)}
+                        {vehicle.archived ? (
+                          <span className="ms-2 text-xs font-normal text-muted-foreground">
+                            {t('vehicles.archived')}
+                          </span>
+                        ) : null}
+                      </p>
+                      <p className={cn('font-semibold tabular-nums', result < 0 && 'text-danger')}>
+                        {format.money(result)}
+                      </p>
+                    </div>
+                    <UseMeter
+                      ratio={occupancy(report, vehicle.rentedMillis)}
+                      label={formatUse(vehicle.rentedMillis)}
+                    />
+                    <dl className="grid grid-cols-2 gap-2 text-sm">
+                      <div>
+                        <dt className="text-muted-foreground">{t('vehicles.revenue')}</dt>
+                        <dd className="tabular-nums">{format.money(vehicle.revenueMillimes)}</dd>
+                      </div>
+                      <div>
+                        <dt className="text-muted-foreground">{t('vehicles.expenses')}</dt>
+                        <dd className="tabular-nums">{format.money(vehicle.expenseMillimes)}</dd>
+                      </div>
+                    </dl>
+                  </Card>
+                </li>
+              );
+            })}
+            {report.agencyExpenseMillimes > 0 ? (
+              <li>
+                <Card className="grid gap-1 p-4 text-sm">
+                  <p className="font-medium">{t('vehicles.agency')}</p>
+                  <p className="text-muted-foreground">{t('vehicles.agencyHint')}</p>
+                  <p className="font-semibold tabular-nums text-danger">
+                    {format.money(-report.agencyExpenseMillimes)}
+                  </p>
+                </Card>
+              </li>
+            ) : null}
+          </ul>
+        </>
+      )}
+    </section>
+  );
+}
+
 function ActivityBody({
   report,
   format,
@@ -605,6 +939,9 @@ function ActivityBody({
 }) {
   const t = useTranslations('agency.dashboard.report');
   const revenueTrend = variation(report.revenueMillimes, report.previousRevenueMillimes);
+  const expenseTrend = variation(report.expenseMillimes, report.previousExpenseMillimes);
+  const result = report.revenueMillimes - report.expenseMillimes;
+  const previousResult = report.previousRevenueMillimes - report.previousExpenseMillimes;
   const bookingsTrend = variation(report.bookings, report.previousBookings);
   const average = report.bookings === 0 ? 0 : Math.round(report.revenueMillimes / report.bookings);
   const trend = (value: number | null) =>
@@ -613,34 +950,37 @@ function ActivityBody({
   return (
     <>
       <dl className="grid gap-3 sm:grid-cols-3">
-        <div className="rounded-control bg-surface-muted px-4 py-3">
-          <dt className="text-sm font-medium">
-            <HoverHint hint={t('revenueHint')}>{t('revenue')}</HoverHint>
-          </dt>
-          <dd className="mt-1 font-heading text-xl font-bold tabular-nums">
-            {format.money(report.revenueMillimes)}
-          </dd>
-          <dd className="text-xs text-muted-foreground">{trend(revenueTrend)}</dd>
-        </div>
-        <div className="rounded-control bg-surface-muted px-4 py-3">
-          <dt className="text-sm font-medium">
-            <HoverHint hint={t('departuresHint')}>{t('departures')}</HoverHint>
-          </dt>
-          <dd className="mt-1 font-heading text-xl font-bold tabular-nums">
-            {format.integer(report.bookings)}
-          </dd>
-          <dd className="text-xs text-muted-foreground">{trend(bookingsTrend)}</dd>
-        </div>
-        <div className="rounded-control bg-surface-muted px-4 py-3">
-          <dt className="text-sm font-medium">
-            <HoverHint hint={t('averageHint')}>{t('average')}</HoverHint>
-          </dt>
-          <dd className="mt-1 font-heading text-xl font-bold tabular-nums">
-            {format.money(average)}
-          </dd>
-        </div>
+        <MoneyStat
+          label={t('revenue')}
+          hint={t('revenueHint')}
+          value={format.money(report.revenueMillimes)}
+          note={trend(revenueTrend)}
+        />
+        <MoneyStat
+          label={t('expenses')}
+          hint={t('expensesHint')}
+          value={format.money(report.expenseMillimes)}
+          note={trend(expenseTrend)}
+        />
+        <MoneyStat
+          label={t('result')}
+          hint={t('resultHint')}
+          value={format.money(result)}
+          note={trend(variation(result, previousResult))}
+          negative={result < 0}
+        />
+      </dl>
+      <dl className="grid gap-3 sm:grid-cols-2">
+        <MoneyStat
+          label={t('departures')}
+          hint={t('departuresHint')}
+          value={format.integer(report.bookings)}
+          note={trend(bookingsTrend)}
+        />
+        <MoneyStat label={t('average')} hint={t('averageHint')} value={format.money(average)} />
       </dl>
       <ActivityChart report={report} format={format} anchor={anchor} today={today} />
+      <ActivityVehicles report={report} format={format} anchor={anchor} />
       <ActivityLines report={report} format={format} />
     </>
   );

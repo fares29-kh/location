@@ -192,7 +192,23 @@ export interface ActivityReportLine {
   totalMillimes: number;
 }
 
-/** Activité d'une période : encaissements, départs, et le détail pour le rapport. */
+/** Une voiture de l'agence sur la période du rapport. */
+export interface ActivityVehicle {
+  id: string;
+  brand: string;
+  model: string;
+  plateNumber: string | null;
+  /** Retirée de la flotte, encore présente parce qu'elle a un chiffre sur la période. */
+  archived: boolean;
+  /** Temps loué sur la période, plafonné à la durée de la période. */
+  rentedMillis: number;
+  /** Encaissements nets des locations de cette voiture. */
+  revenueMillimes: number;
+  /** Dépenses notées sur cette voiture. */
+  expenseMillimes: number;
+}
+
+/** Activité d'une période : encaissements, dépenses, voitures, et le détail pour le rapport. */
 export interface ActivityReport {
   agencyName: string;
   grain: ReportGrain;
@@ -200,10 +216,16 @@ export interface ActivityReport {
   to: string;
   revenueMillimes: number;
   previousRevenueMillimes: number;
+  /** Dépenses enregistrées sur la période, y compris celles de toute l'agence. */
+  expenseMillimes: number;
+  previousExpenseMillimes: number;
+  /** Part des dépenses qui ne sont attachées à aucune voiture. */
+  agencyExpenseMillimes: number;
   bookings: number;
   previousBookings: number;
   series: ActivityReportPoint[];
   lines: ActivityReportLine[];
+  vehicles: ActivityVehicle[];
   /** Vrai si la liste du rapport est plafonnée. */
   truncated: boolean;
 }

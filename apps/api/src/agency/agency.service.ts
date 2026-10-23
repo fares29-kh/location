@@ -20,6 +20,7 @@ import {
   type CustomerQuery,
   type CustomerView,
   type ActivityReport,
+  type ActivityVehicle,
   type DashboardData,
   type DashboardReportQuery,
   type NavCounts,
@@ -86,6 +87,10 @@ import {
   activityRevenueQuery,
   type ActivityAmountRow,
   type ActivityCountRow,
+  activityExpenseQuery,
+  type ActivityExpenseRow,
+  activityVehiclesQuery,
+  type ActivityVehicleSqlRow,
   type CountRow,
   CUSTOMER_SELECT,
   customerCountQuery,
@@ -132,6 +137,30 @@ const REPORT_LINE_LIMIT = 80;
 function daysInMonth(monthKey: string): number {
   const [year = 0, month = 1] = monthKey.split('-').map(Number);
   return new Date(Date.UTC(year, month, 0)).getUTCDate();
+}
+
+function toActivityVehicle(row: ActivityVehicleSqlRow, periodMs: number): ActivityVehicle {
+  const rented = Math.max(0, Math.round(row.rented_seconds * 1000));
+  return {
+    id: row.id,
+    brand: row.brand,
+    model: row.model,
+    plateNumber: row.plate,
+    archived: row.archived,
+    rentedMillis: Math.min(Math.max(periodMs, 0), rented),
+    revenueMillimes: Number(row.revenue),
+    expenseMillimes: Number(row.expenses),
+  };
+}
+
+function byVehicleResult(left: ActivityVehicle, right: ActivityVehicle): number {
+  const net =
+    right.revenueMillimes - right.expenseMillimes - (left.revenueMillimes - left.expenseMillimes);
+  if (net !== 0) {
+    return net;
+  }
+  const brand = left.brand.localeCompare(right.brand, 'fr');
+  return brand === 0 ? left.model.localeCompare(right.model, 'fr') : brand;
 }
 
 function periodBounds(buckets: { period: Period }[]): Period {
@@ -551,54 +580,61 @@ export class AgencyService {
     };
   }
 
-  /** Encaissements et départs d'une journée, d'une semaine, d'un mois ou d'une année. */
+  /** Encaissements, dépenses et voitures d'une journée, d'une semaine, d'un mois ou d'une année. */
   async getActivityReport(ownerId: string, query: DashboardReportQuery): Promise<ActivityReport> {
     const agencyId = await this.agencyIdFor(ownerId);
     const today = todayKey();
     const anchor = query.anchor === undefined || query.anchor > today ? today : query.anchor;
     const { current, previous, buckets } = reportWindows(query.grain, anchor);
-    const [agency, revenueRows, bookingRows, lines] = await this.prisma.$transaction([
-      this.prisma.agency.findUniqueOrThrow({ where: { id: agencyId }, select: { name: true } }),
-      this.prisma.$queryRaw<ActivityAmountRow[]>(
-        activityRevenueQuery(
-          agencyId,
-          buckets.map((bucket) => bucket.period),
-          previous,
+    const [agency, revenueRows, bookingRows, expenseRows, vehicleRows, lines] =
+      await this.prisma.$transaction([
+        this.prisma.agency.findUniqueOrThrow({ where: { id: agencyId }, select: { name: true } }),
+        this.prisma.$queryRaw<ActivityAmountRow[]>(
+          activityRevenueQuery(
+            agencyId,
+            buckets.map((bucket) => bucket.period),
+            previous,
+          ),
         ),
-      ),
-      this.prisma.$queryRaw<ActivityCountRow[]>(
-        activityBookingQuery(
-          agencyId,
-          buckets.map((bucket) => bucket.period),
-          previous,
+        this.prisma.$queryRaw<ActivityCountRow[]>(
+          activityBookingQuery(
+            agencyId,
+            buckets.map((bucket) => bucket.period),
+            previous,
+          ),
         ),
-      ),
-      this.prisma.booking.findMany({
-        where: {
-          agencyId,
-          pickupAt: { gte: current.start, lt: current.end },
-          status: { in: [...ACTIVITY_STATUSES] },
-        },
-        select: {
-          reference: true,
-          status: true,
-          pickupAt: true,
-          returnAt: true,
-          totalMillimes: true,
-          customer: { select: { firstName: true, lastName: true } },
-          vehicle: {
-            select: { brand: true, model: true, plateNumber: true, retiredPlateNumber: true },
+        this.prisma.$queryRaw<ActivityExpenseRow[]>(
+          activityExpenseQuery(agencyId, current, previous),
+        ),
+        this.prisma.$queryRaw<ActivityVehicleSqlRow[]>(activityVehiclesQuery(agencyId, current)),
+        this.prisma.booking.findMany({
+          where: {
+            agencyId,
+            pickupAt: { gte: current.start, lt: current.end },
+            status: { in: [...ACTIVITY_STATUSES] },
           },
-        },
-        orderBy: [{ pickupAt: 'asc' }, { id: 'asc' }],
-        take: REPORT_LINE_LIMIT + 1,
-      }),
-    ]);
+          select: {
+            reference: true,
+            status: true,
+            pickupAt: true,
+            returnAt: true,
+            totalMillimes: true,
+            customer: { select: { firstName: true, lastName: true } },
+            vehicle: {
+              select: { brand: true, model: true, plateNumber: true, retiredPlateNumber: true },
+            },
+          },
+          orderBy: [{ pickupAt: 'asc' }, { id: 'asc' }],
+          take: REPORT_LINE_LIMIT + 1,
+        }),
+      ]);
     const revenue = single(revenueRows);
     const departures = single(bookingRows);
+    const expenses = single(expenseRows);
     const amounts = revenue.amounts.map(Number);
     const counts = departures.counts.map(Number);
     const shown = lines.slice(0, REPORT_LINE_LIMIT);
+    const periodMs = current.end.getTime() - current.start.getTime();
     return {
       agencyName: agency.name,
       grain: query.grain,
@@ -606,8 +642,12 @@ export class AgencyService {
       to: current.end.toISOString(),
       revenueMillimes: amounts.reduce((sum, value) => sum + value, 0),
       previousRevenueMillimes: Number(revenue.previous),
+      expenseMillimes: Number(expenses.amount),
+      previousExpenseMillimes: Number(expenses.previous),
+      agencyExpenseMillimes: Number(expenses.agency),
       bookings: counts.reduce((sum, value) => sum + value, 0),
       previousBookings: departures.previous,
+      vehicles: vehicleRows.map((row) => toActivityVehicle(row, periodMs)).sort(byVehicleResult),
       series: buckets.map((bucket, index) => ({
         key: bucket.key,
         revenueMillimes: amounts[index] ?? 0,

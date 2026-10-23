@@ -764,7 +764,7 @@
       },
       "report": {
         "title": "Figures for the period",
-        "subtitle": "The three totals and the chart measure the same money collected. The list below counts rentals that start.",
+        "subtitle": "Money in, money out, and what remains. The chart shows collections only. Each car is listed after that.",
         "periodLabel": "Choose the period",
         "grains": {
           "day": "Day",
@@ -773,10 +773,10 @@
           "year": "Year"
         },
         "grainHint": {
-          "day": "Collections for this day, hour by hour.",
-          "week": "Collections for the week, Monday to Sunday.",
-          "month": "Collections for each day of the month.",
-          "year": "Collections for each month of the year."
+          "day": "This day: collections hour by hour, the day’s costs, and each car.",
+          "week": "This week, Monday to Sunday: collections, costs, and each car.",
+          "month": "This month: collections for each day, costs, and each car.",
+          "year": "This year: collections for each month, costs, and each car."
         },
         "previous": "Previous period",
         "next": "Next period",
@@ -787,6 +787,11 @@
         "departuresHint": "Bookings whose pick-up day falls in this period.",
         "average": "Average ticket",
         "averageHint": "Collections divided by the number of rentals started.",
+        "expenses": "Expenses",
+        "expensesHint": "Fuel, oil changes, servicing and the other costs recorded in this period.",
+        "result": "Result",
+        "resultHint": "Collections minus expenses. A negative number means costs are higher than money received.",
+        "openExpenses": "View expenses",
         "versus": "{value} compared with the previous period",
         "noComparison": "No previous period to compare",
         "chartTitle": {
@@ -823,7 +828,26 @@
         "documentTitle": "Activity report",
         "truncated": "The report lists the first {count} rentals. The totals cover the whole period.",
         "totals": "Total",
-        "fileName": "DriveTN-report-{period}"
+        "fileName": "DriveTN-report-{period}",
+        "vehicles": {
+          "title": "Each car",
+          "hint": "Collected is money received for this car’s rentals. Spent is a cost recorded on it. Use is the time it was with a customer.",
+          "use": "Use",
+          "useHint": "Share of the period when the car was with a customer.",
+          "revenue": "Collected",
+          "revenueHint": "Money received for this car’s rentals, deposits excluded.",
+          "expenses": "Spent",
+          "expensesHint": "Costs recorded on this car during the period.",
+          "result": "Result",
+          "resultHint": "Collected minus spent, for this car.",
+          "agency": "Whole agency",
+          "agencyHint": "Costs that are not tied to one car. They count in the expense total.",
+          "archived": "retired",
+          "empty": "No car in the fleet.",
+          "manage": "Manage the fleet",
+          "hours": "{count, plural, one {# hour} other {# hours}}",
+          "days": "{count, plural, one {# day} other {# days}}"
+        }
       }
     },
     "bookings": {
