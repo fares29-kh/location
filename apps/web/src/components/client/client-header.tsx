@@ -5,7 +5,7 @@ import { Badge } from '@drivetn/ui/badge';
 import { Button } from '@drivetn/ui/button';
 import { cn } from '@drivetn/ui/lib/cn';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@drivetn/ui/sheet';
-import { type LucideIcon, Menu, Palette } from 'lucide-react';
+import { Building2, type LucideIcon, Menu, Palette } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 
@@ -76,9 +76,11 @@ function HeaderNavLink({
 export function ClientHeader({
   user,
   designEnabled,
+  agencyUrl,
 }: {
   user: CurrentUser | null;
   designEnabled: boolean;
+  agencyUrl: string;
 }) {
   const t = useTranslations('client.nav');
   const tCommon = useTranslations('common');
@@ -140,6 +142,9 @@ export function ClientHeader({
         <div className="ms-auto flex items-center gap-1">
           <LocaleSwitcher />
           <ThemeToggle />
+          <Button variant="ghost" asChild className="hidden md:inline-flex">
+            <a href={`${agencyUrl}/welcome`}>{t('forAgencies')}</a>
+          </Button>
           {user === null ? (
             <div className="ms-2 hidden items-center gap-2 md:flex">
               <Button variant="ghost" asChild>
@@ -177,6 +182,16 @@ export function ClientHeader({
                   })}
                 </ul>
               </nav>
+              <a
+                href={`${agencyUrl}/welcome`}
+                onClick={() => {
+                  setMenuOpen(false);
+                }}
+                className="mt-4 flex min-h-touch items-center gap-2 rounded-control px-3 text-sm font-medium text-muted-foreground hover:bg-surface-muted hover:text-foreground"
+              >
+                <Building2 className="size-5" aria-hidden="true" />
+                {t('forAgencies')}
+              </a>
               {user === null && (
                 <div className="mt-auto grid gap-2">
                   <Button variant="secondary" asChild>

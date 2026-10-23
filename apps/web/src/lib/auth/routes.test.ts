@@ -18,6 +18,7 @@ describe('isAuthPage', () => {
 describe('isProtectedPath', () => {
   it('protège tout l’espace agence et admin sauf les pages d’authentification', () => {
     expect(isProtectedPath('agency', '/')).toBe(true);
+    expect(isProtectedPath('agency', '/welcome')).toBe(false);
     expect(isProtectedPath('agency', '/design')).toBe(true);
     expect(isProtectedPath('agency', '/login')).toBe(false);
     expect(isProtectedPath('admin', '/forgot-password')).toBe(false);

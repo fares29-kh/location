@@ -29,6 +29,20 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
 
   const session = await resolveMiddlewareSession(request, env.API_INTERNAL_URL);
 
+  if (portal === 'agency' && route.pathname === '/' && !session.authenticated) {
+    const welcome = request.nextUrl.clone();
+    welcome.pathname = localizePath(route.locale, '/welcome');
+    welcome.search = '';
+    return withCookies(NextResponse.redirect(welcome), session.setCookies);
+  }
+
+  if (portal === 'agency' && route.pathname === '/welcome' && session.authenticated) {
+    const home = request.nextUrl.clone();
+    home.pathname = localizePath(route.locale, '/');
+    home.search = '';
+    return withCookies(NextResponse.redirect(home), session.setCookies);
+  }
+
   if (!session.authenticated && isProtectedPath(portal, route.pathname)) {
     const login = request.nextUrl.clone();
     login.pathname = localizePath(route.locale, '/login');

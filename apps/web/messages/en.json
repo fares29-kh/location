@@ -55,7 +55,8 @@
       "bookings": "Bookings",
       "account": "Account",
       "login": "Log in",
-      "signup": "Sign up"
+      "signup": "Sign up",
+      "forAgencies": "Agency space"
     },
     "banner": {
       "label": "Our commitments",
@@ -563,6 +564,84 @@
     "designSystem": "Design system"
   },
   "agency": {
+    "welcome": {
+      "metaTitle": "Agency space",
+      "metaDescription": "List your fleet, receive bookings and track what you collect. Three plans, one workspace.",
+      "eyebrow": "For rental agencies",
+      "title": "Your agency online, from the booking to the costs",
+      "lead": "Clients find you on DriveTN, book without paying online, and pay when you hand over the keys. You keep the fleet, the schedule, the collections and the costs in one place.",
+      "signup": "Create an agency account",
+      "login": "I already have an account",
+      "headerSignup": "Sign up",
+      "headerLogin": "Log in",
+      "clientSite": "See the client site",
+      "servicesTitle": "What the workspace lets you do",
+      "servicesLead": "All three plans open the same workspace. Only the price and the number of listed cars change.",
+      "services": {
+        "fleet": {
+          "title": "Fleet",
+          "text": "Records, photos, prices and the status of each car."
+        },
+        "planning": {
+          "title": "Schedule",
+          "text": "Days already taken, and servicing that blocks a car."
+        },
+        "bookings": {
+          "title": "Bookings",
+          "text": "Online requests and rentals taken at the counter."
+        },
+        "payments": {
+          "title": "Collections",
+          "text": "Money received on site. The client never pays online."
+        },
+        "expenses": {
+          "title": "Expenses",
+          "text": "Fuel, oil changes, servicing and other costs, per car or for the whole agency."
+        },
+        "stats": {
+          "title": "Figures",
+          "text": "Collections, expenses and result, by day, week, month, year, or since you opened. PDF export."
+        },
+        "reviews": {
+          "title": "Reviews",
+          "text": "Ratings left after a returned rental, and your replies."
+        },
+        "visibility": {
+          "title": "Visibility",
+          "text": "Your agency and your cars show up in search and on the map."
+        }
+      },
+      "stepsTitle": "How to open the workspace",
+      "steps": {
+        "account": {
+          "title": "Create the manager account",
+          "text": "Name, phone and email. A code confirms the address."
+        },
+        "setup": {
+          "title": "Present the agency and the cars",
+          "text": "Address, map pin, conditions, then each vehicle."
+        },
+        "review": {
+          "title": "DriveTN checks the file",
+          "text": "The agency stays hidden from clients until it is accepted."
+        },
+        "rent": {
+          "title": "You rent",
+          "text": "You confirm, hand over the keys, and record the payment you received."
+        }
+      },
+      "plansTitle": "The plans",
+      "plansLead": "Prices exclude tax and are billed each month. A new agency starts on Essential.",
+      "perMonth": "excluding tax, per month",
+      "unlimited": "No limit on listed cars",
+      "vehicleLimit": "Up to {count, plural, one {# listed car} other {# listed cars}}",
+      "included": "Starting plan",
+      "plans": {
+        "STARTER": "Essential",
+        "PRO": "Pro",
+        "BUSINESS": "Business"
+      }
+    },
     "nav": {
       "operations": "Operations",
       "management": "Management",

@@ -26,18 +26,26 @@ export default async function ClientLayout({
   params,
 }: LocaleParams & { children: ReactNode }) {
   const locale = await resolveLocale(params);
-  const [user, categories] = await Promise.all([getPortalUser('client'), fetchVehicleCategories()]);
+  const [user, categories, agencyUrl] = await Promise.all([
+    getPortalUser('client'),
+    fetchVehicleCategories(),
+    getPortalOrigin('agency'),
+  ]);
 
   return (
     <RootDocument locale={locale} portal="client">
       <VehicleCategoriesProvider categories={categories}>
         <div className="flex min-h-dvh flex-col">
           <ReassuranceBanner />
-          <ClientHeader user={user} designEnabled={getServerEnv().DESIGN_PAGE_ENABLED} />
+          <ClientHeader
+            user={user}
+            designEnabled={getServerEnv().DESIGN_PAGE_ENABLED}
+            agencyUrl={agencyUrl}
+          />
           <main id={MAIN_CONTENT_ID} className="flex-1">
             {children}
           </main>
-          <ClientFooter agencyUrl={await getPortalOrigin('agency')} />
+          <ClientFooter agencyUrl={agencyUrl} />
         </div>
         <MobileBottomNav />
       </VehicleCategoriesProvider>

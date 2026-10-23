@@ -64,7 +64,7 @@ export function ClientFooter({ agencyUrl }: { agencyUrl: string }) {
           items={[
             { label: t('help'), href: '/#faq-title' },
             { label: tNav('bookings'), href: '/bookings' },
-            { label: t('becomePartner'), href: `${agencyUrl}/signup`, external: true },
+            { label: t('becomePartner'), href: `${agencyUrl}/welcome`, external: true },
           ]}
         />
         <FooterColumn

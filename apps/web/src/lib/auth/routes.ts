@@ -7,6 +7,11 @@ const AUTH_PAGES: Record<Portal, readonly string[]> = {
   admin: ['/login', '/forgot-password', '/auth/handoff'],
 };
 
+/** Pages publiques hors authentification. L'accueil agence présente le service et les formules. */
+const PUBLIC_PAGES: Partial<Record<Portal, readonly string[]>> = {
+  agency: ['/welcome'],
+};
+
 const CLIENT_PROTECTED_PREFIXES = ['/account', '/bookings'];
 
 function matchesPrefix(pathname: string, prefix: string): boolean {
@@ -21,8 +26,12 @@ export function isAuthPage(portal: Portal, pathname: string): boolean {
  * Les espaces agence et admin sont entièrement privés (hors pages d'authentification) ;
  * côté client, seul l'espace personnel l'est.
  */
+export function isPublicPage(portal: Portal, pathname: string): boolean {
+  return (PUBLIC_PAGES[portal] ?? []).some((page) => matchesPrefix(pathname, page));
+}
+
 export function isProtectedPath(portal: Portal, pathname: string): boolean {
-  if (isAuthPage(portal, pathname)) {
+  if (isAuthPage(portal, pathname) || isPublicPage(portal, pathname)) {
     return false;
   }
   if (portal === 'client') {

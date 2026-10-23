@@ -59,11 +59,19 @@ export function AuthSplitLayout({
       <div className="flex min-w-0 flex-col">
         <header className="flex h-16 items-center gap-2 px-4 sm:px-6">
           <Link
-            href="/login"
+            href={portal === 'agency' ? '/welcome' : '/login'}
             className="rounded-control focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <BrandLogo />
           </Link>
+          {portal === 'agency' ? (
+            <Link
+              href="/welcome"
+              className="rounded-sm text-sm font-medium text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              {tCommon('backHome')}
+            </Link>
+          ) : null}
           <div className="ms-auto flex items-center gap-1">
             <LocaleSwitcher />
             <ThemeToggle />
