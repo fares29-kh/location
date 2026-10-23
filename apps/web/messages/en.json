@@ -575,41 +575,26 @@
       "headerSignup": "Sign up",
       "headerLogin": "Log in",
       "clientSite": "See the client site",
-      "servicesTitle": "What the workspace lets you do",
-      "servicesLead": "All three plans open the same workspace. Only the price and the number of listed cars change.",
-      "services": {
-        "fleet": {
-          "title": "Fleet",
-          "text": "Records, photos, prices and the status of each car."
-        },
-        "planning": {
-          "title": "Schedule",
-          "text": "Days already taken, and servicing that blocks a car."
-        },
-        "bookings": {
-          "title": "Bookings",
-          "text": "Online requests and rentals taken at the counter."
-        },
-        "payments": {
-          "title": "Collections",
-          "text": "Money received on site. The client never pays online."
-        },
-        "expenses": {
-          "title": "Expenses",
-          "text": "Fuel, oil changes, servicing and other costs, per car or for the whole agency."
-        },
-        "stats": {
-          "title": "Figures",
-          "text": "Collections, expenses and result, by day, week, month, year, or since you opened. PDF export."
-        },
-        "reviews": {
-          "title": "Reviews",
-          "text": "Ratings left after a returned rental, and your replies."
-        },
-        "visibility": {
-          "title": "Visibility",
-          "text": "Your agency and your cars show up in search and on the map."
-        }
+      "allFeatures": "Every feature",
+      "difference": "What changes",
+      "includedTitle": "Included in all three plans",
+      "feature": {
+        "account": "1 manager account",
+        "fleet": "Car records, photos and prices",
+        "planning": "Schedule and servicing days",
+        "online": "Online bookings",
+        "desk": "Counter bookings",
+        "payments": "On-site collections, no online payment",
+        "expenses": "Costs: fuel, oil change, servicing",
+        "stats": "Figures by day, week, month, year and all-time",
+        "pdf": "Report you can save as PDF",
+        "reviews": "Client reviews and your replies",
+        "map": "Agency shown in search and on the map"
+      },
+      "planRole": {
+        "STARTER": "To start",
+        "PRO": "To grow",
+        "BUSINESS": "Large fleet"
       },
       "stepsTitle": "How to open the workspace",
       "steps": {
@@ -635,7 +620,6 @@
       "perMonth": "excluding tax, per month",
       "unlimited": "No limit on listed cars",
       "vehicleLimit": "Up to {count, plural, one {# listed car} other {# listed cars}}",
-      "included": "Starting plan",
       "plans": {
         "STARTER": "Essential",
         "PRO": "Pro",

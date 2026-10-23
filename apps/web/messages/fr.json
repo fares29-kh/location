@@ -575,41 +575,26 @@
       "headerSignup": "S’inscrire",
       "headerLogin": "Connexion",
       "clientSite": "Voir le site des clients",
-      "servicesTitle": "Ce que l’espace vous permet de faire",
-      "servicesLead": "Les trois formules ouvrent le même espace. Seuls le prix et le nombre de voitures publiées changent.",
-      "services": {
-        "fleet": {
-          "title": "Flotte",
-          "text": "Fiches, photos, prix et état de chaque voiture."
-        },
-        "planning": {
-          "title": "Planning",
-          "text": "Les jours déjà pris, et les entretiens qui bloquent une voiture."
-        },
-        "bookings": {
-          "title": "Réservations",
-          "text": "Demandes en ligne et locations prises au comptoir."
-        },
-        "payments": {
-          "title": "Encaissements",
-          "text": "L’argent reçu sur place. Aucun paiement en ligne du client."
-        },
-        "expenses": {
-          "title": "Dépenses",
-          "text": "Essence, vidange, entretien et les autres frais, par voiture ou pour toute l’agence."
-        },
-        "stats": {
-          "title": "Chiffres",
-          "text": "Encaissements, dépenses et résultat, par jour, semaine, mois, année, ou depuis l’ouverture. Export PDF."
-        },
-        "reviews": {
-          "title": "Avis",
-          "text": "Les notes des clients après une location rendue, et vos réponses."
-        },
-        "visibility": {
-          "title": "Visibilité",
-          "text": "Votre agence et vos voitures apparaissent dans la recherche et sur la carte."
-        }
+      "allFeatures": "Toutes les fonctionnalités",
+      "difference": "Ce qui change",
+      "includedTitle": "Inclus dans les trois formules",
+      "feature": {
+        "account": "1 compte gérant",
+        "fleet": "Fiches, photos et prix des voitures",
+        "planning": "Planning et jours d’entretien",
+        "online": "Réservations en ligne",
+        "desk": "Réservation au comptoir",
+        "payments": "Encaissements sur place, sans paiement en ligne",
+        "expenses": "Dépenses : essence, vidange, entretien",
+        "stats": "Chiffres par jour, semaine, mois, année et total",
+        "pdf": "Rapport à enregistrer en PDF",
+        "reviews": "Avis des clients et vos réponses",
+        "map": "Agence visible dans la recherche et sur la carte"
+      },
+      "planRole": {
+        "STARTER": "Pour commencer",
+        "PRO": "Pour grandir",
+        "BUSINESS": "Grand parc"
       },
       "stepsTitle": "Comment ouvrir l’espace",
       "steps": {
@@ -635,7 +620,6 @@
       "perMonth": "hors taxes, par mois",
       "unlimited": "Voitures publiées sans limite",
       "vehicleLimit": "Jusqu’à {count, plural, one {# voiture publiée} other {# voitures publiées}}",
-      "included": "Formule de départ",
       "plans": {
         "STARTER": "Essentiel",
         "PRO": "Pro",

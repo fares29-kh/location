@@ -20,6 +20,12 @@ export function AgencyWelcomeHeader() {
         >
           <BrandLogo />
         </Link>
+        <a
+          href="#formules"
+          className="hidden rounded-sm text-sm font-medium text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring md:inline"
+        >
+          {t('plansTitle')}
+        </a>
         <div className="ms-auto flex items-center gap-1">
           <LocaleSwitcher />
           <ThemeToggle />
