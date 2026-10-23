@@ -632,7 +632,7 @@
     },
     "dashboard": {
       "title": "لوحة القيادة",
-      "subtitle": "نشاط اليوم في لمحة.",
+      "subtitle": "نشاطك، من اليوم إلى السنة.",
       "openPlanning": "الجدول الزمني",
       "openBookings": "الحجوزات",
       "quickLinks": "اختصارات",
@@ -694,6 +694,53 @@
           "title": "الإعدادات",
           "text": "بطاقة الوكالة وشروط الكراء"
         }
+      },
+      "report": {
+        "title": "النشاط",
+        "subtitle": "المقبوضات والانطلاقات للفترة المختارة. ملف PDF يعرض نفس هذه الأرقام.",
+        "periodLabel": "اختيار الفترة",
+        "grains": {
+          "day": "يوم",
+          "week": "أسبوع",
+          "month": "شهر",
+          "year": "سنة"
+        },
+        "previous": "الفترة السابقة",
+        "next": "الفترة التالية",
+        "today": "اليوم",
+        "revenue": "المقبوضات",
+        "departures": "الانطلاقات",
+        "average": "متوسط الفاتورة",
+        "versus": "{value} مقارنة بالفترة السابقة",
+        "noComparison": "لا توجد فترة سابقة للمقارنة",
+        "chart": "التوزيع على الفترة",
+        "barLabel": "{label}: {amount}، {count, plural, zero {لا انطلاقات} one {انطلاقة واحدة} two {انطلاقتان} few {# انطلاقات} other {# انطلاقة}}",
+        "hour": "{hour}:00",
+        "preview": "انطلاقات الفترة",
+        "empty": "لا توجد انطلاقات في هذه الفترة.",
+        "more": "{count, plural, zero {لا انطلاقات إضافية في التقرير} one {انطلاقة إضافية في التقرير} two {انطلاقتان إضافيتان في التقرير} few {# انطلاقات إضافية في التقرير} other {# انطلاقة إضافية في التقرير}}",
+        "download": "حفظ PDF",
+        "downloadHint": "تُفتح نافذة الطباعة. اختر «حفظ بتنسيق PDF».",
+        "columns": {
+          "reference": "المرجع",
+          "customer": "الحريف",
+          "vehicle": "السيارة",
+          "pickup": "الانطلاق",
+          "return": "الإرجاع",
+          "status": "الحالة",
+          "amount": "المبلغ"
+        },
+        "seriesColumns": {
+          "period": "الفترة",
+          "revenue": "المقبوضات",
+          "departures": "الانطلاقات"
+        },
+        "generated": "أُعد في {date}",
+        "brand": "DriveTN",
+        "documentTitle": "تقرير النشاط",
+        "truncated": "يعرض التقرير أول {count} انطلاقات. المجاميع تغطي الفترة كاملة.",
+        "totals": "المجموع",
+        "fileName": "DriveTN-rapport-{period}"
       }
     },
     "bookings": {

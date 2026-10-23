@@ -632,7 +632,7 @@
     },
     "dashboard": {
       "title": "Dashboard",
-      "subtitle": "Today’s activity at a glance.",
+      "subtitle": "Your activity, from a single day to a full year.",
       "openPlanning": "Schedule",
       "openBookings": "Bookings",
       "quickLinks": "Shortcuts",
@@ -694,6 +694,53 @@
           "title": "Settings",
           "text": "Agency profile and rental terms"
         }
+      },
+      "report": {
+        "title": "Activity",
+        "subtitle": "Collections and pick-ups for the selected period. The PDF uses exactly these figures.",
+        "periodLabel": "Choose the period",
+        "grains": {
+          "day": "Day",
+          "week": "Week",
+          "month": "Month",
+          "year": "Year"
+        },
+        "previous": "Previous period",
+        "next": "Next period",
+        "today": "Today",
+        "revenue": "Collections",
+        "departures": "Pick-ups",
+        "average": "Average ticket",
+        "versus": "{value} compared with the previous period",
+        "noComparison": "No previous period to compare",
+        "chart": "Breakdown over the period",
+        "barLabel": "{label}: {amount}, {count, plural, one {# pick-up} other {# pick-ups}}",
+        "hour": "{hour}:00",
+        "preview": "Pick-ups in this period",
+        "empty": "No pick-ups in this period.",
+        "more": "{count, plural, one {# more pick-up in the report} other {# more pick-ups in the report}}",
+        "download": "Save as PDF",
+        "downloadHint": "The print window opens. Choose “Save as PDF”.",
+        "columns": {
+          "reference": "Reference",
+          "customer": "Customer",
+          "vehicle": "Vehicle",
+          "pickup": "Pick-up",
+          "return": "Return",
+          "status": "Status",
+          "amount": "Amount"
+        },
+        "seriesColumns": {
+          "period": "Period",
+          "revenue": "Collections",
+          "departures": "Pick-ups"
+        },
+        "generated": "Issued on {date}",
+        "brand": "DriveTN",
+        "documentTitle": "Activity report",
+        "truncated": "The report lists the first {count} pick-ups. The totals cover the whole period.",
+        "totals": "Total",
+        "fileName": "DriveTN-report-{period}"
       }
     },
     "bookings": {

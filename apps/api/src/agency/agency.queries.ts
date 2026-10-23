@@ -390,6 +390,69 @@ export function nextBookingsQuery(agencyId: string, now: Date, vehicleId?: strin
     ORDER BY b.vehicle_id, b.pickup_at ASC, b.id ASC`;
 }
 
+/** Départs confirmés ou déjà effectués : base du rapport d'activité. */
+export const ACTIVITY_STATUSES: BookingStatus[] = [
+  'CONFIRMED',
+  'PICKED_UP',
+  'RETURNED',
+  'COMPLETED',
+];
+
+export interface ActivityAmountRow {
+  amounts: bigint[];
+  previous: bigint;
+}
+
+export interface ActivityCountRow {
+  counts: number[];
+  previous: number;
+}
+
+/** Encaissements nets par tranche, et total de la période précédente. */
+export function activityRevenueQuery(
+  agencyId: string,
+  buckets: Period[],
+  previous: Period,
+): Prisma.Sql {
+  const recordedAt = Prisma.sql`p.recorded_at`;
+  const sums = buckets.map(
+    (bucket) =>
+      Prisma.sql`COALESCE(SUM(${NET_RENTAL}) FILTER (WHERE ${within(recordedAt, bucket)}), 0)`,
+  );
+  const span = { start: previous.start, end: buckets.at(-1)?.end ?? previous.end };
+  return Prisma.sql`
+    SELECT
+      ARRAY[${Prisma.join(sums)}]::bigint[] AS amounts,
+      COALESCE(SUM(${NET_RENTAL}) FILTER (WHERE ${within(recordedAt, previous)}), 0)::bigint AS previous
+    FROM payments p
+    JOIN bookings b ON b.id = p.booking_id
+    WHERE b.agency_id = ${agencyId}
+      AND p.kind IN ('RENTAL', 'REFUND')
+      AND ${within(recordedAt, span)}`;
+}
+
+/** Nombre de départs par tranche, et total de la période précédente. */
+export function activityBookingQuery(
+  agencyId: string,
+  buckets: Period[],
+  previous: Period,
+): Prisma.Sql {
+  const pickupAt = Prisma.sql`b.pickup_at`;
+  const kept = statusIn(Prisma.sql`b.status`, ACTIVITY_STATUSES);
+  const sums = buckets.map(
+    (bucket) =>
+      Prisma.sql`COALESCE(COUNT(*) FILTER (WHERE ${within(pickupAt, bucket)} AND ${kept}), 0)`,
+  );
+  const span = { start: previous.start, end: buckets.at(-1)?.end ?? previous.end };
+  return Prisma.sql`
+    SELECT
+      ARRAY[${Prisma.join(sums)}]::int[] AS counts,
+      COALESCE(COUNT(*) FILTER (WHERE ${within(pickupAt, previous)} AND ${kept}), 0)::int AS previous
+    FROM bookings b
+    WHERE b.agency_id = ${agencyId}
+      AND ${within(pickupAt, span)}`;
+}
+
 export interface RevenueRow {
   months: bigint[];
   previous_to_date: bigint;

@@ -632,7 +632,7 @@
     },
     "dashboard": {
       "title": "Tableau de bord",
-      "subtitle": "Votre activité du jour en un coup d’œil.",
+      "subtitle": "Votre activité, du jour à l’année.",
       "openPlanning": "Planning",
       "openBookings": "Réservations",
       "quickLinks": "Raccourcis",
@@ -694,6 +694,53 @@
           "title": "Paramètres",
           "text": "Fiche agence et conditions de location"
         }
+      },
+      "report": {
+        "title": "Activité",
+        "subtitle": "Encaissements et départs de la période choisie. Le PDF reprend exactement ces chiffres.",
+        "periodLabel": "Choisir la période",
+        "grains": {
+          "day": "Jour",
+          "week": "Semaine",
+          "month": "Mois",
+          "year": "Année"
+        },
+        "previous": "Période précédente",
+        "next": "Période suivante",
+        "today": "Aujourd’hui",
+        "revenue": "Encaissements",
+        "departures": "Départs",
+        "average": "Panier moyen",
+        "versus": "{value} par rapport à la période précédente",
+        "noComparison": "Pas de période précédente à comparer",
+        "chart": "Répartition sur la période",
+        "barLabel": "{label} : {amount}, {count, plural, one {# départ} other {# départs}}",
+        "hour": "{hour} h",
+        "preview": "Départs de la période",
+        "empty": "Aucun départ sur cette période.",
+        "more": "{count, plural, one {# départ de plus dans le rapport} other {# départs de plus dans le rapport}}",
+        "download": "Enregistrer en PDF",
+        "downloadHint": "La fenêtre d’impression s’ouvre. Choisissez « Enregistrer au format PDF ».",
+        "columns": {
+          "reference": "Référence",
+          "customer": "Client",
+          "vehicle": "Véhicule",
+          "pickup": "Départ",
+          "return": "Retour",
+          "status": "Statut",
+          "amount": "Montant"
+        },
+        "seriesColumns": {
+          "period": "Période",
+          "revenue": "Encaissements",
+          "departures": "Départs"
+        },
+        "generated": "Édité le {date}",
+        "brand": "DriveTN",
+        "documentTitle": "Rapport d’activité",
+        "truncated": "Le rapport détaille les {count} premiers départs. Les totaux couvrent toute la période.",
+        "totals": "Total",
+        "fileName": "DriveTN-rapport-{period}"
       }
     },
     "bookings": {

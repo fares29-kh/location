@@ -35,6 +35,7 @@ import { QueryError, StatCardsSkeleton } from '../query-states';
 import { BookingStatusTag } from '../status-tags';
 import { type AgencyFormat, useAgencyFormat } from '../use-agency-format';
 import { useNow } from '../use-now';
+import { ActivityReportCard } from './activity-report';
 
 /** Au-delà de ce délai, une demande sans réponse est signalée comme urgente. */
 const URGENT_AFTER_MS = 2 * 3_600_000;
@@ -442,6 +443,8 @@ export function DashboardView({ firstName }: { firstName: string }) {
           </>
         }
       />
+
+      <ActivityReportCard />
 
       {isPending ? (
         <DashboardSkeleton />

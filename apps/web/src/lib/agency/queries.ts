@@ -9,6 +9,7 @@ import type {
   RentalConditions,
   VehicleInput,
   VehicleMaintenanceInput,
+  ReportGrain,
   VehiclePhoto,
   VehicleStatus,
 } from '@drivetn/types';
@@ -36,6 +37,8 @@ import { type PhotoDraft, photoOrderToApply, planPhotoChanges } from './vehicle-
 export const agencyKeys = {
   all: ['agency'] as const,
   dashboard: () => [...agencyKeys.all, 'dashboard'] as const,
+  activityReport: (grain: string, anchor: string) =>
+    [...agencyKeys.all, 'activity-report', grain, anchor] as const,
   navCounts: () => [...agencyKeys.all, 'nav-counts'] as const,
   bookings: () => [...agencyKeys.all, 'bookings'] as const,
   bookingList: (query: BookingQuery) => [...agencyKeys.bookings(), 'list', query] as const,
@@ -57,6 +60,13 @@ function invalidateAgency(queryClient: QueryClient) {
 
 export function useDashboard() {
   return useQuery({ queryKey: agencyKeys.dashboard(), queryFn: () => agencyApi.getDashboard() });
+}
+
+export function useActivityReport(grain: ReportGrain, anchor: string) {
+  return useQuery({
+    queryKey: agencyKeys.activityReport(grain, anchor),
+    queryFn: () => agencyApi.getActivityReport({ grain, anchor }),
+  });
 }
 
 export function useNavCounts() {

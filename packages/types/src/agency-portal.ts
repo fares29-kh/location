@@ -163,6 +163,51 @@ export interface FleetBreakdown {
   inactive: number;
 }
 
+export const REPORT_GRAINS = ['day', 'week', 'month', 'year'] as const;
+export type ReportGrain = (typeof REPORT_GRAINS)[number];
+
+const reportDay = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, { message: 'INVALID_DATE' });
+
+/** Période du rapport d'activité. `anchor` est un jour de Tunis ; absent : aujourd'hui. */
+export const dashboardReportQuerySchema = z.object({
+  grain: z.enum(REPORT_GRAINS).catch('month'),
+  anchor: reportDay.optional(),
+});
+export type DashboardReportQuery = z.output<typeof dashboardReportQuerySchema>;
+
+export interface ActivityReportPoint {
+  /** Heure `0`–`23`, jour `AAAA-MM-JJ` ou mois `AAAA-MM`. */
+  key: string;
+  revenueMillimes: number;
+  bookings: number;
+}
+
+export interface ActivityReportLine {
+  reference: string;
+  customer: string;
+  vehicle: string;
+  pickupAt: string;
+  returnAt: string;
+  status: BookingStatus;
+  totalMillimes: number;
+}
+
+/** Activité d'une période : encaissements, départs, et le détail pour le rapport. */
+export interface ActivityReport {
+  agencyName: string;
+  grain: ReportGrain;
+  from: string;
+  to: string;
+  revenueMillimes: number;
+  previousRevenueMillimes: number;
+  bookings: number;
+  previousBookings: number;
+  series: ActivityReportPoint[];
+  lines: ActivityReportLine[];
+  /** Vrai si la liste du rapport est plafonnée. */
+  truncated: boolean;
+}
+
 export interface DashboardData {
   kpis: DashboardKpis;
   pending: BookingView[];

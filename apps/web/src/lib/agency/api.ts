@@ -24,7 +24,9 @@ import type {
   CustomerDetail,
   CustomerQuery,
   CustomerView,
+  ActivityReport,
   DashboardData,
+  DashboardReportQuery,
   NavCounts,
   Paginated,
   PaymentList,
@@ -45,6 +47,7 @@ export interface AgencyApi {
   readonly isDemo: boolean;
 
   getDashboard(): Promise<DashboardData>;
+  getActivityReport(query: DashboardReportQuery): Promise<ActivityReport>;
   getNavCounts(): Promise<NavCounts>;
 
   listBookings(query: BookingQuery): Promise<BookingList>;
@@ -103,6 +106,14 @@ function createHttpAgencyApi(): AgencyApi {
     isDemo: false,
 
     getDashboard: () => apiFetch('/agency/dashboard', { schema: shape<DashboardData>() }),
+    getActivityReport: (query) =>
+      apiFetch(
+        withQuery('/agency/reports/activity', {
+          grain: query.grain,
+          ...(query.anchor === undefined ? {} : { anchor: query.anchor }),
+        }),
+        { schema: shape<ActivityReport>() },
+      ),
     getNavCounts: () => apiFetch('/agency/nav-counts', { schema: shape<NavCounts>() }),
 
     listBookings: (query) =>

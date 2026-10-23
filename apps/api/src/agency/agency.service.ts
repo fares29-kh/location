@@ -19,7 +19,9 @@ import {
   type CustomerDetail,
   type CustomerQuery,
   type CustomerView,
+  type ActivityReport,
   type DashboardData,
+  type DashboardReportQuery,
   type NavCounts,
   normalizeTunisianPhone,
   type Paginated,
@@ -28,8 +30,10 @@ import {
   type PaymentMethod,
   type PaymentQuery,
   type PlanningData,
+  isoWeekday,
   rentalPriceMillimes,
   rentalWindow,
+  type ReportGrain,
   type RecordPaymentInput,
   type RentalConditions,
   type Review,
@@ -77,6 +81,11 @@ import {
   bookingPageQuery,
   bookingSearchSql,
   bookingStatusCountsQuery,
+  ACTIVITY_STATUSES,
+  activityBookingQuery,
+  activityRevenueQuery,
+  type ActivityAmountRow,
+  type ActivityCountRow,
   type CountRow,
   CUSTOMER_SELECT,
   customerCountQuery,
@@ -102,6 +111,7 @@ import {
   reviewFilterWhere,
   revenueQuery,
   type RevenueRow,
+  type Period,
   startOfDay,
   startOfMonth,
   type StatusCountRow,
@@ -117,6 +127,105 @@ const DEFAULT_GOVERNORATE = '11';
 const DASHBOARD_PENDING = 5;
 const NAV_LATEST_PENDING = 5;
 const REVENUE_MONTHS = 6;
+const REPORT_LINE_LIMIT = 80;
+
+function daysInMonth(monthKey: string): number {
+  const [year = 0, month = 1] = monthKey.split('-').map(Number);
+  return new Date(Date.UTC(year, month, 0)).getUTCDate();
+}
+
+function periodBounds(buckets: { period: Period }[]): Period {
+  const first = buckets[0];
+  const last = buckets.at(-1);
+  if (first === undefined || last === undefined) {
+    throw new Error('Période de rapport vide');
+  }
+  return { start: first.period.start, end: last.period.end };
+}
+
+/** Tranches de la période affichée, et la période précédente de même longueur. */
+function reportWindows(
+  grain: ReportGrain,
+  anchor: string,
+): {
+  current: Period;
+  previous: Period;
+  buckets: { key: string; period: Period }[];
+} {
+  if (grain === 'day') {
+    const buckets = Array.from({ length: 24 }, (_, hour) => ({
+      key: String(hour),
+      period: {
+        start: tunisDateTime(anchor, hour),
+        end: hour === 23 ? tunisDateTime(addDays(anchor, 1), 0) : tunisDateTime(anchor, hour + 1),
+      },
+    }));
+    const previousDay = addDays(anchor, -1);
+    return {
+      current: { start: tunisDateTime(anchor, 0), end: tunisDateTime(addDays(anchor, 1), 0) },
+      previous: {
+        start: tunisDateTime(previousDay, 0),
+        end: tunisDateTime(anchor, 0),
+      },
+      buckets,
+    };
+  }
+  if (grain === 'week') {
+    const startDay = addDays(anchor, -isoWeekday(anchor));
+    const buckets = Array.from({ length: 7 }, (_, index) => {
+      const day = addDays(startDay, index);
+      return {
+        key: day,
+        period: { start: startOfDay(day), end: startOfDay(addDays(day, 1)) },
+      };
+    });
+    const previousStart = addDays(startDay, -7);
+    const current = periodBounds(buckets);
+    return {
+      current,
+      previous: { start: startOfDay(previousStart), end: current.start },
+      buckets,
+    };
+  }
+  if (grain === 'month') {
+    const month = anchor.slice(0, 7);
+    const count = daysInMonth(month);
+    const buckets = Array.from({ length: count }, (_, index) => {
+      const day = `${month}-${String(index + 1).padStart(2, '0')}`;
+      return {
+        key: day,
+        period: { start: startOfDay(day), end: startOfDay(addDays(day, 1)) },
+      };
+    });
+    const previousMonth = addMonths(month, -1);
+    return {
+      current: periodBounds(buckets),
+      previous: {
+        start: startOfMonth(previousMonth),
+        end: startOfMonth(month),
+      },
+      buckets,
+    };
+  }
+  const year = anchor.slice(0, 4);
+  const buckets = Array.from({ length: 12 }, (_, index) => {
+    const month = `${year}-${String(index + 1).padStart(2, '0')}`;
+    return {
+      key: month,
+      period: { start: startOfMonth(month), end: startOfMonth(addMonths(month, 1)) },
+    };
+  });
+  const previousYear = String(Number(year) - 1);
+  const current = periodBounds(buckets);
+  return {
+    current,
+    previous: {
+      start: startOfMonth(`${previousYear}-01`),
+      end: current.start,
+    },
+    buckets,
+  };
+}
 
 function isUniqueViolation(error: unknown): boolean {
   return error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002';
@@ -439,6 +548,84 @@ export class AgencyService {
         inactive: fleetCounts.inactive,
       },
       rating: { average: rating._avg.rating ?? 0, count: rating._count },
+    };
+  }
+
+  /** Encaissements et départs d'une journée, d'une semaine, d'un mois ou d'une année. */
+  async getActivityReport(ownerId: string, query: DashboardReportQuery): Promise<ActivityReport> {
+    const agencyId = await this.agencyIdFor(ownerId);
+    const today = todayKey();
+    const anchor = query.anchor === undefined || query.anchor > today ? today : query.anchor;
+    const { current, previous, buckets } = reportWindows(query.grain, anchor);
+    const [agency, revenueRows, bookingRows, lines] = await this.prisma.$transaction([
+      this.prisma.agency.findUniqueOrThrow({ where: { id: agencyId }, select: { name: true } }),
+      this.prisma.$queryRaw<ActivityAmountRow[]>(
+        activityRevenueQuery(
+          agencyId,
+          buckets.map((bucket) => bucket.period),
+          previous,
+        ),
+      ),
+      this.prisma.$queryRaw<ActivityCountRow[]>(
+        activityBookingQuery(
+          agencyId,
+          buckets.map((bucket) => bucket.period),
+          previous,
+        ),
+      ),
+      this.prisma.booking.findMany({
+        where: {
+          agencyId,
+          pickupAt: { gte: current.start, lt: current.end },
+          status: { in: [...ACTIVITY_STATUSES] },
+        },
+        select: {
+          reference: true,
+          status: true,
+          pickupAt: true,
+          returnAt: true,
+          totalMillimes: true,
+          customer: { select: { firstName: true, lastName: true } },
+          vehicle: {
+            select: { brand: true, model: true, plateNumber: true, retiredPlateNumber: true },
+          },
+        },
+        orderBy: [{ pickupAt: 'asc' }, { id: 'asc' }],
+        take: REPORT_LINE_LIMIT + 1,
+      }),
+    ]);
+    const revenue = single(revenueRows);
+    const departures = single(bookingRows);
+    const amounts = revenue.amounts.map(Number);
+    const counts = departures.counts.map(Number);
+    const shown = lines.slice(0, REPORT_LINE_LIMIT);
+    return {
+      agencyName: agency.name,
+      grain: query.grain,
+      from: current.start.toISOString(),
+      to: current.end.toISOString(),
+      revenueMillimes: amounts.reduce((sum, value) => sum + value, 0),
+      previousRevenueMillimes: Number(revenue.previous),
+      bookings: counts.reduce((sum, value) => sum + value, 0),
+      previousBookings: departures.previous,
+      series: buckets.map((bucket, index) => ({
+        key: bucket.key,
+        revenueMillimes: amounts[index] ?? 0,
+        bookings: counts[index] ?? 0,
+      })),
+      lines: shown.map((line) => ({
+        reference: line.reference,
+        customer: `${line.customer.firstName} ${line.customer.lastName}`.trim(),
+        vehicle:
+          (line.vehicle.plateNumber ?? line.vehicle.retiredPlateNumber)
+            ? `${line.vehicle.brand} ${line.vehicle.model} · ${line.vehicle.plateNumber ?? line.vehicle.retiredPlateNumber}`
+            : `${line.vehicle.brand} ${line.vehicle.model}`,
+        pickupAt: line.pickupAt.toISOString(),
+        returnAt: line.returnAt.toISOString(),
+        status: line.status,
+        totalMillimes: line.totalMillimes,
+      })),
+      truncated: lines.length > REPORT_LINE_LIMIT,
     };
   }
 

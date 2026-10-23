@@ -14,7 +14,10 @@ import {
   type CustomerQuery,
   customerQuerySchema,
   type CustomerView,
+  type ActivityReport,
   type DashboardData,
+  type DashboardReportQuery,
+  dashboardReportQuerySchema,
   type NavCounts,
   type Paginated,
   type PaymentList,
@@ -132,6 +135,15 @@ export class AgencyController {
   @ApiOperation({ summary: 'Indicateurs, demandes en attente, départs et retours du jour' })
   dashboard(@CurrentUser() user: AuthenticatedUser): Promise<DashboardData> {
     return this.agency.getDashboard(user.id);
+  }
+
+  @Get('reports/activity')
+  @ApiOperation({ summary: 'Activité du jour, de la semaine, du mois ou de l’année' })
+  activityReport(
+    @CurrentUser() user: AuthenticatedUser,
+    @Query(new ZodValidationPipe(dashboardReportQuerySchema)) query: DashboardReportQuery,
+  ): Promise<ActivityReport> {
+    return this.agency.getActivityReport(user.id, query);
   }
 
   @Get('nav-counts')
