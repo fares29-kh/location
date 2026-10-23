@@ -577,6 +577,7 @@
       "clientSite": "Voir le site des clients",
       "navService": "Le service",
       "navSteps": "Parcours",
+      "navTrial": "Essai",
       "definitionEyebrow": "Le site",
       "definitionTitle": "DriveTN relie les clients et votre agence",
       "definitionText": "DriveTN est le site où un particulier cherche une voiture à louer en Tunisie. Votre agence y publie sa flotte. Le client choisit les dates et réserve sans payer en ligne. Vous confirmez, vous remettez les clés, et vous notez le règlement reçu. Le planning, les encaissements et les dépenses restent dans le même espace.",
@@ -674,7 +675,10 @@
         }
       },
       "plansTitle": "Les formules",
-      "plansLead": "Prix hors taxes, facturé chaque mois. À l’inscription, l’agence est sur Essentiel.",
+      "plansLead": "Prix hors taxes, facturé chaque mois. À l’inscription, l’agence est sur Essentiel, avec 14 jours offerts.",
+      "trialEyebrow": "Essai",
+      "trialTitle": "14 jours pour essayer, sans payer",
+      "trialText": "À la création du compte, l’agence a 14 jours. Elle peut préparer sa flotte et recevoir des demandes. Passé ce délai, si l’abonnement n’est pas réglé, le compte est désactivé automatiquement. Il redevient actif dès que l’abonnement est payé.",
       "perMonth": "hors taxes, par mois",
       "unlimited": "Voitures publiées sans limite",
       "vehicleLimit": "Jusqu’à {count, plural, one {# voiture publiée} other {# voitures publiées}}",
@@ -683,6 +687,12 @@
         "PRO": "Pro",
         "BUSINESS": "Business"
       }
+    },
+    "billing": {
+      "trialTitle": "Essai gratuit",
+      "trialText": "{days, plural, one {# jour restant.} other {# jours restants.}} Passé ce délai, le compte est désactivé automatiquement si l’abonnement n’est pas réglé.",
+      "heldTitle": "Compte désactivé",
+      "heldText": "L’essai est terminé et l’abonnement n’est pas réglé. Le compte redevient actif dès que l’abonnement est payé."
     },
     "nav": {
       "operations": "Activité",
@@ -1870,6 +1880,7 @@
         "subscription": "Abonnement",
         "plan": "Formule",
         "monthlyFee": "Mensualité HT",
+        "trialEnds": "Fin de l’essai",
         "vehicles": "Véhicules",
         "commissionDefault": "Commission (par défaut)",
         "commissionCustom": "Commission (spécifique)",

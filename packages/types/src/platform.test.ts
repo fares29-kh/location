@@ -14,6 +14,10 @@ import {
   parsePercentToBps,
   platformSettingsSchema,
   reviewModerationInputSchema,
+  subscriptionLapsed,
+  trialDaysLeft,
+  trialEnd,
+  TRIAL_DAYS,
   userStatusInputSchema,
 } from './platform';
 
@@ -164,5 +168,62 @@ describe('paramètres de la plateforme', () => {
     expect(platformSettingsSchema.safeParse({ ...valid, bookingExpiryHours: 0 }).success).toBe(
       false,
     );
+  });
+});
+
+describe('essai gratuit', () => {
+  const openedAt = new Date('2026-10-01T08:00:00.000Z');
+  const endsAt = trialEnd(openedAt);
+
+  it('dure 14 jours', () => {
+    expect(endsAt.getTime() - openedAt.getTime()).toBe(TRIAL_DAYS * 86_400_000);
+    expect(trialDaysLeft(endsAt, openedAt)).toBe(14);
+    expect(trialDaysLeft(endsAt, new Date(endsAt.getTime() - 1))).toBe(1);
+    expect(trialDaysLeft(endsAt, endsAt)).toBeNull();
+  });
+
+  it('laisse le compte ouvert pendant l’essai et le coupe ensuite sans paiement', () => {
+    const invoice = { paidAt: null, dueAt: endsAt };
+    expect(subscriptionLapsed({ now: openedAt, trialEndsAt: endsAt, invoices: [invoice] })).toBe(
+      false,
+    );
+    expect(
+      subscriptionLapsed({
+        now: new Date(endsAt.getTime() + 1),
+        trialEndsAt: endsAt,
+        invoices: [invoice],
+      }),
+    ).toBe(true);
+    expect(
+      subscriptionLapsed({
+        now: new Date(endsAt.getTime() + 1),
+        trialEndsAt: endsAt,
+        invoices: [{ paidAt: endsAt, dueAt: endsAt }],
+      }),
+    ).toBe(false);
+  });
+
+  it('coupe aussi un abonnement déjà payé quand une facture suivante est échue', () => {
+    const now = new Date('2026-12-20T08:00:00.000Z');
+    expect(
+      subscriptionLapsed({
+        now,
+        trialEndsAt: endsAt,
+        invoices: [
+          { paidAt: endsAt, dueAt: endsAt },
+          { paidAt: null, dueAt: new Date('2026-12-15T22:59:00.000Z') },
+        ],
+      }),
+    ).toBe(true);
+  });
+
+  it('ne concerne pas les comptes ouverts avant la règle', () => {
+    expect(
+      subscriptionLapsed({
+        now: endsAt,
+        trialEndsAt: null,
+        invoices: [{ paidAt: null, dueAt: openedAt }],
+      }),
+    ).toBe(false);
   });
 });

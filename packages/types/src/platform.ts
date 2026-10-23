@@ -122,6 +122,49 @@ export const SUBSCRIPTION_PLAN_DEFINITIONS: Record<SubscriptionPlan, Subscriptio
   BUSINESS: { monthlyPriceMillimes: 199_000, vehicleLimit: null },
 };
 
+/** Durée de l'essai gratuit accordé à la création du compte agence. */
+export const TRIAL_DAYS = 14;
+
+const TRIAL_DAY_MS = 86_400_000;
+
+/** Fin de l'essai, 14 jours après l'ouverture du compte. */
+export function trialEnd(openedAt: Date): Date {
+  return new Date(openedAt.getTime() + TRIAL_DAYS * TRIAL_DAY_MS);
+}
+
+/** Jours entiers restants. `null` quand l'essai est terminé. */
+export function trialDaysLeft(trialEndsAt: Date, now: Date): number | null {
+  const remaining = trialEndsAt.getTime() - now.getTime();
+  if (remaining <= 0) {
+    return null;
+  }
+  return Math.ceil(remaining / TRIAL_DAY_MS);
+}
+
+/**
+ * L'abonnement n'est plus en règle : l'essai est fini, et aucune facture n'est payée
+ * ou une facture échue reste impayée. Les comptes sans essai (ouverts avant cette règle)
+ * ne sont pas concernés.
+ */
+export function subscriptionLapsed({
+  now,
+  trialEndsAt,
+  invoices,
+}: {
+  now: Date;
+  trialEndsAt: Date | null;
+  invoices: readonly { paidAt: Date | null; dueAt: Date }[];
+}): boolean {
+  if (trialEndsAt === null || now.getTime() < trialEndsAt.getTime()) {
+    return false;
+  }
+  const paid = invoices.some((invoice) => invoice.paidAt !== null);
+  const overdue = invoices.some(
+    (invoice) => invoice.paidAt === null && invoice.dueAt.getTime() < now.getTime(),
+  );
+  return overdue || !paid;
+}
+
 export const INVOICE_STATUSES = ['ISSUED', 'PAID', 'OVERDUE'] as const;
 export const invoiceStatusSchema = z.enum(INVOICE_STATUSES);
 export type InvoiceStatus = z.infer<typeof invoiceStatusSchema>;

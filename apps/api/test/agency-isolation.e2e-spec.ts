@@ -327,6 +327,11 @@ describe.skipIf(!e2eEnabled)('Portail agence : cloisonnement (e2e)', () => {
       pendingBookings: 0,
       unansweredReviews: 0,
       latestPending: [],
+      billing: {
+        trialEndsAt: '2026-10-29T10:30:00.000Z',
+        daysLeft: 14,
+        held: false,
+      },
     });
     expect(body<BookingList>(await asC.get('/bookings').expect(200)).total).toBe(0);
     expect(body<VehicleView[]>(await asC.get('/vehicles').expect(200))).toEqual([]);

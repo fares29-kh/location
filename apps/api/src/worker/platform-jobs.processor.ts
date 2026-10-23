@@ -69,10 +69,15 @@ export class PlatformJobsProcessor implements OnApplicationBootstrap, OnApplicat
     switch (job.name) {
       case EXPIRE_BOOKINGS_JOB:
         await this.expiry.expireStale();
+        await this.invoicing.suspendLapsed();
         return;
-      case ISSUE_INVOICES_JOB:
-        await this.invoicing.issueForPeriod(addMonths(toMonthKey(new Date()), -1));
+      case ISSUE_INVOICES_JOB: {
+        const now = new Date();
+        await this.invoicing.ensureOpeningInvoices(now);
+        await this.invoicing.issueForPeriod(addMonths(toMonthKey(now), -1), now);
+        await this.invoicing.suspendLapsed(now);
         return;
+      }
       default:
         this.logger.warn(`Job inconnu ignoré : ${job.name}`);
     }

@@ -375,6 +375,7 @@ export function createAgencyQueries(data: AgencyDataset, now: Date = new Date())
         pendingBookings: pending.length,
         unansweredReviews: reviewStats().unansweredCount,
         latestPending: pending.slice(-5).reverse().map(toView),
+        billing: { trialEndsAt: null, daysLeft: null, held: false },
       };
     },
 

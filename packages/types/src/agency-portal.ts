@@ -477,6 +477,17 @@ export interface NavCounts {
   pendingBookings: number;
   unansweredReviews: number;
   latestPending: BookingView[];
+  billing: AgencyBillingNotice;
+}
+
+/** Essai et coupure d'abonnement, affichés dans l'espace agence. */
+export interface AgencyBillingNotice {
+  /** Fin de l'essai. `null` pour un compte ouvert avant cette règle. */
+  trialEndsAt: string | null;
+  /** Jours entiers restants. `null` si l'essai est terminé, absent, ou le compte déjà coupé. */
+  daysLeft: number | null;
+  /** Le compte est désactivé faute d'abonnement réglé. */
+  held: boolean;
 }
 
 // --- Dépenses de l'agence --------------------------------------------------------------

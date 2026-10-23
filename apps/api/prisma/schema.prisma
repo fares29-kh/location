@@ -337,6 +337,10 @@ model Agency {
   /// Dernière décision de l'administration et son motif (refus, suspension).
   decidedAt              DateTime?        @map("decided_at")
   statusReason           String?          @map("status_reason")
+  /// Fin de l'essai gratuit. `null` : compte ouvert avant cette règle, non soumis à la coupure.
+  trialEndsAt            DateTime?        @map("trial_ends_at")
+  /// Statut à rendre quand l'abonnement impayé est réglé. `null` si la suspension n'est pas automatique.
+  billingHoldFrom        AgencyStatus?    @map("billing_hold_from")
   createdAt              DateTime         @default(now()) @map("created_at")
   updatedAt              DateTime         @updatedAt @map("updated_at")
 

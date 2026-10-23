@@ -172,6 +172,7 @@ export class AdminAgenciesService {
         status: applyAgencyDecision(agency.status, input.decision),
         decidedAt: new Date(),
         statusReason: reason,
+        billingHoldFrom: null,
       },
     });
     if (updated.count === 0) {

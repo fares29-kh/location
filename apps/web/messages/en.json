@@ -577,6 +577,7 @@
       "clientSite": "See the client site",
       "navService": "The service",
       "navSteps": "How it works",
+      "navTrial": "Trial",
       "definitionEyebrow": "The site",
       "definitionTitle": "DriveTN connects clients with your agency",
       "definitionText": "DriveTN is the site where someone in Tunisia looks for a car to rent. Your agency lists its fleet there. The client picks the dates and books without paying online. You confirm, hand over the keys, and record the payment you received. The schedule, the collections and the costs stay in the same workspace.",
@@ -674,7 +675,10 @@
         }
       },
       "plansTitle": "The plans",
-      "plansLead": "Prices exclude tax and are billed each month. A new agency starts on Essential.",
+      "plansLead": "Prices exclude tax and are billed each month. A new agency starts on Essential, with 14 free days.",
+      "trialEyebrow": "Trial",
+      "trialTitle": "14 days to try, without paying",
+      "trialText": "When the account is created, the agency has 14 days. It can prepare its fleet and receive requests. After that, if the subscription is not paid, the account is deactivated automatically. It becomes active again once the subscription is paid.",
       "perMonth": "excluding tax, per month",
       "unlimited": "No limit on listed cars",
       "vehicleLimit": "Up to {count, plural, one {# listed car} other {# listed cars}}",
@@ -683,6 +687,12 @@
         "PRO": "Pro",
         "BUSINESS": "Business"
       }
+    },
+    "billing": {
+      "trialTitle": "Free trial",
+      "trialText": "{days, plural, one {# day left.} other {# days left.}} After that, the account is deactivated automatically if the subscription is not paid.",
+      "heldTitle": "Account deactivated",
+      "heldText": "The trial has ended and the subscription is not paid. The account becomes active again once the subscription is paid."
     },
     "nav": {
       "operations": "Operations",
@@ -1870,6 +1880,7 @@
         "subscription": "Subscription",
         "plan": "Plan",
         "monthlyFee": "Monthly fee excl. tax",
+        "trialEnds": "Trial ends",
         "vehicles": "Vehicles",
         "commissionDefault": "Commission (default)",
         "commissionCustom": "Commission (custom)",

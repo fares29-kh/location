@@ -25,6 +25,7 @@ export function AgencyWelcomeHeader() {
             [
               ['#service', 'navService'],
               ['#parcours', 'navSteps'],
+              ['#essai', 'navTrial'],
               ['#formules', 'plansTitle'],
             ] as const
           ).map(([href, key]) => (

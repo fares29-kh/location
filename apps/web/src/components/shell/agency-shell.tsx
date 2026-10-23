@@ -1,6 +1,7 @@
 'use client';
 
 import type { CurrentUser } from '@drivetn/types';
+import { Alert } from '@drivetn/ui/alert';
 import {
   CalendarCheck,
   CalendarDays,
@@ -34,6 +35,7 @@ export function AgencyShell({
   children: ReactNode;
 }) {
   const t = useTranslations('agency.nav');
+  const tBilling = useTranslations('agency.billing');
   const tCommon = useTranslations('common');
   const tShell = useTranslations('shell');
   const { data: counts } = useNavCounts();
@@ -95,6 +97,16 @@ export function AgencyShell({
         </>
       }
     >
+      {counts?.billing.held === true && (
+        <Alert tone="danger" title={tBilling('heldTitle')} className="mb-4">
+          {tBilling('heldText')}
+        </Alert>
+      )}
+      {counts?.billing.held === false && counts.billing.daysLeft !== null && (
+        <Alert tone="info" title={tBilling('trialTitle')} className="mb-4">
+          {tBilling('trialText', { days: counts.billing.daysLeft })}
+        </Alert>
+      )}
       {children}
     </AppShell>
   );

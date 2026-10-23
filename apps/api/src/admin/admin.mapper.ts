@@ -113,6 +113,7 @@ export function toAdminAgency(row: AdminAgencyRow, stats: AgencyStats): AdminAge
     createdAt: row.createdAt.toISOString(),
     decidedAt: row.decidedAt?.toISOString() ?? null,
     statusReason: row.statusReason,
+    trialEndsAt: row.trialEndsAt?.toISOString() ?? null,
   };
 }
 

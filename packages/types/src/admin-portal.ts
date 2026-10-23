@@ -66,6 +66,8 @@ export interface AdminAgency extends AgencyRef {
   /** Dernière décision de l'administration (validation, refus, suspension…). */
   decidedAt: string | null;
   statusReason: string | null;
+  /** Fin de l'essai gratuit. `null` pour un compte ouvert avant cette règle. */
+  trialEndsAt: string | null;
 }
 
 export const ADMIN_AGENCY_FILTERS = ['all', 'pending', 'active', 'suspended', 'rejected'] as const;

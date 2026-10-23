@@ -18,6 +18,7 @@ import type { Prisma } from '@prisma/client';
 import { AuditService } from '../audit/audit.service';
 import { AppException } from '../common/errors/app.exception';
 import { MessagingService } from '../messaging/messaging.service';
+import { InvoicingService } from '../platform/invoicing.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { INVOICE_INCLUDE, toInvoice } from './admin.mapper';
 import { contains, monthBounds, pageWindow, paginated } from './admin.utils';
@@ -49,6 +50,7 @@ export class AdminBillingService {
     private readonly prisma: PrismaService,
     private readonly audit: AuditService,
     private readonly messaging: MessagingService,
+    private readonly invoicing: InvoicingService,
   ) {}
 
   async list(query: InvoiceQuery, now: Date = new Date()): Promise<InvoiceList> {
@@ -157,6 +159,7 @@ export class AdminBillingService {
       metadata: { agencyId: invoice.agency.id, method },
       ip,
     });
+    await this.invoicing.releaseHold(invoice.agency.id);
     return invoice;
   }
 

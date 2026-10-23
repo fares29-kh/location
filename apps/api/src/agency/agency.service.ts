@@ -35,6 +35,7 @@ import {
   isoWeekday,
   rentalPriceMillimes,
   rentalWindow,
+  trialEnd,
   type ReportGrain,
   type RecordPaymentInput,
   type RentalConditions,
@@ -60,6 +61,7 @@ import { AuditService } from '../audit/audit.service';
 import { CatalogService } from '../catalog/catalog.service';
 import { AppException } from '../common/errors/app.exception';
 import { pageWindow, toPaginated } from '../common/pagination';
+import { InvoicingService } from '../platform/invoicing.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { StorageService } from '../storage/storage.service';
 import { VEHICLE_PHOTOS_INCLUDE, vehiclePhotoKeys } from '../storage/vehicle-photos';
@@ -343,6 +345,7 @@ export class AgencyService {
     private readonly audit: AuditService,
     private readonly storage: StorageService,
     private readonly catalog: CatalogService,
+    private readonly invoicing: InvoicingService,
   ) {}
 
   /** Agence du propriétaire, créée à la première connexion à partir de son compte. */
@@ -356,6 +359,7 @@ export class AgencyService {
     }
     const owner = await this.prisma.user.findUniqueOrThrow({ where: { id: ownerId } });
     const phone = normalizeTunisianPhone(owner.phone);
+    const openedAt = new Date();
     try {
       const agency = await this.prisma.agency.create({
         data: {
@@ -366,6 +370,7 @@ export class AgencyService {
           email: owner.email,
           address: '',
           governorateCode: DEFAULT_GOVERNORATE,
+          trialEndsAt: trialEnd(openedAt),
         },
         select: { id: true },
       });
@@ -375,6 +380,7 @@ export class AgencyService {
         entityType: 'agency',
         entityId: agency.id,
       });
+      await this.invoicing.openTrial(agency.id, openedAt);
       return agency.id;
     } catch (error) {
       if (isUniqueViolation(error)) {
@@ -722,6 +728,7 @@ export class AgencyService {
       pendingBookings,
       unansweredReviews,
       latestPending: latestPending.map((row) => toBookingView(row, publicUrl)),
+      billing: await this.invoicing.billingNotice(agencyId),
     };
   }
 

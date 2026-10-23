@@ -287,6 +287,24 @@ export async function AgencyWelcome({ locale, clientUrl }: { locale: Locale; cli
       </section>
 
       <section
+        id="essai"
+        className="border-y border-border bg-surface-muted/50 py-16 sm:py-24"
+        aria-labelledby="agency-trial-title"
+      >
+        <div className="container grid gap-6 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:items-center">
+          <SectionHeading
+            id="agency-trial-title"
+            eyebrow={t('trialEyebrow')}
+            title={t('trialTitle')}
+            align="start"
+          />
+          <p className="max-w-2xl text-lg leading-relaxed text-muted-foreground">
+            {t('trialText')}
+          </p>
+        </div>
+      </section>
+
+      <section
         id="formules"
         className="scroll-mt-24 border-t border-border bg-surface-muted/40 py-16 sm:py-24"
         aria-labelledby="agency-plans-title"
