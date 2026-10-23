@@ -651,7 +651,9 @@
         "title": "Aujourd’hui",
         "subtitle": "Voitures à remettre au client, et voitures à récupérer.",
         "departures": "À remettre",
+        "departuresHint": "Voitures à remettre au client aujourd’hui.",
         "returns": "À récupérer",
+        "returnsHint": "Voitures que le client ramène aujourd’hui.",
         "noDepartures": "Aucun départ prévu aujourd’hui.",
         "noReturns": "Aucun retour prévu aujourd’hui."
       },
@@ -665,6 +667,13 @@
         "outstanding": "Reste à encaisser",
         "outstandingHint": "Argent encore dû sur les locations en cours ou déjà rendues.",
         "allCollected": "Tout est encaissé",
+        "itemHint": {
+          "available": "Voitures prêtes à être louées.",
+          "onRent": "Voitures actuellement chez un client.",
+          "maintenance": "Voitures en entretien, non proposées à la location.",
+          "inactive": "Voitures retirées de la location."
+        },
+        "ratingHint": "Note moyenne laissée par les clients après une location rendue.",
         "available": "Disponibles",
         "onRent": "En location",
         "maintenance": "En entretien",
@@ -683,6 +692,12 @@
           "week": "Semaine",
           "month": "Mois",
           "year": "Année"
+        },
+        "grainHint": {
+          "day": "Les encaissements de cette journée, heure par heure.",
+          "week": "Les encaissements de la semaine, du lundi au dimanche.",
+          "month": "Les encaissements de chaque jour du mois.",
+          "year": "Les encaissements de chaque mois de l’année."
         },
         "previous": "Période précédente",
         "next": "Période suivante",

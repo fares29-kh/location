@@ -5,6 +5,7 @@ import { Button } from '@drivetn/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@drivetn/ui/card';
 import { cn } from '@drivetn/ui/lib/cn';
 import { Skeleton } from '@drivetn/ui/skeleton';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@drivetn/ui/tooltip';
 import { ChevronLeft, ChevronRight, Download } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useState } from 'react';
@@ -21,6 +22,7 @@ import { useActivityReport } from '@/lib/agency/queries';
 
 import { FilterTabs } from '../filter-tabs';
 import { QueryError } from '../query-states';
+import { HoverHint } from './hover-hint';
 import { type AgencyFormat, useAgencyFormat } from '../use-agency-format';
 
 const GRAINS: readonly ReportGrain[] = ['day', 'week', 'month', 'year'];
@@ -293,9 +295,10 @@ function ActivityChart({
 
   return (
     <figure className="grid gap-2">
-      <figcaption className="grid gap-1">
-        <span className="text-sm font-medium">{t(`chartTitle.${report.grain}`)}</span>
-        <span className="text-xs text-muted-foreground">{t('chartHint')}</span>
+      <figcaption>
+        <HoverHint hint={t('chartHint')} className="text-sm font-medium">
+          {t(`chartTitle.${report.grain}`)}
+        </HoverHint>
       </figcaption>
       <div className="overflow-x-auto">
         <ol
@@ -308,40 +311,48 @@ function ActivityChart({
             );
             const current = isCurrentPoint(report, point.key, anchor, today);
             const ratio = point.revenueMillimes / max;
+            const description = t('barLabel', {
+              label,
+              amount: format.money(point.revenueMillimes),
+            });
             return (
-              <li
-                key={point.key}
-                className={cn('flex h-full flex-1 flex-col justify-end gap-1', wide && 'min-w-8')}
-              >
-                <span
-                  className={cn(
-                    'block w-full',
-                    point.revenueMillimes > 0 &&
-                      (current
-                        ? 'rounded-t-control bg-primary'
-                        : 'rounded-t-control bg-primary/70'),
-                  )}
-                  style={{
-                    height:
-                      point.revenueMillimes > 0 ? `${String(Math.max(ratio * 100, 8))}%` : '0%',
-                  }}
-                >
-                  <span className="sr-only">
-                    {t('barLabel', {
-                      label,
-                      amount: format.money(point.revenueMillimes),
-                    })}
-                  </span>
-                </span>
-                <span
-                  className={cn(
-                    'truncate text-center text-[0.625rem] capitalize text-muted-foreground',
-                    current && 'font-semibold text-foreground',
-                  )}
-                  aria-hidden="true"
-                >
-                  {label}
-                </span>
+              <li key={point.key} className={cn('flex h-full flex-1 flex-col', wide && 'min-w-8')}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      type="button"
+                      className="flex h-full w-full cursor-help flex-col justify-end gap-1 border-0 bg-transparent p-0 font-inherit text-inherit focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    >
+                      <span
+                        className={cn(
+                          'block w-full',
+                          point.revenueMillimes > 0 &&
+                            (current
+                              ? 'rounded-t-control bg-primary'
+                              : 'rounded-t-control bg-primary/70'),
+                        )}
+                        style={{
+                          height:
+                            point.revenueMillimes > 0
+                              ? `${String(Math.max(ratio * 100, 8))}%`
+                              : '0%',
+                        }}
+                      >
+                        <span className="sr-only">{description}</span>
+                      </span>
+                      <span
+                        className={cn(
+                          'truncate text-center text-[0.625rem] capitalize text-muted-foreground',
+                          current && 'font-semibold text-foreground',
+                        )}
+                        aria-hidden="true"
+                      >
+                        {label}
+                      </span>
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-64 text-balance">{description}</TooltipContent>
+                </Tooltip>
               </li>
             );
           })}
@@ -359,10 +370,9 @@ function ActivityLines({ report, format }: { report: ActivityReport; format: Age
 
   return (
     <div className="grid gap-2">
-      <div className="grid gap-1">
-        <h3 className="text-sm font-medium">{t('preview')}</h3>
-        <p className="text-xs text-muted-foreground">{t('linesHint')}</p>
-      </div>
+      <h3 className="text-sm font-medium">
+        <HoverHint hint={t('linesHint')}>{t('preview')}</HoverHint>
+      </h3>
       {preview.length === 0 ? (
         <p className="text-sm text-muted-foreground">{t('empty')}</p>
       ) : (
@@ -485,28 +495,38 @@ export function ActivityReportCard() {
       <CardHeader className="gap-4">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="grid gap-1">
-            <CardTitle className="text-base">{t('title')}</CardTitle>
-            <CardDescription>{t('subtitle')}</CardDescription>
+            <CardTitle className="text-base">
+              <HoverHint hint={t('subtitle')}>{t('title')}</HoverHint>
+            </CardTitle>
+            <CardDescription className="sr-only">{t('subtitle')}</CardDescription>
           </div>
-          <Button
-            type="button"
-            variant="secondary"
-            disabled={reportQuery.data === undefined}
-            title={t('downloadHint')}
-            onClick={() => {
-              if (reportQuery.data !== undefined) {
-                download(reportQuery.data);
-              }
-            }}
-          >
-            <Download aria-hidden="true" />
-            {t('download')}
-          </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                type="button"
+                variant="secondary"
+                disabled={reportQuery.data === undefined}
+                onClick={() => {
+                  if (reportQuery.data !== undefined) {
+                    download(reportQuery.data);
+                  }
+                }}
+              >
+                <Download aria-hidden="true" />
+                {t('download')}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent className="max-w-64 text-balance">{t('downloadHint')}</TooltipContent>
+          </Tooltip>
         </div>
         <FilterTabs
           label={t('periodLabel')}
           value={grain}
-          options={GRAINS.map((value) => ({ value, label: t(`grains.${value}`) }))}
+          options={GRAINS.map((value) => ({
+            value,
+            label: t(`grains.${value}`),
+            hint: t(`grainHint.${value}`),
+          }))}
           onValueChange={(value) => {
             setGrain(value);
             setAnchor(today);
@@ -594,24 +614,27 @@ function ActivityBody({
     <>
       <dl className="grid gap-3 sm:grid-cols-3">
         <div className="rounded-control bg-surface-muted px-4 py-3">
-          <dt className="text-sm font-medium">{t('revenue')}</dt>
-          <dd className="text-xs text-muted-foreground">{t('revenueHint')}</dd>
+          <dt className="text-sm font-medium">
+            <HoverHint hint={t('revenueHint')}>{t('revenue')}</HoverHint>
+          </dt>
           <dd className="mt-1 font-heading text-xl font-bold tabular-nums">
             {format.money(report.revenueMillimes)}
           </dd>
           <dd className="text-xs text-muted-foreground">{trend(revenueTrend)}</dd>
         </div>
         <div className="rounded-control bg-surface-muted px-4 py-3">
-          <dt className="text-sm font-medium">{t('departures')}</dt>
-          <dd className="text-xs text-muted-foreground">{t('departuresHint')}</dd>
+          <dt className="text-sm font-medium">
+            <HoverHint hint={t('departuresHint')}>{t('departures')}</HoverHint>
+          </dt>
           <dd className="mt-1 font-heading text-xl font-bold tabular-nums">
             {format.integer(report.bookings)}
           </dd>
           <dd className="text-xs text-muted-foreground">{trend(bookingsTrend)}</dd>
         </div>
         <div className="rounded-control bg-surface-muted px-4 py-3">
-          <dt className="text-sm font-medium">{t('average')}</dt>
-          <dd className="text-xs text-muted-foreground">{t('averageHint')}</dd>
+          <dt className="text-sm font-medium">
+            <HoverHint hint={t('averageHint')}>{t('average')}</HoverHint>
+          </dt>
           <dd className="mt-1 font-heading text-xl font-bold tabular-nums">
             {format.money(average)}
           </dd>

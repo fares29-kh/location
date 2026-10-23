@@ -651,7 +651,9 @@
         "title": "Today",
         "subtitle": "Cars to hand over to the customer, and cars to take back.",
         "departures": "Hand over",
+        "departuresHint": "Cars to hand over to the customer today.",
         "returns": "Take back",
+        "returnsHint": "Cars the customer brings back today.",
         "noDepartures": "No pick-ups scheduled today.",
         "noReturns": "No returns scheduled today."
       },
@@ -665,6 +667,13 @@
         "outstanding": "Still to collect",
         "outstandingHint": "Money still owed on rentals in progress or already returned.",
         "allCollected": "Everything collected",
+        "itemHint": {
+          "available": "Cars ready to be rented.",
+          "onRent": "Cars currently with a customer.",
+          "maintenance": "Cars being serviced, not offered for rent.",
+          "inactive": "Cars withdrawn from rental."
+        },
+        "ratingHint": "Average rating left by customers after a returned rental.",
         "available": "Available",
         "onRent": "On rent",
         "maintenance": "In maintenance",
@@ -683,6 +692,12 @@
           "week": "Week",
           "month": "Month",
           "year": "Year"
+        },
+        "grainHint": {
+          "day": "Collections for this day, hour by hour.",
+          "week": "Collections for the week, Monday to Sunday.",
+          "month": "Collections for each day of the month.",
+          "year": "Collections for each month of the year."
         },
         "previous": "Previous period",
         "next": "Next period",

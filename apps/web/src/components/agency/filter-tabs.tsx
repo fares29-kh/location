@@ -1,11 +1,14 @@
 'use client';
 
 import { cn } from '@drivetn/ui/lib/cn';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@drivetn/ui/tooltip';
 
 export interface FilterTabOption<T extends string> {
   value: T;
   label: string;
   count?: number;
+  /** Texte affiché au survol du filtre. */
+  hint?: string;
 }
 
 export interface FilterTabsProps<T extends string> {
@@ -35,9 +38,9 @@ export function FilterTabs<T extends string>({
     >
       {options.map((option) => {
         const selected = option.value === value;
-        return (
+        const button = (
           <button
-            key={option.value}
+            key={option.hint === undefined ? option.value : undefined}
             type="button"
             aria-pressed={selected}
             onClick={() => {
@@ -63,6 +66,15 @@ export function FilterTabs<T extends string>({
               </span>
             )}
           </button>
+        );
+        if (option.hint === undefined) {
+          return button;
+        }
+        return (
+          <Tooltip key={option.value}>
+            <TooltipTrigger asChild>{button}</TooltipTrigger>
+            <TooltipContent className="max-w-64 text-balance">{option.hint}</TooltipContent>
+          </Tooltip>
         );
       })}
     </div>

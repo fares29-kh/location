@@ -7,6 +7,7 @@ import { cn } from '@drivetn/ui/lib/cn';
 import { Rating } from '@drivetn/ui/rating';
 import { Skeleton } from '@drivetn/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@drivetn/ui/tabs';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@drivetn/ui/tooltip';
 import {
   ArrowRight,
   CalendarCheck,
@@ -31,6 +32,7 @@ import { BookingStatusTag } from '../status-tags';
 import { type AgencyFormat, useAgencyFormat } from '../use-agency-format';
 import { useNow } from '../use-now';
 import { ActivityReportCard } from './activity-report';
+import { HoverHint } from './hover-hint';
 
 /** Au-delà de ce délai, une demande sans réponse est signalée comme urgente. */
 const URGENT_AFTER_MS = 2 * 3_600_000;
@@ -44,10 +46,10 @@ function PendingRequests({ data, format }: { data: DashboardData; format: Agency
       <CardHeader className="flex-row flex-wrap items-start justify-between gap-3 pb-4">
         <div className="grid gap-1">
           <CardTitle className="flex items-center gap-2 text-base">
-            {t('title')}
+            <HoverHint hint={t('subtitle')}>{t('title')}</HoverHint>
             {data.pendingCount > 0 && <Badge tone="warning">{data.pendingCount}</Badge>}
           </CardTitle>
-          <CardDescription>{t('subtitle')}</CardDescription>
+          <CardDescription className="sr-only">{t('subtitle')}</CardDescription>
         </div>
         {data.pendingCount > 0 && (
           <Button asChild variant="ghost" size="sm">
@@ -172,26 +174,42 @@ function TodayCard({ data, format }: { data: DashboardData; format: AgencyFormat
   return (
     <Card>
       <CardHeader className="pb-2">
-        <CardTitle className="text-base">{t('title')}</CardTitle>
-        <CardDescription>
-          {t('subtitle')} {format.weekdayDate(new Date())}
+        <CardTitle className="text-base">
+          <HoverHint hint={t('subtitle')}>{t('title')}</HoverHint>
+        </CardTitle>
+        <CardDescription className="first-letter:uppercase">
+          {format.weekdayDate(new Date())}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="departures">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="departures">
-              <KeyRound className="size-4" aria-hidden="true" />
-              {t('departures')}
-              <span className="tabular-nums text-muted-foreground">
-                {data.departuresToday.length}
-              </span>
-            </TabsTrigger>
-            <TabsTrigger value="returns">
-              <Undo2 className="size-4" aria-hidden="true" />
-              {t('returns')}
-              <span className="tabular-nums text-muted-foreground">{data.returnsToday.length}</span>
-            </TabsTrigger>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <TabsTrigger value="departures">
+                  <KeyRound className="size-4" aria-hidden="true" />
+                  {t('departures')}
+                  <span className="tabular-nums text-muted-foreground">
+                    {data.departuresToday.length}
+                  </span>
+                </TabsTrigger>
+              </TooltipTrigger>
+              <TooltipContent className="max-w-64 text-balance">
+                {t('departuresHint')}
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <TabsTrigger value="returns">
+                  <Undo2 className="size-4" aria-hidden="true" />
+                  {t('returns')}
+                  <span className="tabular-nums text-muted-foreground">
+                    {data.returnsToday.length}
+                  </span>
+                </TabsTrigger>
+              </TooltipTrigger>
+              <TooltipContent className="max-w-64 text-balance">{t('returnsHint')}</TooltipContent>
+            </Tooltip>
           </TabsList>
           <TabsContent value="departures">
             <AgendaList bookings={data.departuresToday} kind="departures" format={format} />
@@ -219,15 +237,15 @@ function FleetCard({ data, format }: { data: DashboardData; format: AgencyFormat
   return (
     <Card>
       <CardHeader className="pb-4">
-        <CardTitle className="text-base">{t('title')}</CardTitle>
-        <CardDescription>{t('intro')}</CardDescription>
+        <CardTitle className="text-base">
+          <HoverHint hint={t('intro')}>{t('title')}</HoverHint>
+        </CardTitle>
       </CardHeader>
       <CardContent className="grid gap-6 lg:grid-cols-2">
         <div className="grid gap-5">
-          <div className="grid gap-1">
-            <p className="text-sm font-medium">{t('statusTitle')}</p>
-            <p className="text-xs text-muted-foreground">{t('statusHint', { count: total })}</p>
-          </div>
+          <p className="text-sm font-medium">
+            <HoverHint hint={t('statusHint', { count: total })}>{t('statusTitle')}</HoverHint>
+          </p>
           <div
             className="flex h-3 overflow-hidden rounded-full bg-surface-muted"
             aria-hidden="true"
@@ -246,7 +264,9 @@ function FleetCard({ data, format }: { data: DashboardData; format: AgencyFormat
             {FLEET_SEGMENTS.map(({ key, className }) => (
               <li key={key} className="flex items-center gap-2 text-sm">
                 <span className={cn('size-2.5 rounded-full', className)} aria-hidden="true" />
-                <span className="flex-1 text-muted-foreground">{t(key)}</span>
+                <HoverHint hint={t(`itemHint.${key}`)} className="flex-1 text-muted-foreground">
+                  {t(key)}
+                </HoverHint>
                 <span className="font-semibold tabular-nums">
                   {format.integer(data.fleet[key])}
                 </span>
@@ -256,24 +276,29 @@ function FleetCard({ data, format }: { data: DashboardData; format: AgencyFormat
         </div>
         <div className="grid content-start gap-4">
           <div className="rounded-control bg-surface-muted px-4 py-3">
-            <p className="text-xs text-muted-foreground">{t('occupancy')}</p>
+            <p className="text-xs text-muted-foreground">
+              <HoverHint hint={t('occupancyHint')}>{t('occupancy')}</HoverHint>
+            </p>
             <p className="font-heading text-xl font-bold tabular-nums">
               {format.percent(data.kpis.occupancyRate)}
             </p>
-            <p className="text-xs text-muted-foreground">{t('occupancyHint')}</p>
           </div>
           <div className="rounded-control bg-surface-muted px-4 py-3">
-            <p className="text-xs text-muted-foreground">{t('outstanding')}</p>
+            <p className="text-xs text-muted-foreground">
+              <HoverHint hint={t('outstandingHint')}>{t('outstanding')}</HoverHint>
+            </p>
             <p className="font-heading text-xl font-bold tabular-nums">
               {format.money(data.kpis.outstandingMillimes)}
             </p>
-            <p className="text-xs text-muted-foreground">
-              {data.kpis.outstandingMillimes > 0 ? t('outstandingHint') : t('allCollected')}
-            </p>
+            {data.kpis.outstandingMillimes === 0 ? (
+              <p className="text-xs text-muted-foreground">{t('allCollected')}</p>
+            ) : null}
           </div>
           <div className="flex items-center justify-between gap-3 rounded-control bg-surface-muted/60 p-3">
             <div className="grid gap-1">
-              <span className="text-xs text-muted-foreground">{t('rating')}</span>
+              <span className="text-xs text-muted-foreground">
+                <HoverHint hint={t('ratingHint')}>{t('rating')}</HoverHint>
+              </span>
               <span className="flex items-center gap-2">
                 <span className="font-heading text-lg font-bold tabular-nums">
                   {format.decimal(data.rating.average)}
@@ -345,12 +370,11 @@ export function DashboardView({ firstName }: { firstName: string }) {
         <QueryError error={error} onRetry={() => void refetch()} retrying={isFetching} />
       ) : (
         <section className="grid gap-3" aria-labelledby="dashboard-now">
-          <div className="grid gap-1">
-            <h2 id="dashboard-now" className="font-heading text-lg font-semibold">
+          <h2 id="dashboard-now" className="font-heading text-lg font-semibold">
+            <HoverHint hint={t('sections.nowText')} className="font-heading text-lg font-semibold">
               {t('sections.now')}
-            </h2>
-            <p className="text-sm text-muted-foreground">{t('sections.nowText')}</p>
-          </div>
+            </HoverHint>
+          </h2>
           <div className="grid gap-6 lg:grid-cols-3">
             <PendingRequests data={data} format={format} />
             <TodayCard data={data} format={format} />
