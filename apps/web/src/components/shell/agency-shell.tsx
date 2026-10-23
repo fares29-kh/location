@@ -6,6 +6,7 @@ import {
   CalendarDays,
   CarFront,
   HandCoins,
+  Receipt,
   LayoutDashboard,
   Palette,
   Settings,
@@ -55,6 +56,7 @@ export function AgencyShell({
         },
         { id: 'calendar', label: t('calendar'), icon: CalendarDays, href: '/calendar' },
         { id: 'payments', label: t('payments'), icon: HandCoins, href: '/payments' },
+        { id: 'expenses', label: t('expenses'), icon: Receipt, href: '/expenses' },
       ],
     },
     {

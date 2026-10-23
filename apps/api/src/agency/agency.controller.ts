@@ -8,6 +8,12 @@ import {
   type BookingTransitionInput,
   bookingTransitionSchema,
   type BookingView,
+  type ExpenseInput,
+  type ExpenseList,
+  type ExpenseQuery,
+  expenseInputSchema,
+  expenseQuerySchema,
+  type ExpenseView,
   type DeskBookingInput,
   deskBookingSchema,
   type CustomerDetail,
@@ -76,6 +82,7 @@ import { CurrentUser, Roles } from '../common/auth/decorators';
 import { AppException } from '../common/errors/app.exception';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
 import { AgencyService } from './agency.service';
+import { ExpensesService } from './expenses.service';
 import { planningWindow } from './planning-window';
 import { renderLogo, VehiclePhotosService } from './vehicle-photos.service';
 
@@ -129,6 +136,7 @@ export class AgencyController {
   constructor(
     private readonly agency: AgencyService,
     private readonly photos: VehiclePhotosService,
+    private readonly expenses: ExpensesService,
   ) {}
 
   @Get('dashboard')
@@ -331,6 +339,47 @@ export class AgencyController {
     @Param('id') id: string,
   ): Promise<CustomerDetail> {
     return this.agency.getCustomer(user.id, id);
+  }
+
+  @Get('expenses')
+  @ApiOperation({ summary: 'Dépenses du mois : essence, vidange, entretien et autres frais' })
+  listExpenses(
+    @CurrentUser() user: AuthenticatedUser,
+    @Query(new ZodValidationPipe(expenseQuerySchema)) query: ExpenseQuery,
+  ): Promise<ExpenseList> {
+    return this.expenses.list(user.id, query);
+  }
+
+  @Post('expenses')
+  @ApiOperation({ summary: 'Enregistrer une dépense' })
+  createExpense(
+    @CurrentUser() user: AuthenticatedUser,
+    @Body(new ZodValidationPipe(expenseInputSchema)) body: ExpenseInput,
+    @Req() request: Request,
+  ): Promise<ExpenseView> {
+    return this.expenses.create(user.id, body, request.ip ?? null);
+  }
+
+  @Patch('expenses/:id')
+  @ApiOperation({ summary: 'Corriger une dépense' })
+  updateExpense(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id') id: string,
+    @Body(new ZodValidationPipe(expenseInputSchema)) body: ExpenseInput,
+    @Req() request: Request,
+  ): Promise<ExpenseView> {
+    return this.expenses.update(user.id, id, body, request.ip ?? null);
+  }
+
+  @Delete('expenses/:id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Supprimer une dépense' })
+  deleteExpense(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id') id: string,
+    @Req() request: Request,
+  ): Promise<void> {
+    return this.expenses.remove(user.id, id, request.ip ?? null);
   }
 
   @Get('payments')

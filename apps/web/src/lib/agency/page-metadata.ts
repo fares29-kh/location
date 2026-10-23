@@ -8,6 +8,7 @@ export type AgencyPageKey =
   | 'bookings'
   | 'calendar'
   | 'payments'
+  | 'expenses'
   | 'fleet'
   | 'customers'
   | 'reviews'

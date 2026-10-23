@@ -456,3 +456,83 @@ export interface NavCounts {
   unansweredReviews: number;
   latestPending: BookingView[];
 }
+
+// --- Dépenses de l'agence --------------------------------------------------------------
+
+/** Nature d'une dépense. `OTHER` exige une note qui dit de quoi il s'agit. */
+export const EXPENSE_CATEGORIES = [
+  'FUEL',
+  'OIL_CHANGE',
+  'MAINTENANCE',
+  'REPAIR',
+  'INSURANCE',
+  'CLEANING',
+  'ADMINISTRATIVE',
+  'OTHER',
+] as const;
+export type ExpenseCategory = (typeof EXPENSE_CATEGORIES)[number];
+
+export const EXPENSE_NOTE_MAX = 300;
+/** Un million de dinars : au-delà, ce n'est plus une dépense d'exploitation. */
+export const EXPENSE_AMOUNT_MAX_MILLIMES = 1_000_000_000;
+
+const expenseMonth = z.string().regex(/^\d{4}-\d{2}$/, { message: 'INVALID_DATE' });
+
+export const expenseInputSchema = z
+  .object({
+    category: z.enum(EXPENSE_CATEGORIES),
+    amountMillimes: z
+      .number()
+      .int()
+      .positive({ message: 'INVALID_AMOUNT' })
+      .max(EXPENSE_AMOUNT_MAX_MILLIMES, { message: 'OUT_OF_RANGE' }),
+    spentOn: dayKeySchema,
+    /** `null` : la dépense concerne toute l'agence, pas une voiture. */
+    vehicleId: z.string().trim().min(1).nullable(),
+    note: z.string().trim().max(EXPENSE_NOTE_MAX, { message: 'TOO_LONG' }),
+  })
+  .refine((value) => value.category !== 'OTHER' || value.note.length >= 3, {
+    path: ['note'],
+    message: 'REQUIRED',
+  });
+
+export type ExpenseInput = z.input<typeof expenseInputSchema>;
+export type ExpenseRequest = z.output<typeof expenseInputSchema>;
+
+export const expenseQuerySchema = z.object({
+  /** Mois `AAAA-MM` en Tunisie. Absent : le mois en cours. */
+  month: expenseMonth.optional().catch(undefined),
+  category: z.enum([...EXPENSE_CATEGORIES, 'ALL']).catch('ALL'),
+  vehicleId: z.string().trim().min(1).max(40).optional().catch(undefined),
+  page: pageSchema,
+  limit: limitSchema,
+});
+export type ExpenseQuery = z.output<typeof expenseQuerySchema>;
+
+export interface ExpenseVehicle {
+  id: string;
+  brand: string;
+  model: string;
+  plateNumber: string | null;
+}
+
+export interface ExpenseView {
+  id: string;
+  category: ExpenseCategory;
+  amountMillimes: number;
+  /** Jour de la dépense, `AAAA-MM-JJ` en Tunisie. */
+  spentOn: string;
+  note: string;
+  vehicle: ExpenseVehicle | null;
+}
+
+export interface ExpenseList {
+  month: string;
+  totalMillimes: number;
+  byCategory: { category: ExpenseCategory; amountMillimes: number }[];
+  items: ExpenseView[];
+  total: number;
+  page: number;
+  pageSize: number;
+  pageCount: number;
+}

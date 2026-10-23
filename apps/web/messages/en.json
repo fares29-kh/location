@@ -572,6 +572,7 @@
       "fleet": "Fleet",
       "customers": "Customers",
       "payments": "Payments received",
+      "expenses": "Expenses",
       "reviews": "Reviews",
       "settings": "Settings",
       "pendingCount": "{count, plural, one {# pending request} other {# pending requests}}",
@@ -623,12 +624,90 @@
       "INVALID_AMOUNT": "Invalid amount (e.g. 120 or 120.500).",
       "PAYMENT_METHOD_REQUIRED": "Select at least one payment method.",
       "INVALID_DATE": "Invalid date.",
+      "FUTURE_DATE": "Choose today or a past date.",
       "RETURN_BEFORE_PICKUP": "The return must be after the pickup.",
       "PAST_DATE": "Choose today or a later date.",
       "PHONE_NOT_CUSTOMER": "This number already belongs to an account that is not a customer.",
       "ACCOUNT_SUSPENDED": "This customer account is suspended.",
       "ALREADY_REPORTED": "You have already reported this review.",
       "generic": "Invalid value."
+    },
+    "expenses": {
+      "title": "Expenses",
+      "subtitle": "Fuel, oil changes, servicing and other costs. This money leaves the till: it is not what customers pay.",
+      "add": "New expense",
+      "monthLabel": "Choose the month",
+      "previous": "Previous month",
+      "next": "Next month",
+      "currentMonth": "Current month",
+      "total": "Month total",
+      "filterLabel": "Filter by kind",
+      "all": "All",
+      "vehicleLabel": "Car",
+      "vehicleAll": "All cars",
+      "vehicleAgency": "Whole agency",
+      "vehicleHint": "Choose “Whole agency” when the cost is not for one car.",
+      "categories": {
+        "FUEL": "Fuel",
+        "OIL_CHANGE": "Oil change",
+        "MAINTENANCE": "Servicing",
+        "REPAIR": "Repair",
+        "INSURANCE": "Insurance",
+        "CLEANING": "Cleaning",
+        "ADMINISTRATIVE": "Paperwork",
+        "OTHER": "Other"
+      },
+      "categoryHints": {
+        "FUEL": "Fuel bought for the cars.",
+        "OIL_CHANGE": "Oil and filter change.",
+        "MAINTENANCE": "Planned servicing: service, tyres, brakes.",
+        "REPAIR": "Repair after a breakdown or a bump.",
+        "INSURANCE": "Insurance for the cars or the agency.",
+        "CLEANING": "Wash and preparation of a car.",
+        "ADMINISTRATIVE": "Road tax, paperwork or filing fees.",
+        "OTHER": "A cost that fits no other box. Describe it."
+      },
+      "columns": {
+        "date": "Date",
+        "category": "Kind",
+        "vehicle": "Car",
+        "note": "Detail",
+        "amount": "Amount",
+        "actions": "Actions"
+      },
+      "agencyWide": "Whole agency",
+      "edit": "Correct",
+      "remove": "Remove",
+      "emptyTitle": "No expenses this month",
+      "emptyText": "Record fuel, an oil change or servicing to see what the cars cost.",
+      "emptyFilteredTitle": "No expense of this kind",
+      "emptyFilteredText": "Change the filter, or record this expense.",
+      "clearFilters": "Show the whole month",
+      "form": {
+        "createTitle": "New expense",
+        "editTitle": "Correct the expense",
+        "description": "The amount leaves the agency till.",
+        "category": "Kind",
+        "amount": "Amount (TND)",
+        "amountHint": "In dinars, for example 85 or 85.500.",
+        "date": "Date",
+        "vehicle": "Car",
+        "note": "Detail",
+        "noteHint": "Required for “Other”: say what it is.",
+        "save": "Save",
+        "cancel": "Cancel"
+      },
+      "delete": {
+        "title": "Remove this expense?",
+        "text": "{category} on {date}, {amount}. It leaves the month total.",
+        "confirm": "Remove the expense",
+        "dismiss": "Keep",
+        "close": "Close"
+      },
+      "saved": "Expense recorded",
+      "updated": "Expense corrected",
+      "deleted": "Expense removed",
+      "error": "The expense could not be saved. Try again."
     },
     "dashboard": {
       "title": "Dashboard",
@@ -2060,7 +2139,8 @@
         "review": "Reviews",
         "settings": "Settings",
         "referential": "Reference data",
-        "vehicle": "Vehicles"
+        "vehicle": "Vehicles",
+        "expense": "Expenses"
       },
       "columns": {
         "date": "Date",
@@ -2127,6 +2207,11 @@
         "vehicle": {
           "deleted": "Vehicle removed from the fleet",
           "status_changed": "Vehicle availability changed"
+        },
+        "expense": {
+          "created": "Expense recorded",
+          "updated": "Expense corrected",
+          "deleted": "Expense removed"
         }
       }
     }

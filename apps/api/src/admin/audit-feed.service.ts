@@ -97,36 +97,45 @@ export class AuditFeedService {
         ),
       ),
     ];
-    const [agencies, users, bookings, payments, invoices, reviews, vehicles] = await Promise.all([
-      this.prisma.agency.findMany({
-        where: { id: { in: idsOf('agency') } },
-        select: { id: true, name: true },
-      }),
-      this.prisma.user.findMany({
-        where: { id: { in: idsOf('user') } },
-        select: { id: true, firstName: true, lastName: true },
-      }),
-      this.prisma.booking.findMany({
-        where: { id: { in: idsOf('booking') } },
-        select: { id: true, reference: true },
-      }),
-      this.prisma.payment.findMany({
-        where: { id: { in: idsOf('payment') } },
-        select: { id: true, booking: { select: { reference: true } } },
-      }),
-      this.prisma.invoice.findMany({
-        where: { id: { in: idsOf('invoice') } },
-        select: { id: true, number: true },
-      }),
-      this.prisma.review.findMany({
-        where: { id: { in: idsOf('review') } },
-        select: { id: true, agency: { select: { name: true } } },
-      }),
-      this.prisma.vehicle.findMany({
-        where: { id: { in: idsOf('vehicle') } },
-        select: { id: true, brand: true, model: true },
-      }),
-    ]);
+    const [agencies, users, bookings, payments, invoices, reviews, vehicles, expenses] =
+      await Promise.all([
+        this.prisma.agency.findMany({
+          where: { id: { in: idsOf('agency') } },
+          select: { id: true, name: true },
+        }),
+        this.prisma.user.findMany({
+          where: { id: { in: idsOf('user') } },
+          select: { id: true, firstName: true, lastName: true },
+        }),
+        this.prisma.booking.findMany({
+          where: { id: { in: idsOf('booking') } },
+          select: { id: true, reference: true },
+        }),
+        this.prisma.payment.findMany({
+          where: { id: { in: idsOf('payment') } },
+          select: { id: true, booking: { select: { reference: true } } },
+        }),
+        this.prisma.invoice.findMany({
+          where: { id: { in: idsOf('invoice') } },
+          select: { id: true, number: true },
+        }),
+        this.prisma.review.findMany({
+          where: { id: { in: idsOf('review') } },
+          select: { id: true, agency: { select: { name: true } } },
+        }),
+        this.prisma.vehicle.findMany({
+          where: { id: { in: idsOf('vehicle') } },
+          select: { id: true, brand: true, model: true },
+        }),
+        this.prisma.agencyExpense.findMany({
+          where: { id: { in: idsOf('expense') } },
+          select: {
+            id: true,
+            agency: { select: { name: true } },
+            vehicle: { select: { brand: true, model: true } },
+          },
+        }),
+      ]);
     return new Map([
       ...agencies.map((row) => [`agency:${row.id}`, row.name] as const),
       ...users.map((row) => [`user:${row.id}`, fullName(row)] as const),
@@ -135,6 +144,13 @@ export class AuditFeedService {
       ...invoices.map((row) => [`invoice:${row.id}`, row.number] as const),
       ...reviews.map((row) => [`review:${row.id}`, row.agency.name] as const),
       ...vehicles.map((row) => [`vehicle:${row.id}`, `${row.brand} ${row.model}`] as const),
+      ...expenses.map(
+        (row) =>
+          [
+            `expense:${row.id}`,
+            row.vehicle === null ? row.agency.name : `${row.vehicle.brand} ${row.vehicle.model}`,
+          ] as const,
+      ),
     ]);
   }
 

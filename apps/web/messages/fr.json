@@ -572,6 +572,7 @@
       "fleet": "Flotte",
       "customers": "Clients",
       "payments": "Encaissements",
+      "expenses": "Dépenses",
       "reviews": "Avis",
       "settings": "Paramètres",
       "pendingCount": "{count, plural, one {# demande en attente} other {# demandes en attente}}",
@@ -623,12 +624,90 @@
       "INVALID_AMOUNT": "Montant invalide (ex. 120 ou 120,500).",
       "PAYMENT_METHOD_REQUIRED": "Sélectionnez au moins un mode de paiement.",
       "INVALID_DATE": "Date invalide.",
+      "FUTURE_DATE": "Choisissez aujourd’hui ou une date passée.",
       "RETURN_BEFORE_PICKUP": "Le retour doit être après le départ.",
       "PAST_DATE": "Choisissez aujourd’hui ou une date à venir.",
       "PHONE_NOT_CUSTOMER": "Ce numéro appartient déjà à un compte qui n’est pas un client.",
       "ACCOUNT_SUSPENDED": "Ce compte client est suspendu.",
       "ALREADY_REPORTED": "Vous avez déjà signalé cet avis.",
       "generic": "Valeur invalide."
+    },
+    "expenses": {
+      "title": "Dépenses",
+      "subtitle": "Essence, vidange, entretien et les autres frais. Cet argent sort de la caisse : ce n’est pas ce que les clients paient.",
+      "add": "Nouvelle dépense",
+      "monthLabel": "Choisir le mois",
+      "previous": "Mois précédent",
+      "next": "Mois suivant",
+      "currentMonth": "Mois en cours",
+      "total": "Total du mois",
+      "filterLabel": "Filtrer par nature",
+      "all": "Toutes",
+      "vehicleLabel": "Voiture",
+      "vehicleAll": "Toutes les voitures",
+      "vehicleAgency": "Toute l’agence",
+      "vehicleHint": "Choisissez « Toute l’agence » si le frais ne concerne pas une seule voiture.",
+      "categories": {
+        "FUEL": "Essence",
+        "OIL_CHANGE": "Vidange",
+        "MAINTENANCE": "Entretien",
+        "REPAIR": "Réparation",
+        "INSURANCE": "Assurance",
+        "CLEANING": "Lavage",
+        "ADMINISTRATIVE": "Administratif",
+        "OTHER": "Autre"
+      },
+      "categoryHints": {
+        "FUEL": "Carburant acheté pour les voitures.",
+        "OIL_CHANGE": "Vidange d’huile et filtre.",
+        "MAINTENANCE": "Entretien prévu : révision, pneus, freins.",
+        "REPAIR": "Réparation après une panne ou un choc.",
+        "INSURANCE": "Assurance des voitures ou de l’agence.",
+        "CLEANING": "Lavage et préparation d’une voiture.",
+        "ADMINISTRATIVE": "Vignette, taxe, papier ou frais de dossier.",
+        "OTHER": "Un frais qui n’entre dans aucune case. Décrivez-le dans le détail."
+      },
+      "columns": {
+        "date": "Date",
+        "category": "Nature",
+        "vehicle": "Voiture",
+        "note": "Détail",
+        "amount": "Montant",
+        "actions": "Actions"
+      },
+      "agencyWide": "Toute l’agence",
+      "edit": "Corriger",
+      "remove": "Supprimer",
+      "emptyTitle": "Aucune dépense ce mois-ci",
+      "emptyText": "Enregistrez l’essence, une vidange ou un entretien pour voir ce que les voitures coûtent.",
+      "emptyFilteredTitle": "Aucune dépense de ce type",
+      "emptyFilteredText": "Changez le filtre, ou enregistrez cette dépense.",
+      "clearFilters": "Voir tout le mois",
+      "form": {
+        "createTitle": "Nouvelle dépense",
+        "editTitle": "Corriger la dépense",
+        "description": "Le montant sort de la caisse de l’agence.",
+        "category": "Nature",
+        "amount": "Montant (DT)",
+        "amountHint": "En dinars, par exemple 85 ou 85,500.",
+        "date": "Date",
+        "vehicle": "Voiture",
+        "note": "Détail",
+        "noteHint": "Obligatoire pour « Autre » : dites de quoi il s’agit.",
+        "save": "Enregistrer",
+        "cancel": "Annuler"
+      },
+      "delete": {
+        "title": "Supprimer cette dépense ?",
+        "text": "{category} du {date}, {amount}. Elle disparaît du total du mois.",
+        "confirm": "Supprimer la dépense",
+        "dismiss": "Garder",
+        "close": "Fermer"
+      },
+      "saved": "Dépense enregistrée",
+      "updated": "Dépense corrigée",
+      "deleted": "Dépense supprimée",
+      "error": "La dépense n’a pas pu être enregistrée. Réessayez."
     },
     "dashboard": {
       "title": "Tableau de bord",
@@ -2060,7 +2139,8 @@
         "review": "Avis",
         "settings": "Paramètres",
         "referential": "Référentiels",
-        "vehicle": "Véhicules"
+        "vehicle": "Véhicules",
+        "expense": "Dépenses"
       },
       "columns": {
         "date": "Date",
@@ -2127,6 +2207,11 @@
         "vehicle": {
           "deleted": "Véhicule retiré de la flotte",
           "status_changed": "Disponibilité d’un véhicule modifiée"
+        },
+        "expense": {
+          "created": "Dépense enregistrée",
+          "updated": "Dépense corrigée",
+          "deleted": "Dépense supprimée"
         }
       }
     }

@@ -4,6 +4,8 @@ import type {
   AgencyProfileInput,
   BookingTransitionInput,
   DeskBookingInput,
+  ExpenseQuery,
+  ExpenseRequest,
   RecordPaymentInput,
   ReviewReportReason,
   RentalConditions,
@@ -49,6 +51,8 @@ export const agencyKeys = {
   customerList: (query: CustomerQuery) => [...agencyKeys.customers(), 'list', query] as const,
   customer: (id: string) => [...agencyKeys.customers(), 'detail', id] as const,
   payments: (query: PaymentQuery) => [...agencyKeys.all, 'payments', query] as const,
+  expenses: () => [...agencyKeys.all, 'expenses'] as const,
+  expenseList: (query: ExpenseQuery) => [...agencyKeys.expenses(), query] as const,
   reviews: (query: ReviewQuery) => [...agencyKeys.all, 'reviews', query] as const,
   settings: () => [...agencyKeys.all, 'settings'] as const,
 };
@@ -291,6 +295,31 @@ export function useReplyToReview() {
 
 export function useAgencySettings() {
   return useQuery({ queryKey: agencyKeys.settings(), queryFn: () => agencyApi.getSettings() });
+}
+
+export function useExpenses(query: ExpenseQuery) {
+  return useQuery({
+    queryKey: agencyKeys.expenseList(query),
+    queryFn: () => agencyApi.listExpenses(query),
+    placeholderData: keepPreviousData,
+  });
+}
+
+export function useSaveExpense() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, input }: { id?: string; input: ExpenseRequest }) =>
+      id === undefined ? agencyApi.createExpense(input) : agencyApi.updateExpense(id, input),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: agencyKeys.expenses() }),
+  });
+}
+
+export function useDeleteExpense() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => agencyApi.deleteExpense(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: agencyKeys.expenses() }),
+  });
 }
 
 function useSettingsMutation<TInput>(mutationFn: (input: TInput) => Promise<AgencySettings>) {

@@ -347,6 +347,7 @@ model Agency {
   reviews     Review[]
   documents   AgencyDocument[]
   invoices    Invoice[]
+  expenses    AgencyExpense[]
 
   @@index([status, governorateCode])
   @@map("agencies")
@@ -477,6 +478,7 @@ model Vehicle {
   bookings     Booking[]
   photos       VehiclePhoto[]
   maintenances VehicleMaintenance[]
+  expenses     AgencyExpense[]
 
   @@unique([agencyId, plateNumber])
   @@index([agencyId, status])
@@ -503,6 +505,39 @@ model VehiclePhoto {
 
   @@index([vehicleId, position])
   @@map("vehicle_photos")
+}
+
+enum ExpenseCategory {
+  FUEL
+  OIL_CHANGE
+  MAINTENANCE
+  REPAIR
+  INSURANCE
+  CLEANING
+  ADMINISTRATIVE
+  OTHER
+}
+
+/// Dépense d'exploitation déclarée par l'agence (essence, vidange, entretien…).
+/// `vehicleId` nul : la dépense concerne toute l'agence.
+model AgencyExpense {
+  id             String          @id @default(cuid())
+  agencyId       String          @map("agency_id")
+  vehicleId      String?         @map("vehicle_id")
+  category       ExpenseCategory
+  amountMillimes Int             @map("amount_millimes")
+  /// Jour de la dépense, stocké à minuit UTC (la date est un jour de Tunis).
+  spentOn        DateTime        @map("spent_on")
+  note           String          @default("")
+  createdAt      DateTime        @default(now()) @map("created_at")
+  updatedAt      DateTime        @updatedAt @map("updated_at")
+
+  agency  Agency   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  vehicle Vehicle? @relation(fields: [vehicleId], references: [id], onDelete: Restrict)
+
+  @@index([agencyId, spentOn])
+  @@index([agencyId, category])
+  @@map("agency_expenses")
 }
 
 /// Entretien planifié : le véhicule n'est ni réservable ni proposé aux clients sur ces jours.

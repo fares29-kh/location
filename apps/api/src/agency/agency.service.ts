@@ -1226,7 +1226,8 @@ export class AgencyService {
         );
       }
       const past = await tx.booking.count({ where: { vehicleId: vehicle.id } });
-      if (past > 0) {
+      const expenses = await tx.agencyExpense.count({ where: { vehicleId: vehicle.id } });
+      if (past > 0 || expenses > 0) {
         await tx.vehicle.update({
           where: { id: vehicle.id },
           data: {

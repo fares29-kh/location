@@ -13,6 +13,7 @@ export type AuditEntityType =
   | 'invoice'
   | 'review'
   | 'vehicle'
+  | 'expense'
   | 'refresh_token_family';
 
 export interface AuditEntry {

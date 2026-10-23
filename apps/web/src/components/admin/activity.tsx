@@ -9,6 +9,7 @@ import {
   KeyRound,
   type LucideIcon,
   MessageSquareWarning,
+  Receipt,
   ReceiptText,
   Settings,
   Tags,
@@ -39,6 +40,7 @@ export const AUDIT_CATEGORY_ICONS: Record<AuditCategory, LucideIcon> = {
   settings: Settings,
   referential: Tags,
   vehicle: CarFront,
+  expense: Receipt,
 };
 
 const SENSITIVE_ACTIONS: readonly AuditAction[] = [
@@ -49,6 +51,7 @@ const SENSITIVE_ACTIONS: readonly AuditAction[] = [
   'user.suspended',
   'review.hidden',
   'vehicle.deleted',
+  'expense.deleted',
 ];
 
 const POSITIVE_ACTIONS: readonly AuditAction[] = [

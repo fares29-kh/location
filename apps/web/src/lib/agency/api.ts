@@ -2,6 +2,10 @@ import type {
   AgencyProfileInput,
   BookingTransitionInput,
   DeskBookingInput,
+  ExpenseList,
+  ExpenseQuery,
+  ExpenseRequest,
+  ExpenseView,
   RecordPaymentInput,
   ReviewReportInput,
   RentalConditions,
@@ -73,6 +77,11 @@ export interface AgencyApi {
   getCustomer(id: string): Promise<CustomerDetail>;
 
   listPayments(query: PaymentQuery): Promise<PaymentList>;
+
+  listExpenses(query: ExpenseQuery): Promise<ExpenseList>;
+  createExpense(input: ExpenseRequest): Promise<ExpenseView>;
+  updateExpense(id: string, input: ExpenseRequest): Promise<ExpenseView>;
+  deleteExpense(id: string): Promise<void>;
 
   listReviews(query: ReviewQuery): Promise<ReviewList>;
   replyToReview(id: string, reply: string): Promise<Review>;
@@ -194,6 +203,27 @@ function createHttpAgencyApi(): AgencyApi {
 
     listPayments: (query) =>
       apiFetch(withQuery('/agency/payments', { ...query }), { schema: shape<PaymentList>() }),
+
+    listExpenses: (query) =>
+      apiFetch(
+        withQuery('/agency/expenses', {
+          month: query.month ?? '',
+          category: query.category,
+          page: query.page,
+          limit: query.limit,
+          ...(query.vehicleId === undefined ? {} : { vehicleId: query.vehicleId }),
+        }),
+        { schema: shape<ExpenseList>() },
+      ),
+    createExpense: (input) =>
+      apiFetch('/agency/expenses', { method: 'POST', body: input, schema: shape<ExpenseView>() }),
+    updateExpense: (id, input) =>
+      apiFetch(`/agency/expenses/${segment(id)}`, {
+        method: 'PATCH',
+        body: input,
+        schema: shape<ExpenseView>(),
+      }),
+    deleteExpense: (id) => apiFetch(`/agency/expenses/${segment(id)}`, { method: 'DELETE' }),
 
     listReviews: (query) =>
       apiFetch(withQuery('/agency/reviews', { ...query }), { schema: shape<ReviewList>() }),
