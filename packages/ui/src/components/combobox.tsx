@@ -167,7 +167,7 @@ export function Combobox({
           sideOffset={4}
           collisionPadding={8}
           className={cn(
-            'z-50 w-[var(--radix-popover-trigger-width)] min-w-[12rem] overflow-hidden rounded-control border border-border bg-surface text-foreground shadow-elevated',
+            'z-[90] w-[var(--radix-popover-trigger-width)] min-w-[12rem] overflow-hidden rounded-control border border-border bg-surface text-foreground shadow-elevated',
             'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
           )}
         >
