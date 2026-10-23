@@ -40,7 +40,7 @@ import { type VehicleAvailability, VehicleAvailabilityTag } from '../status-tags
 import { useAgencyFormat } from '../use-agency-format';
 import { useUrlState } from '../use-url-state';
 import { matchesVehicleSearch } from '../vehicle-search';
-import { VehicleStatusItems } from '../vehicle-status-items';
+import { VehicleGuards } from '../vehicle-status-items';
 import { VehicleThumb } from '../vehicle-thumb';
 import { VehicleFormSheet } from './vehicle-form-sheet';
 
@@ -85,33 +85,37 @@ function OccupancyMeter({ rate }: { rate: number }) {
 
 function VehicleStatusMenu({ vehicle }: { vehicle: VehicleView }) {
   const t = useTranslations('agency.fleet');
+  const name = `${vehicle.brand} ${vehicle.model}`;
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon-sm"
-          aria-label={t('moreActions', { name: `${vehicle.brand} ${vehicle.model}` })}
-        >
-          <MoreHorizontal aria-hidden="true" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-60">
-        <VehicleStatusItems
-          vehicleId={vehicle.id}
-          status={vehicle.status}
-          onRent={vehicle.currentBooking !== null}
-        />
-        <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-          <Link href="/calendar">
-            <CalendarRange aria-hidden="true" />
-            {t('viewPlanning')}
-          </Link>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <VehicleGuards
+      vehicleId={vehicle.id}
+      name={name}
+      status={vehicle.status}
+      onRent={vehicle.currentBooking !== null}
+    >
+      {({ statusItems, deleteItem }) => (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon-sm" aria-label={t('moreActions', { name })}>
+              <MoreHorizontal aria-hidden="true" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-60">
+            {statusItems}
+            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild>
+              <Link href="/calendar">
+                <CalendarRange aria-hidden="true" />
+                {t('viewPlanning')}
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            {deleteItem}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )}
+    </VehicleGuards>
   );
 }
 

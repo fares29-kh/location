@@ -194,6 +194,14 @@ export function useSaveVehicle() {
   });
 }
 
+export function useDeleteVehicle() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => agencyApi.deleteVehicle(id),
+    onSuccess: () => invalidateAgency(queryClient),
+  });
+}
+
 export function useVehicleStatus() {
   const queryClient = useQueryClient();
   return useMutation({

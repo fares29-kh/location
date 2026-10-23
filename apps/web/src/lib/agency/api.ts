@@ -59,6 +59,7 @@ export interface AgencyApi {
   createVehicle(input: VehicleInput): Promise<VehicleView>;
   updateVehicle(id: string, input: VehicleInput): Promise<VehicleView>;
   setVehicleStatus(id: string, status: VehicleStatus): Promise<VehicleView>;
+  deleteVehicle(id: string): Promise<void>;
   addMaintenance(vehicleId: string, input: VehicleMaintenanceInput): Promise<VehicleMaintenance>;
   removeMaintenance(vehicleId: string, maintenanceId: string): Promise<void>;
   uploadVehiclePhoto(vehicleId: string, file: File): Promise<VehiclePhoto>;
@@ -141,6 +142,7 @@ function createHttpAgencyApi(): AgencyApi {
         body: { status },
         schema: shape<VehicleView>(),
       }),
+    deleteVehicle: (id) => apiFetch(`/agency/vehicles/${segment(id)}`, { method: 'DELETE' }),
     addMaintenance: (vehicleId, input) =>
       apiFetch(`/agency/vehicles/${segment(vehicleId)}/maintenances`, {
         method: 'POST',

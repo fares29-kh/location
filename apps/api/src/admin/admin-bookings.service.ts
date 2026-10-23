@@ -86,6 +86,7 @@ export class AdminBookingsService {
         { reference: text },
         { agency: { name: text } },
         { vehicle: { plateNumber: text } },
+        { vehicle: { retiredPlateNumber: text } },
         {
           customer: {
             OR: [

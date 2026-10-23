@@ -5,11 +5,13 @@ import { Button } from '@drivetn/ui/button';
 import { toast } from '@drivetn/ui/toaster';
 import { ImagePlus, Trash2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useId, useRef } from 'react';
+import { useId, useRef, useState } from 'react';
 
 import { AgencyLogo } from '@/components/agencies/agency-logo';
 import { useRemoveLogo, useUploadLogo } from '@/lib/agency/queries';
 import { ApiError } from '@/lib/api/errors';
+
+import { ConfirmDialog } from '../confirm-dialog';
 
 const MAX_MEGABYTES = AGENCY_LOGO_MAX_BYTES / (1024 * 1024);
 const ACCEPT = VEHICLE_PHOTO_TYPES.join(',');
@@ -26,6 +28,8 @@ function isInvalidImage(error: unknown): boolean {
 /** Logo de l'agence : envoyé dès la sélection, indépendamment du reste de la fiche. */
 export function LogoField({ name, logoUrl }: { name: string; logoUrl: string | null }) {
   const t = useTranslations('agency.settings.profile');
+  const tCommon = useTranslations('common');
+  const [confirmRemove, setConfirmRemove] = useState(false);
   const inputId = useId();
   const hintId = useId();
   const input = useRef<HTMLInputElement>(null);
@@ -78,10 +82,7 @@ export function LogoField({ name, logoUrl }: { name: string; logoUrl: string | n
               loading={remove.isPending}
               disabled={busy}
               onClick={() => {
-                remove.mutate(undefined, {
-                  onSuccess: () => toast.success(t('logoRemoved')),
-                  onError: () => toast.error(t('logoRemoveError')),
-                });
+                setConfirmRemove(true);
               }}
             >
               <Trash2 aria-hidden="true" />
@@ -89,6 +90,32 @@ export function LogoField({ name, logoUrl }: { name: string; logoUrl: string | n
             </Button>
           )}
         </div>
+        {confirmRemove && (
+          <ConfirmDialog
+            open
+            title={t('logoRemoveTitle')}
+            description={t('logoRemoveText')}
+            confirmLabel={t('logoRemoveConfirm')}
+            dismissLabel={t('logoRemoveDismiss')}
+            closeLabel={tCommon('close')}
+            destructive
+            pending={remove.isPending}
+            onOpenChange={(open) => {
+              if (!open && !remove.isPending) {
+                setConfirmRemove(false);
+              }
+            }}
+            onConfirm={() => {
+              remove.mutate(undefined, {
+                onSuccess: () => {
+                  setConfirmRemove(false);
+                  toast.success(t('logoRemoved'));
+                },
+                onError: () => toast.error(t('logoRemoveError')),
+              });
+            }}
+          />
+        )}
         <p id={hintId} className="text-xs text-muted-foreground">
           {t('logoHint', { size: MAX_MEGABYTES })}
         </p>

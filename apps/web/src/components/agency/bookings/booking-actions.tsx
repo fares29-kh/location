@@ -213,11 +213,7 @@ export function BookingActionsBar({
   const overflow = actions.filter((action) => SECONDARY_ACTIONS.includes(action));
 
   function trigger(action: BookingAction) {
-    if (DESTRUCTIVE_ACTIONS.includes(action)) {
-      setConfirm({ action });
-    } else {
-      void runner.run(booking, action);
-    }
+    setConfirm({ action });
   }
 
   return (

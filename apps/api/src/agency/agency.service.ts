@@ -55,7 +55,7 @@ import { AppException } from '../common/errors/app.exception';
 import { pageWindow, toPaginated } from '../common/pagination';
 import { PrismaService } from '../prisma/prisma.service';
 import { StorageService } from '../storage/storage.service';
-import { VEHICLE_PHOTOS_INCLUDE } from '../storage/vehicle-photos';
+import { VEHICLE_PHOTOS_INCLUDE, vehiclePhotoKeys } from '../storage/vehicle-photos';
 import {
   type BookingRefRow,
   nextBookingRef,
@@ -239,7 +239,10 @@ export class AgencyService {
     const bookingScope = vehicleId === undefined ? { agencyId } : { agencyId, vehicleId };
     const [vehicles, current, upcoming, stats] = await this.prisma.$transaction([
       this.prisma.vehicle.findMany({
-        where: vehicleId === undefined ? { agencyId } : { agencyId, id: vehicleId },
+        where:
+          vehicleId === undefined
+            ? { agencyId, deletedAt: null }
+            : { agencyId, id: vehicleId, deletedAt: null },
         include: { photos: VEHICLE_PHOTOS_INCLUDE, category: VEHICLE_CATEGORY_INCLUDE },
         orderBy: { id: 'asc' },
       }),
@@ -291,7 +294,9 @@ export class AgencyService {
 
   private async ownedVehicle(ownerId: string, vehicleId: string) {
     const agencyId = await this.agencyIdFor(ownerId);
-    const vehicle = await this.prisma.vehicle.findFirst({ where: { id: vehicleId, agencyId } });
+    const vehicle = await this.prisma.vehicle.findFirst({
+      where: { id: vehicleId, agencyId, deletedAt: null },
+    });
     if (vehicle === null) {
       throw new NotFoundException('Véhicule introuvable.');
     }
@@ -520,7 +525,7 @@ export class AgencyService {
     const agencyId = await this.agencyIdFor(ownerId);
     const [vehicles, bookings, maintenances] = await this.prisma.$transaction([
       this.prisma.vehicle.findMany({
-        where: { agencyId, status: { not: 'INACTIVE' } },
+        where: { agencyId, deletedAt: null, status: { not: 'INACTIVE' } },
         include: {
           photos: { ...VEHICLE_PHOTOS_INCLUDE, take: 1 },
           category: VEHICLE_CATEGORY_INCLUDE,
@@ -750,7 +755,7 @@ export class AgencyService {
         const booking = await this.prisma.$transaction(async (tx) => {
           await tx.$queryRaw`SELECT id FROM vehicles WHERE id = ${input.vehicleId} FOR UPDATE`;
           const vehicle = await tx.vehicle.findFirst({
-            where: { id: input.vehicleId, agencyId: agency.id },
+            where: { id: input.vehicleId, agencyId: agency.id, deletedAt: null },
           });
           if (vehicle?.status !== 'ACTIVE' || agency.status !== 'ACTIVE') {
             throw new AppException(
@@ -941,7 +946,7 @@ export class AgencyService {
   async createVehicle(ownerId: string, input: VehicleInput): Promise<VehicleView> {
     const agencyId = await this.agencyIdFor(ownerId);
     const data = await this.catalog.resolveVehicleInput(input);
-    const count = await this.prisma.vehicle.count({ where: { agencyId } });
+    const count = await this.prisma.vehicle.count({ where: { agencyId, deletedAt: null } });
     try {
       const vehicle = await this.prisma.vehicle.create({
         data: {
@@ -981,6 +986,7 @@ export class AgencyService {
     ownerId: string,
     vehicleId: string,
     status: VehicleStatus,
+    ip: string | null,
   ): Promise<VehicleView> {
     const vehicle = await this.ownedVehicle(ownerId, vehicleId);
     if (status !== 'ACTIVE') {
@@ -991,8 +997,78 @@ export class AgencyService {
         throw new AppException(HttpStatus.CONFLICT, 'CONFLICT', 'Le véhicule est en location.');
       }
     }
-    await this.prisma.vehicle.update({ where: { id: vehicle.id }, data: { status } });
+    if (vehicle.status !== status) {
+      await this.prisma.vehicle.update({ where: { id: vehicle.id }, data: { status } });
+      await this.audit.log({
+        action: 'vehicle.status_changed',
+        actorId: ownerId,
+        entityType: 'vehicle',
+        entityId: vehicle.id,
+        metadata: { from: vehicle.status, to: status },
+        ip,
+      });
+    }
     return this.vehicleView(ownerId, vehicle.id);
+  }
+
+  /**
+   * Retire le véhicule de la flotte. Refusé tant qu'une demande, une réservation confirmée
+   * ou une location en cours existe. Sans aucun historique, la fiche et ses photos sont
+   * effacées ; sinon elle est archivée et l'immatriculation est libérée.
+   */
+  async deleteVehicle(ownerId: string, vehicleId: string, ip: string | null): Promise<void> {
+    const agencyId = await this.agencyIdFor(ownerId);
+    const outcome = await this.prisma.$transaction(async (tx) => {
+      await tx.$queryRaw`SELECT id FROM vehicles WHERE id = ${vehicleId} FOR UPDATE`;
+      const vehicle = await tx.vehicle.findFirst({
+        where: { id: vehicleId, agencyId, deletedAt: null },
+        include: { photos: { select: { storageKey: true } } },
+      });
+      if (vehicle === null) {
+        throw new NotFoundException('Véhicule introuvable.');
+      }
+      const open = await tx.booking.count({
+        where: { vehicleId: vehicle.id, status: { in: [...BLOCKING_BOOKING_STATUSES] } },
+      });
+      if (open > 0) {
+        throw new AppException(
+          HttpStatus.CONFLICT,
+          'CONFLICT',
+          'Des réservations sont encore ouvertes pour ce véhicule.',
+          { reason: 'OPEN_BOOKINGS' },
+        );
+      }
+      const past = await tx.booking.count({ where: { vehicleId: vehicle.id } });
+      if (past > 0) {
+        await tx.vehicle.update({
+          where: { id: vehicle.id },
+          data: {
+            deletedAt: new Date(),
+            status: 'INACTIVE',
+            retiredPlateNumber: vehicle.plateNumber,
+            plateNumber: null,
+          },
+        });
+        return { keys: [] as string[], archived: true };
+      }
+      const keys = vehicle.photos.flatMap((photo) => {
+        const pair = vehiclePhotoKeys(photo.storageKey);
+        return [pair.large, pair.small];
+      });
+      await tx.vehicle.delete({ where: { id: vehicle.id } });
+      return { keys, archived: false };
+    });
+    await this.audit.log({
+      action: 'vehicle.deleted',
+      actorId: ownerId,
+      entityType: 'vehicle',
+      entityId: vehicleId,
+      metadata: { archived: outcome.archived },
+      ip,
+    });
+    if (outcome.keys.length > 0) {
+      await this.storage.deletePublic(outcome.keys);
+    }
   }
 
   /**

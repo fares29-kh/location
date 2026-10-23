@@ -56,7 +56,7 @@ export function toVehicle(row: VehicleRow, publicUrl: (key: string) => string): 
     brand: row.brand,
     model: row.model,
     year: row.year,
-    plateNumber: row.plateNumber,
+    plateNumber: row.plateNumber ?? row.retiredPlateNumber,
     category: row.category.slug,
     transmission: row.transmission,
     fuel: row.fuel,

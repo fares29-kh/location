@@ -97,7 +97,7 @@ export class AuditFeedService {
         ),
       ),
     ];
-    const [agencies, users, bookings, payments, invoices, reviews] = await Promise.all([
+    const [agencies, users, bookings, payments, invoices, reviews, vehicles] = await Promise.all([
       this.prisma.agency.findMany({
         where: { id: { in: idsOf('agency') } },
         select: { id: true, name: true },
@@ -122,6 +122,10 @@ export class AuditFeedService {
         where: { id: { in: idsOf('review') } },
         select: { id: true, agency: { select: { name: true } } },
       }),
+      this.prisma.vehicle.findMany({
+        where: { id: { in: idsOf('vehicle') } },
+        select: { id: true, brand: true, model: true },
+      }),
     ]);
     return new Map([
       ...agencies.map((row) => [`agency:${row.id}`, row.name] as const),
@@ -130,6 +134,7 @@ export class AuditFeedService {
       ...payments.map((row) => [`payment:${row.id}`, row.booking.reference] as const),
       ...invoices.map((row) => [`invoice:${row.id}`, row.number] as const),
       ...reviews.map((row) => [`review:${row.id}`, row.agency.name] as const),
+      ...vehicles.map((row) => [`vehicle:${row.id}`, `${row.brand} ${row.model}`] as const),
     ]);
   }
 
@@ -138,7 +143,7 @@ export class AuditFeedService {
     const text = contains(search);
     const ids = (rows: { id: string }[]) => rows.map((row) => row.id);
     const take = SEARCH_MATCH_LIMIT;
-    const [agencies, users, bookings, invoices] = await Promise.all([
+    const [agencies, users, bookings, invoices, vehicles] = await Promise.all([
       this.prisma.agency.findMany({ where: { name: text }, select: { id: true }, take }),
       this.prisma.user.findMany({
         where: { OR: [{ firstName: text }, { lastName: text }, { email: text }] },
@@ -147,6 +152,18 @@ export class AuditFeedService {
       }),
       this.prisma.booking.findMany({ where: { reference: text }, select: { id: true }, take }),
       this.prisma.invoice.findMany({ where: { number: text }, select: { id: true }, take }),
+      this.prisma.vehicle.findMany({
+        where: {
+          OR: [
+            { brand: text },
+            { model: text },
+            { plateNumber: text },
+            { retiredPlateNumber: text },
+          ],
+        },
+        select: { id: true },
+        take,
+      }),
     ]);
     return [
       { ip: text },
@@ -155,6 +172,7 @@ export class AuditFeedService {
       { entityType: 'user', entityId: { in: ids(users) } },
       { entityType: 'booking', entityId: { in: ids(bookings) } },
       { entityType: 'invoice', entityId: { in: ids(invoices) } },
+      { entityType: 'vehicle', entityId: { in: ids(vehicles) } },
     ];
   }
 }

@@ -159,7 +159,11 @@ export class CustomerBookingsService {
             where: { id: input.vehicleId },
             include: { agency: true },
           });
-          if (vehicle?.status !== 'ACTIVE' || vehicle.agency.status !== 'ACTIVE') {
+          if (
+            vehicle?.status !== 'ACTIVE' ||
+            vehicle.deletedAt !== null ||
+            vehicle.agency.status !== 'ACTIVE'
+          ) {
             throw unavailable();
           }
           const overlapping = await tx.booking.count({

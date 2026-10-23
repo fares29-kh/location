@@ -6,7 +6,14 @@ import { PrismaService } from '../prisma/prisma.service';
 
 /** Type d'élément concerné, utilisé par le journal de l'administration pour le libellé. */
 export type AuditEntityType =
-  'agency' | 'user' | 'booking' | 'payment' | 'invoice' | 'review' | 'refresh_token_family';
+  | 'agency'
+  | 'user'
+  | 'booking'
+  | 'payment'
+  | 'invoice'
+  | 'review'
+  | 'vehicle'
+  | 'refresh_token_family';
 
 export interface AuditEntry {
   action: AuditAction;

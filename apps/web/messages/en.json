@@ -1006,7 +1006,10 @@
         "delete": "Delete maintenance",
         "deleted": "Maintenance deleted: the vehicle can be booked again.",
         "deleteError": "The maintenance could not be deleted.",
-        "close": "Close"
+        "close": "Close",
+        "confirmText": "These dates will become bookable again.",
+        "confirm": "Confirm deletion",
+        "confirmBack": "Back"
       }
     },
     "fleet": {
@@ -1050,6 +1053,16 @@
       "photoCount": "{count, plural, one {# photo} other {# photos}}",
       "moreActions": "More actions for {name}",
       "viewPlanning": "View schedule",
+      "delete": {
+        "action": "Delete vehicle",
+        "title": "Delete {name}?",
+        "text": "It leaves your fleet and is no longer offered to customers. Finished rentals stay in the history, and the plate can be used again. If a request, a confirmed booking or a rental in progress remains, deletion is refused.",
+        "confirm": "Delete permanently",
+        "dismiss": "Keep the vehicle",
+        "success": "{name} was removed from the fleet.",
+        "error": "The vehicle could not be deleted.",
+        "blocked": "Finish, decline or cancel the open bookings for this vehicle first."
+      },
       "statusMenu": {
         "title": "Availability",
         "options": {
@@ -1063,7 +1076,20 @@
           "INACTIVE": "Vehicle withdrawn from rental."
         },
         "error": "The status couldn’t be changed.",
-        "onRentHint": "The status can be changed once the vehicle is returned."
+        "onRentHint": "The status and deletion will be available once the vehicle is returned.",
+        "confirmTitle": {
+          "MAINTENANCE": "Move {name} to maintenance?",
+          "INACTIVE": "Take {name} out of service?"
+        },
+        "confirmText": {
+          "MAINTENANCE": "Customers will not be able to book it while it is in maintenance. Bookings already confirmed stay in place.",
+          "INACTIVE": "It will no longer be offered for rent. You can put it back in service later. Bookings already confirmed stay in place."
+        },
+        "confirm": {
+          "MAINTENANCE": "Move to maintenance",
+          "INACTIVE": "Take out of service"
+        },
+        "dismiss": "Cancel"
       },
       "emptyTitle": "No vehicles in your fleet",
       "emptyText": "Add your first vehicle to start receiving bookings.",
@@ -1263,6 +1289,10 @@
         "logoUpload": "Add a logo",
         "logoReplace": "Change logo",
         "logoRemove": "Remove",
+        "logoRemoveTitle": "Remove the logo?",
+        "logoRemoveText": "Your profile will show no image until you upload another one.",
+        "logoRemoveConfirm": "Remove the logo",
+        "logoRemoveDismiss": "Keep the logo",
         "logoSaved": "Logo saved: it now appears on your listings.",
         "logoRemoved": "Logo removed.",
         "logoError": "The logo couldn’t be saved.",
@@ -1978,7 +2008,8 @@
         "invoice": "Billing",
         "review": "Reviews",
         "settings": "Settings",
-        "referential": "Reference data"
+        "referential": "Reference data",
+        "vehicle": "Vehicles"
       },
       "columns": {
         "date": "Date",
@@ -2041,6 +2072,10 @@
           "created": "Reference data: added",
           "updated": "Reference data: changed",
           "deleted": "Reference data: deleted"
+        },
+        "vehicle": {
+          "deleted": "Vehicle removed from the fleet",
+          "status_changed": "Vehicle availability changed"
         }
       }
     }

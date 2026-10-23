@@ -5,6 +5,7 @@ import {
   Banknote,
   Building2,
   CalendarCheck,
+  CarFront,
   KeyRound,
   type LucideIcon,
   MessageSquareWarning,
@@ -37,6 +38,7 @@ export const AUDIT_CATEGORY_ICONS: Record<AuditCategory, LucideIcon> = {
   review: MessageSquareWarning,
   settings: Settings,
   referential: Tags,
+  vehicle: CarFront,
 };
 
 const SENSITIVE_ACTIONS: readonly AuditAction[] = [
@@ -46,6 +48,7 @@ const SENSITIVE_ACTIONS: readonly AuditAction[] = [
   'agency.suspended',
   'user.suspended',
   'review.hidden',
+  'vehicle.deleted',
 ];
 
 const POSITIVE_ACTIONS: readonly AuditAction[] = [

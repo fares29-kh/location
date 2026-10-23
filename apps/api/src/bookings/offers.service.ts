@@ -48,6 +48,7 @@ export class OffersService {
 
     const where: Prisma.VehicleWhereInput = {
       status: 'ACTIVE',
+      deletedAt: null,
       ...(query.category === undefined ? {} : { category: { slug: query.category } }),
       agency: { status: 'ACTIVE', governorateCode },
       ...(window === null
@@ -182,7 +183,7 @@ export class OffersService {
     vehicleId: string,
   ): Promise<{ vehicleId: string; unavailable: UnavailableRange[] }> {
     const vehicle = await this.prisma.vehicle.findFirst({
-      where: { id: vehicleId, status: 'ACTIVE', agency: { status: 'ACTIVE' } },
+      where: { id: vehicleId, status: 'ACTIVE', deletedAt: null, agency: { status: 'ACTIVE' } },
       select: { id: true },
     });
     if (vehicle === null) {

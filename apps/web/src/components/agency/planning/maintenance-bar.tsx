@@ -50,6 +50,7 @@ export function MaintenanceBar({
   const t = useTranslations('agency.planning');
   const tCommon = useTranslations('common');
   const [open, setOpen] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const removal = useRemoveMaintenance();
   const period = usePeriodLabel(maintenance);
   const place = placeInRange(maintenanceTimeRange(maintenance), range);
@@ -91,7 +92,15 @@ export function MaintenanceBar({
         </TooltipContent>
       </Tooltip>
 
-      <Dialog open={open} onOpenChange={setOpen}>
+      <Dialog
+        open={open}
+        onOpenChange={(next) => {
+          setOpen(next);
+          if (!next) {
+            setConfirmDelete(false);
+          }
+        }}
+      >
         <DialogContent closeLabel={tCommon('close')}>
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
@@ -114,21 +123,40 @@ export function MaintenanceBar({
               </dd>
             </div>
           </dl>
-          <p className="text-sm text-muted-foreground">{t('maintenanceDetail.hint')}</p>
+          <p className="text-sm text-muted-foreground">
+            {confirmDelete ? t('maintenanceDetail.confirmText') : t('maintenanceDetail.hint')}
+          </p>
           <DialogFooter>
-            <DialogClose asChild>
-              <Button variant="secondary">{t('maintenanceDetail.close')}</Button>
-            </DialogClose>
+            {confirmDelete ? (
+              <Button
+                variant="secondary"
+                disabled={removal.isPending}
+                onClick={() => {
+                  setConfirmDelete(false);
+                }}
+              >
+                {t('maintenanceDetail.confirmBack')}
+              </Button>
+            ) : (
+              <DialogClose asChild>
+                <Button variant="secondary">{t('maintenanceDetail.close')}</Button>
+              </DialogClose>
+            )}
             <Button
               variant="danger"
               loading={removal.isPending}
               onClick={() => {
+                if (!confirmDelete) {
+                  setConfirmDelete(true);
+                  return;
+                }
                 removal.mutate(
                   { vehicleId: maintenance.vehicleId, maintenanceId: maintenance.id },
                   {
                     onSuccess: () => {
                       toast.success(t('maintenanceDetail.deleted'));
                       setOpen(false);
+                      setConfirmDelete(false);
                     },
                     onError: () => toast.error(t('maintenanceDetail.deleteError')),
                   },
@@ -136,7 +164,7 @@ export function MaintenanceBar({
               }}
             >
               {!removal.isPending && <Trash2 aria-hidden="true" />}
-              {t('maintenanceDetail.delete')}
+              {confirmDelete ? t('maintenanceDetail.confirm') : t('maintenanceDetail.delete')}
             </Button>
           </DialogFooter>
         </DialogContent>

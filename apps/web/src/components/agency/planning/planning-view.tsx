@@ -44,7 +44,7 @@ import { type AgencyFormat, useAgencyFormat } from '../use-agency-format';
 import { useNow } from '../use-now';
 import { useUrlState } from '../use-url-state';
 import { matchesVehicleSearch } from '../vehicle-search';
-import { VehicleStatusItems } from '../vehicle-status-items';
+import { VehicleGuards } from '../vehicle-status-items';
 import { VehicleThumb } from '../vehicle-thumb';
 import { MAINTENANCE_HATCH, MaintenanceBar } from './maintenance-bar';
 import { MaintenanceDialog, type MaintenanceDraft } from './maintenance-dialog';
@@ -147,33 +147,39 @@ function VehicleRowMenu({
   const t = useTranslations('agency.planning');
   const name = `${vehicle.brand} ${vehicle.model}`;
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon-sm"
-          className="shrink-0 text-muted-foreground"
-          aria-label={t('rowMenu', { vehicle: name })}
-        >
-          <MoreHorizontal aria-hidden="true" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="w-64">
-        <DropdownMenuItem onSelect={onSchedule}>
-          <Wrench aria-hidden="true" />
-          {t('scheduleMaintenance')}
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <VehicleStatusItems vehicleId={vehicle.id} status={vehicle.status} onRent={onRent} />
-        <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-          <Link href={`/fleet?q=${encodeURIComponent(vehicle.plateNumber ?? name)}`}>
-            <CarFront aria-hidden="true" />
-            {t('viewInFleet')}
-          </Link>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <VehicleGuards vehicleId={vehicle.id} name={name} status={vehicle.status} onRent={onRent}>
+      {({ statusItems, deleteItem }) => (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              className="shrink-0 text-muted-foreground"
+              aria-label={t('rowMenu', { vehicle: name })}
+            >
+              <MoreHorizontal aria-hidden="true" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-64">
+            <DropdownMenuItem onSelect={onSchedule}>
+              <Wrench aria-hidden="true" />
+              {t('scheduleMaintenance')}
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            {statusItems}
+            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild>
+              <Link href={`/fleet?q=${encodeURIComponent(vehicle.plateNumber ?? name)}`}>
+                <CarFront aria-hidden="true" />
+                {t('viewInFleet')}
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            {deleteItem}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )}
+    </VehicleGuards>
   );
 }
 

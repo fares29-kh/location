@@ -230,8 +230,22 @@ export class AgencyController {
     @Param('id') id: string,
     @Body(new ZodValidationPipe(vehicleStatusInputSchema))
     body: z.output<typeof vehicleStatusInputSchema>,
+    @Req() request: Request,
   ): Promise<VehicleView> {
-    return this.agency.setVehicleStatus(user.id, id, body.status);
+    return this.agency.setVehicleStatus(user.id, id, body.status, request.ip ?? null);
+  }
+
+  @Delete('vehicles/:id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({
+    summary: 'Retirer un véhicule de la flotte (refusé si une réservation est ouverte)',
+  })
+  deleteVehicle(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id') id: string,
+    @Req() request: Request,
+  ): Promise<void> {
+    return this.agency.deleteVehicle(user.id, id, request.ip ?? null);
   }
 
   @Post('vehicles/:id/maintenances')

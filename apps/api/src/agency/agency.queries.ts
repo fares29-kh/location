@@ -144,7 +144,7 @@ export function bookingSearchSql(agencyId: string, search: string): Prisma.Sql {
     const plateMatch =
       plate.length === 0
         ? Prisma.empty
-        : Prisma.sql` OR ${folded(Prisma.sql`search_fold(translate(v.plate_number, ' -', ''))`, plate)}`;
+        : Prisma.sql` OR ${folded(Prisma.sql`search_fold(translate(v.plate_number, ' -', ''))`, plate)} OR ${folded(Prisma.sql`search_fold(translate(v.retired_plate_number, ' -', ''))`, plate)}`;
     return Prisma.sql`(
       b.reference ILIKE ${containsPattern(term)}
       OR b.customer_id IN (SELECT u.id FROM users u WHERE ${folded(CUSTOMER_NAME, term)}${phone})
@@ -309,7 +309,8 @@ export function fleetQuery(agencyId: string): Prisma.Sql {
       SELECT DISTINCT b.vehicle_id FROM bookings b
       WHERE b.agency_id = ${agencyId} AND b.status = 'PICKED_UP'
     ) rented ON rented.vehicle_id = v.id
-    WHERE v.agency_id = ${agencyId}`;
+    WHERE v.agency_id = ${agencyId}
+      AND v.deleted_at IS NULL`;
 }
 
 /** Durée louée (secondes) entre `since` et `now` : jamais au-delà de maintenant. */

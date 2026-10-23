@@ -465,6 +465,10 @@ model Vehicle {
   /// Couleur de carrosserie (hexadécimal), utilisée pour la vignette.
   color             String
   mileageKm         Int             @default(0) @map("mileage_km")
+  /// Renseigné : retiré de la flotte, conservé pour l'historique des locations.
+  deletedAt         DateTime?       @map("deleted_at")
+  /// Immatriculation libérée à la suppression, pour l'afficher encore sur les locations passées.
+  retiredPlateNumber String?         @map("retired_plate_number")
   createdAt         DateTime        @default(now()) @map("created_at")
   updatedAt         DateTime        @updatedAt @map("updated_at")
 
@@ -476,6 +480,7 @@ model Vehicle {
 
   @@unique([agencyId, plateNumber])
   @@index([agencyId, status])
+  @@index([agencyId, deletedAt])
   @@index([categoryId, status])
   @@index([brand])
   @@map("vehicles")

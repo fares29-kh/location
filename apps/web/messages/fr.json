@@ -1006,7 +1006,10 @@
         "delete": "Supprimer l’entretien",
         "deleted": "Entretien supprimé : le véhicule est de nouveau réservable.",
         "deleteError": "L’entretien n’a pas pu être supprimé.",
-        "close": "Fermer"
+        "close": "Fermer",
+        "confirmText": "Ces dates redeviendront réservables.",
+        "confirm": "Confirmer la suppression",
+        "confirmBack": "Retour"
       }
     },
     "fleet": {
@@ -1050,6 +1053,16 @@
       "photoCount": "{count, plural, one {# photo} other {# photos}}",
       "moreActions": "Plus d’actions pour {name}",
       "viewPlanning": "Voir le planning",
+      "delete": {
+        "action": "Supprimer le véhicule",
+        "title": "Supprimer {name} ?",
+        "text": "Il disparaît de votre flotte et n’est plus proposé aux clients. Les locations déjà terminées restent dans l’historique, et l’immatriculation pourra être réutilisée. S’il reste une demande, une réservation confirmée ou une location en cours, la suppression est refusée.",
+        "confirm": "Supprimer définitivement",
+        "dismiss": "Conserver le véhicule",
+        "success": "{name} a été retiré de la flotte.",
+        "error": "Le véhicule n’a pas pu être supprimé.",
+        "blocked": "Terminez, refusez ou annulez d’abord les réservations encore ouvertes de ce véhicule."
+      },
       "statusMenu": {
         "title": "Disponibilité",
         "options": {
@@ -1063,7 +1076,20 @@
           "INACTIVE": "Véhicule retiré de la location."
         },
         "error": "Le statut n’a pas pu être modifié.",
-        "onRentHint": "Statut modifiable après le retour du véhicule."
+        "onRentHint": "Le statut et la suppression seront possibles après le retour du véhicule.",
+        "confirmTitle": {
+          "MAINTENANCE": "Passer {name} en entretien ?",
+          "INACTIVE": "Mettre {name} hors service ?"
+        },
+        "confirmText": {
+          "MAINTENANCE": "Les clients ne pourront plus le réserver tant qu’il est en entretien. Les réservations déjà confirmées restent valables.",
+          "INACTIVE": "Il ne sera plus proposé à la location. Vous pourrez le remettre en service plus tard. Les réservations déjà confirmées restent valables."
+        },
+        "confirm": {
+          "MAINTENANCE": "Passer en entretien",
+          "INACTIVE": "Mettre hors service"
+        },
+        "dismiss": "Annuler"
       },
       "emptyTitle": "Aucun véhicule dans votre flotte",
       "emptyText": "Ajoutez votre premier véhicule pour recevoir des réservations.",
@@ -1263,6 +1289,10 @@
         "logoUpload": "Ajouter un logo",
         "logoReplace": "Changer le logo",
         "logoRemove": "Retirer",
+        "logoRemoveTitle": "Retirer le logo ?",
+        "logoRemoveText": "Votre fiche s’affichera sans image tant que vous n’en envoyez pas une autre.",
+        "logoRemoveConfirm": "Retirer le logo",
+        "logoRemoveDismiss": "Conserver le logo",
         "logoSaved": "Logo enregistré : il apparaît désormais sur vos annonces.",
         "logoRemoved": "Logo retiré.",
         "logoError": "Le logo n’a pas pu être enregistré.",
@@ -1978,7 +2008,8 @@
         "invoice": "Facturation",
         "review": "Avis",
         "settings": "Paramètres",
-        "referential": "Référentiels"
+        "referential": "Référentiels",
+        "vehicle": "Véhicules"
       },
       "columns": {
         "date": "Date",
@@ -2041,6 +2072,10 @@
           "created": "Référentiel : ajout",
           "updated": "Référentiel : modification",
           "deleted": "Référentiel : suppression"
+        },
+        "vehicle": {
+          "deleted": "Véhicule retiré de la flotte",
+          "status_changed": "Disponibilité d’un véhicule modifiée"
         }
       }
     }

@@ -327,6 +327,8 @@ export const AUDIT_ACTIONS = [
   'referential.created',
   'referential.updated',
   'referential.deleted',
+  'vehicle.deleted',
+  'vehicle.status_changed',
 ] as const;
 export type AuditAction = (typeof AUDIT_ACTIONS)[number];
 
@@ -344,6 +346,7 @@ export const AUDIT_CATEGORIES = [
   'review',
   'settings',
   'referential',
+  'vehicle',
 ] as const;
 export type AuditCategory = (typeof AUDIT_CATEGORIES)[number];
 

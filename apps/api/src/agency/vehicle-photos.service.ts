@@ -96,7 +96,7 @@ export class VehiclePhotosService {
   private async ownedVehicle(ownerId: string, vehicleId: string) {
     const agencyId = await this.agency.agencyIdFor(ownerId);
     const vehicle = await this.prisma.vehicle.findFirst({
-      where: { id: vehicleId, agencyId },
+      where: { id: vehicleId, agencyId, deletedAt: null },
       select: { id: true, agencyId: true },
     });
     if (vehicle === null) {

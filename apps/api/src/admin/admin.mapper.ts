@@ -28,7 +28,7 @@ export const ADMIN_AGENCY_INCLUDE = {
   owner: true,
   governorate: { select: { nameFr: true } },
   documents: { select: { kind: true, uploadedAt: true } },
-  _count: { select: { vehicles: true, bookings: true } },
+  _count: { select: { vehicles: { where: { deletedAt: null } }, bookings: true } },
 } satisfies Prisma.AgencyInclude;
 
 type AdminAgencyRow = Prisma.AgencyGetPayload<{ include: typeof ADMIN_AGENCY_INCLUDE }>;
@@ -36,7 +36,7 @@ type AdminAgencyRow = Prisma.AgencyGetPayload<{ include: typeof ADMIN_AGENCY_INC
 export const PLATFORM_BOOKING_INCLUDE = {
   agency: { select: AGENCY_REF_SELECT },
   customer: true,
-  vehicle: { select: { brand: true, model: true, plateNumber: true } },
+  vehicle: { select: { brand: true, model: true, plateNumber: true, retiredPlateNumber: true } },
   payments: { select: { kind: true, amountMillimes: true } },
 } satisfies Prisma.BookingInclude;
 
@@ -138,7 +138,11 @@ export function toPlatformBooking(row: PlatformBookingRow): PlatformBooking {
     paymentStatus: summarizePayments(row.totalMillimes, row.payments).status,
     agency: toAgencyRef(row.agency),
     customer: toPersonRef(row.customer),
-    vehicle: row.vehicle,
+    vehicle: {
+      brand: row.vehicle.brand,
+      model: row.vehicle.model,
+      plateNumber: row.vehicle.plateNumber ?? row.vehicle.retiredPlateNumber,
+    },
     pickupAt: row.pickupAt.toISOString(),
     returnAt: row.returnAt.toISOString(),
     pickupLocation: toPlace(row.pickupPlace).fr,
