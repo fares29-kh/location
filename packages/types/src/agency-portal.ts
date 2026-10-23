@@ -163,7 +163,7 @@ export interface FleetBreakdown {
   inactive: number;
 }
 
-export const REPORT_GRAINS = ['day', 'week', 'month', 'year'] as const;
+export const REPORT_GRAINS = ['day', 'week', 'month', 'year', 'all'] as const;
 export type ReportGrain = (typeof REPORT_GRAINS)[number];
 
 const reportDay = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, { message: 'INVALID_DATE' });

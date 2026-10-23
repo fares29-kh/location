@@ -27,7 +27,7 @@ import { QueryError } from '../query-states';
 import { HoverHint } from './hover-hint';
 import { type AgencyFormat, useAgencyFormat } from '../use-agency-format';
 
-const GRAINS: readonly ReportGrain[] = ['day', 'week', 'month', 'year'];
+const GRAINS: readonly ReportGrain[] = ['day', 'week', 'month', 'year', 'all'];
 const PREVIEW_LIMIT = 5;
 
 function periodStart(grain: ReportGrain, anchor: DayKey): DayKey {
@@ -52,6 +52,9 @@ function shiftAnchor(grain: ReportGrain, anchor: DayKey, direction: -1 | 1): Day
   }
   if (grain === 'year') {
     return `${String(Number(anchor.slice(0, 4)) + direction)}-01-01`;
+  }
+  if (grain === 'all') {
+    return anchor;
   }
   return addDays(anchor, direction);
 }
@@ -123,8 +126,8 @@ function periodSlug(grain: ReportGrain, anchor: DayKey): string {
   if (grain === 'month') {
     return anchor.slice(0, 7);
   }
-  if (grain === 'year') {
-    return anchor.slice(0, 4);
+  if (grain === 'year' || grain === 'all') {
+    return grain === 'all' ? 'total' : anchor.slice(0, 4);
   }
   return anchor;
 }
@@ -166,6 +169,9 @@ function pointLabel(
   }
   if (grain === 'year') {
     return format.monthShort(`${key}-15T12:00:00Z`);
+  }
+  if (grain === 'all') {
+    return key;
   }
   return format.dayMonth(dayKeyToDate(key));
 }
@@ -333,6 +339,9 @@ function isCurrentPoint(
   if (report.grain === 'year') {
     return key === today.slice(0, 7);
   }
+  if (report.grain === 'all') {
+    return key === today.slice(0, 4);
+  }
   return key === today;
 }
 
@@ -485,12 +494,17 @@ export function ActivityReportCard() {
   const onPeriod = reportQuery.data !== undefined && periodIncludesToday(grain, anchor, today);
 
   const download = (report: ActivityReport) => {
-    const title = periodTitle(grain, anchor, format);
+    const title =
+      grain === 'all'
+        ? t('since', { date: format.date(report.from) })
+        : periodTitle(grain, anchor, format);
     const revenueTrend = variation(report.revenueMillimes, report.previousRevenueMillimes);
     const comparison =
-      revenueTrend === null
-        ? t('noComparison')
-        : t('versus', { value: format.signedPercent(revenueTrend) });
+      grain === 'all'
+        ? title
+        : revenueTrend === null
+          ? t('noComparison')
+          : t('versus', { value: format.signedPercent(revenueTrend) });
     const average =
       report.bookings === 0 ? 0 : Math.round(report.revenueMillimes / report.bookings);
     const copy: ReportCopy = {
@@ -634,46 +648,54 @@ export function ActivityReportCard() {
             setAnchor(today);
           }}
         />
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center rounded-control border border-border bg-surface">
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon-sm"
-              aria-label={t('previous')}
-              onClick={() => {
-                setAnchor((current) => shiftAnchor(grain, current, -1));
-              }}
-            >
-              <ChevronLeft className="rtl:rotate-180" aria-hidden="true" />
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              className="border-x border-border"
-              disabled={onPeriod}
-              onClick={() => {
-                setAnchor(today);
-              }}
-            >
-              {t('today')}
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon-sm"
-              aria-label={t('next')}
-              disabled={onPeriod}
-              onClick={() => {
-                setAnchor((current) => shiftAnchor(grain, current, 1));
-              }}
-            >
-              <ChevronRight className="rtl:rotate-180" aria-hidden="true" />
-            </Button>
+        {grain === 'all' ? (
+          <p className="text-sm font-semibold">
+            {reportQuery.data === undefined
+              ? t('grains.all')
+              : t('since', { date: format.date(reportQuery.data.from) })}
+          </p>
+        ) : (
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="flex items-center rounded-control border border-border bg-surface">
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon-sm"
+                aria-label={t('previous')}
+                onClick={() => {
+                  setAnchor((current) => shiftAnchor(grain, current, -1));
+                }}
+              >
+                <ChevronLeft className="rtl:rotate-180" aria-hidden="true" />
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="border-x border-border"
+                disabled={onPeriod}
+                onClick={() => {
+                  setAnchor(today);
+                }}
+              >
+                {t('today')}
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon-sm"
+                aria-label={t('next')}
+                disabled={onPeriod}
+                onClick={() => {
+                  setAnchor((current) => shiftAnchor(grain, current, 1));
+                }}
+              >
+                <ChevronRight className="rtl:rotate-180" aria-hidden="true" />
+              </Button>
+            </div>
+            <p className="text-sm font-semibold capitalize">{periodTitle(grain, anchor, format)}</p>
           </div>
-          <p className="text-sm font-semibold capitalize">{periodTitle(grain, anchor, format)}</p>
-        </div>
+        )}
       </CardHeader>
       <CardContent className="grid gap-6">
         {reportQuery.isPending ? (
@@ -944,8 +966,12 @@ function ActivityBody({
   const previousResult = report.previousRevenueMillimes - report.previousExpenseMillimes;
   const bookingsTrend = variation(report.bookings, report.previousBookings);
   const average = report.bookings === 0 ? 0 : Math.round(report.revenueMillimes / report.bookings);
-  const trend = (value: number | null) =>
-    value === null ? t('noComparison') : t('versus', { value: format.signedPercent(value) });
+  const trend = (value: number | null): string | undefined => {
+    if (report.grain === 'all') {
+      return undefined;
+    }
+    return value === null ? t('noComparison') : t('versus', { value: format.signedPercent(value) });
+  };
 
   return (
     <>

@@ -19,6 +19,7 @@ import {
   type CustomerDetail,
   type CustomerQuery,
   type CustomerView,
+  type DayKey,
   type ActivityReport,
   type ActivityVehicle,
   type DashboardData,
@@ -42,6 +43,7 @@ import {
   type ReviewReportInput,
   type ReviewQuery,
   todayKey,
+  toDayKey,
   toE164,
   toMonthKey,
   tunisDateTime,
@@ -172,9 +174,37 @@ function periodBounds(buckets: { period: Period }[]): Period {
   return { start: first.period.start, end: last.period.end };
 }
 
+/** Tout depuis l'ouverture : une barre par année, jusqu'à aujourd'hui. Pas de période précédente. */
+function allWindows(
+  createdAt: Date,
+  today: DayKey,
+): {
+  current: Period;
+  previous: Period;
+  buckets: { key: string; period: Period }[];
+} {
+  const opened = toDayKey(createdAt);
+  const startDay = opened > today ? today : opened;
+  const firstYear = Number(startDay.slice(0, 4));
+  const lastYear = Number(today.slice(0, 4));
+  const tomorrow = startOfDay(addDays(today, 1));
+  const buckets: { key: string; period: Period }[] = [];
+  for (let year = firstYear; year <= lastYear; year += 1) {
+    const yearStart = startOfMonth(`${String(year)}-01`);
+    const openedStart = startOfDay(startDay);
+    const start = openedStart > yearStart ? openedStart : yearStart;
+    const end = year === lastYear ? tomorrow : startOfMonth(`${String(year + 1)}-01`);
+    if (start < end) {
+      buckets.push({ key: String(year), period: { start, end } });
+    }
+  }
+  const current = periodBounds(buckets);
+  return { current, previous: { start: current.start, end: current.start }, buckets };
+}
+
 /** Tranches de la période affichée, et la période précédente de même longueur. */
 function reportWindows(
-  grain: ReportGrain,
+  grain: Exclude<ReportGrain, 'all'>,
   anchor: string,
 ): {
   current: Period;
@@ -580,15 +610,21 @@ export class AgencyService {
     };
   }
 
-  /** Encaissements, dépenses et voitures d'une journée, d'une semaine, d'un mois ou d'une année. */
+  /** Encaissements, dépenses et voitures d'une journée, d'une semaine, d'un mois, d'une année, ou depuis l'ouverture. */
   async getActivityReport(ownerId: string, query: DashboardReportQuery): Promise<ActivityReport> {
     const agencyId = await this.agencyIdFor(ownerId);
     const today = todayKey();
     const anchor = query.anchor === undefined || query.anchor > today ? today : query.anchor;
-    const { current, previous, buckets } = reportWindows(query.grain, anchor);
-    const [agency, revenueRows, bookingRows, expenseRows, vehicleRows, lines] =
+    const agency = await this.prisma.agency.findUniqueOrThrow({
+      where: { id: agencyId },
+      select: { name: true, createdAt: true },
+    });
+    const { current, previous, buckets } =
+      query.grain === 'all'
+        ? allWindows(agency.createdAt, today)
+        : reportWindows(query.grain, anchor);
+    const [revenueRows, bookingRows, expenseRows, vehicleRows, lines] =
       await this.prisma.$transaction([
-        this.prisma.agency.findUniqueOrThrow({ where: { id: agencyId }, select: { name: true } }),
         this.prisma.$queryRaw<ActivityAmountRow[]>(
           activityRevenueQuery(
             agencyId,
