@@ -1136,6 +1136,14 @@ export class AgencyService {
   }
 
   async updateProfile(ownerId: string, profile: AgencyProfile): Promise<AgencySettings> {
+    if ((profile.latitude === null) !== (profile.longitude === null)) {
+      throw new AppException(
+        HttpStatus.BAD_REQUEST,
+        'VALIDATION_ERROR',
+        'La position est incomplète.',
+        [{ path: 'latitude', message: 'OUT_OF_RANGE' }],
+      );
+    }
     const agencyId = await this.agencyIdFor(ownerId);
     const agency = await this.prisma.agency.update({
       where: { id: agencyId },

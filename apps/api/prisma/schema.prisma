@@ -318,6 +318,9 @@ model Agency {
   email                  String?
   address                String
   governorateCode        String           @map("governorate_code")
+  /// Position exacte choisie par l'agence. `null` : chef-lieu du gouvernorat.
+  latitude               Float?
+  longitude              Float?
   description            String           @default("")
   /// Clé du logo dans le bucket public (WebP), `null` sans logo.
   logoKey                String?          @map("logo_key")

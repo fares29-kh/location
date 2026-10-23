@@ -3,6 +3,8 @@
 import {
   agencyProfileSchema,
   CANCELLATION_HOURS_MAX,
+  type ChangePasswordInput,
+  changePasswordSchema,
   DRIVER_AGE_MAX,
   DRIVER_AGE_MIN,
   emailSchema,
@@ -15,7 +17,14 @@ import {
   rentalConditionsSchema,
 } from '@drivetn/types';
 import { Button } from '@drivetn/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@drivetn/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@drivetn/ui/card';
 import { Checkbox } from '@drivetn/ui/checkbox';
 import { Field } from '@drivetn/ui/field';
 import { Input } from '@drivetn/ui/input';
@@ -29,7 +38,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@drivetn/ui/tabs';
 import { Textarea } from '@drivetn/ui/textarea';
 import { toast } from '@drivetn/ui/toaster';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Building2, Mail, MapPin, Phone, ShieldCheck, Zap } from 'lucide-react';
+import { useMutation } from '@tanstack/react-query';
+import { Building2, KeyRound, Mail, MapPin, Phone, ShieldCheck, Zap } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useId } from 'react';
 import { Controller, type UseFormReturn, useForm, useWatch } from 'react-hook-form';
@@ -38,6 +48,10 @@ import { z } from 'zod';
 import { AgencyLogo } from '@/components/agencies/agency-logo';
 import { controlProps } from '@/components/auth/control-props';
 import { displayPhone } from '@/components/auth/otp-step';
+import { PasswordInput } from '@/components/auth/password-input';
+import { applyServerIssues, useAuthMessages } from '@/components/auth/use-auth-messages';
+import { ApiError } from '@/lib/api/errors';
+import { usersApi } from '@/lib/api/auth';
 import { useAgencySettings, useUpdateConditions, useUpdateProfile } from '@/lib/agency/queries';
 import type { AgencySettings } from '@/lib/agency/types';
 
@@ -46,11 +60,12 @@ import { QueryError } from '../query-states';
 import { useAgencyFormat } from '../use-agency-format';
 import { useUrlState } from '../use-url-state';
 import { useValidationMessage } from '../use-validation-message';
+import { LocationPicker } from './location-picker';
 import { LogoField } from './logo-field';
 
 const DESCRIPTION_MAX_LENGTH = 600;
 const CANCELLATION_OPTIONS = [0, 12, 24, 48, 72, CANCELLATION_HOURS_MAX] as const;
-const SETTINGS_TABS = ['profile', 'conditions'] as const;
+const SETTINGS_TABS = ['profile', 'conditions', 'security'] as const;
 const URL_DEFAULTS = { tab: 'profile' };
 
 function isValidParam(_key: keyof typeof URL_DEFAULTS, value: string): boolean {
@@ -122,6 +137,10 @@ function ProfileForm({
   const description = useWatch({ control: form.control, name: 'description' });
   const phone = useWatch({ control: form.control, name: 'phone' });
   const name = useWatch({ control: form.control, name: 'name' });
+  const latitude = useWatch({ control: form.control, name: 'latitude' });
+  const longitude = useWatch({ control: form.control, name: 'longitude' });
+  const mapPoint =
+    typeof latitude === 'number' && typeof longitude === 'number' ? { latitude, longitude } : null;
 
   const textField = (
     name: 'name' | 'email' | 'address',
@@ -169,6 +188,7 @@ function ProfileForm({
     max: format.integer(DESCRIPTION_MAX_LENGTH),
   });
   const governorateError = validationMessage(errors.governorateCode?.message);
+  const locationError = validationMessage(errors.latitude?.message);
 
   return (
     <form
@@ -278,6 +298,26 @@ function ProfileForm({
               )}
             />
           </Field>
+          <div className="grid gap-2 sm:col-span-2">
+            <LocationPicker
+              value={mapPoint}
+              onChange={(point) => {
+                form.setValue('latitude', point?.latitude ?? null, {
+                  shouldDirty: true,
+                  shouldValidate: true,
+                });
+                form.setValue('longitude', point?.longitude ?? null, {
+                  shouldDirty: true,
+                  shouldValidate: true,
+                });
+              }}
+            />
+            {locationError !== undefined && (
+              <p className="text-sm text-destructive" role="alert">
+                {locationError}
+              </p>
+            )}
+          </div>
         </CardContent>
       </Card>
 
@@ -569,9 +609,11 @@ function ClientPreview({
           </p>
           <p className="flex items-center gap-1 text-sm text-muted-foreground">
             <MapPin className="size-3.5" aria-hidden="true" />
-            {governorate === undefined
-              ? profile.address
-              : pickLocalized(governorate.name, format.locale)}
+            {typeof profile.latitude === 'number' && typeof profile.longitude === 'number'
+              ? t('exactLocation')
+              : governorate === undefined
+                ? profile.address
+                : pickLocalized(governorate.name, format.locale)}
           </p>
         </div>
         {profile.description.trim().length > 0 && (
@@ -619,6 +661,78 @@ function ClientPreview({
   );
 }
 
+function PasswordForm() {
+  const t = useTranslations('agency.settings.security');
+  const tAuth = useTranslations('auth');
+  const { validationMessage } = useAuthMessages();
+  const id = useId();
+  const form = useForm({
+    resolver: zodResolver(changePasswordSchema, undefined, { raw: true }),
+    defaultValues: { currentPassword: '', newPassword: '' },
+  });
+  const change = useMutation({
+    mutationFn: (values: ChangePasswordInput) => usersApi.changePassword(values),
+    onSuccess: () => {
+      form.reset();
+      toast.success(t('success'));
+    },
+    onError: (error) => {
+      if (error instanceof ApiError && error.code === 'INVALID_CREDENTIALS') {
+        form.setError('currentPassword', { type: 'server', message: 'INVALID_CREDENTIALS' });
+        return;
+      }
+      if (!applyServerIssues(error, form.setError, ['currentPassword', 'newPassword'])) {
+        toast.error(t('error'));
+      }
+    },
+  });
+  const { errors } = form.formState;
+  const currentError = validationMessage(errors.currentPassword?.message);
+  const newError = validationMessage(errors.newPassword?.message);
+
+  return (
+    <Card>
+      <form
+        noValidate
+        onSubmit={(event) => {
+          void form.handleSubmit((values) => {
+            change.mutate(values);
+          })(event);
+        }}
+      >
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <KeyRound className="size-4 text-primary" aria-hidden="true" />
+            {t('title')}
+          </CardTitle>
+          <CardDescription>{t('description')}</CardDescription>
+        </CardHeader>
+        <CardContent className="grid gap-4 sm:max-w-md">
+          <Field id={`${id}-current`} label={t('current')} error={currentError}>
+            <PasswordInput
+              {...controlProps(`${id}-current`, { error: currentError })}
+              autoComplete="current-password"
+              {...form.register('currentPassword')}
+            />
+          </Field>
+          <Field id={`${id}-new`} label={t('next')} hint={tAuth('passwordHint')} error={newError}>
+            <PasswordInput
+              {...controlProps(`${id}-new`, { error: newError, hint: tAuth('passwordHint') })}
+              autoComplete="new-password"
+              {...form.register('newPassword')}
+            />
+          </Field>
+        </CardContent>
+        <CardFooter className="justify-end">
+          <Button type="submit" loading={change.isPending}>
+            {t('submit')}
+          </Button>
+        </CardFooter>
+      </form>
+    </Card>
+  );
+}
+
 function toProfileValues(settings: AgencySettings): ProfileFormValues {
   return { ...settings.profile, email: settings.profile.email ?? '' };
 }
@@ -654,12 +768,16 @@ function SettingsForms({
         <TabsList>
           <TabsTrigger value="profile">{t('tabs.profile')}</TabsTrigger>
           <TabsTrigger value="conditions">{t('tabs.conditions')}</TabsTrigger>
+          <TabsTrigger value="security">{t('tabs.security')}</TabsTrigger>
         </TabsList>
         <TabsContent value="profile" forceMount className="data-[state=inactive]:hidden">
           <ProfileForm governorates={governorates} logoUrl={settings.logoUrl} form={profileForm} />
         </TabsContent>
         <TabsContent value="conditions" forceMount className="data-[state=inactive]:hidden">
           <ConditionsForm form={conditionsForm} />
+        </TabsContent>
+        <TabsContent value="security" className="mt-6">
+          <PasswordForm />
         </TabsContent>
       </Tabs>
       <aside className="grid gap-3 lg:sticky lg:top-20">

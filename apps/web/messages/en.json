@@ -1245,10 +1245,11 @@
     },
     "settings": {
       "title": "Settings",
-      "subtitle": "Your agency profile and rental terms.",
+      "subtitle": "Your profile, your place on the map and access to your account.",
       "tabs": {
         "profile": "Agency profile",
-        "conditions": "Rental terms"
+        "conditions": "Rental terms",
+        "security": "Security"
       },
       "unsaved": "Unsaved changes",
       "discard": "Discard",
@@ -1280,10 +1281,17 @@
         "email": "Email",
         "emailHint": "Optional.",
         "addressTitle": "Address",
-        "addressText": "Your main pick-up location.",
+        "addressText": "The written address, then the exact point on the map. Without a point, customers see you at the governorate seat.",
         "address": "Address",
         "governorate": "Governorate",
         "governoratePlaceholder": "Select",
+        "locationMap": "Map to place the agency",
+        "locationUseMine": "Use my location",
+        "locationClear": "Remove the point",
+        "locationMissing": "Click the map to place your office.",
+        "locationSet": "Saved point: {latitude}, {longitude}",
+        "locationOutside": "This point is outside Tunisia.",
+        "locationDenied": "The device location is not available. Place the point on the map.",
         "saved": "Agency profile saved.",
         "saveError": "The profile couldn’t be saved."
       },
@@ -1307,9 +1315,19 @@
         "saved": "Rental terms saved.",
         "saveError": "The rental terms couldn’t be saved."
       },
+      "security": {
+        "title": "Password",
+        "description": "Choose a new password. Other sessions of this account will be closed.",
+        "current": "Current password",
+        "next": "New password",
+        "submit": "Change password",
+        "success": "Password changed.",
+        "error": "The password could not be changed."
+      },
       "preview": {
         "title": "Customer view",
         "namePlaceholder": "Your agency name",
+        "exactLocation": "Exact place on the map",
         "freeCancellation": "Free cancellation up to {count, plural, one {# hour} other {# hours}} before",
         "instant": "Instant confirmation",
         "onRequest": "Confirmed by the agency",

@@ -86,6 +86,10 @@ export const CONSTRAINT_MESSAGES: Readonly<Record<string, ConstraintRule>> = {
     code: 'CONFLICT',
     message: 'La commission de l’agence doit être comprise entre 0 et 100 %.',
   },
+  agencies_location_check: {
+    code: 'CONFLICT',
+    message: 'La position de l’agence doit se trouver en Tunisie.',
+  },
   agencies_conditions_nonnegative_check: {
     code: 'CONFLICT',
     message:

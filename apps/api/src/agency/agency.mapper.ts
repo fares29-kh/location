@@ -247,6 +247,8 @@ export function toSettings(
       address: agency.address,
       governorateCode: agency.governorateCode,
       description: agency.description,
+      latitude: agency.latitude,
+      longitude: agency.longitude,
     },
     conditions: {
       minDriverAge: agency.minDriverAge,

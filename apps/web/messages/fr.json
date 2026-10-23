@@ -1245,10 +1245,11 @@
     },
     "settings": {
       "title": "Paramètres",
-      "subtitle": "Votre fiche agence et vos conditions de location.",
+      "subtitle": "Votre fiche, votre position sur la carte et l’accès à votre compte.",
       "tabs": {
         "profile": "Fiche agence",
-        "conditions": "Conditions de location"
+        "conditions": "Conditions de location",
+        "security": "Sécurité"
       },
       "unsaved": "Modifications non enregistrées",
       "discard": "Annuler",
@@ -1280,10 +1281,17 @@
         "email": "E-mail",
         "emailHint": "Facultatif.",
         "addressTitle": "Adresse",
-        "addressText": "Le lieu de prise en charge principal.",
+        "addressText": "L’adresse écrite, puis le point exact sur la carte. Sans point, les clients vous voient au chef-lieu du gouvernorat.",
         "address": "Adresse",
         "governorate": "Gouvernorat",
         "governoratePlaceholder": "Choisir",
+        "locationMap": "Carte pour placer l’agence",
+        "locationUseMine": "Utiliser ma position",
+        "locationClear": "Retirer le point",
+        "locationMissing": "Cliquez sur la carte pour placer votre local.",
+        "locationSet": "Point enregistré : {latitude}, {longitude}",
+        "locationOutside": "Ce point est en dehors de la Tunisie.",
+        "locationDenied": "La position de l’appareil n’est pas disponible. Placez le point sur la carte.",
         "saved": "Fiche agence enregistrée.",
         "saveError": "La fiche n’a pas pu être enregistrée."
       },
@@ -1307,9 +1315,19 @@
         "saved": "Conditions de location enregistrées.",
         "saveError": "Les conditions n’ont pas pu être enregistrées."
       },
+      "security": {
+        "title": "Mot de passe",
+        "description": "Choisissez un nouveau mot de passe. Les autres sessions de ce compte seront fermées.",
+        "current": "Mot de passe actuel",
+        "next": "Nouveau mot de passe",
+        "submit": "Changer le mot de passe",
+        "success": "Mot de passe modifié.",
+        "error": "Le mot de passe n’a pas pu être modifié."
+      },
       "preview": {
         "title": "Vue client",
         "namePlaceholder": "Nom de votre agence",
+        "exactLocation": "Position exacte sur la carte",
         "freeCancellation": "Annulation gratuite jusqu’à {count, plural, one {# heure} other {# heures}} avant",
         "instant": "Confirmation immédiate",
         "onRequest": "Confirmation par l’agence",

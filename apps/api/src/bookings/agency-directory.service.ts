@@ -19,8 +19,8 @@ export class AgencyDirectoryService {
   ) {}
 
   /**
-   * Agences actives avec leur flotte disponible et leur note, placées sur le chef-lieu de leur
-   * gouvernorat (ville homonyme, sinon premier lieu actif) ; sans lieu connu, l'agence est omise.
+   * Agences actives avec leur flotte et leur note. Un point choisi par l'agence est utilisé tel
+   * quel ; sinon elle est placée au chef-lieu de son gouvernorat. Sans lieu connu, elle est omise.
    */
   async list(): Promise<PublicAgency[]> {
     const agencies = await this.prisma.agency.findMany({
@@ -30,6 +30,8 @@ export class AgencyDirectoryService {
         name: true,
         logoKey: true,
         governorateCode: true,
+        latitude: true,
+        longitude: true,
         address: true,
         description: true,
         phone: true,
@@ -95,12 +97,20 @@ export class AgencyDirectoryService {
     const placed = new Map<string, number>();
     const directory: PublicAgency[] = [];
     for (const agency of agencies) {
+      const exact =
+        agency.latitude !== null && agency.longitude !== null
+          ? { latitude: agency.latitude, longitude: agency.longitude }
+          : null;
       const center = centers.get(agency.governorateCode);
-      if (center === undefined) {
+      let point = exact;
+      if (point === null && center !== undefined) {
+        const index = placed.get(agency.governorateCode) ?? 0;
+        placed.set(agency.governorateCode, index + 1);
+        point = spreadAround(center, index);
+      }
+      if (point === null) {
         continue;
       }
-      const index = placed.get(agency.governorateCode) ?? 0;
-      placed.set(agency.governorateCode, index + 1);
 
       const rating = ratingByAgency.get(agency.id);
       const rates = agency.vehicles.map((vehicle) => vehicle.dailyRateMillimes);
@@ -123,7 +133,7 @@ export class AgencyDirectoryService {
           .map((category) => category.slug),
         instantConfirmation: agency.instantConfirmation,
         freeCancellationHours: agency.freeCancellationHours,
-        ...spreadAround(center, index),
+        ...point,
       });
     }
     return directory;

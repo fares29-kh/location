@@ -562,6 +562,8 @@ export function createAgencyDataset(now: Date = new Date()): AgencyDataset {
         email: 'contact@carthage-auto.tn',
         address: 'Rue du Lac Biwa, Les Berges du Lac, 1053 Tunis',
         governorateCode: '11',
+        latitude: null,
+        longitude: null,
         description:
           'Agence familiale depuis 2009 : livraison à l’aéroport Tunis-Carthage 7j/7, véhicules récents et entretenus, assistance WhatsApp.',
       },
