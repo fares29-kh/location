@@ -6,7 +6,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@driv
 import { cn } from '@drivetn/ui/lib/cn';
 import { Rating } from '@drivetn/ui/rating';
 import { Skeleton } from '@drivetn/ui/skeleton';
-import { StatCard } from '@drivetn/ui/stat-card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@drivetn/ui/tabs';
 import {
   ArrowRight,
@@ -14,13 +13,9 @@ import {
   CalendarDays,
   CarFront,
   CheckCheck,
-  CircleDollarSign,
   Clock,
-  Gauge,
   KeyRound,
-  Settings,
   Undo2,
-  Wallet,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
@@ -31,7 +26,7 @@ import type { BookingView, DashboardData, FleetBreakdown } from '@/lib/agency/ty
 import { BookingActionsBar } from '../bookings/booking-actions';
 import { PageHeader } from '../page-header';
 import { customerName, CustomerIdentity } from '../people';
-import { QueryError, StatCardsSkeleton } from '../query-states';
+import { QueryError } from '../query-states';
 import { BookingStatusTag } from '../status-tags';
 import { type AgencyFormat, useAgencyFormat } from '../use-agency-format';
 import { useNow } from '../use-now';
@@ -39,58 +34,6 @@ import { ActivityReportCard } from './activity-report';
 
 /** Au-delà de ce délai, une demande sans réponse est signalée comme urgente. */
 const URGENT_AFTER_MS = 2 * 3_600_000;
-
-function variation(current: number, previous: number): number | null {
-  if (previous === 0) {
-    return null;
-  }
-  return (current - previous) / previous;
-}
-
-function Kpis({ data, format }: { data: DashboardData; format: AgencyFormat }) {
-  const t = useTranslations('agency.dashboard.kpis');
-  const { kpis, fleet } = data;
-  const revenueTrend = variation(kpis.revenueMonthMillimes, kpis.revenuePreviousMonthMillimes);
-  const bookingsTrend = variation(kpis.bookingsMonth, kpis.bookingsPreviousMonth);
-  const trendText = (value: number | null) =>
-    value === null
-      ? t('noComparison')
-      : t('versusLastMonth', { value: format.signedPercent(value) });
-  const direction = (value: number | null) =>
-    value === null || value === 0 ? 'neutral' : value > 0 ? 'up' : 'down';
-
-  return (
-    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-      <StatCard
-        label={t('revenue')}
-        value={format.money(kpis.revenueMonthMillimes)}
-        icon={CircleDollarSign}
-        trend={trendText(revenueTrend)}
-        trendDirection={direction(revenueTrend)}
-      />
-      <StatCard
-        label={t('bookings')}
-        value={format.integer(kpis.bookingsMonth)}
-        icon={CalendarCheck}
-        trend={trendText(bookingsTrend)}
-        trendDirection={direction(bookingsTrend)}
-      />
-      <StatCard
-        label={t('occupancy')}
-        value={format.percent(kpis.occupancyRate)}
-        icon={Gauge}
-        trend={t('onRentNow', { count: fleet.onRent })}
-      />
-      <StatCard
-        label={t('outstanding')}
-        value={format.money(kpis.outstandingMillimes)}
-        icon={Wallet}
-        trend={kpis.outstandingMillimes > 0 ? t('outstandingHint') : t('allCollected')}
-        trendDirection={kpis.outstandingMillimes > 0 ? 'down' : 'up'}
-      />
-    </div>
-  );
-}
 
 function PendingRequests({ data, format }: { data: DashboardData; format: AgencyFormat }) {
   const t = useTranslations('agency.dashboard.pending');
@@ -230,8 +173,8 @@ function TodayCard({ data, format }: { data: DashboardData; format: AgencyFormat
     <Card>
       <CardHeader className="pb-2">
         <CardTitle className="text-base">{t('title')}</CardTitle>
-        <CardDescription className="first-letter:uppercase">
-          {format.weekdayDate(new Date())}
+        <CardDescription>
+          {t('subtitle')} {format.weekdayDate(new Date())}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -262,80 +205,6 @@ function TodayCard({ data, format }: { data: DashboardData; format: AgencyFormat
   );
 }
 
-function RevenueChart({ data, format }: { data: DashboardData; format: AgencyFormat }) {
-  const t = useTranslations('agency.dashboard.revenue');
-  const max = Math.max(1, ...data.revenueByMonth.map((entry) => entry.amountMillimes));
-  const total = data.revenueByMonth.reduce((sum, entry) => sum + entry.amountMillimes, 0);
-
-  return (
-    <Card className="lg:col-span-2">
-      <CardHeader className="flex-row flex-wrap items-start justify-between gap-3 pb-4">
-        <div className="grid gap-1">
-          <CardTitle className="text-base">{t('title')}</CardTitle>
-          <CardDescription>{t('subtitle')}</CardDescription>
-        </div>
-        <div className="text-end">
-          <p className="text-xs text-muted-foreground">{t('total')}</p>
-          <p className="font-heading text-lg font-bold tabular-nums">{format.money(total)}</p>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <figure>
-          <figcaption className="sr-only">{t('title')}</figcaption>
-          <ol className="flex h-56 items-end gap-2 sm:gap-4">
-            {data.revenueByMonth.map((entry, index) => {
-              const current = index === data.revenueByMonth.length - 1;
-              const ratio = entry.amountMillimes / max;
-              const date = `${entry.month}-15T12:00:00Z`;
-              return (
-                <li
-                  key={entry.month}
-                  className="group flex h-full flex-1 flex-col justify-end gap-2"
-                >
-                  <span
-                    className={cn(
-                      'text-center text-[0.6875rem] font-medium tabular-nums text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 sm:text-xs',
-                      current && 'text-primary opacity-100',
-                    )}
-                  >
-                    {format.integer(Math.round(entry.amountMillimes / 1000))}
-                  </span>
-                  <span
-                    className={cn(
-                      'block w-full rounded-t-control transition-colors',
-                      current
-                        ? 'bg-primary'
-                        : 'bg-primary/25 group-hover:bg-primary/40 dark:bg-primary/30',
-                    )}
-                    style={{ height: `${String(Math.max(ratio * 100, 2))}%` }}
-                  >
-                    <span className="sr-only">
-                      {t('barLabel', {
-                        month: format.monthLong(date),
-                        amount: format.money(entry.amountMillimes),
-                      })}
-                    </span>
-                  </span>
-                  <span
-                    className={cn(
-                      'text-center text-xs capitalize text-muted-foreground',
-                      current && 'font-semibold text-foreground',
-                    )}
-                    aria-hidden="true"
-                  >
-                    {format.monthShort(date)}
-                  </span>
-                </li>
-              );
-            })}
-          </ol>
-        </figure>
-        <p className="mt-3 text-xs text-muted-foreground">{t('unit')}</p>
-      </CardContent>
-    </Card>
-  );
-}
-
 const FLEET_SEGMENTS: readonly { key: keyof FleetBreakdown; className: string }[] = [
   { key: 'available', className: 'bg-success' },
   { key: 'onRent', className: 'bg-violet-500' },
@@ -351,52 +220,81 @@ function FleetCard({ data, format }: { data: DashboardData; format: AgencyFormat
     <Card>
       <CardHeader className="pb-4">
         <CardTitle className="text-base">{t('title')}</CardTitle>
-        <CardDescription>{t('subtitle', { count: total })}</CardDescription>
+        <CardDescription>{t('intro')}</CardDescription>
       </CardHeader>
-      <CardContent className="grid gap-5">
-        <div className="flex h-3 overflow-hidden rounded-full bg-surface-muted" aria-hidden="true">
-          {FLEET_SEGMENTS.map(({ key, className }) =>
-            data.fleet[key] > 0 ? (
-              <span
-                key={key}
-                className={cn('h-full', className)}
-                style={{ width: `${String((data.fleet[key] / Math.max(total, 1)) * 100)}%` }}
-              />
-            ) : null,
-          )}
-        </div>
-        <ul className="grid grid-cols-2 gap-3">
-          {FLEET_SEGMENTS.map(({ key, className }) => (
-            <li key={key} className="flex items-center gap-2 text-sm">
-              <span className={cn('size-2.5 rounded-full', className)} aria-hidden="true" />
-              <span className="flex-1 text-muted-foreground">{t(key)}</span>
-              <span className="font-semibold tabular-nums">{format.integer(data.fleet[key])}</span>
-            </li>
-          ))}
-        </ul>
-        <div className="flex items-center justify-between gap-3 rounded-control bg-surface-muted/60 p-3">
+      <CardContent className="grid gap-6 lg:grid-cols-2">
+        <div className="grid gap-5">
           <div className="grid gap-1">
-            <span className="text-xs text-muted-foreground">{t('rating')}</span>
-            <span className="flex items-center gap-2">
-              <span className="font-heading text-lg font-bold tabular-nums">
-                {format.decimal(data.rating.average)}
-              </span>
-              <Rating
-                value={data.rating.average}
-                label={t('ratingLabel', { value: format.decimal(data.rating.average) })}
-              />
-            </span>
+            <p className="text-sm font-medium">{t('statusTitle')}</p>
+            <p className="text-xs text-muted-foreground">{t('statusHint', { count: total })}</p>
           </div>
-          <Button asChild variant="link" size="sm">
-            <Link href="/reviews">{t('reviewsCount', { count: data.rating.count })}</Link>
+          <div
+            className="flex h-3 overflow-hidden rounded-full bg-surface-muted"
+            aria-hidden="true"
+          >
+            {FLEET_SEGMENTS.map(({ key, className }) =>
+              data.fleet[key] > 0 ? (
+                <span
+                  key={key}
+                  className={cn('h-full', className)}
+                  style={{ width: `${String((data.fleet[key] / Math.max(total, 1)) * 100)}%` }}
+                />
+              ) : null,
+            )}
+          </div>
+          <ul className="grid grid-cols-2 gap-3">
+            {FLEET_SEGMENTS.map(({ key, className }) => (
+              <li key={key} className="flex items-center gap-2 text-sm">
+                <span className={cn('size-2.5 rounded-full', className)} aria-hidden="true" />
+                <span className="flex-1 text-muted-foreground">{t(key)}</span>
+                <span className="font-semibold tabular-nums">
+                  {format.integer(data.fleet[key])}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div className="grid content-start gap-4">
+          <div className="rounded-control bg-surface-muted px-4 py-3">
+            <p className="text-xs text-muted-foreground">{t('occupancy')}</p>
+            <p className="font-heading text-xl font-bold tabular-nums">
+              {format.percent(data.kpis.occupancyRate)}
+            </p>
+            <p className="text-xs text-muted-foreground">{t('occupancyHint')}</p>
+          </div>
+          <div className="rounded-control bg-surface-muted px-4 py-3">
+            <p className="text-xs text-muted-foreground">{t('outstanding')}</p>
+            <p className="font-heading text-xl font-bold tabular-nums">
+              {format.money(data.kpis.outstandingMillimes)}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              {data.kpis.outstandingMillimes > 0 ? t('outstandingHint') : t('allCollected')}
+            </p>
+          </div>
+          <div className="flex items-center justify-between gap-3 rounded-control bg-surface-muted/60 p-3">
+            <div className="grid gap-1">
+              <span className="text-xs text-muted-foreground">{t('rating')}</span>
+              <span className="flex items-center gap-2">
+                <span className="font-heading text-lg font-bold tabular-nums">
+                  {format.decimal(data.rating.average)}
+                </span>
+                <Rating
+                  value={data.rating.average}
+                  label={t('ratingLabel', { value: format.decimal(data.rating.average) })}
+                />
+              </span>
+            </div>
+            <Button asChild variant="link" size="sm">
+              <Link href="/reviews">{t('reviewsCount', { count: data.rating.count })}</Link>
+            </Button>
+          </div>
+          <Button asChild variant="secondary">
+            <Link href="/fleet">
+              <CarFront aria-hidden="true" />
+              {t('manage')}
+            </Link>
           </Button>
         </div>
-        <Button asChild variant="secondary">
-          <Link href="/fleet">
-            <CarFront aria-hidden="true" />
-            {t('manage')}
-          </Link>
-        </Button>
       </CardContent>
     </Card>
   );
@@ -404,12 +302,9 @@ function FleetCard({ data, format }: { data: DashboardData; format: AgencyFormat
 
 function DashboardSkeleton() {
   return (
-    <div className="grid gap-6">
-      <StatCardsSkeleton />
-      <div className="grid gap-6 lg:grid-cols-3">
-        <Skeleton className="h-80 rounded-card lg:col-span-2" />
-        <Skeleton className="h-80 rounded-card" />
-      </div>
+    <div className="grid gap-6 lg:grid-cols-3">
+      <Skeleton className="h-80 rounded-card lg:col-span-2" />
+      <Skeleton className="h-80 rounded-card" />
     </div>
   );
 }
@@ -444,54 +339,28 @@ export function DashboardView({ firstName }: { firstName: string }) {
         }
       />
 
-      <ActivityReportCard />
-
       {isPending ? (
         <DashboardSkeleton />
       ) : isError ? (
         <QueryError error={error} onRetry={() => void refetch()} retrying={isFetching} />
       ) : (
-        <>
-          <Kpis data={data} format={format} />
+        <section className="grid gap-3" aria-labelledby="dashboard-now">
+          <div className="grid gap-1">
+            <h2 id="dashboard-now" className="font-heading text-lg font-semibold">
+              {t('sections.now')}
+            </h2>
+            <p className="text-sm text-muted-foreground">{t('sections.nowText')}</p>
+          </div>
           <div className="grid gap-6 lg:grid-cols-3">
             <PendingRequests data={data} format={format} />
             <TodayCard data={data} format={format} />
           </div>
-          <div className="grid gap-6 lg:grid-cols-3">
-            <RevenueChart data={data} format={format} />
-            <FleetCard data={data} format={format} />
-          </div>
-          <section aria-label={t('quickLinks')} className="grid gap-3 sm:grid-cols-3">
-            {(
-              [
-                { href: '/fleet', icon: CarFront, key: 'fleet' },
-                { href: '/payments', icon: Wallet, key: 'payments' },
-                { href: '/settings', icon: Settings, key: 'settings' },
-              ] as const
-            ).map(({ href, icon: Icon, key }) => (
-              <Link
-                key={key}
-                href={href}
-                className="group flex items-center gap-3 rounded-card border border-border bg-surface p-4 shadow-soft transition-colors hover:border-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                <span className="flex size-10 items-center justify-center rounded-control bg-primary-soft text-primary-soft-foreground">
-                  <Icon className="size-5" aria-hidden="true" />
-                </span>
-                <span className="grid flex-1">
-                  <span className="text-sm font-semibold">{t(`shortcuts.${key}.title`)}</span>
-                  <span className="text-xs text-muted-foreground">
-                    {t(`shortcuts.${key}.text`)}
-                  </span>
-                </span>
-                <ArrowRight
-                  className="size-4 text-muted-foreground transition-transform group-hover:translate-x-0.5 rtl:rotate-180 rtl:group-hover:-translate-x-0.5"
-                  aria-hidden="true"
-                />
-              </Link>
-            ))}
-          </section>
-        </>
+        </section>
       )}
+
+      <ActivityReportCard />
+
+      {data !== undefined && <FleetCard data={data} format={format} />}
     </div>
   );
 }

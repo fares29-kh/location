@@ -155,6 +155,8 @@ interface ReportCopy {
   average: string;
   comparison: string;
   chart: string;
+  chartHint: string;
+  linesHint: string;
   seriesHeaders: readonly [string, string, string];
   series: readonly { label: string; revenue: string; departures: string }[];
   preview: string;
@@ -237,12 +239,14 @@ function reportHtml(copy: ReportCopy): string {
 </section>
 <p class="meta">${escapeHtml(copy.comparison)}</p>
 <h2>${escapeHtml(copy.chart)}</h2>
+<p class="meta">${escapeHtml(copy.chartHint)}</p>
 <table>
   <thead><tr>${copy.seriesHeaders.map((header, index) => (index === 0 ? head(header) : `<th class="num">${escapeHtml(header)}</th>`)).join('')}</tr></thead>
   <tbody>${seriesRows}</tbody>
   <tfoot>${totalRow}</tfoot>
 </table>
 <h2>${escapeHtml(copy.preview)}</h2>
+<p class="meta">${escapeHtml(copy.linesHint)}</p>
 <table>
   <thead><tr>${copy.lineHeaders.map((header, index) => (index < 3 ? head(header) : `<th class="num">${escapeHtml(header)}</th>`)).join('')}</tr></thead>
   <tbody>${lineRows}</tbody>
@@ -288,8 +292,11 @@ function ActivityChart({
   const wide = report.grain === 'day' || report.grain === 'month';
 
   return (
-    <figure>
-      <figcaption className="mb-3 text-sm font-medium">{t('chart')}</figcaption>
+    <figure className="grid gap-2">
+      <figcaption className="grid gap-1">
+        <span className="text-sm font-medium">{t(`chartTitle.${report.grain}`)}</span>
+        <span className="text-xs text-muted-foreground">{t('chartHint')}</span>
+      </figcaption>
       <div className="overflow-x-auto">
         <ol
           className="flex h-48 items-end gap-1"
@@ -308,18 +315,21 @@ function ActivityChart({
               >
                 <span
                   className={cn(
-                    'block w-full rounded-t-control',
-                    current ? 'bg-primary' : 'bg-primary/25 dark:bg-primary/30',
+                    'block w-full',
+                    point.revenueMillimes > 0 &&
+                      (current
+                        ? 'rounded-t-control bg-primary'
+                        : 'rounded-t-control bg-primary/70'),
                   )}
                   style={{
-                    height: `${String(Math.max(ratio * 100, point.revenueMillimes > 0 ? 4 : 2))}%`,
+                    height:
+                      point.revenueMillimes > 0 ? `${String(Math.max(ratio * 100, 8))}%` : '0%',
                   }}
                 >
                   <span className="sr-only">
                     {t('barLabel', {
                       label,
                       amount: format.money(point.revenueMillimes),
-                      count: point.bookings,
                     })}
                   </span>
                 </span>
@@ -349,7 +359,10 @@ function ActivityLines({ report, format }: { report: ActivityReport; format: Age
 
   return (
     <div className="grid gap-2">
-      <h3 className="text-sm font-medium">{t('preview')}</h3>
+      <div className="grid gap-1">
+        <h3 className="text-sm font-medium">{t('preview')}</h3>
+        <p className="text-xs text-muted-foreground">{t('linesHint')}</p>
+      </div>
       {preview.length === 0 ? (
         <p className="text-sm text-muted-foreground">{t('empty')}</p>
       ) : (
@@ -426,7 +439,9 @@ export function ActivityReportCard() {
       averageLabel: t('average'),
       average: format.money(average),
       comparison,
-      chart: t('chart'),
+      chart: t(`chartTitle.${report.grain}`),
+      chartHint: t('chartHint'),
+      linesHint: t('linesHint'),
       seriesHeaders: [
         t('seriesColumns.period'),
         t('seriesColumns.revenue'),
@@ -552,7 +567,6 @@ export function ActivityReportCard() {
         ) : (
           <ActivityBody report={reportQuery.data} format={format} anchor={anchor} today={today} />
         )}
-        <p className="text-xs text-muted-foreground">{t('downloadHint')}</p>
       </CardContent>
     </Card>
   );
@@ -580,22 +594,27 @@ function ActivityBody({
     <>
       <dl className="grid gap-3 sm:grid-cols-3">
         <div className="rounded-control bg-surface-muted px-4 py-3">
-          <dt className="text-xs text-muted-foreground">{t('revenue')}</dt>
-          <dd className="font-heading text-xl font-bold tabular-nums">
+          <dt className="text-sm font-medium">{t('revenue')}</dt>
+          <dd className="text-xs text-muted-foreground">{t('revenueHint')}</dd>
+          <dd className="mt-1 font-heading text-xl font-bold tabular-nums">
             {format.money(report.revenueMillimes)}
           </dd>
           <dd className="text-xs text-muted-foreground">{trend(revenueTrend)}</dd>
         </div>
         <div className="rounded-control bg-surface-muted px-4 py-3">
-          <dt className="text-xs text-muted-foreground">{t('departures')}</dt>
-          <dd className="font-heading text-xl font-bold tabular-nums">
+          <dt className="text-sm font-medium">{t('departures')}</dt>
+          <dd className="text-xs text-muted-foreground">{t('departuresHint')}</dd>
+          <dd className="mt-1 font-heading text-xl font-bold tabular-nums">
             {format.integer(report.bookings)}
           </dd>
           <dd className="text-xs text-muted-foreground">{trend(bookingsTrend)}</dd>
         </div>
         <div className="rounded-control bg-surface-muted px-4 py-3">
-          <dt className="text-xs text-muted-foreground">{t('average')}</dt>
-          <dd className="font-heading text-xl font-bold tabular-nums">{format.money(average)}</dd>
+          <dt className="text-sm font-medium">{t('average')}</dt>
+          <dd className="text-xs text-muted-foreground">{t('averageHint')}</dd>
+          <dd className="mt-1 font-heading text-xl font-bold tabular-nums">
+            {format.money(average)}
+          </dd>
         </div>
       </dl>
       <ActivityChart report={report} format={format} anchor={anchor} today={today} />

@@ -632,20 +632,12 @@
     },
     "dashboard": {
       "title": "Dashboard",
-      "subtitle": "Your activity, from a single day to a full year.",
+      "subtitle": "First, what needs doing today. Then one set of figures for the period you choose.",
       "openPlanning": "Schedule",
       "openBookings": "Bookings",
-      "quickLinks": "Shortcuts",
-      "kpis": {
-        "revenue": "Revenue this month",
-        "bookings": "Bookings this month",
-        "occupancy": "30-day occupancy",
-        "outstanding": "Outstanding balance",
-        "versusLastMonth": "{value} vs the same period last month",
-        "noComparison": "No comparison available",
-        "onRentNow": "{count, plural, one {# vehicle on rent} other {# vehicles on rent}}",
-        "outstandingHint": "Balances of ongoing and completed rentals",
-        "allCollected": "Everything collected"
+      "sections": {
+        "now": "To do now",
+        "nowText": "Requests waiting for an answer, and cars to hand over or take back today."
       },
       "pending": {
         "title": "Pending requests",
@@ -657,21 +649,22 @@
       },
       "today": {
         "title": "Today",
-        "departures": "Pick-ups",
-        "returns": "Returns",
+        "subtitle": "Cars to hand over to the customer, and cars to take back.",
+        "departures": "Hand over",
+        "returns": "Take back",
         "noDepartures": "No pick-ups scheduled today.",
         "noReturns": "No returns scheduled today."
       },
-      "revenue": {
-        "title": "Revenue",
-        "subtitle": "Completed rentals over the last 6 months",
-        "total": "6-month total",
-        "barLabel": "{month}: {amount}",
-        "unit": "Amounts in Tunisian dinars, deposits excluded."
-      },
       "fleet": {
-        "title": "Fleet",
-        "subtitle": "{count, plural, one {# vehicle} other {# vehicles}}",
+        "title": "The fleet right now",
+        "intro": "Where the cars are, how much of the last 30 days they were rented, and money still owed. These figures do not follow the period you pick above.",
+        "statusTitle": "Where the cars are",
+        "statusHint": "{count, plural, one {# car} other {# cars}}. Each color is a current state, not an amount of money.",
+        "occupancy": "30-day occupancy",
+        "occupancyHint": "Share of time the active cars were rented, over the last 30 days.",
+        "outstanding": "Still to collect",
+        "outstandingHint": "Money still owed on rentals in progress or already returned.",
+        "allCollected": "Everything collected",
         "available": "Available",
         "onRent": "On rent",
         "maintenance": "In maintenance",
@@ -681,23 +674,9 @@
         "reviewsCount": "{count, plural, one {# review} other {# reviews}}",
         "manage": "Manage fleet"
       },
-      "shortcuts": {
-        "fleet": {
-          "title": "Fleet",
-          "text": "Rates, availability and maintenance"
-        },
-        "payments": {
-          "title": "Payments",
-          "text": "Payments received and deposits"
-        },
-        "settings": {
-          "title": "Settings",
-          "text": "Agency profile and rental terms"
-        }
-      },
       "report": {
-        "title": "Activity",
-        "subtitle": "Collections and pick-ups for the selected period. The PDF uses exactly these figures.",
+        "title": "Figures for the period",
+        "subtitle": "The three totals and the chart measure the same money collected. The list below counts rentals that start.",
         "periodLabel": "Choose the period",
         "grains": {
           "day": "Day",
@@ -709,16 +688,26 @@
         "next": "Next period",
         "today": "Today",
         "revenue": "Collections",
-        "departures": "Pick-ups",
+        "revenueHint": "Money received from rentals in this period, deposits excluded.",
+        "departures": "Rentals started",
+        "departuresHint": "Bookings whose pick-up day falls in this period.",
         "average": "Average ticket",
+        "averageHint": "Collections divided by the number of rentals started.",
         "versus": "{value} compared with the previous period",
         "noComparison": "No previous period to compare",
-        "chart": "Breakdown over the period",
-        "barLabel": "{label}: {amount}, {count, plural, one {# pick-up} other {# pick-ups}}",
+        "chartTitle": {
+          "day": "Collections for each hour",
+          "week": "Collections for each day",
+          "month": "Collections for each day",
+          "year": "Collections for each month"
+        },
+        "chartHint": "Each bar is a share of the collections above. No bar means no money was received in that slot.",
+        "barLabel": "{label}: {amount} collected",
         "hour": "{hour}:00",
-        "preview": "Pick-ups in this period",
-        "empty": "No pick-ups in this period.",
-        "more": "{count, plural, one {# more pick-up in the report} other {# more pick-ups in the report}}",
+        "preview": "Rentals that start",
+        "linesHint": "The amount is the rental price. It may have been collected on another day.",
+        "empty": "No rental starts in this period.",
+        "more": "{count, plural, one {# more rental in the report} other {# more rentals in the report}}",
         "download": "Save as PDF",
         "downloadHint": "The print window opens. Choose “Save as PDF”.",
         "columns": {
@@ -733,12 +722,12 @@
         "seriesColumns": {
           "period": "Period",
           "revenue": "Collections",
-          "departures": "Pick-ups"
+          "departures": "Rentals started"
         },
         "generated": "Issued on {date}",
         "brand": "DriveTN",
         "documentTitle": "Activity report",
-        "truncated": "The report lists the first {count} pick-ups. The totals cover the whole period.",
+        "truncated": "The report lists the first {count} rentals. The totals cover the whole period.",
         "totals": "Total",
         "fileName": "DriveTN-report-{period}"
       }

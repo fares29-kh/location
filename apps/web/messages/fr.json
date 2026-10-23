@@ -632,20 +632,12 @@
     },
     "dashboard": {
       "title": "Tableau de bord",
-      "subtitle": "Votre activité, du jour à l’année.",
+      "subtitle": "D’abord ce qu’il faut faire aujourd’hui, puis un seul bloc de chiffres pour la période choisie.",
       "openPlanning": "Planning",
       "openBookings": "Réservations",
-      "quickLinks": "Raccourcis",
-      "kpis": {
-        "revenue": "Chiffre d’affaires du mois",
-        "bookings": "Réservations du mois",
-        "occupancy": "Occupation sur 30 jours",
-        "outstanding": "Reste à encaisser",
-        "versusLastMonth": "{value} vs la même période le mois dernier",
-        "noComparison": "Pas de comparaison disponible",
-        "onRentNow": "{count, plural, one {# véhicule en location} other {# véhicules en location}}",
-        "outstandingHint": "Soldes des locations en cours et terminées",
-        "allCollected": "Tout est encaissé"
+      "sections": {
+        "now": "À faire maintenant",
+        "nowText": "Les demandes qui attendent une réponse, et les voitures à remettre ou à récupérer aujourd’hui."
       },
       "pending": {
         "title": "Demandes en attente",
@@ -657,21 +649,22 @@
       },
       "today": {
         "title": "Aujourd’hui",
-        "departures": "Départs",
-        "returns": "Retours",
+        "subtitle": "Voitures à remettre au client, et voitures à récupérer.",
+        "departures": "À remettre",
+        "returns": "À récupérer",
         "noDepartures": "Aucun départ prévu aujourd’hui.",
         "noReturns": "Aucun retour prévu aujourd’hui."
       },
-      "revenue": {
-        "title": "Chiffre d’affaires",
-        "subtitle": "Locations terminées sur les 6 derniers mois",
-        "total": "Total sur 6 mois",
-        "barLabel": "{month} : {amount}",
-        "unit": "Montants en dinars tunisiens, hors cautions."
-      },
       "fleet": {
-        "title": "Flotte",
-        "subtitle": "{count, plural, one {# véhicule} other {# véhicules}}",
+        "title": "La flotte en ce moment",
+        "intro": "L’état des voitures, le temps loué sur 30 jours, et l’argent encore dû. Ces chiffres ne changent pas quand vous changez de période.",
+        "statusTitle": "Où sont les voitures",
+        "statusHint": "{count, plural, one {# voiture} other {# voitures}}. Chaque couleur est un état actuel, pas un montant.",
+        "occupancy": "Occupation sur 30 jours",
+        "occupancyHint": "Part du temps où les voitures actives ont été louées, sur les 30 derniers jours.",
+        "outstanding": "Reste à encaisser",
+        "outstandingHint": "Argent encore dû sur les locations en cours ou déjà rendues.",
+        "allCollected": "Tout est encaissé",
         "available": "Disponibles",
         "onRent": "En location",
         "maintenance": "En entretien",
@@ -681,23 +674,9 @@
         "reviewsCount": "{count, plural, one {# avis} other {# avis}}",
         "manage": "Gérer la flotte"
       },
-      "shortcuts": {
-        "fleet": {
-          "title": "Flotte",
-          "text": "Tarifs, disponibilités et entretien"
-        },
-        "payments": {
-          "title": "Encaissements",
-          "text": "Paiements reçus et cautions"
-        },
-        "settings": {
-          "title": "Paramètres",
-          "text": "Fiche agence et conditions de location"
-        }
-      },
       "report": {
-        "title": "Activité",
-        "subtitle": "Encaissements et départs de la période choisie. Le PDF reprend exactement ces chiffres.",
+        "title": "Chiffres de la période",
+        "subtitle": "Les trois totaux et le graphique mesurent le même argent encaissé. La liste, en dessous, compte les locations qui commencent.",
         "periodLabel": "Choisir la période",
         "grains": {
           "day": "Jour",
@@ -709,16 +688,26 @@
         "next": "Période suivante",
         "today": "Aujourd’hui",
         "revenue": "Encaissements",
-        "departures": "Départs",
+        "revenueHint": "Argent reçu des locations sur cette période, sans les cautions.",
+        "departures": "Locations commencées",
+        "departuresHint": "Réservations dont le jour de départ tombe dans cette période.",
         "average": "Panier moyen",
+        "averageHint": "Encaissements divisés par le nombre de locations commencées.",
         "versus": "{value} par rapport à la période précédente",
         "noComparison": "Pas de période précédente à comparer",
-        "chart": "Répartition sur la période",
-        "barLabel": "{label} : {amount}, {count, plural, one {# départ} other {# départs}}",
+        "chartTitle": {
+          "day": "Encaissements de chaque heure",
+          "week": "Encaissements de chaque jour",
+          "month": "Encaissements de chaque jour",
+          "year": "Encaissements de chaque mois"
+        },
+        "chartHint": "Chaque barre est une part des encaissements ci-dessus. Sans barre, aucun argent n’a été reçu sur ce créneau.",
+        "barLabel": "{label} : {amount} encaissés",
         "hour": "{hour} h",
-        "preview": "Départs de la période",
-        "empty": "Aucun départ sur cette période.",
-        "more": "{count, plural, one {# départ de plus dans le rapport} other {# départs de plus dans le rapport}}",
+        "preview": "Locations qui commencent",
+        "linesHint": "Le montant est le prix de la location. Il peut avoir été encaissé un autre jour.",
+        "empty": "Aucune location ne commence sur cette période.",
+        "more": "{count, plural, one {# location de plus dans le rapport} other {# locations de plus dans le rapport}}",
         "download": "Enregistrer en PDF",
         "downloadHint": "La fenêtre d’impression s’ouvre. Choisissez « Enregistrer au format PDF ».",
         "columns": {
@@ -733,12 +722,12 @@
         "seriesColumns": {
           "period": "Période",
           "revenue": "Encaissements",
-          "departures": "Départs"
+          "departures": "Locations commencées"
         },
         "generated": "Édité le {date}",
         "brand": "DriveTN",
         "documentTitle": "Rapport d’activité",
-        "truncated": "Le rapport détaille les {count} premiers départs. Les totaux couvrent toute la période.",
+        "truncated": "Le rapport détaille les {count} premières locations. Les totaux couvrent toute la période.",
         "totals": "Total",
         "fileName": "DriveTN-rapport-{period}"
       }
