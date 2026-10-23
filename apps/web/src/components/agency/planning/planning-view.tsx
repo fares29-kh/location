@@ -149,7 +149,7 @@ function VehicleRowMenu({
   return (
     <VehicleGuards vehicleId={vehicle.id} name={name} status={vehicle.status} onRent={onRent}>
       {({ statusItems, deleteItem }) => (
-        <DropdownMenu>
+        <DropdownMenu modal={false}>
           <DropdownMenuTrigger asChild>
             <Button
               variant="ghost"

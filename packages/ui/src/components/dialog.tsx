@@ -2,7 +2,7 @@
 
 import { X } from 'lucide-react';
 import { Dialog as DialogPrimitive } from 'radix-ui';
-import type { ComponentProps } from 'react';
+import { type ComponentProps, useLayoutEffect, useRef } from 'react';
 
 import { cn } from '../lib/cn';
 
@@ -11,7 +11,7 @@ export const DialogTrigger = DialogPrimitive.Trigger;
 export const DialogClose = DialogPrimitive.Close;
 
 export const overlayClassName = cn(
-  'fixed inset-0 z-50 bg-black/50 backdrop-blur-[2px]',
+  'fixed inset-0 z-[70] bg-black/50 backdrop-blur-[2px]',
   'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
 );
 
@@ -27,13 +27,46 @@ export interface DialogContentProps extends ComponentProps<typeof DialogPrimitiv
   closeLabel?: string;
 }
 
-export function DialogContent({ className, children, closeLabel, ...props }: DialogContentProps) {
+export function DialogContent({
+  className,
+  children,
+  closeLabel,
+  onInteractOutside,
+  onFocusOutside,
+  ...props
+}: DialogContentProps) {
+  const openedAt = useRef(0);
+  useLayoutEffect(() => {
+    openedAt.current = performance.now();
+  }, []);
+  // Le clic qui ouvre la fenêtre (souvent depuis un menu) ne doit pas la refermer aussitôt.
+  const keepThroughOpeningClick = (event: {
+    preventDefault: () => void;
+    defaultPrevented: boolean;
+  }) => {
+    if (performance.now() - openedAt.current < 500) {
+      event.preventDefault();
+    }
+  };
+
   return (
     <DialogPrimitive.Portal>
       <DialogOverlay />
       <DialogPrimitive.Content
+        onInteractOutside={(event) => {
+          keepThroughOpeningClick(event);
+          if (!event.defaultPrevented) {
+            onInteractOutside?.(event);
+          }
+        }}
+        onFocusOutside={(event) => {
+          keepThroughOpeningClick(event);
+          if (!event.defaultPrevented) {
+            onFocusOutside?.(event);
+          }
+        }}
         className={cn(
-          'fixed inset-0 z-50 m-auto grid h-fit max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-lg gap-4 overflow-y-auto',
+          'fixed inset-0 z-[70] m-auto grid h-fit max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-lg gap-4 overflow-y-auto',
           'rounded-panel border border-border bg-surface p-6 text-foreground shadow-elevated',
           'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
           'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',

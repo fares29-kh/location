@@ -95,7 +95,7 @@ function VehicleStatusMenu({ vehicle }: { vehicle: VehicleView }) {
       onRent={vehicle.currentBooking !== null}
     >
       {({ statusItems, deleteItem }) => (
-        <DropdownMenu>
+        <DropdownMenu modal={false}>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon-sm" aria-label={t('moreActions', { name })}>
               <MoreHorizontal aria-hidden="true" />

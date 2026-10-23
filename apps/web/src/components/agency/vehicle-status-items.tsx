@@ -81,7 +81,9 @@ export function VehicleGuards({
                   return;
                 }
                 setStatusError(undefined);
-                setWithdrawal(next);
+                window.setTimeout(() => {
+                  setWithdrawal(next);
+                }, 0);
               }}
             >
               {VEHICLE_STATUSES.map((option) => (
@@ -107,7 +109,9 @@ export function VehicleGuards({
             disabled={onRent || deletion.isPending}
             onSelect={() => {
               setDeleteError(undefined);
-              setDeleting(true);
+              window.setTimeout(() => {
+                setDeleting(true);
+              }, 0);
             }}
           >
             <Trash2 aria-hidden="true" />
