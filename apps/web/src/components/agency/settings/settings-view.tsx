@@ -78,7 +78,7 @@ function range(from: number, to: number): number[] {
 }
 
 /** Variante du schéma partagé dont l'erreur d'email reste un code traduisible. */
-const profileFormSchema = agencyProfileSchema.extend({
+const profileFormSchema = agencyProfileSchema.safeExtend({
   email: z
     .string()
     .trim()
