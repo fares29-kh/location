@@ -286,6 +286,22 @@ export function AgencyPopupCard({
             <MapPin className="size-3.5 shrink-0" aria-hidden="true" />
             <span className="truncate">{agency.address}</span>
           </p>
+          {agency.extraPhones.length > 0 && (
+            <ul className="flex flex-wrap gap-x-3 gap-y-1">
+              {agency.extraPhones.map((extraPhone) => (
+                <li key={extraPhone}>
+                  <a
+                    href={`tel:${toE164(extraPhone)}`}
+                    className="inline-flex items-center gap-1 font-medium text-foreground"
+                    dir="ltr"
+                  >
+                    <Phone className="size-3.5 text-primary" aria-hidden="true" />
+                    {formatNationalPhone(extraPhone)}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )}
           {agency.categories.length > 0 && (
             <p className="flex items-center gap-1.5">
               <CarFront className="size-3.5 shrink-0" aria-hidden="true" />

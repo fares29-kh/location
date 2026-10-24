@@ -559,6 +559,7 @@ export function createAgencyDataset(now: Date = new Date()): AgencyDataset {
         name: 'Carthage Auto Location',
         phone: '71234567',
         whatsappPhone: '98123456',
+        extraPhones: ['98111222'],
         email: 'contact@carthage-auto.tn',
         address: 'Rue du Lac Biwa, Les Berges du Lac, 1053 Tunis',
         governorateCode: '11',

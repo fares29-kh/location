@@ -83,6 +83,13 @@ function Overview({ agency }: { agency: AgencyDetail }) {
               {displayPhone(agency.owner.phone)}
             </a>
           </InfoRow>
+          {agency.extraPhones.map((extraPhone) => (
+            <InfoRow key={extraPhone} icon={Phone}>
+              <a href={`tel:+216${extraPhone}`} className="tabular-nums hover:text-primary">
+                {displayPhone(extraPhone)}
+              </a>
+            </InfoRow>
+          ))}
           <InfoRow icon={Mail}>
             {agency.email === null ? (
               <span className="text-muted-foreground">{t('noEmail')}</span>

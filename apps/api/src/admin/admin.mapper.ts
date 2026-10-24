@@ -97,6 +97,7 @@ export function toAdminAgency(row: AdminAgencyRow, stats: AgencyStats): AdminAge
     status: row.status,
     owner: toPersonRef(row.owner),
     phone: row.phone,
+    extraPhones: row.extraPhones,
     email: row.email,
     address: row.address,
     taxId: row.taxId,

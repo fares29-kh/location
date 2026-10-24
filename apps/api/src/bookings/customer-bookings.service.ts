@@ -103,6 +103,7 @@ function toCustomerBooking(
       logoUrl: row.agency.logoKey === null ? null : publicUrl(row.agency.logoKey),
       phone: row.agency.phone,
       whatsappPhone: row.agency.whatsappPhone,
+      extraPhones: row.agency.extraPhones,
       address: row.agency.address,
     },
   };

@@ -243,6 +243,7 @@ export function toSettings(
       name: agency.name,
       phone: agency.phone,
       whatsappPhone: agency.whatsappPhone,
+      extraPhones: agency.extraPhones,
       email: agency.email ?? undefined,
       address: agency.address,
       governorateCode: agency.governorateCode,

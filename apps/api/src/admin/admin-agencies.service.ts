@@ -9,6 +9,7 @@ import {
   applyAgencyDecision,
   type AuditAction,
   getAgencyDecisions,
+  normalizeTunisianPhone,
   toMonthKey,
 } from '@drivetn/types';
 import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
@@ -245,13 +246,16 @@ export class AdminAgenciesService {
       return {};
     }
     const text = contains(search);
-    const digits = contains(search.replace(/\s+/g, ''));
+    const compact = search.replace(/\s+/g, '');
+    const digits = contains(compact);
+    const national = normalizeTunisianPhone(compact);
     return {
       OR: [
         { name: text },
         { taxId: text },
         { email: text },
         { phone: digits },
+        ...(national.length === 8 ? [{ extraPhones: { has: national } }] : []),
         { governorate: { nameFr: text } },
         {
           owner: {

@@ -6,7 +6,9 @@ import {
   canCustomerReview,
   canEditCustomerReview,
   type CustomerBooking,
+  formatNationalPhone,
   pickLocalized,
+  toE164,
 } from '@drivetn/types';
 import { Button } from '@drivetn/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@drivetn/ui/card';
@@ -262,6 +264,14 @@ function BookingCard({
               </a>
             </Button>
           )}
+          {booking.agency.extraPhones.map((extraPhone) => (
+            <Button key={extraPhone} asChild variant="secondary" size="sm">
+              <a href={`tel:${toE164(extraPhone)}`} dir="ltr">
+                <Phone aria-hidden="true" />
+                {formatNationalPhone(extraPhone)}
+              </a>
+            </Button>
+          ))}
           {booking.agency.whatsappPhone.length > 0 && (
             <WhatsAppButton
               size="sm"

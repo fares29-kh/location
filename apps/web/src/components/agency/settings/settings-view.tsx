@@ -2,6 +2,7 @@
 
 import {
   agencyProfileSchema,
+  AGENCY_EXTRA_PHONES_MAX,
   CANCELLATION_HOURS_MAX,
   type ChangePasswordInput,
   changePasswordSchema,
@@ -39,7 +40,7 @@ import { Textarea } from '@drivetn/ui/textarea';
 import { toast } from '@drivetn/ui/toaster';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
-import { Building2, KeyRound, Mail, MapPin, Phone, ShieldCheck, Zap } from 'lucide-react';
+import { Building2, KeyRound, Mail, MapPin, Phone, Plus, ShieldCheck, X, Zap } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useId } from 'react';
 import { Controller, type UseFormReturn, useForm, useWatch } from 'react-hook-form';
@@ -136,6 +137,10 @@ function ProfileForm({
   const { errors, isDirty } = form.formState;
   const description = useWatch({ control: form.control, name: 'description' });
   const phone = useWatch({ control: form.control, name: 'phone' });
+  const extraPhones = useWatch({ control: form.control, name: 'extraPhones' }) ?? [];
+  const setExtraPhones = (next: string[]) => {
+    form.setValue('extraPhones', next, { shouldDirty: true, shouldValidate: true });
+  };
   const name = useWatch({ control: form.control, name: 'name' });
   const latitude = useWatch({ control: form.control, name: 'latitude' });
   const longitude = useWatch({ control: form.control, name: 'longitude' });
@@ -253,6 +258,69 @@ function ProfileForm({
             >
               {t('sameAsPhone')}
             </button>
+          </div>
+          <div className="grid gap-3 sm:col-span-2">
+            <div className="grid gap-1">
+              <p className="text-sm font-medium">{t('extraPhones')}</p>
+              <p className="text-sm text-muted-foreground">{t('extraPhonesHint')}</p>
+            </div>
+            {extraPhones.map((extraPhone, index) => {
+              const bucket: unknown = errors.extraPhones;
+              const item =
+                typeof bucket === 'object' && bucket !== null
+                  ? (bucket as Record<string, unknown>)[String(index)]
+                  : undefined;
+              const raw =
+                typeof item === 'object' &&
+                item !== null &&
+                'message' in item &&
+                typeof item.message === 'string'
+                  ? item.message
+                  : undefined;
+              const message = validationMessage(raw);
+              return (
+                <div key={index} className="flex items-start gap-2">
+                  <div className="min-w-0 flex-1">
+                    <Field id={`${id}-extra-${index}`} label={t('phone')} error={message}>
+                      <PhoneInput
+                        {...controlProps(`${id}-extra-${index}`, { error: message })}
+                        value={extraPhone}
+                        onValueChange={(value) => {
+                          const next = [...extraPhones];
+                          next[index] = value;
+                          setExtraPhones(next);
+                        }}
+                      />
+                    </Field>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="mt-7"
+                    aria-label={t('removePhone')}
+                    onClick={() => {
+                      setExtraPhones(extraPhones.filter((_, item) => item !== index));
+                    }}
+                  >
+                    <X aria-hidden="true" />
+                  </Button>
+                </div>
+              );
+            })}
+            {extraPhones.length < AGENCY_EXTRA_PHONES_MAX && (
+              <Button
+                type="button"
+                variant="secondary"
+                className="justify-self-start"
+                onClick={() => {
+                  setExtraPhones([...extraPhones, '']);
+                }}
+              >
+                <Plus aria-hidden="true" />
+                {t('addPhone')}
+              </Button>
+            )}
           </div>
           <div className="sm:col-span-2">
             {textField('email', t('email'), {
@@ -624,6 +692,14 @@ function ClientPreview({
             <Phone className="size-4 text-muted-foreground" aria-hidden="true" />
             <span className="tabular-nums">{displayPhone(profile.phone)}</span>
           </li>
+          {profile.extraPhones?.map((extraPhone) =>
+            extraPhone.length > 0 ? (
+              <li key={extraPhone} className="flex items-center gap-2" dir="ltr">
+                <Phone className="size-4 text-muted-foreground" aria-hidden="true" />
+                <span className="tabular-nums">{displayPhone(extraPhone)}</span>
+              </li>
+            ) : null,
+          )}
           {profile.email.length > 0 && (
             <li className="flex items-center gap-2">
               <Mail className="size-4 text-muted-foreground" aria-hidden="true" />

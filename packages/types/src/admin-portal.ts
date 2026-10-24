@@ -50,6 +50,7 @@ export interface AdminAgency extends AgencyRef {
   status: AgencyStatus;
   owner: PersonRef;
   phone: string;
+  extraPhones: string[];
   email: string | null;
   address: string;
   /** Matricule fiscal (ex. 1234567/A/M/000). */

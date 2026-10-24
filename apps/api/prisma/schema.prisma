@@ -315,6 +315,8 @@ model Agency {
   /// Numéros nationaux à 8 chiffres.
   phone                  String
   whatsappPhone          String           @map("whatsapp_phone")
+  /// Autres numéros nationaux, en plus du téléphone principal.
+  extraPhones            String[]         @default([]) @map("extra_phones")
   email                  String?
   address                String
   governorateCode        String           @map("governorate_code")

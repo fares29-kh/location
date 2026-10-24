@@ -175,6 +175,8 @@ export const publicAgencySchema = z.object({
   description: z.string(),
   phone: z.string(),
   whatsappPhone: z.string(),
+  /** Autres numéros, en plus du téléphone principal. */
+  extraPhones: z.array(z.string()).default([]),
   /** Note moyenne sur 5, `null` sans avis. */
   rating: z.number().min(0).max(5).nullable(),
   reviewsCount: z.number().int().min(0),
@@ -336,6 +338,7 @@ export interface CustomerBooking {
     logoUrl: string | null;
     phone: string;
     whatsappPhone: string;
+    extraPhones: string[];
     address: string;
   };
 }

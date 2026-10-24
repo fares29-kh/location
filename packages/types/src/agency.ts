@@ -19,19 +19,39 @@ const tunisiaLongitude = z
   .min(TUNISIA_LONGITUDE_MIN, { message: 'OUT_OF_RANGE' })
   .max(TUNISIA_LONGITUDE_MAX, { message: 'OUT_OF_RANGE' });
 
+/** Numéros en plus du téléphone principal et du WhatsApp. */
+export const AGENCY_EXTRA_PHONES_MAX = 4;
+
+const extraPhonesSchema = z
+  .array(tunisianPhoneSchema)
+  .max(AGENCY_EXTRA_PHONES_MAX, { message: 'TOO_MANY' })
+  .default([]);
+
 /** Fiche publique de l'agence, affichée aux clients sur le portail. */
-export const agencyProfileSchema = z.object({
-  name: z.string().trim().min(1, { message: 'REQUIRED' }).max(80, { message: 'TOO_LONG' }),
-  phone: tunisianPhoneSchema,
-  whatsappPhone: tunisianPhoneSchema,
-  email: optionalEmailSchema,
-  address: z.string().trim().min(1, { message: 'REQUIRED' }).max(200, { message: 'TOO_LONG' }),
-  governorateCode: z.string().regex(/^\d{2}$/, { message: 'REQUIRED' }),
-  description: z.string().trim().max(600, { message: 'TOO_LONG' }),
-  /** `null` : l'agence est placée au chef-lieu de son gouvernorat. */
-  latitude: tunisiaLatitude.nullable(),
-  longitude: tunisiaLongitude.nullable(),
-});
+export const agencyProfileSchema = z
+  .object({
+    name: z.string().trim().min(1, { message: 'REQUIRED' }).max(80, { message: 'TOO_LONG' }),
+    phone: tunisianPhoneSchema,
+    whatsappPhone: tunisianPhoneSchema,
+    /** Autres lignes, distinctes du téléphone principal. */
+    extraPhones: extraPhonesSchema,
+    email: optionalEmailSchema,
+    address: z.string().trim().min(1, { message: 'REQUIRED' }).max(200, { message: 'TOO_LONG' }),
+    governorateCode: z.string().regex(/^\d{2}$/, { message: 'REQUIRED' }),
+    description: z.string().trim().max(600, { message: 'TOO_LONG' }),
+    /** `null` : l'agence est placée au chef-lieu de son gouvernorat. */
+    latitude: tunisiaLatitude.nullable(),
+    longitude: tunisiaLongitude.nullable(),
+  })
+  .superRefine((profile, ctx) => {
+    const seen = new Set<string>();
+    profile.extraPhones.forEach((phone, index) => {
+      if (phone === profile.phone || seen.has(phone)) {
+        ctx.addIssue({ code: 'custom', message: 'ALREADY_USED', path: ['extraPhones', index] });
+      }
+      seen.add(phone);
+    });
+  });
 
 export type AgencyProfileInput = z.input<typeof agencyProfileSchema>;
 export type AgencyProfile = z.output<typeof agencyProfileSchema>;

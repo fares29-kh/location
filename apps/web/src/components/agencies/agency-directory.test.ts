@@ -21,6 +21,7 @@ function agency(overrides: Partial<PublicAgency>): PublicAgency {
     description: '',
     phone: '71123456',
     whatsappPhone: '98123456',
+    extraPhones: [],
     rating: null,
     reviewsCount: 0,
     vehiclesCount: 0,
