@@ -49,7 +49,7 @@ export class LoginDto {
   password: string;
 
   @ApiPropertyOptional({
-    description: 'Jeton reCAPTCHA v2, obligatoire si le captcha est configuré',
+    description: 'Jeton reCAPTCHA v3, obligatoire si le captcha est configuré',
   })
   captchaToken?: string;
 }
@@ -62,7 +62,7 @@ export class OtpRequestDto {
   email: string;
 
   @ApiPropertyOptional({
-    description: 'Jeton reCAPTCHA v2 pour une connexion par code, si le captcha est configuré',
+    description: 'Jeton reCAPTCHA v3 pour une connexion par code, si le captcha est configuré',
   })
   captchaToken?: string;
 }

@@ -8,19 +8,24 @@ import { REDIS_CLIENT } from '../redis/redis.constants';
 
 const VERIFY_URL = 'https://www.google.com/recaptcha/api/siteverify';
 const VERIFY_TIMEOUT_MS = 5_000;
-/** Fenêtre pendant laquelle un renvoi de code de connexion n'exige pas une nouvelle case. */
+/** Score v3 en dessous duquel la connexion est refusée. 1 = humain très probable. */
+const MIN_SCORE = 0.5;
+const EXPECTED_ACTION = 'login';
+/** Fenêtre pendant laquelle un renvoi de code de connexion n'exige pas un nouveau jeton. */
 const LOGIN_OTP_GRACE_SECONDS = 15 * 60;
 
 interface SiteverifyResponse {
   success?: boolean;
   hostname?: string;
+  score?: number;
+  action?: string;
 }
 
 function graceKey(email: string): string {
   return `drivetn:captcha:login-otp:${email}`;
 }
 
-/** Vérifie le jeton reCAPTCHA v2. Sans secret configuré, la vérification est ignorée. */
+/** Vérifie le jeton reCAPTCHA v3. Sans secret configuré, la vérification est ignorée. */
 @Injectable()
 export class RecaptchaService {
   private readonly logger = new Logger(RecaptchaService.name);
@@ -46,7 +51,7 @@ export class RecaptchaService {
   }
 
   /**
-   * Premier envoi du code de connexion : la case est obligatoire.
+   * Premier envoi du code de connexion : le jeton est obligatoire.
    * Un renvoi pour le même email reste accepté pendant le délai du code.
    */
   async assertLoginOtp(email: string, token: string | undefined, ip: string | null): Promise<void> {
@@ -90,13 +95,24 @@ export class RecaptchaService {
         return false;
       }
       const payload = (await response.json()) as SiteverifyResponse;
-      return payload.success === true && this.hostnameAllowed(payload.hostname);
+      return this.accepted(payload);
     } catch (error) {
       this.logger.warn(
         `Vérification reCAPTCHA impossible : ${error instanceof Error ? error.message : 'erreur inconnue'}`,
       );
       return false;
     }
+  }
+
+  /** Jeton réussi, émis pour l'action de connexion, avec un score suffisant. */
+  private accepted(payload: SiteverifyResponse): boolean {
+    if (payload.success !== true || !this.hostnameAllowed(payload.hostname)) {
+      return false;
+    }
+    if (payload.action !== undefined && payload.action !== EXPECTED_ACTION) {
+      return false;
+    }
+    return typeof payload.score !== 'number' || payload.score >= MIN_SCORE;
   }
 
   /** Le jeton doit venir de ce domaine ou d'un sous-domaine (agency, admin, app). */

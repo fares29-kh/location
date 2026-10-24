@@ -46,7 +46,7 @@ export const envSchema = z.object({
   SMTP_PASSWORD: z.string().default(''),
   SMTP_FROM: z.string().default('DriveTN <noreply@localhost>'),
   /**
-   * Secret reCAPTCHA v2 (case à cocher). Vide : les connexions n'exigent pas de captcha.
+   * Secret reCAPTCHA v3 (score). Vide : les connexions n'exigent pas de captcha.
    * La clé de site correspondante est lue par le site web.
    */
   RECAPTCHA_SECRET_KEY: z.string().default(''),

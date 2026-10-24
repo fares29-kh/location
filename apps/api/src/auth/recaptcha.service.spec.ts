@@ -31,10 +31,40 @@ describe('RecaptchaService', () => {
       'fetch',
       vi.fn().mockResolvedValue({
         ok: true,
-        json: () => Promise.resolve({ success: true, hostname: 'agency.madrasti.dev' }),
+        json: () =>
+          Promise.resolve({
+            success: true,
+            hostname: 'agency.madrasti.dev',
+            action: 'login',
+            score: 0.9,
+          }),
       }),
     );
     await expect(service('secret', redis).assertToken('token', '1.2.3.4')).resolves.toBeUndefined();
+  });
+
+  it('refuse un score trop bas', async () => {
+    const redis = { get: vi.fn(), set: vi.fn() };
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            success: true,
+            hostname: 'madrasti.dev',
+            action: 'login',
+            score: 0.1,
+          }),
+      }),
+    );
+    const outcome = await service('secret', redis)
+      .assertToken('token', null)
+      .then(
+        () => null,
+        (error: unknown) => error,
+      );
+    expect(outcome).toBeInstanceOf(AppException);
   });
 
   it('refuse un jeton émis pour un autre domaine', async () => {
