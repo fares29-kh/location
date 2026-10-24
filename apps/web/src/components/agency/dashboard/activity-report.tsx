@@ -361,17 +361,14 @@ function ActivityChart({
   const wide = report.grain === 'day' || report.grain === 'month';
 
   return (
-    <figure className="grid gap-2">
-      <figcaption>
+    <figure className="min-w-0 max-w-full">
+      <figcaption className="mb-2">
         <HoverHint hint={t('chartHint')} className="text-sm font-medium">
           {t(`chartTitle.${report.grain}`)}
         </HoverHint>
       </figcaption>
-      <div className="min-w-0 overflow-x-auto">
-        <ol
-          className="flex h-48 items-end gap-1"
-          style={wide ? { minWidth: `${String(report.series.length * 2.25)}rem` } : undefined}
-        >
+      <div className="w-full overflow-x-hidden">
+        <ol className={cn('flex h-48 w-full items-end', wide ? 'gap-px sm:gap-1' : 'gap-1')}>
           {report.series.map((point) => {
             const label = pointLabel(report.grain, point.key, format, (hour) =>
               t('hour', { hour }),
@@ -383,7 +380,7 @@ function ActivityChart({
               amount: format.money(point.revenueMillimes),
             });
             return (
-              <li key={point.key} className={cn('flex h-full flex-1 flex-col', wide && 'min-w-8')}>
+              <li key={point.key} className="flex h-full min-w-0 flex-1 flex-col">
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <button
@@ -436,15 +433,15 @@ function ActivityLines({ report, format }: { report: ActivityReport; format: Age
   const hidden = report.lines.length - preview.length;
 
   return (
-    <div className="grid gap-2">
+    <div className="grid min-w-0 max-w-full grid-cols-1 gap-2">
       <h3 className="text-sm font-medium">
         <HoverHint hint={t('linesHint')}>{t('preview')}</HoverHint>
       </h3>
       {preview.length === 0 ? (
         <p className="text-sm text-muted-foreground">{t('empty')}</p>
       ) : (
-        <div className="min-w-0 overflow-x-auto">
-          <table className="w-full min-w-[36rem] text-start text-sm">
+        <div className="w-full overflow-x-auto">
+          <table className="w-full table-fixed text-start text-sm md:table-auto md:min-w-[36rem]">
             <thead className="text-xs uppercase tracking-wide text-muted-foreground">
               <tr>
                 <th className="px-2 py-2 font-medium">{t('columns.reference')}</th>
@@ -607,7 +604,7 @@ export function ActivityReportCard() {
   };
 
   return (
-    <Card>
+    <Card className="min-w-0 max-w-full overflow-hidden">
       <CardHeader className="gap-4">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="grid gap-1">
@@ -782,7 +779,7 @@ function ActivityVehicles({
     )} · ${format.percent(occupancy(report, millis))}`;
 
   return (
-    <section className="grid gap-3" aria-labelledby="activity-vehicles">
+    <section className="grid min-w-0 max-w-full gap-3" aria-labelledby="activity-vehicles">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h3 id="activity-vehicles" className="text-sm font-medium">
           <HoverHint hint={t('vehicles.hint')}>{t('vehicles.title')}</HoverHint>

@@ -121,7 +121,7 @@ export function AppShell({
   const CollapseIcon = collapsed ? PanelLeftOpen : PanelLeftClose;
 
   return (
-    <div className="flex min-h-dvh">
+    <div className="flex min-h-dvh w-full max-w-full">
       <Sidebar collapsed={collapsed} className="sticky top-0 hidden h-dvh lg:flex">
         <SidebarHeader className={collapsed ? 'justify-center px-0' : undefined}>
           <Link
@@ -198,7 +198,10 @@ export function AppShell({
             <UserMenu user={user} portal={portal} className="ms-1 sm:ms-2" />
           </TopbarSection>
         </Topbar>
-        <main id={MAIN_CONTENT_ID} className="min-w-0 flex-1 p-4 sm:p-6 lg:p-8">
+        <main
+          id={MAIN_CONTENT_ID}
+          className="w-full min-w-0 max-w-full flex-1 overflow-x-clip p-4 sm:p-6 lg:p-8"
+        >
           <div className="mx-auto grid w-full min-w-0 max-w-7xl grid-cols-1">{children}</div>
         </main>
       </div>
