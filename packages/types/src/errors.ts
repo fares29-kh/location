@@ -12,6 +12,7 @@ export const ERROR_CODES = [
   'INTERNAL_ERROR',
   // Codes métier de l'authentification, traduits par le front.
   'INVALID_CREDENTIALS',
+  'CAPTCHA_FAILED',
   'OTP_INVALID',
   'OTP_EXPIRED',
   'OTP_TOO_MANY_ATTEMPTS',

@@ -8,6 +8,8 @@ const serverEnvSchema = z.object({
   DESIGN_PAGE_ENABLED: z.stringbool().default(false),
   /** Affiche les comptes de démo sous les formulaires de connexion ; jamais en production. */
   DEMO_ACCOUNTS_ENABLED: z.stringbool().default(false),
+  /** Clé de site reCAPTCHA v2. Vide : la case n'est pas affichée. */
+  RECAPTCHA_SITE_KEY: z.string().default(''),
 });
 
 export type ServerEnv = z.infer<typeof serverEnvSchema>;

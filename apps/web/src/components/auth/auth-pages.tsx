@@ -63,6 +63,7 @@ export function createLoginPage(portal: Portal) {
           <LoginForm
             portal={portal}
             nextPath={await nextPathFrom(searchParams)}
+            siteKey={getServerEnv().RECAPTCHA_SITE_KEY}
             demo={
               getServerEnv().DEMO_ACCOUNTS_ENABLED
                 ? { accounts: getDemoAccounts(portal), password: DEMO_PASSWORD }

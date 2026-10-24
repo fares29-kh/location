@@ -45,6 +45,11 @@ export const envSchema = z.object({
   SMTP_USER: z.string().default(''),
   SMTP_PASSWORD: z.string().default(''),
   SMTP_FROM: z.string().default('DriveTN <noreply@localhost>'),
+  /**
+   * Secret reCAPTCHA v2 (case à cocher). Vide : les connexions n'exigent pas de captcha.
+   * La clé de site correspondante est lue par le site web.
+   */
+  RECAPTCHA_SECRET_KEY: z.string().default(''),
   SEED_DEMO_ACCOUNTS: booleanString,
   /** Stockage S3 (MinIO en local, Object Storage Hetzner). Sans point d'accès, voir Azure. */
   S3_ENDPOINT: z.url({ protocol: /^https?$/ }).optional(),

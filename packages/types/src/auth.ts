@@ -130,9 +130,13 @@ export const signupSchema = z.object({
 export type SignupInput = z.input<typeof signupSchema>;
 export type SignupRequest = z.output<typeof signupSchema>;
 
+/** Jeton reCAPTCHA v2. Absent quand le captcha n'est pas configuré. */
+const captchaTokenSchema = z.string().trim().min(1).max(4096).optional();
+
 export const loginSchema = z.object({
   identifier: identifierSchema,
   password: z.string().min(1, { message: 'REQUIRED' }).max(PASSWORD_MAX_LENGTH),
+  captchaToken: captchaTokenSchema,
 });
 export type LoginInput = z.input<typeof loginSchema>;
 export type LoginRequest = z.output<typeof loginSchema>;
@@ -147,6 +151,7 @@ export const signupOtpRequestSchema = z.object({
 export const loginOtpRequestSchema = z.object({
   purpose: z.literal('LOGIN'),
   email: emailSchema,
+  captchaToken: captchaTokenSchema,
 });
 
 /** Demande (ou renvoi) d'un code : confirmation d'inscription ou connexion sans mot de passe. */

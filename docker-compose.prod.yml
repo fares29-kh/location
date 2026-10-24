@@ -170,6 +170,7 @@ services:
       AZURE_STORAGE_ACCESS_KEY: ${AZURE_MEDIA_KEY:-}
       AZURE_STORAGE_CONTAINER: ${AZURE_MEDIA_CONTAINER:-}
       MEDIA_PUBLIC_URL: ${MEDIA_PUBLIC_URL:?MEDIA_PUBLIC_URL manquant}
+      RECAPTCHA_SECRET_KEY: ${RECAPTCHA_SECRET_KEY:-}
       RUN_MIGRATIONS: 'true'
       SEED_ON_START: ${SEED_ON_START:-true}
       SEED_DEMO_ACCOUNTS: 'false'
@@ -268,6 +269,7 @@ services:
       API_INTERNAL_URL: http://api:4000
       DESIGN_PAGE_ENABLED: ${DESIGN_PAGE_ENABLED:-false}
       DEMO_ACCOUNTS_ENABLED: 'false'
+      RECAPTCHA_SITE_KEY: ${RECAPTCHA_SITE_KEY:-}
     depends_on:
       api:
         condition: service_healthy

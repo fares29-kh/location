@@ -24,6 +24,7 @@ import { authApi } from '@/lib/api/auth';
 import { ApiError } from '@/lib/api/errors';
 
 import { controlProps } from './control-props';
+import { useLoginCaptcha } from './recaptcha-field';
 import { type DemoCredentials, DemoAccounts } from './demo-accounts';
 import { PasswordInput } from './password-input';
 import { type PendingVerification, PhoneVerification } from './phone-verification';
@@ -40,11 +41,13 @@ interface PasswordCredentials {
 }
 
 function PasswordLogin({
+  siteKey,
   initialValues,
   redirecting,
   onAuthenticated,
   onVerificationRequired,
 }: {
+  siteKey: string;
   initialValues: PasswordCredentials;
   redirecting: boolean;
   onAuthenticated: (result: AuthResult) => void;
@@ -52,6 +55,7 @@ function PasswordLogin({
 }) {
   const t = useTranslations('auth');
   const { validationMessage, errorMessage } = useAuthMessages();
+  const captcha = useLoginCaptcha(siteKey);
   const id = useId();
   const [formError, setFormError] = useState<string | null>(null);
   const form = useForm({
@@ -61,8 +65,15 @@ function PasswordLogin({
 
   const login = useMutation({
     mutationFn: async (values: PasswordCredentials) => {
+      const captchaToken = captcha.consume();
+      if (captchaToken === null) {
+        throw new Error('captcha');
+      }
       try {
-        const result = await authApi.login(values);
+        const result = await authApi.login({
+          ...values,
+          ...(captchaToken === '' ? {} : { captchaToken }),
+        });
         return { kind: 'authenticated', result } satisfies PasswordLoginOutcome;
       } catch (error) {
         const email =
@@ -90,6 +101,10 @@ function PasswordLogin({
       }
     },
     onError: (error) => {
+      captcha.reset();
+      if (error instanceof Error && error.message === 'captcha') {
+        return;
+      }
       if (!applyServerIssues(error, form.setError, ['identifier', 'password'])) {
         setFormError(errorMessage(error));
       }
@@ -127,6 +142,8 @@ function PasswordLogin({
           {...form.register('password')}
         />
       </Field>
+      {captcha.field}
+      {captcha.missing && <p className="text-sm text-danger">{t('login.captcha')}</p>}
       <div className="flex justify-end">
         <Link
           href="/forgot-password"
@@ -144,9 +161,16 @@ function PasswordLogin({
 
 const otpLoginSchema = loginOtpRequestSchema.omit({ purpose: true });
 
-function OtpLogin({ onCodeSent }: { onCodeSent: (verification: PendingVerification) => void }) {
+function OtpLogin({
+  siteKey,
+  onCodeSent,
+}: {
+  siteKey: string;
+  onCodeSent: (verification: PendingVerification) => void;
+}) {
   const t = useTranslations('auth');
   const { validationMessage, errorMessage } = useAuthMessages();
+  const captcha = useLoginCaptcha(siteKey);
   const id = useId();
   const form = useForm({
     resolver: zodResolver(otpLoginSchema, undefined, { raw: true }),
@@ -154,11 +178,25 @@ function OtpLogin({ onCodeSent }: { onCodeSent: (verification: PendingVerificati
   });
 
   const request = useMutation({
-    mutationFn: (email: string) => authApi.requestOtp({ purpose: 'LOGIN', email }),
+    mutationFn: (email: string) => {
+      const captchaToken = captcha.consume();
+      if (captchaToken === null) {
+        throw new Error('captcha');
+      }
+      return authApi.requestOtp({
+        purpose: 'LOGIN',
+        email,
+        ...(captchaToken === '' ? {} : { captchaToken }),
+      });
+    },
     onSuccess: (dispatch, email) => {
       onCodeSent({ flow: 'login', dispatch: { ...dispatch, email } });
     },
     onError: (error) => {
+      captcha.reset();
+      if (error instanceof Error && error.message === 'captcha') {
+        return;
+      }
       applyServerIssues(error, form.setError, ['email']);
     },
   });
@@ -191,6 +229,8 @@ function OtpLogin({ onCodeSent }: { onCodeSent: (verification: PendingVerificati
           {...form.register('email')}
         />
       </Field>
+      {captcha.field}
+      {captcha.missing && <p className="text-sm text-danger">{t('login.captcha')}</p>}
       <Button type="submit" size="lg" loading={request.isPending}>
         {t('login.sendCode')}
       </Button>
@@ -202,10 +242,12 @@ function OtpLogin({ onCodeSent }: { onCodeSent: (verification: PendingVerificati
 export function LoginForm({
   portal,
   nextPath,
+  siteKey,
   demo = null,
 }: {
   portal: Portal;
   nextPath: string | null;
+  siteKey: string;
   demo?: DemoCredentials | null;
 }) {
   const t = useTranslations('auth');
@@ -249,6 +291,7 @@ export function LoginForm({
         <TabsContent value="password" className="mt-6">
           <PasswordLogin
             key={prefill.version}
+            siteKey={siteKey}
             initialValues={prefill.values}
             redirecting={redirecting}
             onAuthenticated={complete}
@@ -256,7 +299,7 @@ export function LoginForm({
           />
         </TabsContent>
         <TabsContent value="otp" className="mt-6">
-          <OtpLogin onCodeSent={setVerification} />
+          <OtpLogin siteKey={siteKey} onCodeSent={setVerification} />
         </TabsContent>
       </Tabs>
 

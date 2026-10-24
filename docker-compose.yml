@@ -34,6 +34,7 @@ x-api-environment: &api-environment
   S3_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD:?MINIO_ROOT_PASSWORD manquant (copiez .env.example vers .env)}
   S3_BUCKET_PUBLIC: ${S3_BUCKET_PUBLIC:-drivetn-public}
   MEDIA_PUBLIC_URL: /media
+  RECAPTCHA_SECRET_KEY: ${RECAPTCHA_SECRET_KEY:-}
 
 x-api-build: &api-build
   context: .
@@ -234,6 +235,7 @@ services:
       API_INTERNAL_URL: http://api:4000
       DESIGN_PAGE_ENABLED: ${DESIGN_PAGE_ENABLED:-true}
       DEMO_ACCOUNTS_ENABLED: ${SEED_DEMO_ACCOUNTS:-false}
+      RECAPTCHA_SITE_KEY: ${RECAPTCHA_SITE_KEY:-}
     depends_on:
       api:
         condition: service_healthy

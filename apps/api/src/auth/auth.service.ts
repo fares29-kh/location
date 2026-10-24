@@ -39,6 +39,7 @@ import { RateLimitService } from '../rate-limit/rate-limit.service';
 import { REDIS_CLIENT } from '../redis/redis.constants';
 import { OtpService } from './otp.service';
 import { PasswordService } from './password.service';
+import { RecaptchaService } from './recaptcha.service';
 import { type SessionTokens, TokenService } from './token.service';
 import { toCurrentUser } from './user.mapper';
 
@@ -74,6 +75,7 @@ export class AuthService {
     private readonly passwords: PasswordService,
     private readonly tokens: TokenService,
     private readonly otp: OtpService,
+    private readonly captcha: RecaptchaService,
     private readonly audit: AuditService,
     private readonly rateLimit: RateLimitService,
     @Inject(REDIS_CLIENT) private readonly redis: Redis,
@@ -158,6 +160,7 @@ export class AuthService {
       });
     }
 
+    await this.captcha.assertLoginOtp(input.email, input.captchaToken, context.ip);
     const user = await this.prisma.user.findFirst({
       where: { email: input.email, deletedAt: null },
     });
@@ -204,6 +207,7 @@ export class AuthService {
   }
 
   async loginWithPassword(input: LoginRequest, context: RequestContext): Promise<LoginOutcome> {
+    await this.captcha.assertToken(input.captchaToken, context.ip);
     await this.rateLimit.consume(
       `login:${input.identifier.type}:${input.identifier.value}`,
       LOGIN_IDENTIFIER_LIMIT,
