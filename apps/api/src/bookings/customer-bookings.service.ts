@@ -167,6 +167,17 @@ export class CustomerBookingsService {
           ) {
             throw unavailable();
           }
+          const offered = await tx.vehiclePickupLocation.findUnique({
+            where: { vehicleId_locationId: { vehicleId: vehicle.id, locationId: location.id } },
+          });
+          if (offered === null) {
+            throw new AppException(
+              HttpStatus.BAD_REQUEST,
+              'VALIDATION_ERROR',
+              'Ce véhicule n’est pas remis à cet endroit.',
+              [{ path: 'location', message: 'PLACE_NOT_OFFERED' }],
+            );
+          }
           const overlapping = await tx.booking.count({
             where: {
               vehicleId: vehicle.id,

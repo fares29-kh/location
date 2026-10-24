@@ -1,6 +1,12 @@
 'use client';
 
-import { addDays, dayKeyToDate, type Locale, rentalPriceMillimes } from '@drivetn/types';
+import {
+  addDays,
+  dayKeyToDate,
+  type Locale,
+  pickLocalized,
+  rentalPriceMillimes,
+} from '@drivetn/types';
 import { Badge } from '@drivetn/ui/badge';
 import { Button } from '@drivetn/ui/button';
 import { cn } from '@drivetn/ui/lib/cn';
@@ -15,6 +21,7 @@ import {
   Fuel,
   Gauge,
   type LucideIcon,
+  MapPin,
   Snowflake,
   Users,
   Zap,
@@ -136,6 +143,18 @@ export function OfferCard({
             )}
             <span className="truncate font-medium text-foreground">{offer.agency.name}</span>
           </p>
+          {offer.pickupLocations.length > 0 && (
+            <p className="flex min-w-0 items-center gap-1.5 text-sm text-muted-foreground">
+              <MapPin className="size-4 shrink-0 text-primary" aria-hidden="true" />
+              <span className="truncate">
+                {t('pickupPlaces', {
+                  places: offer.pickupLocations
+                    .map((place) => pickLocalized(place.name, locale))
+                    .join(', '),
+                })}
+              </span>
+            </p>
+          )}
           <div className="flex items-center gap-2 text-sm">
             {offer.rating !== null && rating !== null ? (
               <>

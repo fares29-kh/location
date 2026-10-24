@@ -152,6 +152,8 @@ export interface Offer {
   /** `null` : kilométrage illimité. */
   mileageLimitKm: number | null;
   agency: OfferAgency;
+  /** Lieux où cette voiture peut être remise. La recherche s'appuie sur cette liste. */
+  pickupLocations: { slug: string; name: LocalizedText }[];
   /** Créneaux déjà pris. Le jour `return` est libre à 10 h. */
   unavailable: UnavailableRange[];
 }

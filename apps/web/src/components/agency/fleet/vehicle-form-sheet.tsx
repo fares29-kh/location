@@ -8,6 +8,7 @@ import {
   parseDinars,
   TRANSMISSIONS,
   transmissionSchema,
+  VEHICLE_PICKUP_LOCATIONS_MAX,
   VEHICLE_SEATS_MAX,
   VEHICLE_SEATS_MIN,
   VEHICLE_YEAR_MIN,
@@ -45,6 +46,7 @@ import { type PhotoDraft, savedPhotoDrafts } from '@/lib/agency/vehicle-photos';
 import { useVehicleBrands } from '@/lib/vehicle-brands';
 
 import { applyFieldIssues, useValidationMessage } from '../use-validation-message';
+import { PickupLocationsField } from './pickup-locations-field';
 import { VehiclePhotosField } from './vehicle-photos-field';
 
 const integerString = (min: number, max: () => number) =>
@@ -89,6 +91,10 @@ const vehicleFormSchema = z
     deposit: amountString(true),
     unlimitedMileage: z.boolean(),
     mileageLimitKm: z.string().trim(),
+    pickupLocationSlugs: z
+      .array(z.string())
+      .min(1, { message: 'REQUIRED' })
+      .max(VEHICLE_PICKUP_LOCATIONS_MAX, { message: 'TOO_MANY' }),
   })
   .refine(
     (value) =>
@@ -99,7 +105,14 @@ const vehicleFormSchema = z
 
 type VehicleFormValues = z.input<typeof vehicleFormSchema>;
 
-const SERVER_FIELDS = ['brand', 'model', 'year', 'plateNumber', 'category'] as const;
+const SERVER_FIELDS = [
+  'brand',
+  'model',
+  'year',
+  'plateNumber',
+  'category',
+  'pickupLocationSlugs',
+] as const;
 const SEAT_OPTIONS = Array.from({ length: VEHICLE_SEATS_MAX - VEHICLE_SEATS_MIN + 1 }, (_, index) =>
   String(VEHICLE_SEATS_MIN + index),
 );
@@ -123,6 +136,7 @@ function toFormValues(
     deposit: vehicle === null ? '' : millimesToDinarInput(vehicle.depositMillimes),
     unlimitedMileage: mileageLimit === null,
     mileageLimitKm: mileageLimit === null ? '' : String(mileageLimit),
+    pickupLocationSlugs: vehicle?.pickupLocationSlugs ?? [],
   };
 }
 
@@ -140,6 +154,7 @@ function toInput(values: VehicleFormValues): VehicleInput {
     dailyRateMillimes: parseDinars(values.dailyRate) ?? 0,
     depositMillimes: parseDinars(values.deposit) ?? 0,
     mileageLimitKm: values.unlimitedMileage ? null : Number(values.mileageLimitKm),
+    pickupLocationSlugs: values.pickupLocationSlugs,
   };
 }
 
@@ -504,6 +519,23 @@ export function VehicleFormSheet({
                       onCheckedChange={field.onChange}
                     />
                   </label>
+                )}
+              />
+            </FormSection>
+
+            <FormSection title={tForm('sections.places')}>
+              <Controller
+                control={form.control}
+                name="pickupLocationSlugs"
+                render={({ field }) => (
+                  <PickupLocationsField
+                    id={`${id}-places`}
+                    value={field.value}
+                    onChange={(slugs) => {
+                      field.onChange(slugs);
+                    }}
+                    error={validationMessage(errors.pickupLocationSlugs?.message)}
+                  />
                 )}
               />
             </FormSection>

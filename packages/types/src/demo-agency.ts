@@ -13,6 +13,16 @@ import { addDays, type DayKey, todayKey, tunisDateTime } from './dates';
 import type { LocalizedText } from './location';
 import { createRandom, type Random } from './random';
 
+/** Lieux de Tunis proposés par la flotte de démonstration. */
+const DEMO_PICKUP_SLUGS = [
+  'aeroport-tunis-carthage',
+  'carthage',
+  'gare-de-tunis',
+  'la-marsa',
+  'port-de-la-goulette',
+  'tunis',
+];
+
 const VEHICLE_SPECS: readonly Omit<
   Vehicle,
   'id' | 'createdAt' | 'plateNumber' | 'status' | 'mileageKm' | 'photos'
@@ -70,6 +80,7 @@ function vehicle(
     dailyRateMillimes: dailyRateDinars * 1000,
     depositMillimes: depositDinars * 1000,
     mileageLimitKm: category === 'premium' ? 250 : null,
+    pickupLocationSlugs: DEMO_PICKUP_SLUGS,
   };
 }
 

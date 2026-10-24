@@ -342,7 +342,11 @@ export function roundFloats<T>(value: T): T {
  */
 export const LEGACY_AGENCY_INCLUDE = {
   vehicles: {
-    include: { photos: VEHICLE_PHOTOS_INCLUDE, category: { select: { slug: true } } },
+    include: {
+      photos: VEHICLE_PHOTOS_INCLUDE,
+      category: { select: { slug: true } },
+      pickupLocations: { select: { location: { select: { slug: true } } } },
+    },
     orderBy: { id: 'asc' },
   },
   bookings: {

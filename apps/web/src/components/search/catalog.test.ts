@@ -62,6 +62,7 @@ const OFFER: Offer = {
     acceptedPaymentMethods: ['CASH'],
   },
   photos: [],
+  pickupLocations: [],
   unavailable: [],
 };
 

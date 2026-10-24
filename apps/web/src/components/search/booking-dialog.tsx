@@ -60,14 +60,29 @@ const bookingFormSchema = z
 type BookingFormValues = z.input<typeof bookingFormSchema>;
 
 const FORM_FIELDS = ['pickup', 'return', 'location', 'note'] as const;
-const VALIDATION_CODES = ['REQUIRED', 'TOO_LONG', 'RETURN_BEFORE_PICKUP', 'PAST_DATE'] as const;
+const VALIDATION_CODES = [
+  'REQUIRED',
+  'TOO_LONG',
+  'RETURN_BEFORE_PICKUP',
+  'PAST_DATE',
+  'PLACE_NOT_OFFERED',
+] as const;
 
 function isValidationCode(code: string): code is (typeof VALIDATION_CODES)[number] {
   return (VALIDATION_CODES as readonly string[]).includes(code);
 }
 
-/** Lieux du gouvernorat de l'agence ; tous les lieux si le référentiel ne le précise pas. */
-function agencyLocations(options: readonly LocationOption[], governorateCode: string) {
+/** Lieux où cette voiture est remise. Sans liste, on retombe sur le gouvernorat du bureau. */
+function vehicleLocations(
+  options: readonly LocationOption[],
+  slugs: readonly string[],
+  governorateCode: string,
+) {
+  const allowed = new Set(slugs);
+  const offered = options.filter((option) => allowed.has(option.value));
+  if (offered.length > 0) {
+    return offered;
+  }
   const local = options.filter((option) => option.governorateCode === governorateCode);
   return local.length > 0 ? local : options;
 }
@@ -103,7 +118,11 @@ export function BookingDialog({
   const ranges = availability.data?.unavailable ?? [];
   const vehicleGone = availability.error instanceof ApiError && availability.error.status === 404;
 
-  const places = agencyLocations(locationOptions, offer.agency.governorateCode);
+  const places = vehicleLocations(
+    locationOptions,
+    offer.pickupLocations.map((place) => place.slug),
+    offer.agency.governorateCode,
+  );
   const form = useForm<BookingFormValues>({
     resolver: zodResolver(bookingFormSchema),
     defaultValues: {

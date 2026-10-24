@@ -30,6 +30,7 @@ import type {
 import type { AuditEntityType } from '../audit/audit.service';
 import { invoiceNumber } from '../platform/invoicing.service';
 import { categoryIdsBySlug } from './categories';
+import { linkVehicleGovernorate } from './locations.seed';
 
 const DAY_MS = 86_400_000;
 const HOUR_MS = 3_600_000;
@@ -561,21 +562,21 @@ async function seedActivity(
   const categoryIds = await categoryIdsBySlug(tx);
   const vehicles = [];
   for (const { category, ...model } of FLEET) {
-    vehicles.push(
-      await tx.vehicle.create({
-        data: {
-          agencyId,
-          ...model,
-          categoryId: categoryIds(category),
-          year: random.int(2021, 2025),
-          plateNumber: `${String(random.int(180, 260))} TU ${String(random.int(1000, 9999))}`,
-          airConditioning: true,
-          mileageLimitKm: category === 'suv' ? null : 300,
-          mileageKm: random.int(8_000, 90_000),
-          createdAt: approvedAt,
-        },
-      }),
-    );
+    const created = await tx.vehicle.create({
+      data: {
+        agencyId,
+        ...model,
+        categoryId: categoryIds(category),
+        year: random.int(2021, 2025),
+        plateNumber: `${String(random.int(180, 260))} TU ${String(random.int(1000, 9999))}`,
+        airConditioning: true,
+        mileageLimitKm: category === 'suv' ? null : 300,
+        mileageKm: random.int(8_000, 90_000),
+        createdAt: approvedAt,
+      },
+    });
+    await linkVehicleGovernorate(tx, created.id, governorate.code);
+    vehicles.push(created);
   }
   const place = {
     fr: `Agence · ${governorate.nameFr}`,

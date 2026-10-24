@@ -127,6 +127,15 @@ export function vehicleYearMax(now: Date = new Date()): number {
   return now.getFullYear() + 1;
 }
 
+/** Nombre maximum de lieux de remise pour une même voiture. */
+export const VEHICLE_PICKUP_LOCATIONS_MAX = 20;
+
+const pickupLocationSlugsSchema = z
+  .array(z.string().trim().min(1).max(80))
+  .min(1, { message: 'REQUIRED' })
+  .max(VEHICLE_PICKUP_LOCATIONS_MAX, { message: 'TOO_MANY' })
+  .refine((slugs) => new Set(slugs).size === slugs.length, { message: 'ALREADY_USED' });
+
 /**
  * Saisie d'un véhicule. La marque, son modèle et la catégorie doivent exister dans les
  * référentiels de l'administration : l'API les vérifie (`INVALID_BRAND`, `INVALID_MODEL`,
@@ -169,6 +178,8 @@ export const vehicleInputSchema = z.object({
   depositMillimes: z.number().int().nonnegative({ message: 'INVALID_AMOUNT' }),
   /** `null` : kilométrage illimité. */
   mileageLimitKm: z.number().int().positive({ message: 'OUT_OF_RANGE' }).nullable(),
+  /** Slugs des lieux où le client peut prendre cette voiture. */
+  pickupLocationSlugs: pickupLocationSlugsSchema,
 });
 
 export type VehicleInput = z.infer<typeof vehicleInputSchema>;

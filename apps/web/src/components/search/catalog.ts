@@ -2,6 +2,7 @@ import {
   FUEL_TYPES,
   type FuelType,
   type Locale,
+  type LocalizedText,
   type Offer,
   type OfferAgency,
   pickLocalized,
@@ -115,6 +116,8 @@ export interface SearchOffer extends FilterableOffer {
   depositMillimes: number;
   mileageLimitKm: number | null;
   agency: OfferAgency;
+  /** Lieux où cette voiture peut être remise. */
+  pickupLocations: { slug: string; name: LocalizedText }[];
   /** Photos de l'agence, la première sert de couverture. */
   photos: VehiclePhoto[];
   /** Créneaux déjà pris. Le jour de retour est libre à 10 h. */
@@ -140,6 +143,7 @@ export function toSearchOffer(offer: Offer): SearchOffer {
     rating: offer.agency.rating,
     reviews: offer.agency.reviewsCount,
     agency: offer.agency,
+    pickupLocations: offer.pickupLocations,
     photos: offer.photos,
     unavailable: offer.unavailable,
   };

@@ -2,6 +2,7 @@ import { type AgencyDataset, createAgencyDataset, getDemoAccounts, toE164 } from
 import type { PrismaClient } from '@prisma/client';
 
 import { categoryIdsBySlug } from './categories';
+import { linkVehiclePlaces } from './locations.seed';
 
 export interface DemoAgencySeedResult {
   created: boolean;
@@ -81,7 +82,7 @@ export async function seedDemoAgency(
   const categoryId = await categoryIdsBySlug(prisma);
   const vehicleIds = new Map<string, string>();
   for (const vehicle of dataset.vehicles) {
-    const { id, createdAt, photos: _photos, category, ...data } = vehicle;
+    const { id, createdAt, photos: _photos, category, pickupLocationSlugs, ...data } = vehicle;
     const row = await prisma.vehicle.create({
       data: {
         ...data,
@@ -90,6 +91,7 @@ export async function seedDemoAgency(
         createdAt: new Date(createdAt),
       },
     });
+    await linkVehiclePlaces(prisma, row.id, pickupLocationSlugs);
     vehicleIds.set(id, row.id);
   }
 

@@ -40,12 +40,18 @@ export const CUSTOMER_SELECT = {
 /** Seul le slug de la catégorie est exposé ; les libellés viennent du référentiel public. */
 export const VEHICLE_CATEGORY_INCLUDE = { select: { slug: true } } as const;
 
+/** Lieux de remise, réduits au slug pour la fiche agence. */
+export const VEHICLE_PICKUP_INCLUDE = {
+  select: { location: { select: { slug: true } } },
+} as const;
+
 /** Les vues réservation n'affichent que la vignette du véhicule : seule la couverture est lue. */
 export const BOOKING_VIEW_INCLUDE = {
   vehicle: {
     include: {
       photos: { ...VEHICLE_PHOTOS_INCLUDE, take: 1 },
       category: VEHICLE_CATEGORY_INCLUDE,
+      pickupLocations: VEHICLE_PICKUP_INCLUDE,
     },
   },
   customer: { select: CUSTOMER_SELECT },

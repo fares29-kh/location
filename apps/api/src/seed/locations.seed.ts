@@ -148,6 +148,7 @@ const CITY_ROWS: readonly CitySeed[] = [
   ['sousse', '51', 'Sousse', 'سوسة', 'Sousse', 35.8256, 10.636],
   ['port-el-kantaoui', '51', 'Port El Kantaoui', 'القنطاوي', 'Port El Kantaoui', 35.892, 10.595],
   ['monastir', '52', 'Monastir', 'المنستير', 'Monastir', 35.7643, 10.8113],
+  ['bouhjar', '52', 'Bouhjar', 'بوحجر', 'Bouhjar', 35.683, 10.883],
   ['mahdia', '53', 'Mahdia', 'المهدية', 'Mahdia', 35.5047, 11.0622],
   ['sfax', '61', 'Sfax', 'صفاقس', 'Sfax', 34.7406, 10.7603],
   ['gafsa', '71', 'Gafsa', 'قفصة', 'Gafsa', 34.425, 8.7842],
@@ -236,6 +237,47 @@ export const STATIONS_AND_PORTS: readonly LocationSeed[] = [
 ];
 
 export const LOCATIONS: readonly LocationSeed[] = [...AIRPORTS, ...CITIES, ...STATIONS_AND_PORTS];
+
+type PlaceLinkClient = Pick<PrismaClient, 'location' | 'vehiclePickupLocation'>;
+
+/** Relie une voiture aux lieux actifs dont le slug est donné. */
+export async function linkVehiclePlaces(
+  prisma: PlaceLinkClient,
+  vehicleId: string,
+  slugs: readonly string[],
+): Promise<void> {
+  if (slugs.length === 0) {
+    return;
+  }
+  const locations = await prisma.location.findMany({
+    where: { slug: { in: [...slugs] }, isActive: true },
+    select: { id: true },
+  });
+  if (locations.length === 0) {
+    return;
+  }
+  await prisma.vehiclePickupLocation.createMany({
+    data: locations.map((location) => ({ vehicleId, locationId: location.id })),
+    skipDuplicates: true,
+  });
+}
+
+/** Relie une voiture à tous les lieux actifs d'un gouvernorat. */
+export async function linkVehicleGovernorate(
+  prisma: PlaceLinkClient,
+  vehicleId: string,
+  governorateCode: string,
+): Promise<void> {
+  const locations = await prisma.location.findMany({
+    where: { governorateCode, isActive: true },
+    select: { slug: true },
+  });
+  await linkVehiclePlaces(
+    prisma,
+    vehicleId,
+    locations.map((location) => location.slug),
+  );
+}
 
 /** Idempotent : met à jour les données de référence sans toucher à l'activation (`isActive`). */
 export async function seedLocations(prisma: Pick<PrismaClient, 'location'>): Promise<number> {

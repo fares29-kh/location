@@ -204,6 +204,8 @@ function VehicleCard({
             {vehicle.mileageLimitKm === null
               ? t('unlimitedMileage')
               : t('mileagePerDay', { km: format.integer(vehicle.mileageLimitKm) })}
+            <br />
+            {t('pickupCount', { count: vehicle.pickupLocationSlugs.length })}
           </p>
         </div>
 

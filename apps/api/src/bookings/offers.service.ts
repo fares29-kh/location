@@ -26,19 +26,24 @@ export class OffersService {
 
   /**
    * Véhicules disponibles des agences actives. Le lieu (ou, à défaut, le gouvernorat) restreint
-   * au gouvernorat de l'agence ; avec des dates, les véhicules déjà réservés sur le créneau sont exclus.
+   * aux lieux de remise de la voiture, pas au bureau de l'agence. Avec des dates, les véhicules
+   * déjà réservés sur le créneau sont exclus.
    */
   async search(query: OfferSearch): Promise<OfferSearchResult> {
-    let governorateCode = query.governorate;
+    const place =
+      query.location !== undefined && query.location.length > 0
+        ? { slug: query.location, isActive: true }
+        : query.governorate !== undefined
+          ? { governorateCode: query.governorate, isActive: true }
+          : null;
     if (query.location !== undefined && query.location.length > 0) {
       const location = await this.prisma.location.findUnique({
         where: { slug: query.location },
-        select: { governorateCode: true, isActive: true },
+        select: { isActive: true },
       });
       if (!location?.isActive) {
         return { offers: [], days: null };
       }
-      governorateCode = location.governorateCode;
     }
 
     const window =
@@ -50,7 +55,8 @@ export class OffersService {
       status: 'ACTIVE',
       deletedAt: null,
       ...(query.category === undefined ? {} : { category: { slug: query.category } }),
-      agency: { status: 'ACTIVE', governorateCode },
+      agency: { status: 'ACTIVE' },
+      ...(place === null ? {} : { pickupLocations: { some: { location: place } } }),
       ...(window === null
         ? {}
         : {
@@ -73,6 +79,19 @@ export class OffersService {
         agency: true,
         photos: VEHICLE_PHOTOS_INCLUDE,
         category: { select: { slug: true } },
+        pickupLocations: {
+          select: {
+            location: {
+              select: {
+                slug: true,
+                isActive: true,
+                nameFr: true,
+                nameAr: true,
+                nameEn: true,
+              },
+            },
+          },
+        },
       },
       orderBy: [{ dailyRateMillimes: 'asc' }, { id: 'asc' }],
       take: OFFERS_LIMIT,
@@ -109,6 +128,13 @@ export class OffersService {
         dailyRateMillimes: vehicle.dailyRateMillimes,
         depositMillimes: vehicle.depositMillimes,
         mileageLimitKm: vehicle.mileageLimitKm,
+        pickupLocations: vehicle.pickupLocations
+          .filter((link) => link.location.isActive)
+          .map((link) => ({
+            slug: link.location.slug,
+            name: { fr: link.location.nameFr, ar: link.location.nameAr, en: link.location.nameEn },
+          }))
+          .sort((a, b) => a.name.fr.localeCompare(b.name.fr, 'fr')),
         agency: {
           id: vehicle.agency.id,
           name: vehicle.agency.name,

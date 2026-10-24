@@ -265,6 +265,7 @@ describe.skipIf(!e2eEnabled)('Portail agence : cloisonnement (e2e)', () => {
         dailyRateMillimes: 1000,
         depositMillimes: 0,
         mileageLimitKm: null,
+        pickupLocationSlugs: ['tunis'],
       };
       await asA.put(`/vehicles/${bVehicleId}`).send(input).expect(404);
       await asA.patch(`/vehicles/${bVehicleId}/status`).send({ status: 'INACTIVE' }).expect(404);

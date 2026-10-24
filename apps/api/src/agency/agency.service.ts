@@ -125,6 +125,7 @@ import {
   startOfMonth,
   type StatusCountRow,
   VEHICLE_CATEGORY_INCLUDE,
+  VEHICLE_PICKUP_INCLUDE,
   vehicleStatsQuery,
   type VehicleStatsRow,
   VISIBLE_REVIEW,
@@ -417,7 +418,11 @@ export class AgencyService {
           vehicleId === undefined
             ? { agencyId, deletedAt: null }
             : { agencyId, id: vehicleId, deletedAt: null },
-        include: { photos: VEHICLE_PHOTOS_INCLUDE, category: VEHICLE_CATEGORY_INCLUDE },
+        include: {
+          photos: VEHICLE_PHOTOS_INCLUDE,
+          category: VEHICLE_CATEGORY_INCLUDE,
+          pickupLocations: VEHICLE_PICKUP_INCLUDE,
+        },
         orderBy: { id: 'asc' },
       }),
       this.prisma.booking.findMany({
@@ -799,6 +804,7 @@ export class AgencyService {
         include: {
           photos: { ...VEHICLE_PHOTOS_INCLUDE, take: 1 },
           category: VEHICLE_CATEGORY_INCLUDE,
+          pickupLocations: VEHICLE_PICKUP_INCLUDE,
         },
         orderBy: { id: 'asc' },
       }),
@@ -1215,7 +1221,8 @@ export class AgencyService {
 
   async createVehicle(ownerId: string, input: VehicleInput): Promise<VehicleView> {
     const agencyId = await this.agencyIdFor(ownerId);
-    const data = await this.catalog.resolveVehicleInput(input);
+    const { pickupLocationSlugs, ...data } = await this.catalog.resolveVehicleInput(input);
+    const locationIds = await this.pickupLocationIds(pickupLocationSlugs);
     const count = await this.prisma.vehicle.count({ where: { agencyId, deletedAt: null } });
     try {
       const vehicle = await this.prisma.vehicle.create({
@@ -1223,6 +1230,7 @@ export class AgencyService {
           ...data,
           agencyId,
           color: VEHICLE_COLORS[count % VEHICLE_COLORS.length] ?? '#2563EB',
+          pickupLocations: { create: locationIds.map((locationId) => ({ locationId })) },
         },
       });
       return await this.vehicleView(ownerId, vehicle.id);
@@ -1240,9 +1248,19 @@ export class AgencyService {
     input: VehicleInput,
   ): Promise<VehicleView> {
     const vehicle = await this.ownedVehicle(ownerId, vehicleId);
-    const data = await this.catalog.resolveVehicleInput(input);
+    const { pickupLocationSlugs, ...data } = await this.catalog.resolveVehicleInput(input);
+    const locationIds = await this.pickupLocationIds(pickupLocationSlugs);
     try {
-      await this.prisma.vehicle.update({ where: { id: vehicle.id }, data });
+      await this.prisma.vehicle.update({
+        where: { id: vehicle.id },
+        data: {
+          ...data,
+          pickupLocations: {
+            deleteMany: {},
+            create: locationIds.map((locationId) => ({ locationId })),
+          },
+        },
+      });
     } catch (error) {
       if (isUniqueViolation(error)) {
         throw plateAlreadyUsed();
@@ -1250,6 +1268,20 @@ export class AgencyService {
       throw error;
     }
     return this.vehicleView(ownerId, vehicle.id);
+  }
+
+  /** Identifiants des lieux actifs demandés. Un slug inconnu est refusé. */
+  private async pickupLocationIds(slugs: readonly string[]): Promise<string[]> {
+    const rows = await this.prisma.location.findMany({
+      where: { slug: { in: [...slugs] }, isActive: true },
+      select: { id: true },
+    });
+    if (rows.length !== slugs.length) {
+      throw new AppException(HttpStatus.BAD_REQUEST, 'VALIDATION_ERROR', 'Lieu inconnu.', [
+        { path: 'pickupLocationSlugs', message: 'UNKNOWN_LOCATION' },
+      ]);
+    }
+    return rows.map((row) => row.id);
   }
 
   async setVehicleStatus(

@@ -31,10 +31,15 @@ import type {
   PLANNING_BOOKING_SELECT,
   REVIEW_INCLUDE,
   VEHICLE_CATEGORY_INCLUDE,
+  VEHICLE_PICKUP_INCLUDE,
 } from './agency.queries';
 
 type VehicleRow = Prisma.VehicleGetPayload<{
-  include: { photos: true; category: typeof VEHICLE_CATEGORY_INCLUDE };
+  include: {
+    photos: true;
+    category: typeof VEHICLE_CATEGORY_INCLUDE;
+    pickupLocations: typeof VEHICLE_PICKUP_INCLUDE;
+  };
 }>;
 type PlanningBookingRow = Prisma.BookingGetPayload<{ select: typeof PLANNING_BOOKING_SELECT }>;
 type CustomerRow = Prisma.UserGetPayload<{ select: typeof CUSTOMER_SELECT }>;
@@ -65,6 +70,9 @@ export function toVehicle(row: VehicleRow, publicUrl: (key: string) => string): 
     dailyRateMillimes: row.dailyRateMillimes,
     depositMillimes: row.depositMillimes,
     mileageLimitKm: row.mileageLimitKm,
+    pickupLocationSlugs: row.pickupLocations
+      .map((link) => link.location.slug)
+      .sort((a, b) => a.localeCompare(b)),
     status: row.status,
     photos: row.photos.map((photo) => toVehiclePhoto(photo, publicUrl)),
     color: row.color,

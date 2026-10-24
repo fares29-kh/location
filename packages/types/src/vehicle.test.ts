@@ -25,6 +25,7 @@ const validVehicle = {
   dailyRateMillimes: 95_000,
   depositMillimes: 500_000,
   mileageLimitKm: null,
+  pickupLocationSlugs: ['monastir', 'bouhjar'],
 };
 
 describe('immatriculation tunisienne', () => {

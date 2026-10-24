@@ -217,8 +217,9 @@ model Location {
   createdAt       DateTime     @default(now()) @map("created_at")
   updatedAt       DateTime     @updatedAt @map("updated_at")
 
-  governorate Governorate @relation(fields: [governorateCode], references: [code])
+  governorate Governorate             @relation(fields: [governorateCode], references: [code])
   bookings    Booking[]
+  vehicles    VehiclePickupLocation[]
 
   @@index([governorateCode])
   @@index([type, isActive])
@@ -479,12 +480,13 @@ model Vehicle {
   createdAt         DateTime        @default(now()) @map("created_at")
   updatedAt         DateTime        @updatedAt @map("updated_at")
 
-  agency   Agency          @relation(fields: [agencyId], references: [id], onDelete: Cascade)
-  category VehicleCategory @relation(fields: [categoryId], references: [id], onDelete: Restrict)
-  bookings     Booking[]
-  photos       VehiclePhoto[]
-  maintenances VehicleMaintenance[]
-  expenses     AgencyExpense[]
+  agency          Agency                  @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  category        VehicleCategory         @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  bookings        Booking[]
+  photos          VehiclePhoto[]
+  maintenances    VehicleMaintenance[]
+  expenses        AgencyExpense[]
+  pickupLocations VehiclePickupLocation[]
 
   @@unique([agencyId, plateNumber])
   @@index([agencyId, status])
@@ -492,6 +494,19 @@ model Vehicle {
   @@index([categoryId, status])
   @@index([brand])
   @@map("vehicles")
+}
+
+/// Lieux où l'agence accepte de remettre ce véhicule. Indépendant du bureau.
+model VehiclePickupLocation {
+  vehicleId  String @map("vehicle_id")
+  locationId String @map("location_id")
+
+  vehicle  Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  location Location @relation(fields: [locationId], references: [id], onDelete: Restrict)
+
+  @@id([vehicleId, locationId])
+  @@index([locationId])
+  @@map("vehicle_pickup_locations")
 }
 
 /// Photo d'un véhicule, stockée dans le bucket public en deux tailles (WebP).
