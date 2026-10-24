@@ -2,7 +2,7 @@ import { type LocationType, pickLocalized, todayKey } from '@drivetn/types';
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 
-import { AIRPORTS, CITIES } from '@/components/home/places';
+import { AIRPORTS, CITIES, fallbackGovernorates } from '@/components/home/places';
 import { bookableDates, parseSearchFilters, toSearchOffer } from '@/components/search/catalog';
 import type { GovernorateOption, LocationOption } from '@/components/search/search-form';
 import { SearchView } from '@/components/search/search-view';
@@ -40,12 +40,14 @@ export default async function SearchPage({ params, searchParams }: SearchPagePro
     getTranslations({ locale, namespace: 'client.home.places' }),
   ]);
 
-  const governorateOptions: GovernorateOption[] = governorates
-    .map((governorate) => ({
-      code: governorate.code,
-      label: pickLocalized(governorate.name, locale),
-    }))
-    .sort((a, b) => a.label.localeCompare(b.label, locale));
+  const governorateOptions: GovernorateOption[] = (
+    governorates.length > 0
+      ? governorates.map((governorate) => ({
+          code: governorate.code,
+          label: pickLocalized(governorate.name, locale),
+        }))
+      : fallbackGovernorates(locale)
+  ).sort((a, b) => a.label.localeCompare(b.label, locale));
 
   // Sans API, on retombe sur les lieux mis en avant sur l'accueil.
   const options: LocationOption[] =

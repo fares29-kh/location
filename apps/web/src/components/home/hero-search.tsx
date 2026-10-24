@@ -1,19 +1,12 @@
 'use client';
 
+import type { LocationType } from '@drivetn/types';
 import { Button } from '@drivetn/ui/button';
+import { Combobox } from '@drivetn/ui/combobox';
 import { inputClassName } from '@drivetn/ui/input';
 import { Label } from '@drivetn/ui/label';
 import { cn } from '@drivetn/ui/lib/cn';
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from '@drivetn/ui/select';
-import { CalendarDays, type LucideIcon, MapPin, Search, X } from 'lucide-react';
+import { CalendarDays, Landmark, type LucideIcon, MapPin, Search, X } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { type ReactNode, useId, useMemo, useState, useSyncExternalStore } from 'react';
 
@@ -22,22 +15,32 @@ import { buildSearchHref } from '@/components/search/search-href';
 import { useRouter } from '@/i18n/navigation';
 import { addDays, dayKeyToDate, isoWeekday, todayKey } from '@/lib/agency/dates';
 
-import { AIRPORTS, CITIES } from './places';
-
 const STORAGE_KEY = 'drivetn:last-search';
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
-const LOCATIONS: ReadonlySet<string> = new Set([
-  ...AIRPORTS.map((airport) => airport.slug),
-  ...CITIES,
-]);
+/** Valeur interne de « toute la Tunisie » / « tous les lieux ». */
+const ALL = 'all';
+
+export interface HeroGovernorate {
+  code: string;
+  label: string;
+}
+
+export interface HeroPlace {
+  slug: string;
+  label: string;
+  type: LocationType;
+  governorateCode: string;
+  keywords: string;
+}
 
 interface SearchDraft {
+  governorate: string;
   location: string;
   pickup: string;
   dropoff: string;
 }
 
-const EMPTY_DRAFT: SearchDraft = { location: '', pickup: '', dropoff: '' };
+const EMPTY_DRAFT: SearchDraft = { governorate: '', location: '', pickup: '', dropoff: '' };
 
 const PRESETS = ['weekend', 'threeDays', 'oneWeek', 'twoWeeks'] as const;
 type Preset = (typeof PRESETS)[number];
@@ -91,12 +94,15 @@ function parseStoredSearch(raw: string | null, today: string | null): SearchDraf
     if (typeof value !== 'object' || value === null) {
       return null;
     }
-    const { location, pickup, dropoff } = value as Partial<Record<keyof SearchDraft, unknown>>;
+    const { governorate, location, pickup, dropoff } = value as Partial<
+      Record<keyof SearchDraft, unknown>
+    >;
     const validPickup = typeof pickup === 'string' && ISO_DATE.test(pickup) && pickup >= today;
     const validDropoff =
       validPickup && typeof dropoff === 'string' && ISO_DATE.test(dropoff) && dropoff >= pickup;
     return {
-      location: typeof location === 'string' && LOCATIONS.has(location) ? location : '',
+      governorate: typeof governorate === 'string' ? governorate : '',
+      location: typeof location === 'string' ? location : '',
       pickup: validPickup ? pickup : '',
       dropoff: validDropoff ? dropoff : '',
     };
@@ -141,8 +147,15 @@ function SearchField({
   );
 }
 
-export function HeroSearch() {
+export function HeroSearch({
+  governorates,
+  places,
+}: {
+  governorates: readonly HeroGovernorate[];
+  places: readonly HeroPlace[];
+}) {
   const t = useTranslations('client.home');
+  const tForm = useTranslations('client.search.form');
   const locale = useLocale();
   const router = useRouter();
   const id = useId();
@@ -153,7 +166,15 @@ export function HeroSearch() {
   );
   const stored = useSyncExternalStore(subscribeToStorage, readStoredSearch, () => null);
   const [draft, setDraft] = useState<SearchDraft | null>(null);
-  const { location, pickup, dropoff } = draft ?? parseStoredSearch(stored, today) ?? EMPTY_DRAFT;
+  const remembered = draft ?? parseStoredSearch(stored, today) ?? EMPTY_DRAFT;
+  const place = places.find((item) => item.slug === remembered.location);
+  const location = place?.slug ?? '';
+  const governorate =
+    place?.governorateCode ??
+    (governorates.some((item) => item.code === remembered.governorate)
+      ? remembered.governorate
+      : '');
+  const { pickup, dropoff } = remembered;
 
   const dayFormat = useMemo(
     () =>
@@ -167,11 +188,39 @@ export function HeroSearch() {
   );
 
   const update = (patch: Partial<SearchDraft>) => {
-    setDraft({ location, pickup, dropoff, ...patch });
+    setDraft({ governorate, location, pickup, dropoff, ...patch });
   };
 
+  const typeLabel = (type: LocationType): string => {
+    if (type === 'AIRPORT') {
+      return t('search.airports');
+    }
+    if (type === 'CITY') {
+      return t('search.cities');
+    }
+    return type === 'TRAIN_STATION' ? tForm('stations') : tForm('ports');
+  };
+
+  const governorateOptions = [
+    { value: ALL, label: tForm('allGovernorates') },
+    ...governorates.map((item) => ({ value: item.code, label: item.label })),
+  ];
+  const visiblePlaces =
+    governorate === '' ? places : places.filter((item) => item.governorateCode === governorate);
+  const placeOptions = [
+    {
+      value: ALL,
+      label: governorate === '' ? tForm('allLocations') : tForm('allLocationsIn'),
+    },
+    ...visiblePlaces.map((item) => ({
+      value: item.slug,
+      label: item.label,
+      keywords: `${item.keywords} ${typeLabel(item.type)}`,
+    })),
+  ];
+
   const days = rentalDays(pickup, dropoff);
-  const hasValues = location !== '' || pickup !== '' || dropoff !== '';
+  const hasValues = governorate !== '' || location !== '' || pickup !== '' || dropoff !== '';
 
   let summary: string;
   if (days !== null) {
@@ -191,47 +240,63 @@ export function HeroSearch() {
       role="search"
       onSubmit={(event) => {
         event.preventDefault();
-        storeSearch({ location, pickup, dropoff });
-        router.push(buildSearchHref({ location, pickup, dropoff }));
+        storeSearch({ governorate, location, pickup, dropoff });
+        router.push(buildSearchHref({ governorate, location, pickup, dropoff }));
       }}
       aria-label={t('search.label')}
       className="grid grid-cols-2 gap-3 rounded-panel border border-border/80 bg-surface/90 p-3 shadow-elevated ring-1 ring-black/[0.02] backdrop-blur-xl sm:gap-4 sm:p-5"
     >
+      <SearchField
+        id={`${id}-governorate`}
+        icon={Landmark}
+        label={tForm('governorate')}
+        className="col-span-2"
+      >
+        <Combobox
+          id={`${id}-governorate`}
+          value={governorate === '' ? ALL : governorate}
+          onValueChange={(value) => {
+            const next = value === ALL ? '' : value;
+            const chosen = places.find((item) => item.slug === location);
+            update({
+              governorate: next,
+              location: next !== '' && chosen?.governorateCode !== next ? '' : location,
+            });
+          }}
+          options={governorateOptions}
+          placeholder={tForm('allGovernorates')}
+          searchPlaceholder={tForm('searchPlaceholder')}
+          emptyText={tForm('noMatch')}
+          className="h-12 bg-background/60"
+        />
+      </SearchField>
+
       <SearchField
         id={`${id}-location`}
         icon={MapPin}
         label={t('search.location')}
         className="col-span-2"
       >
-        <Select
-          name="location"
-          value={location}
+        <Combobox
+          id={`${id}-location`}
+          value={location === '' ? ALL : location}
           onValueChange={(value) => {
-            update({ location: value });
+            if (value === ALL) {
+              update({ location: '' });
+              return;
+            }
+            const chosen = places.find((item) => item.slug === value);
+            update({
+              location: value,
+              governorate: chosen?.governorateCode ?? governorate,
+            });
           }}
-        >
-          <SelectTrigger id={`${id}-location`} className="h-12 bg-background/60">
-            <SelectValue placeholder={t('search.locationPlaceholder')} />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectLabel>{t('search.airports')}</SelectLabel>
-              {AIRPORTS.map((airport) => (
-                <SelectItem key={airport.id} value={airport.slug}>
-                  {t(`places.${airport.id}`)}
-                </SelectItem>
-              ))}
-            </SelectGroup>
-            <SelectGroup>
-              <SelectLabel>{t('search.cities')}</SelectLabel>
-              {CITIES.map((city) => (
-                <SelectItem key={city} value={city}>
-                  {t(`places.${city}`)}
-                </SelectItem>
-              ))}
-            </SelectGroup>
-          </SelectContent>
-        </Select>
+          options={placeOptions}
+          placeholder={t('search.locationPlaceholder')}
+          searchPlaceholder={tForm('searchPlaceholder')}
+          emptyText={tForm('noMatch')}
+          className="h-12 bg-background/60"
+        />
       </SearchField>
 
       <SearchField id={`${id}-pickup`} icon={CalendarDays} label={t('search.pickupDate')}>

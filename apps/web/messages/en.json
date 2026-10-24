@@ -72,7 +72,7 @@
       "search": {
         "label": "Search for a car",
         "location": "Pick-up location",
-        "locationPlaceholder": "City or airport",
+        "locationPlaceholder": "City, airport, station or port",
         "airports": "Airports",
         "cities": "Cities",
         "pickupDate": "Pick-up",
@@ -206,7 +206,9 @@
         "governorate": "Governorate",
         "allGovernorates": "All of Tunisia",
         "allLocations": "All locations",
-        "allLocationsIn": "All locations in the governorate"
+        "allLocationsIn": "All locations in the governorate",
+        "searchPlaceholder": "Type a name",
+        "noMatch": "No matching place."
       },
       "unavailableTitle": "Search temporarily unavailable",
       "unavailableText": "We couldn’t load the agencies’ offers. Please try again in a moment.",

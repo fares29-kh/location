@@ -72,7 +72,7 @@
       "search": {
         "label": "ابحث عن سيارة",
         "location": "مكان الاستلام",
-        "locationPlaceholder": "مدينة أو مطار",
+        "locationPlaceholder": "مدينة أو مطار أو محطة أو ميناء",
         "airports": "المطارات",
         "cities": "المدن",
         "pickupDate": "الانطلاق",
@@ -206,7 +206,9 @@
         "governorate": "الولاية",
         "allGovernorates": "كامل تونس",
         "allLocations": "كل الأماكن",
-        "allLocationsIn": "كل أماكن الولاية"
+        "allLocationsIn": "كل أماكن الولاية",
+        "searchPlaceholder": "اكتب اسمًا",
+        "noMatch": "لا يوجد مكان مطابق."
       },
       "unavailableTitle": "البحث غير متاح مؤقتًا",
       "unavailableText": "تعذّر تحميل عروض الوكالات. أعد المحاولة بعد لحظات.",

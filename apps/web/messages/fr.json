@@ -72,7 +72,7 @@
       "search": {
         "label": "Rechercher une voiture",
         "location": "Lieu de prise en charge",
-        "locationPlaceholder": "Ville ou aéroport",
+        "locationPlaceholder": "Ville, aéroport, gare ou port",
         "airports": "Aéroports",
         "cities": "Villes",
         "pickupDate": "Départ",
@@ -206,7 +206,9 @@
         "governorate": "Gouvernorat",
         "allGovernorates": "Toute la Tunisie",
         "allLocations": "Tous les lieux",
-        "allLocationsIn": "Tous les lieux du gouvernorat"
+        "allLocationsIn": "Tous les lieux du gouvernorat",
+        "searchPlaceholder": "Tapez un nom",
+        "noMatch": "Aucun lieu ne correspond."
       },
       "unavailableTitle": "Recherche momentanément indisponible",
       "unavailableText": "Impossible de charger les offres des agences. Réessayez dans quelques instants.",

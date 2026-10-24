@@ -2,7 +2,7 @@ import { HandCoins, MessageCircle, ShieldCheck } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 import { HeroPreview } from './hero-preview';
-import { HeroSearch } from './hero-search';
+import { HeroSearch, type HeroGovernorate, type HeroPlace } from './hero-search';
 
 const TRUST_ITEMS = [
   { id: 'noCard', icon: ShieldCheck },
@@ -12,7 +12,13 @@ const TRUST_ITEMS = [
 
 const ENTER = 'animate-in fade-in slide-in-from-bottom-4 fill-mode-both duration-700';
 
-export function HomeHero() {
+export function HomeHero({
+  governorates,
+  places,
+}: {
+  governorates: readonly HeroGovernorate[];
+  places: readonly HeroPlace[];
+}) {
   const t = useTranslations('client.home');
 
   return (
@@ -51,7 +57,7 @@ export function HomeHero() {
           </p>
 
           <div className={`${ENTER} delay-300`}>
-            <HeroSearch />
+            <HeroSearch governorates={governorates} places={places} />
           </div>
 
           <ul

@@ -2,18 +2,10 @@
 
 import { addDays, type LocationType, todayKey } from '@drivetn/types';
 import { Button } from '@drivetn/ui/button';
+import { Combobox } from '@drivetn/ui/combobox';
 import { inputClassName } from '@drivetn/ui/input';
 import { Label } from '@drivetn/ui/label';
 import { cn } from '@drivetn/ui/lib/cn';
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from '@drivetn/ui/select';
 import { CalendarDays, Landmark, type LucideIcon, MapPin, Search } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { type ReactNode, useId, useState } from 'react';
@@ -99,13 +91,17 @@ export function SearchForm({
   const [today] = useState(todayKey);
   const withGovernorate = governorates.length > 0;
 
-  const places =
+  const typeOrder = Object.keys(GROUP_LABEL_KEYS) as LocationType[];
+  const places = (
     governorate === ALL
       ? options
-      : options.filter((option) => option.governorateCode === governorate);
-  const groups = (Object.keys(GROUP_LABEL_KEYS) as LocationType[])
-    .map((type) => ({ type, items: places.filter((option) => option.type === type) }))
-    .filter((group) => group.items.length > 0);
+      : options.filter((option) => option.governorateCode === governorate)
+  )
+    .slice()
+    .sort(
+      (a, b) =>
+        typeOrder.indexOf(a.type) - typeOrder.indexOf(b.type) || a.label.localeCompare(b.label),
+    );
 
   const changeGovernorate = (value: string) => {
     setGovernorate(value);
@@ -161,19 +157,19 @@ export function SearchForm({
           label={tForm('governorate')}
           className="col-span-2 sm:col-span-1"
         >
-          <Select name="governorate" value={governorate} onValueChange={changeGovernorate}>
-            <SelectTrigger id={`${id}-governorate`} className="h-12 bg-background/60">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent className="max-h-80 overflow-y-auto">
-              <SelectItem value={ALL}>{tForm('allGovernorates')}</SelectItem>
-              {governorates.map((option) => (
-                <SelectItem key={option.code} value={option.code}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <Combobox
+            id={`${id}-governorate`}
+            value={governorate}
+            onValueChange={changeGovernorate}
+            options={[
+              { value: ALL, label: tForm('allGovernorates') },
+              ...governorates.map((option) => ({ value: option.code, label: option.label })),
+            ]}
+            placeholder={tForm('allGovernorates')}
+            searchPlaceholder={tForm('searchPlaceholder')}
+            emptyText={tForm('noMatch')}
+            className="h-12 bg-background/60"
+          />
         </FormField>
       )}
 
@@ -183,26 +179,26 @@ export function SearchForm({
         label={t('location')}
         className={withGovernorate ? 'col-span-2 sm:col-span-1' : 'col-span-2 lg:col-span-1'}
       >
-        <Select name="location" value={location} onValueChange={changeLocation}>
-          <SelectTrigger id={`${id}-location`} className="h-12 bg-background/60">
-            <SelectValue placeholder={t('locationPlaceholder')} />
-          </SelectTrigger>
-          <SelectContent className="max-h-80 overflow-y-auto">
-            <SelectItem value={ALL}>
-              {governorate === ALL ? tForm('allLocations') : tForm('allLocationsIn')}
-            </SelectItem>
-            {groups.map((group) => (
-              <SelectGroup key={group.type}>
-                <SelectLabel>{groupLabel(group.type)}</SelectLabel>
-                {group.items.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-            ))}
-          </SelectContent>
-        </Select>
+        <Combobox
+          id={`${id}-location`}
+          value={location}
+          onValueChange={changeLocation}
+          options={[
+            {
+              value: ALL,
+              label: governorate === ALL ? tForm('allLocations') : tForm('allLocationsIn'),
+            },
+            ...places.map((option) => ({
+              value: option.value,
+              label: option.label,
+              keywords: groupLabel(option.type),
+            })),
+          ]}
+          placeholder={t('locationPlaceholder')}
+          searchPlaceholder={tForm('searchPlaceholder')}
+          emptyText={tForm('noMatch')}
+          className="h-12 bg-background/60"
+        />
       </FormField>
 
       <FormField id={`${id}-pickup`} icon={CalendarDays} label={t('pickupDate')}>
