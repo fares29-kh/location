@@ -214,6 +214,9 @@
       "unavailableText": "We couldn’t load the agencies’ offers. Please try again in a moment.",
       "datesHintTitle": "Add your dates",
       "datesHintText": "Pick a pick-up and return date to see only available cars and the total price.",
+      "accountRequiredTitle": "Create an account",
+      "accountRequiredText": "A free account lets you see the agency phone number and book a car.",
+      "accountRequiredAction": "Create an account",
       "noOffers": {
         "title": "No cars available for this search",
         "text": "Try other dates or another pick-up location.",
@@ -340,7 +343,8 @@
         "whatsapp": "WhatsApp",
         "whatsappMessage": "Hello {name}, I found you on DriveTN and would like to rent a car.",
         "call": "Call",
-        "contactsLocked": "Create an account to see the phone numbers",
+        "contactsLocked": "Create an account to see the phone number and book.",
+        "contactsLockedAction": "Create an account",
         "directions": "Directions",
         "close": "Close",
         "zoomIn": "Zoom in",
@@ -2603,6 +2607,10 @@
     "passwordHint": "At least 8 characters, with at least one letter and one digit.",
     "showPassword": "Show password",
     "hidePassword": "Hide password",
+    "clientAccount": {
+      "title": "Create an account",
+      "text": "A free account lets you see the agency phone number and book a car."
+    },
     "login": {
       "title": "Sign in",
       "subtitle": {

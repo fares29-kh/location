@@ -99,6 +99,9 @@ export function SignupForm({
 
   return (
     <div className="grid gap-6">
+      {portal === 'client' && (
+        <Alert title={t('clientAccount.title')}>{t('clientAccount.text')}</Alert>
+      )}
       <form
         noValidate
         className="grid gap-4"
@@ -170,7 +173,7 @@ export function SignupForm({
       <p className="text-center text-sm text-muted-foreground">
         {t('signup.hasAccount')}{' '}
         <Link
-          href="/login"
+          href={nextPath === null ? '/login' : { pathname: '/login', query: { next: nextPath } }}
           className="rounded-sm font-medium text-primary underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           {t('signup.loginLink')}

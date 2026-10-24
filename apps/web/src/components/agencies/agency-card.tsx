@@ -316,6 +316,15 @@ export function AgencyPopupCard({
           )}
         </div>
 
+        {!signedIn && (
+          <div className="grid gap-2 rounded-xl border border-primary/25 bg-primary-soft p-3">
+            <p className="text-xs leading-relaxed text-foreground">{t('contactsLocked')}</p>
+            <Button asChild size="sm">
+              <Link href="/signup">{t('contactsLockedAction')}</Link>
+            </Button>
+          </div>
+        )}
+
         <div className="flex items-center gap-2">
           <Button asChild size="sm" className="min-w-0 flex-1">
             <Link href={buildSearchHref({ governorate: agency.governorateCode })}>
@@ -350,15 +359,6 @@ export function AgencyPopupCard({
                 <Phone className="size-4 text-primary" aria-hidden="true" />
               </a>
             </>
-          )}
-          {!signedIn && (
-            <Link
-              href="/signup"
-              className="inline-flex h-9 min-w-0 flex-1 items-center justify-center gap-1.5 rounded-control border border-primary/30 bg-primary-soft px-2 text-xs font-semibold text-primary hover:bg-primary-soft/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            >
-              <Phone className="size-3.5 shrink-0" aria-hidden="true" />
-              <span className="truncate">{t('contactsLocked')}</span>
-            </Link>
           )}
           <a
             href={directionsUrl(agency)}

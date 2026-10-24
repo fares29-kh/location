@@ -174,7 +174,7 @@ export function SearchView({
     }
     const next = new URL(window.location.href);
     next.searchParams.set('book', offer.id);
-    router.push({ pathname: '/login', query: { next: `${next.pathname}${next.search}` } });
+    router.push({ pathname: '/signup', query: { next: `${next.pathname}${next.search}` } });
   };
 
   const resetFilters = () => {
@@ -239,6 +239,19 @@ export function SearchView({
             </Alert>
           ) : (
             dates === null && <Alert title={t('datesHintTitle')}>{t('datesHintText')}</Alert>
+          )}
+
+          {!signedIn && (
+            <Alert
+              title={t('accountRequiredTitle')}
+              action={
+                <Button asChild size="sm">
+                  <Link href="/signup">{t('accountRequiredAction')}</Link>
+                </Button>
+              }
+            >
+              {t('accountRequiredText')}
+            </Alert>
           )}
 
           <div className="flex flex-wrap items-center gap-3">

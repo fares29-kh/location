@@ -232,6 +232,9 @@ export function LoginForm({
 
   return (
     <div className="grid gap-6">
+      {portal === 'client' && (
+        <Alert title={t('clientAccount.title')}>{t('clientAccount.text')}</Alert>
+      )}
       <Tabs value={method} onValueChange={setMethod}>
         <TabsList className="grid w-full grid-cols-2" aria-label={t('login.methodsLabel')}>
           <TabsTrigger value="password">
@@ -261,7 +264,9 @@ export function LoginForm({
         <p className="text-center text-sm text-muted-foreground">
           {t('login.noAccount')}{' '}
           <Link
-            href="/signup"
+            href={
+              nextPath === null ? '/signup' : { pathname: '/signup', query: { next: nextPath } }
+            }
             className="rounded-sm font-medium text-primary underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             {t('login.signupLink')}

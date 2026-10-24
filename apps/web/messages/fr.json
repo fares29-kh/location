@@ -214,6 +214,9 @@
       "unavailableText": "Impossible de charger les offres des agences. Réessayez dans quelques instants.",
       "datesHintTitle": "Indiquez vos dates",
       "datesHintText": "Choisissez une date de départ et de retour pour ne voir que les voitures libres et connaître le prix total.",
+      "accountRequiredTitle": "Créez un compte",
+      "accountRequiredText": "Un compte gratuit permet de voir le numéro de téléphone de l’agence et de réserver une voiture.",
+      "accountRequiredAction": "Créer un compte",
       "noOffers": {
         "title": "Aucune voiture disponible pour cette recherche",
         "text": "Essayez d’autres dates ou un autre lieu de prise en charge.",
@@ -340,7 +343,8 @@
         "whatsapp": "WhatsApp",
         "whatsappMessage": "Bonjour {name}, je vous ai trouvé sur DriveTN et je souhaite louer une voiture.",
         "call": "Appeler",
-        "contactsLocked": "Créez un compte pour voir les numéros",
+        "contactsLocked": "Créez un compte pour voir le numéro de téléphone et réserver.",
+        "contactsLockedAction": "Créer un compte",
         "directions": "Itinéraire",
         "close": "Fermer",
         "zoomIn": "Zoomer",
@@ -2603,6 +2607,10 @@
     "passwordHint": "8 caractères minimum, avec au moins une lettre et un chiffre.",
     "showPassword": "Afficher le mot de passe",
     "hidePassword": "Masquer le mot de passe",
+    "clientAccount": {
+      "title": "Créez un compte",
+      "text": "Un compte gratuit permet de voir le numéro de téléphone de l’agence et de réserver une voiture."
+    },
     "login": {
       "title": "Connexion",
       "subtitle": {
