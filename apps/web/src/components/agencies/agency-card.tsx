@@ -203,17 +203,20 @@ export function AgencyPopupCard({
   agency,
   governorate,
   distanceKm,
+  signedIn,
   onClose,
 }: {
   agency: PublicAgency;
   governorate: string;
   distanceKm: number | null;
+  signedIn: boolean;
   onClose: () => void;
 }) {
   const t = useTranslations('client.agencies.map');
   const categoryLabel = useCategoryLabel();
   const locale = useLocale();
   const distanceLabel = useDistanceLabel();
+  const showContacts = signedIn && agency.phone.length > 0;
   const iconLinkClass =
     'flex size-9 shrink-0 items-center justify-center rounded-control border border-border transition-colors hover:bg-surface-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring';
 
@@ -286,7 +289,7 @@ export function AgencyPopupCard({
             <MapPin className="size-3.5 shrink-0" aria-hidden="true" />
             <span className="truncate">{agency.address}</span>
           </p>
-          {agency.extraPhones.length > 0 && (
+          {signedIn && agency.extraPhones.length > 0 && (
             <ul className="flex flex-wrap gap-x-3 gap-y-1">
               {agency.extraPhones.map((extraPhone) => (
                 <li key={extraPhone}>
@@ -320,30 +323,43 @@ export function AgencyPopupCard({
               <ArrowRight aria-hidden="true" className="rtl:-scale-x-100" />
             </Link>
           </Button>
-          <a
-            href={buildWhatsAppUrl(
-              agency.whatsappPhone,
-              t('whatsappMessage', { name: agency.name }),
-            )}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label={t('whatsapp')}
-            title={t('whatsapp')}
-            className={cn(
-              iconLinkClass,
-              'border-transparent bg-[#25D366]/10 text-[#128C4B] hover:bg-[#25D366]/20 dark:text-[#4ADE80]',
-            )}
-          >
-            <WhatsAppIcon className="size-4" />
-          </a>
-          <a
-            href={`tel:${toE164(agency.phone)}`}
-            aria-label={`${t('call')} ${formatNationalPhone(agency.phone)}`}
-            title={formatNationalPhone(agency.phone)}
-            className={iconLinkClass}
-          >
-            <Phone className="size-4 text-primary" aria-hidden="true" />
-          </a>
+          {showContacts && (
+            <>
+              <a
+                href={buildWhatsAppUrl(
+                  agency.whatsappPhone,
+                  t('whatsappMessage', { name: agency.name }),
+                )}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={t('whatsapp')}
+                title={t('whatsapp')}
+                className={cn(
+                  iconLinkClass,
+                  'border-transparent bg-[#25D366]/10 text-[#128C4B] hover:bg-[#25D366]/20 dark:text-[#4ADE80]',
+                )}
+              >
+                <WhatsAppIcon className="size-4" />
+              </a>
+              <a
+                href={`tel:${toE164(agency.phone)}`}
+                aria-label={`${t('call')} ${formatNationalPhone(agency.phone)}`}
+                title={formatNationalPhone(agency.phone)}
+                className={iconLinkClass}
+              >
+                <Phone className="size-4 text-primary" aria-hidden="true" />
+              </a>
+            </>
+          )}
+          {!signedIn && (
+            <Link
+              href="/signup"
+              className="inline-flex h-9 min-w-0 flex-1 items-center justify-center gap-1.5 rounded-control border border-primary/30 bg-primary-soft px-2 text-xs font-semibold text-primary hover:bg-primary-soft/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <Phone className="size-3.5 shrink-0" aria-hidden="true" />
+              <span className="truncate">{t('contactsLocked')}</span>
+            </Link>
+          )}
           <a
             href={directionsUrl(agency)}
             target="_blank"

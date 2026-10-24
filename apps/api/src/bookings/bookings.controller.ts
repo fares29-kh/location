@@ -32,9 +32,12 @@ export class AgencyDirectoryController {
 
   @Get()
   @Header('Cache-Control', 'no-store')
-  @ApiOperation({ summary: 'Agences actives et leur position sur la carte du réseau' })
-  list(): Promise<PublicAgency[]> {
-    return this.directory.list();
+  @ApiOperation({
+    summary:
+      'Agences actives et leur position. Les numéros ne sont inclus que pour un client connecté.',
+  })
+  list(@Req() request: Request): Promise<PublicAgency[]> {
+    return this.directory.list(request.user?.role === 'CUSTOMER');
   }
 
   @Get(':id/reviews')

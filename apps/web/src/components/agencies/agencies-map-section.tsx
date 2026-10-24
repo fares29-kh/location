@@ -90,10 +90,13 @@ function FilterChip({
 export function AgenciesMapSection({
   agencies,
   governorates,
+  signedIn,
 }: {
   /** `null` si l'annuaire n'a pas pu être chargé. */
   agencies: readonly PublicAgency[] | null;
   governorates: readonly GovernorateOption[];
+  /** Les numéros ne sont affichés que pour un client connecté. */
+  signedIn: boolean;
 }) {
   const t = useTranslations('client.agencies.map');
   const id = useId();
@@ -191,6 +194,7 @@ export function AgenciesMapSection({
       agency={agency}
       governorate={governorateName(agency.governorateCode)}
       distanceKm={distanceTo(agency)}
+      signedIn={signedIn}
       onClose={() => {
         setSelectedId(null);
       }}

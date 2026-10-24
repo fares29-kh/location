@@ -8,6 +8,7 @@ import { AgenciesMapSection } from '@/components/agencies/agencies-map-section';
 import { type GovernorateNetwork, AgenciesNetwork } from '@/components/agencies/agencies-network';
 import { AgencyCta } from '@/components/home/agency-cta';
 import { fetchPublicAgencies } from '@/lib/agencies';
+import { getPortalUser } from '@/lib/auth/session';
 import { type LocaleParams, resolveLocale } from '@/lib/locale-params';
 import { fetchGovernorates, fetchPickupLocations } from '@/lib/locations';
 import { getPortalOrigin } from '@/lib/portal-origin';
@@ -22,12 +23,23 @@ export async function generateMetadata({ params }: LocaleParams): Promise<Metada
 
 export default async function AgenciesPage({ params }: LocaleParams) {
   const locale = await resolveLocale(params);
-  const [governorates, locations, agencies, agencyUrl] = await Promise.all([
+  const [governorates, locations, agencies, agencyUrl, user] = await Promise.all([
     fetchGovernorates(),
     fetchPickupLocations(),
     fetchPublicAgencies(),
     getPortalOrigin('agency'),
+    getPortalUser('client'),
   ]);
+  const signedIn = user !== null;
+  const directory =
+    agencies === null || signedIn
+      ? agencies
+      : agencies.map((agency) => ({
+          ...agency,
+          phone: '',
+          whatsappPhone: '',
+          extraPhones: [],
+        }));
 
   const network: GovernorateNetwork[] = governorates.map((governorate) => ({
     code: governorate.code,
@@ -50,7 +62,8 @@ export default async function AgenciesPage({ params }: LocaleParams) {
         pickupPoints={locations.length}
       />
       <AgenciesMapSection
-        agencies={agencies}
+        agencies={directory}
+        signedIn={signedIn}
         governorates={network.map(({ code, name }) => ({ code, name }))}
       />
       <AgenciesNetwork network={network} />

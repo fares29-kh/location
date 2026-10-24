@@ -340,6 +340,7 @@
         "whatsapp": "WhatsApp",
         "whatsappMessage": "Hello {name}, I found you on DriveTN and would like to rent a car.",
         "call": "Call",
+        "contactsLocked": "Create an account to see the phone numbers",
         "directions": "Directions",
         "close": "Close",
         "zoomIn": "Zoom in",

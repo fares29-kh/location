@@ -22,7 +22,7 @@ export class AgencyDirectoryService {
    * Agences actives avec leur flotte et leur note. Un point choisi par l'agence est utilisé tel
    * quel ; sinon elle est placée au chef-lieu de son gouvernorat. Sans lieu connu, elle est omise.
    */
-  async list(): Promise<PublicAgency[]> {
+  async list(revealContacts: boolean): Promise<PublicAgency[]> {
     const agencies = await this.prisma.agency.findMany({
       where: { status: 'ACTIVE' },
       select: {
@@ -123,9 +123,9 @@ export class AgencyDirectoryService {
         governorateCode: agency.governorateCode,
         address: agency.address,
         description: agency.description,
-        phone: agency.phone,
-        whatsappPhone: agency.whatsappPhone,
-        extraPhones: agency.extraPhones,
+        phone: revealContacts ? agency.phone : '',
+        whatsappPhone: revealContacts ? agency.whatsappPhone : '',
+        extraPhones: revealContacts ? agency.extraPhones : [],
         rating: rating?._avg.rating ?? null,
         reviewsCount: rating?._count._all ?? 0,
         vehiclesCount: agency.vehicles.length,
