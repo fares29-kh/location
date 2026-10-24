@@ -1,11 +1,23 @@
 'use client';
 
+import { useTheme } from 'next-themes';
 import { useLocale } from 'next-intl';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface Grecaptcha {
-  ready: (callback: () => void) => void;
-  execute: (siteKey: string, options: { action: string }) => Promise<string>;
+  render: (
+    element: HTMLElement,
+    options: {
+      sitekey: string;
+      theme: 'light' | 'dark';
+      size: 'compact' | 'normal';
+      hl: string;
+      callback: (token: string) => void;
+      'expired-callback': () => void;
+      'error-callback': () => void;
+    },
+  ) => number;
+  reset: (widgetId?: number) => void;
 }
 
 declare global {
@@ -15,94 +27,126 @@ declare global {
 }
 
 const SCRIPT_ID = 'drivetn-recaptcha';
-const ACTION = 'login';
 
-let loading: Promise<void> | null = null;
-
-function loadScript(siteKey: string, locale: string): Promise<void> {
-  if (loading !== null) {
-    return loading;
+function loadScript(): void {
+  if (document.getElementById(SCRIPT_ID) !== null) {
+    return;
   }
-  loading = new Promise((resolve, reject) => {
-    if (document.getElementById(SCRIPT_ID) !== null) {
-      resolve();
-      return;
-    }
-    const script = document.createElement('script');
-    script.id = SCRIPT_ID;
-    const params = new URLSearchParams({ render: siteKey, hl: locale });
-    script.src = `https://www.google.com/recaptcha/api.js?${params.toString()}`;
-    script.async = true;
-    script.onload = () => {
-      resolve();
-    };
-    script.onerror = () => {
-      loading = null;
-      reject(new Error('recaptcha'));
-    };
-    document.head.appendChild(script);
-  });
-  return loading;
+  const script = document.createElement('script');
+  script.id = SCRIPT_ID;
+  script.src = 'https://www.google.com/recaptcha/api.js?render=explicit';
+  script.async = true;
+  script.defer = true;
+  document.head.appendChild(script);
 }
 
-/** Demande un jeton reCAPTCHA v3 au moment de l'envoi du formulaire. */
-export async function executeRecaptcha(siteKey: string, locale: string): Promise<string> {
-  await loadScript(siteKey, locale);
-  const grecaptcha = window.grecaptcha;
-  if (grecaptcha === undefined) {
-    throw new Error('recaptcha');
-  }
-  await new Promise<void>((resolve) => {
-    grecaptcha.ready(resolve);
-  });
-  const token = await grecaptcha.execute(siteKey, { action: ACTION });
-  if (token.length === 0) {
-    throw new Error('recaptcha');
-  }
-  return token;
-}
-
-/** Prépare le jeton au moment de la connexion. Le badge Google s'affiche en bas de page. */
-export function useLoginCaptcha(siteKey: string) {
+/** Case « Je ne suis pas un robot ». Rien n'est affiché si la clé de site est vide. */
+export function RecaptchaField({
+  siteKey,
+  resetSignal,
+  onToken,
+}: {
+  siteKey: string;
+  resetSignal: number;
+  onToken: (token: string) => void;
+}) {
   const locale = useLocale();
-  const [failed, setFailed] = useState(false);
+  const { resolvedTheme } = useTheme();
+  const host = useRef<HTMLDivElement>(null);
+  const widgetId = useRef<number | null>(null);
+  const onTokenRef = useRef(onToken);
+  useEffect(() => {
+    onTokenRef.current = onToken;
+  }, [onToken]);
 
   useEffect(() => {
     if (siteKey === '') {
       return;
     }
-    const showBadge = (): void => {
-      document.querySelectorAll<HTMLElement>('.grecaptcha-badge').forEach((badge) => {
-        badge.style.visibility = 'visible';
+    loadScript();
+    let cancelled = false;
+    const timer = window.setInterval(() => {
+      const grecaptcha = window.grecaptcha;
+      const element = host.current;
+      if (cancelled || grecaptcha === undefined || element === null || widgetId.current !== null) {
+        if (widgetId.current !== null) {
+          window.clearInterval(timer);
+        }
+        return;
+      }
+      widgetId.current = grecaptcha.render(element, {
+        sitekey: siteKey,
+        theme: resolvedTheme === 'dark' ? 'dark' : 'light',
+        size: window.matchMedia('(max-width: 400px)').matches ? 'compact' : 'normal',
+        hl: locale,
+        callback: (token) => {
+          onTokenRef.current(token);
+        },
+        'expired-callback': () => {
+          onTokenRef.current('');
+        },
+        'error-callback': () => {
+          onTokenRef.current('');
+        },
       });
-    };
-    const timer = window.setInterval(showBadge, 300);
-    return () => {
       window.clearInterval(timer);
-      document.querySelectorAll<HTMLElement>('.grecaptcha-badge').forEach((badge) => {
-        badge.style.visibility = 'hidden';
-      });
+    }, 100);
+    return () => {
+      cancelled = true;
+      window.clearInterval(timer);
     };
-  }, [siteKey]);
+  }, [siteKey, locale, resolvedTheme]);
 
-  const consume = async (): Promise<string | null> => {
-    if (siteKey === '') {
-      setFailed(false);
-      return '';
+  useEffect(() => {
+    if (resetSignal === 0 || widgetId.current === null || window.grecaptcha === undefined) {
+      return;
     }
-    try {
-      const token = await executeRecaptcha(siteKey, locale);
-      setFailed(false);
-      return token;
-    } catch {
-      setFailed(true);
+    window.grecaptcha.reset(widgetId.current);
+  }, [resetSignal]);
+
+  if (siteKey === '') {
+    return null;
+  }
+
+  return (
+    <div className="max-w-full overflow-x-auto">
+      <div ref={host} />
+    </div>
+  );
+}
+
+/** Garde le jeton de la case et signale un envoi sans coche. */
+export function useLoginCaptcha(siteKey: string) {
+  const token = useRef('');
+  const [missing, setMissing] = useState(false);
+  const [resetSignal, setResetSignal] = useState(0);
+
+  const consume = (): string | null => {
+    if (siteKey !== '' && token.current === '') {
+      setMissing(true);
       return null;
     }
+    setMissing(false);
+    return token.current;
   };
 
   const reset = (): void => {
-    setFailed(false);
+    token.current = '';
+    setResetSignal((current) => current + 1);
   };
 
-  return { consume, reset, missing: failed, field: null };
+  const field = (
+    <RecaptchaField
+      siteKey={siteKey}
+      resetSignal={resetSignal}
+      onToken={(value) => {
+        token.current = value;
+        if (value !== '') {
+          setMissing(false);
+        }
+      }}
+    />
+  );
+
+  return { consume, reset, missing, field };
 }

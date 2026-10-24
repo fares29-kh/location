@@ -130,7 +130,7 @@ export const signupSchema = z.object({
 export type SignupInput = z.input<typeof signupSchema>;
 export type SignupRequest = z.output<typeof signupSchema>;
 
-/** Jeton reCAPTCHA v3. Absent quand le captcha n'est pas configuré. */
+/** Jeton reCAPTCHA v2. Absent quand le captcha n'est pas configuré. */
 const captchaTokenSchema = z.string().trim().min(1).max(4096).optional();
 
 export const loginSchema = z.object({

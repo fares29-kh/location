@@ -65,7 +65,7 @@ function PasswordLogin({
 
   const login = useMutation({
     mutationFn: async (values: PasswordCredentials) => {
-      const captchaToken = await captcha.consume();
+      const captchaToken = captcha.consume();
       if (captchaToken === null) {
         throw new Error('captcha');
       }
@@ -179,7 +179,7 @@ function OtpLogin({
 
   const request = useMutation({
     mutationFn: async (email: string) => {
-      const captchaToken = await captcha.consume();
+      const captchaToken = captcha.consume();
       if (captchaToken === null) {
         throw new Error('captcha');
       }

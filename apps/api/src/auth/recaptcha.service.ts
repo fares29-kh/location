@@ -25,7 +25,7 @@ function graceKey(email: string): string {
   return `drivetn:captcha:login-otp:${email}`;
 }
 
-/** Vérifie le jeton reCAPTCHA v3. Sans secret configuré, la vérification est ignorée. */
+/** Vérifie le jeton reCAPTCHA. Sans secret configuré, la vérification est ignorée. */
 @Injectable()
 export class RecaptchaService {
   private readonly logger = new Logger(RecaptchaService.name);
