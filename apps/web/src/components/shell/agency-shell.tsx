@@ -41,6 +41,7 @@ export function AgencyShell({
   const { data: counts } = useNavCounts();
   const pending = counts?.pendingBookings ?? 0;
   const unanswered = counts?.unansweredReviews ?? 0;
+  const billing = counts?.billing;
 
   const sections: ShellNavSection[] = [
     {
@@ -97,14 +98,14 @@ export function AgencyShell({
         </>
       }
     >
-      {counts?.billing.held === true && (
+      {billing?.held === true && (
         <Alert tone="danger" title={tBilling('heldTitle')} className="mb-4">
           {tBilling('heldText')}
         </Alert>
       )}
-      {counts?.billing.held === false && counts.billing.daysLeft !== null && (
+      {billing?.held === false && billing.daysLeft !== null && (
         <Alert tone="info" title={tBilling('trialTitle')} className="mb-4">
-          {tBilling('trialText', { days: counts.billing.daysLeft })}
+          {tBilling('trialText', { days: billing.daysLeft })}
         </Alert>
       )}
       {children}
