@@ -120,7 +120,7 @@ function PlanColumn({
       </header>
       <div className={cn('px-6 py-6', highlighted && 'bg-primary-soft/40')}>
         <p className="flex items-end gap-2">
-          <span className="font-heading text-5xl font-extrabold leading-none tabular-nums">
+          <span className="font-heading text-3xl font-extrabold leading-none tabular-nums sm:text-[3.25rem]">
             {price.amount}
           </span>
           <span className="pb-1 text-lg font-semibold">{price.currency}</span>
@@ -165,14 +165,14 @@ export async function AgencyWelcome({ locale, clientUrl }: { locale: Locale; cli
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(16,185,129,0.16),transparent_55%)]" />
           <div className="absolute -end-24 top-10 size-80 rounded-full bg-primary/10 blur-3xl" />
         </div>
-        <div className="container grid items-center gap-12 py-16 sm:py-24 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]">
+        <div className="container grid min-w-0 grid-cols-1 items-center gap-10 py-12 sm:gap-12 sm:py-24 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]">
           <div className="grid max-w-2xl gap-5">
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-primary">
               {t('eyebrow')}
             </p>
             <h1
               id="agency-welcome-title"
-              className="font-heading text-4xl font-extrabold leading-[1.08] tracking-tight sm:text-5xl"
+              className="font-heading text-2xl font-extrabold leading-tight tracking-tight sm:text-3xl"
             >
               {t('title')}
             </h1>
@@ -345,9 +345,12 @@ export async function AgencyWelcome({ locale, clientUrl }: { locale: Locale; cli
       </section>
 
       <section className="container py-16 sm:py-20" aria-labelledby="agency-closing-title">
-        <div className="grid gap-6 rounded-[2rem] bg-zinc-950 px-6 py-12 text-white sm:px-12 sm:py-16 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+        <div className="grid min-w-0 grid-cols-1 gap-6 rounded-[2rem] bg-zinc-950 px-6 py-12 text-white sm:px-12 sm:py-16 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
           <div className="grid max-w-2xl gap-3">
-            <h2 id="agency-closing-title" className="font-heading text-3xl font-extrabold">
+            <h2
+              id="agency-closing-title"
+              className="font-heading text-2xl font-extrabold sm:text-3xl"
+            >
               {t('closingTitle')}
             </h2>
             <p className="text-base leading-relaxed text-white/75">{t('closingText')}</p>

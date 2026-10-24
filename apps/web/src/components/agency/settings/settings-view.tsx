@@ -200,7 +200,7 @@ function ProfileForm({
   return (
     <form
       noValidate
-      className="grid gap-6"
+      className="grid min-w-0 grid-cols-1 gap-6"
       onSubmit={(event) => {
         void form.handleSubmit(async (values) => {
           try {
@@ -468,7 +468,7 @@ function ConditionsForm({
   return (
     <form
       noValidate
-      className="grid gap-6"
+      className="grid min-w-0 grid-cols-1 gap-6"
       onSubmit={(event) => {
         void form.handleSubmit(async (values) => {
           try {
@@ -846,7 +846,7 @@ function SettingsForms({
   const conditions = useWatch({ control: conditionsForm.control }) as RentalConditions;
 
   return (
-    <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
+    <div className="grid min-w-0 grid-cols-1 items-start gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
       <Tabs
         value={params.tab}
         onValueChange={(tab) => {
@@ -886,10 +886,13 @@ export function SettingsView({ governorates }: { governorates: Governorate[] }) 
   const { data, isPending, isError, error, refetch, isFetching } = useAgencySettings();
 
   return (
-    <div className="grid gap-6">
+    <div className="grid min-w-0 grid-cols-1 gap-6">
       <PageHeader title={t('title')} description={t('subtitle')} />
       {isPending ? (
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]" aria-hidden="true">
+        <div
+          className="grid min-w-0 grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]"
+          aria-hidden="true"
+        >
           <div className="grid gap-4">
             <Skeleton className="h-10 w-64" />
             <Skeleton className="h-64 rounded-card" />

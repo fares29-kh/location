@@ -271,7 +271,7 @@ export function PaymentsView() {
   const hasFilters = query.kind !== 'ALL' || query.method !== 'ALL';
 
   return (
-    <div className="grid gap-6">
+    <div className="grid min-w-0 grid-cols-1 gap-6">
       <PageHeader title={t('page.title')} description={t('page.subtitle')} />
 
       <Alert tone="info" title={t('page.offlineTitle')}>
@@ -289,7 +289,7 @@ export function PaymentsView() {
         <>
           <Summary summary={data.summary} />
 
-          <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_20rem]">
+          <div className="grid min-w-0 grid-cols-1 items-start gap-6 xl:grid-cols-[minmax(0,1fr)_20rem]">
             <section className="grid gap-4" aria-labelledby="payments-journal">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <h2 id="payments-journal" className="font-heading text-lg font-semibold">

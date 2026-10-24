@@ -241,7 +241,7 @@ function FleetCard({ data, format }: { data: DashboardData; format: AgencyFormat
           <HoverHint hint={t('intro')}>{t('title')}</HoverHint>
         </CardTitle>
       </CardHeader>
-      <CardContent className="grid gap-6 lg:grid-cols-2">
+      <CardContent className="grid min-w-0 grid-cols-1 gap-6 lg:grid-cols-2">
         <div className="grid gap-5">
           <p className="text-sm font-medium">
             <HoverHint hint={t('statusHint', { count: total })}>{t('statusTitle')}</HoverHint>
@@ -327,7 +327,7 @@ function FleetCard({ data, format }: { data: DashboardData; format: AgencyFormat
 
 function DashboardSkeleton() {
   return (
-    <div className="grid gap-6 lg:grid-cols-3">
+    <div className="grid min-w-0 grid-cols-1 gap-6 lg:grid-cols-3">
       <Skeleton className="h-80 rounded-card lg:col-span-2" />
       <Skeleton className="h-80 rounded-card" />
     </div>
@@ -341,7 +341,7 @@ export function DashboardView({ firstName }: { firstName: string }) {
   const { data, isPending, isError, error, refetch, isFetching } = useDashboard();
 
   return (
-    <div className="grid gap-6">
+    <div className="grid min-w-0 grid-cols-1 gap-6">
       <PageHeader
         eyebrow={tAuth('greeting', { name: firstName })}
         title={t('title')}
@@ -369,13 +369,13 @@ export function DashboardView({ firstName }: { firstName: string }) {
       ) : isError ? (
         <QueryError error={error} onRetry={() => void refetch()} retrying={isFetching} />
       ) : (
-        <section className="grid gap-3" aria-labelledby="dashboard-now">
+        <section className="grid min-w-0 grid-cols-1 gap-3" aria-labelledby="dashboard-now">
           <h2 id="dashboard-now" className="font-heading text-lg font-semibold">
             <HoverHint hint={t('sections.nowText')} className="font-heading text-lg font-semibold">
               {t('sections.now')}
             </HoverHint>
           </h2>
-          <div className="grid gap-6 lg:grid-cols-3">
+          <div className="grid min-w-0 grid-cols-1 gap-6 lg:grid-cols-3">
             <PendingRequests data={data} format={format} />
             <TodayCard data={data} format={format} />
           </div>

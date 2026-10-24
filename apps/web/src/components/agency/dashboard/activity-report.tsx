@@ -367,7 +367,7 @@ function ActivityChart({
           {t(`chartTitle.${report.grain}`)}
         </HoverHint>
       </figcaption>
-      <div className="overflow-x-auto">
+      <div className="min-w-0 overflow-x-auto">
         <ol
           className="flex h-48 items-end gap-1"
           style={wide ? { minWidth: `${String(report.series.length * 2.25)}rem` } : undefined}
@@ -443,7 +443,7 @@ function ActivityLines({ report, format }: { report: ActivityReport; format: Age
       {preview.length === 0 ? (
         <p className="text-sm text-muted-foreground">{t('empty')}</p>
       ) : (
-        <div className="overflow-x-auto">
+        <div className="min-w-0 overflow-x-auto">
           <table className="w-full min-w-[36rem] text-start text-sm">
             <thead className="text-xs uppercase tracking-wide text-muted-foreground">
               <tr>
@@ -697,7 +697,7 @@ export function ActivityReportCard() {
           </div>
         )}
       </CardHeader>
-      <CardContent className="grid gap-6">
+      <CardContent className="grid min-w-0 grid-cols-1 gap-6">
         {reportQuery.isPending ? (
           <Skeleton className="h-56 rounded-control" />
         ) : reportQuery.isError ? (

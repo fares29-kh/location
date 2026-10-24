@@ -32,7 +32,7 @@ function CustomerDetailContent({ customer }: { customer: CustomerDetail }) {
   const active = customer.bookings.filter((booking) => !isBookingClosed(booking.status));
 
   return (
-    <div className="grid gap-6">
+    <div className="grid min-w-0 grid-cols-1 gap-6">
       <div className="grid gap-4">
         <CustomerIdentity customer={customer} size="lg" />
         <ContactActions
@@ -120,7 +120,7 @@ function CustomerDetailContent({ customer }: { customer: CustomerDetail }) {
 
 function DetailSkeleton() {
   return (
-    <div className="grid gap-6" aria-hidden="true">
+    <div className="grid min-w-0 grid-cols-1 gap-6" aria-hidden="true">
       <div className="flex items-center gap-3">
         <Skeleton className="size-14 rounded-full" />
         <div className="grid flex-1 gap-2">

@@ -57,17 +57,17 @@ export function AuthSplitLayout({
       </aside>
 
       <div className="flex min-w-0 flex-col">
-        <header className="flex h-16 items-center gap-2 px-4 sm:px-6">
+        <header className="flex h-16 min-w-0 items-center gap-2 px-4 sm:px-6">
           <Link
             href={portal === 'agency' ? '/welcome' : '/login'}
-            className="rounded-control focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="shrink-0 rounded-control focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <BrandLogo />
           </Link>
           {portal === 'agency' ? (
             <Link
               href="/welcome"
-              className="rounded-sm text-sm font-medium text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="hidden rounded-sm text-sm font-medium text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:inline"
             >
               {tCommon('backHome')}
             </Link>

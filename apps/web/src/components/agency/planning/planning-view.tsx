@@ -239,7 +239,7 @@ function Timeline({
     cn(isoWeekday(day) >= 5 && 'bg-surface-muted/60', day === today && 'bg-primary/[0.07]');
 
   return (
-    <div className="overflow-x-auto">
+    <div className="min-w-0 max-w-full overflow-x-auto">
       <div role="table" aria-label={t('title')} className="grid min-w-max" style={gridStyle}>
         <div role="row" className="contents">
           <span
@@ -541,7 +541,7 @@ export function PlanningView() {
   );
 
   return (
-    <div className="grid gap-6">
+    <div className="grid min-w-0 grid-cols-1 gap-6">
       <PageHeader
         title={t('title')}
         description={t('subtitle')}

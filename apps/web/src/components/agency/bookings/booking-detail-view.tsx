@@ -430,13 +430,13 @@ function HistoryCard({ booking }: { booking: BookingView }) {
 
 function DetailSkeleton() {
   return (
-    <div className="grid gap-6" aria-busy="true">
+    <div className="grid min-w-0 grid-cols-1 gap-6" aria-busy="true">
       <div className="grid gap-3">
         <Skeleton className="h-4 w-28" />
         <Skeleton className="h-8 w-80 max-w-full" />
       </div>
-      <div className="grid gap-6 lg:grid-cols-3">
-        <div className="grid gap-6 lg:col-span-2">
+      <div className="grid min-w-0 grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="grid min-w-0 gap-6 lg:col-span-2">
           <Skeleton className="h-56 rounded-card" />
           <Skeleton className="h-36 rounded-card" />
         </div>
@@ -461,7 +461,7 @@ export function BookingDetailView({ bookingId }: { bookingId: string }) {
   }
   if (isError) {
     return (
-      <div className="grid gap-6">
+      <div className="grid min-w-0 grid-cols-1 gap-6">
         <PageHeader title={t('fallbackTitle')} back={back} />
         <QueryError error={error} onRetry={() => void refetch()} retrying={isFetching} />
       </div>
@@ -469,7 +469,7 @@ export function BookingDetailView({ bookingId }: { bookingId: string }) {
   }
 
   return (
-    <div className="grid gap-6">
+    <div className="grid min-w-0 grid-cols-1 gap-6">
       <PageHeader
         back={back}
         eyebrow={
@@ -516,8 +516,8 @@ export function BookingDetailView({ bookingId }: { bookingId: string }) {
         </Alert>
       )}
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        <div className="grid content-start gap-6 lg:col-span-2">
+      <div className="grid min-w-0 grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="grid min-w-0 content-start gap-6 lg:col-span-2">
           <TripCard booking={booking} />
           <PaymentsCard booking={booking} />
           <VehicleCard booking={booking} />

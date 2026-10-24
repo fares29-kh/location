@@ -151,8 +151,8 @@ export function AppShell({
       </Sidebar>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <Topbar>
-          <TopbarSection>
+        <Topbar className="gap-2 px-3 sm:gap-3 sm:px-6">
+          <TopbarSection className="min-w-0">
             <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
               <SheetTrigger asChild>
                 <Button
@@ -175,6 +175,7 @@ export function AppShell({
                     <SheetTitle>
                       <BrandLogo />
                     </SheetTitle>
+                    <p className="text-sm font-medium text-muted-foreground">{portalLabel}</p>
                   </SidebarHeader>
                   <ShellNavigation
                     sections={sections}
@@ -185,7 +186,7 @@ export function AppShell({
                 </Sidebar>
               </SheetContent>
             </Sheet>
-            <Badge tone="primary" className="text-sm">
+            <Badge tone="primary" className="hidden text-sm sm:inline-flex">
               {portalLabel}
             </Badge>
           </TopbarSection>
@@ -194,11 +195,11 @@ export function AppShell({
             {topbarActions}
             <LocaleSwitcher />
             <ThemeToggle />
-            <UserMenu user={user} portal={portal} className="ms-2" />
+            <UserMenu user={user} portal={portal} className="ms-1 sm:ms-2" />
           </TopbarSection>
         </Topbar>
-        <main id={MAIN_CONTENT_ID} className="flex-1 p-4 sm:p-6 lg:p-8">
-          <div className="mx-auto w-full max-w-7xl">{children}</div>
+        <main id={MAIN_CONTENT_ID} className="min-w-0 flex-1 p-4 sm:p-6 lg:p-8">
+          <div className="mx-auto grid w-full min-w-0 max-w-7xl grid-cols-1">{children}</div>
         </main>
       </div>
     </div>

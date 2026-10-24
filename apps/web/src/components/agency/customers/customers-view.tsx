@@ -179,7 +179,7 @@ export function CustomersView() {
   );
 
   return (
-    <div className="grid gap-6">
+    <div className="grid min-w-0 grid-cols-1 gap-6">
       <PageHeader
         title={t('title')}
         description={data === undefined ? t('subtitle') : t('summary', { count: data.total })}

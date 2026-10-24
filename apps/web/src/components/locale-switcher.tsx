@@ -36,9 +36,15 @@ export function LocaleSwitcher() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="sm" aria-label={t('language')} loading={isPending}>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="sm:w-auto sm:px-3"
+          aria-label={t('language')}
+          loading={isPending}
+        >
           {!isPending && <Languages aria-hidden="true" />}
-          <span className="uppercase">{locale}</span>
+          <span className="hidden uppercase sm:inline">{locale}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
