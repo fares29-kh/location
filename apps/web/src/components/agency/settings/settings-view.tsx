@@ -144,13 +144,14 @@ function ProfileForm({
   const name = useWatch({ control: form.control, name: 'name' });
   const latitude = useWatch({ control: form.control, name: 'latitude' });
   const longitude = useWatch({ control: form.control, name: 'longitude' });
+  const governorateCode = useWatch({ control: form.control, name: 'governorateCode' });
   const mapPoint =
     typeof latitude === 'number' && typeof longitude === 'number' ? { latitude, longitude } : null;
 
   const textField = (
     name: 'name' | 'email' | 'address',
     label: string,
-    options: { hint?: string; type?: string; autoComplete?: string } = {},
+    options: { hint?: string; type?: string; autoComplete?: string; placeholder?: string } = {},
   ) => {
     const message = validationMessage(errors[name]?.message);
     return (
@@ -159,6 +160,7 @@ function ProfileForm({
           {...controlProps(`${id}-${name}`, { error: message, hint: options.hint })}
           type={options.type}
           autoComplete={options.autoComplete}
+          placeholder={options.placeholder}
           dir={options.type === 'email' ? 'ltr' : undefined}
           {...form.register(name)}
         />
@@ -337,8 +339,12 @@ function ProfileForm({
           <CardTitle>{t('addressTitle')}</CardTitle>
           <CardDescription>{t('addressText')}</CardDescription>
         </CardHeader>
-        <CardContent className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_14rem]">
-          {textField('address', t('address'), { autoComplete: 'street-address' })}
+        <CardContent className="grid gap-4">
+          {textField('address', t('address'), {
+            autoComplete: 'street-address',
+            hint: t('addressHint'),
+            placeholder: t('addressPlaceholder'),
+          })}
           <Field id={`${id}-governorate`} label={t('governorate')} error={governorateError}>
             <Controller
               control={form.control}
@@ -366,9 +372,15 @@ function ProfileForm({
               )}
             />
           </Field>
-          <div className="grid gap-2 sm:col-span-2">
+          <div className="grid gap-2">
             <LocationPicker
               value={mapPoint}
+              governorateCode={governorateCode}
+              onAddressSuggestion={(address) => {
+                if (form.getValues('address').trim().length === 0) {
+                  form.setValue('address', address, { shouldDirty: true, shouldValidate: true });
+                }
+              }}
               onChange={(point) => {
                 form.setValue('latitude', point?.latitude ?? null, {
                   shouldDirty: true,
