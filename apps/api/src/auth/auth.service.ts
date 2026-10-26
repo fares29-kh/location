@@ -88,6 +88,7 @@ export class AuthService {
    * n'est pas saisi.
    */
   async signup(input: SignupRequest, context: RequestContext): Promise<OtpDispatch> {
+    await this.captcha.assertToken(input.captchaToken, context.ip);
     if (context.portal === 'admin') {
       throw new ForbiddenException("L'inscription n'est pas ouverte sur ce portail.");
     }
@@ -250,6 +251,7 @@ export class AuthService {
     input: ForgotPasswordRequest,
     context: RequestContext,
   ): Promise<OtpDispatch> {
+    await this.captcha.assertPasswordReset(input.email, input.captchaToken, context.ip);
     const user = await this.prisma.user.findFirst({
       where: { email: input.email, deletedAt: null },
     });

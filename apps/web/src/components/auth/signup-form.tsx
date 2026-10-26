@@ -18,6 +18,7 @@ import { ApiError } from '@/lib/api/errors';
 
 import { controlProps } from './control-props';
 import { PasswordInput } from './password-input';
+import { useLoginCaptcha } from './recaptcha-field';
 import { type PendingVerification, PhoneVerification } from './phone-verification';
 import { applyServerIssues, useAuthMessages } from './use-auth-messages';
 import { useCompleteAuth } from './use-complete-auth';
@@ -28,13 +29,16 @@ const SIGNUP_FIELDS = ['firstName', 'lastName', 'phone', 'email', 'password'] as
 export function SignupForm({
   portal,
   nextPath,
+  siteKey,
 }: {
   portal: 'client' | 'agency';
   nextPath: string | null;
+  siteKey: string;
 }) {
   const t = useTranslations('auth');
   const locale = useLocale();
   const { validationMessage, errorMessage } = useAuthMessages();
+  const captcha = useLoginCaptcha(siteKey);
   const { complete, redirecting } = useCompleteAuth(nextPath);
   const id = useId();
   const [formError, setFormError] = useState<string | null>(null);
@@ -52,7 +56,18 @@ export function SignupForm({
   });
 
   const signup = useMutation({
-    mutationFn: (values: SignupInput) => authApi.signup({ ...values, locale, portal }),
+    mutationFn: (values: SignupInput) => {
+      const captchaToken = captcha.consume();
+      if (captchaToken === null) {
+        throw new Error('captcha');
+      }
+      return authApi.signup({
+        ...values,
+        locale,
+        portal,
+        ...(captchaToken === '' ? {} : { captchaToken }),
+      });
+    },
     onMutate: () => {
       setFormError(null);
     },
@@ -64,6 +79,10 @@ export function SignupForm({
       setVerification({ flow: 'signup', dispatch: { ...dispatch, email: dispatch.email } });
     },
     onError: (error) => {
+      captcha.reset();
+      if (error instanceof Error && error.message === 'captcha') {
+        return;
+      }
       if (error instanceof ApiError && error.code === 'PHONE_ALREADY_USED') {
         form.setError('phone', { type: 'server', message: error.code });
       } else if (error instanceof ApiError && error.code === 'EMAIL_ALREADY_USED') {
@@ -166,6 +185,8 @@ export function SignupForm({
           />
         </Field>
         <p className="text-xs text-muted-foreground">{t('signup.terms')}</p>
+        {captcha.field}
+        {captcha.missing && <p className="text-sm text-danger">{t('login.captcha')}</p>}
         <Button type="submit" size="lg" loading={signup.isPending}>
           {t('signup.submit')}
         </Button>

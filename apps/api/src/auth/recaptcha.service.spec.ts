@@ -93,4 +93,12 @@ describe('RecaptchaService', () => {
     ).resolves.toBeUndefined();
     expect(redis.get).toHaveBeenCalledWith('drivetn:captcha:login-otp:a@b.c');
   });
+
+  it('autorise le renvoi du code de réinitialisation après une case déjà validée', async () => {
+    const redis = { get: vi.fn().mockResolvedValue('1'), set: vi.fn() };
+    await expect(
+      service('secret', redis).assertPasswordReset('a@b.c', undefined, null),
+    ).resolves.toBeUndefined();
+    expect(redis.get).toHaveBeenCalledWith('drivetn:captcha:password-reset:a@b.c');
+  });
 });

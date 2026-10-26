@@ -114,6 +114,9 @@ export const otpCodeSchema = z
   .trim()
   .regex(new RegExp(`^\\d{${OTP_LENGTH}}$`), { message: 'INVALID_OTP_FORMAT' });
 
+/** Jeton reCAPTCHA v2. Absent quand le captcha n'est pas configuré. */
+const captchaTokenSchema = z.string().trim().min(1).max(4096).optional();
+
 export const signupSchema = z.object({
   firstName: personNameSchema,
   lastName: personNameSchema,
@@ -121,6 +124,7 @@ export const signupSchema = z.object({
   email: requiredEmailSchema,
   password: passwordSchema,
   locale: localeSchema.optional(),
+  captchaToken: captchaTokenSchema,
   /**
    * Portail du formulaire. « agency » crée un gérant. Absent : le rôle suit le domaine
    * de la requête (compatibilité).
@@ -129,9 +133,6 @@ export const signupSchema = z.object({
 });
 export type SignupInput = z.input<typeof signupSchema>;
 export type SignupRequest = z.output<typeof signupSchema>;
-
-/** Jeton reCAPTCHA v2. Absent quand le captcha n'est pas configuré. */
-const captchaTokenSchema = z.string().trim().min(1).max(4096).optional();
 
 export const loginSchema = z.object({
   identifier: identifierSchema,
@@ -172,6 +173,7 @@ export type EmailOtpVerifyRequest = z.output<typeof emailOtpVerifySchema>;
 
 export const forgotPasswordSchema = z.object({
   email: emailSchema,
+  captchaToken: captchaTokenSchema,
 });
 export type ForgotPasswordInput = z.input<typeof forgotPasswordSchema>;
 export type ForgotPasswordRequest = z.output<typeof forgotPasswordSchema>;

@@ -39,6 +39,11 @@ export class SignupDto {
 
   @ApiPropertyOptional({ enum: ['client', 'agency'], description: 'Agence : compte gérant' })
   portal?: 'client' | 'agency';
+
+  @ApiPropertyOptional({
+    description: 'Jeton reCAPTCHA v2, obligatoire si le captcha est configuré',
+  })
+  captchaToken?: string;
 }
 
 export class LoginDto {
@@ -78,6 +83,11 @@ export class EmailOtpVerifyDto {
 export class ForgotPasswordDto {
   @ApiProperty({ example: 'amira@example.tn' })
   email: string;
+
+  @ApiPropertyOptional({
+    description: 'Jeton reCAPTCHA v2, obligatoire si le captcha est configuré',
+  })
+  captchaToken?: string;
 }
 
 export class ResetPasswordDto extends EmailOtpVerifyDto {

@@ -84,7 +84,11 @@ export function createSignupPage(portal: SignupPortal) {
     return (
       <AuthPageFrame portal={portal}>
         <AuthCard title={t(`signup.title.${portal}`)} description={t(`signup.subtitle.${portal}`)}>
-          <SignupForm portal={portal} nextPath={await nextPathFrom(searchParams)} />
+          <SignupForm
+            portal={portal}
+            nextPath={await nextPathFrom(searchParams)}
+            siteKey={getServerEnv().RECAPTCHA_SITE_KEY}
+          />
         </AuthCard>
       </AuthPageFrame>
     );
@@ -99,7 +103,7 @@ export function createForgotPasswordPage(portal: Portal) {
     return (
       <AuthPageFrame portal={portal}>
         <AuthCard title={t('forgot.title')} description={t('forgot.subtitle')}>
-          <ForgotPasswordForm />
+          <ForgotPasswordForm siteKey={getServerEnv().RECAPTCHA_SITE_KEY} />
         </AuthCard>
       </AuthPageFrame>
     );

@@ -22,6 +22,7 @@ import { authApi } from '@/lib/api/auth';
 import { ApiError } from '@/lib/api/errors';
 
 import { controlProps } from './control-props';
+import { useLoginCaptcha } from './recaptcha-field';
 import { displayEmail } from './otp-step';
 import { PasswordInput } from './password-input';
 import { ResendCode } from './resend-code';
@@ -34,9 +35,16 @@ function isValidationError(error: unknown): boolean {
   return error instanceof ApiError && error.code === 'VALIDATION_ERROR';
 }
 
-function RequestCodeStep({ onCodeSent }: { onCodeSent: (dispatch: OtpDispatch) => void }) {
+function RequestCodeStep({
+  siteKey,
+  onCodeSent,
+}: {
+  siteKey: string;
+  onCodeSent: (dispatch: OtpDispatch) => void;
+}) {
   const t = useTranslations('auth');
   const { validationMessage, errorMessage } = useAuthMessages();
+  const captcha = useLoginCaptcha(siteKey);
   const id = useId();
   const form = useForm({
     resolver: zodResolver(forgotPasswordSchema, undefined, { raw: true }),
@@ -44,11 +52,24 @@ function RequestCodeStep({ onCodeSent }: { onCodeSent: (dispatch: OtpDispatch) =
   });
 
   const request = useMutation({
-    mutationFn: (values: ForgotPasswordInput) => authApi.forgotPassword(values),
+    mutationFn: (values: ForgotPasswordInput) => {
+      const captchaToken = captcha.consume();
+      if (captchaToken === null) {
+        throw new Error('captcha');
+      }
+      return authApi.forgotPassword({
+        ...values,
+        ...(captchaToken === '' ? {} : { captchaToken }),
+      });
+    },
     onSuccess: (dispatch) => {
       onCodeSent({ ...dispatch, email: dispatch.email ?? form.getValues('email') });
     },
     onError: (error) => {
+      captcha.reset();
+      if (error instanceof Error && error.message === 'captcha') {
+        return;
+      }
       applyServerIssues(error, form.setError, ['email']);
     },
   });
@@ -65,9 +86,11 @@ function RequestCodeStep({ onCodeSent }: { onCodeSent: (dispatch: OtpDispatch) =
         })(event);
       }}
     >
-      {request.isError && !isValidationError(request.error) && (
-        <Alert tone="danger">{errorMessage(request.error)}</Alert>
-      )}
+      {request.isError &&
+        !isValidationError(request.error) &&
+        !(request.error instanceof Error && request.error.message === 'captcha') && (
+          <Alert tone="danger">{errorMessage(request.error)}</Alert>
+        )}
       <Field id={`${id}-email`} label={t('fields.email')} error={emailError}>
         <Input
           {...controlProps(`${id}-email`, { error: emailError })}
@@ -77,6 +100,8 @@ function RequestCodeStep({ onCodeSent }: { onCodeSent: (dispatch: OtpDispatch) =
           {...form.register('email')}
         />
       </Field>
+      {captcha.field}
+      {captcha.missing && <p className="text-sm text-danger">{t('login.captcha')}</p>}
       <Button type="submit" size="lg" loading={request.isPending}>
         {t('forgot.sendCode')}
       </Button>
@@ -175,7 +200,7 @@ function ResetStep({
 }
 
 /** Réinitialisation du mot de passe : email, puis code reçu et nouveau mot de passe. */
-export function ForgotPasswordForm() {
+export function ForgotPasswordForm({ siteKey }: { siteKey: string }) {
   const t = useTranslations('auth');
   const [step, setStep] = useState<
     | { kind: 'request' }
@@ -203,6 +228,7 @@ export function ForgotPasswordForm() {
     <div className="grid gap-6">
       {step.kind === 'request' ? (
         <RequestCodeStep
+          siteKey={siteKey}
           onCodeSent={(dispatch) => {
             if (dispatch.email === undefined) {
               return;

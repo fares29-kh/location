@@ -21,8 +21,8 @@ interface SiteverifyResponse {
   action?: string;
 }
 
-function graceKey(email: string): string {
-  return `drivetn:captcha:login-otp:${email}`;
+function graceKey(scope: 'login-otp' | 'password-reset', email: string): string {
+  return `drivetn:captcha:${scope}:${email}`;
 }
 
 /** Vérifie le jeton reCAPTCHA. Sans secret configuré, la vérification est ignorée. */
@@ -60,10 +60,37 @@ export class RecaptchaService {
     }
     if (token !== undefined) {
       await this.assertToken(token, ip);
-      await this.redis.set(graceKey(email), '1', 'EX', LOGIN_OTP_GRACE_SECONDS);
+      await this.redis.set(graceKey('login-otp', email), '1', 'EX', LOGIN_OTP_GRACE_SECONDS);
       return;
     }
-    const granted = await this.redis.get(graceKey(email));
+    const granted = await this.redis.get(graceKey('login-otp', email));
+    if (granted === null) {
+      throw new AppException(
+        HttpStatus.BAD_REQUEST,
+        'CAPTCHA_FAILED',
+        'La vérification anti-robot a échoué.',
+      );
+    }
+  }
+
+  /**
+   * Premier envoi du code de réinitialisation : le jeton est obligatoire.
+   * Un renvoi pour le même email reste accepté pendant le délai du code.
+   */
+  async assertPasswordReset(
+    email: string,
+    token: string | undefined,
+    ip: string | null,
+  ): Promise<void> {
+    if (this.config.RECAPTCHA_SECRET_KEY === '') {
+      return;
+    }
+    if (token !== undefined) {
+      await this.assertToken(token, ip);
+      await this.redis.set(graceKey('password-reset', email), '1', 'EX', LOGIN_OTP_GRACE_SECONDS);
+      return;
+    }
+    const granted = await this.redis.get(graceKey('password-reset', email));
     if (granted === null) {
       throw new AppException(
         HttpStatus.BAD_REQUEST,
