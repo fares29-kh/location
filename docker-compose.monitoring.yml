@@ -55,9 +55,9 @@ services:
         max-size: 10m
         max-file: '2'
     command:
-      - --config.file=/etc/blackbox/blackbox.yml
+      - --config.file=/etc/blackbox_exporter/config.yml
     volumes:
-      - /var/lib/drivetn/monitoring/blackbox.yml:/etc/blackbox/blackbox.yml:ro
+      - /var/lib/drivetn/monitoring/blackbox.yml:/etc/blackbox_exporter/config.yml:ro
     networks: [drivetn]
 
   grafana:
