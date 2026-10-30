@@ -5,16 +5,16 @@ groups:
       - alert: DisqueDonneesPlein
         expr: |
           (
-            node_filesystem_avail_bytes{mountpoint=~"/var/lib/drivetn|/host/var/lib/drivetn",fstype!~"tmpfs|overlay"}
-            / node_filesystem_size_bytes{mountpoint=~"/var/lib/drivetn|/host/var/lib/drivetn",fstype!~"tmpfs|overlay"}
+            node_filesystem_avail_bytes{mountpoint=~"/|/var/lib/drivetn",fstype!~"tmpfs|overlay|rootfs"}
+            / node_filesystem_size_bytes{mountpoint=~"/|/var/lib/drivetn",fstype!~"tmpfs|overlay|rootfs"}
           ) < 0.15
         for: 10m
         labels:
           severity: critical
-          message: 'Moins de 15 % de libre sur le disque des données. Agrandissez le disque Azure. Ne lancez pas mkfs.'
+          message: 'Moins de 15 % de libre sur un disque. Libérez de la place. Ne lancez pas mkfs.'
         annotations:
-          summary: 'Disque des données presque plein ({{ $value | humanizePercentage }} libre)'
-          description: 'Depuis 10 minutes, /var/lib/drivetn a moins de 15 % de libre. PostgreSQL va refuser les écritures, et les sauvegardes peuvent échouer. Dans le portail Azure, agrandissez le disque de données, puis étendez la partition. Ne reformatez pas ce disque.'
+          summary: 'Un disque est presque plein ({{ $value | humanizePercentage }} libre)'
+          description: 'Depuis 10 minutes, le disque du système ou celui des données a moins de 15 % de libre. PostgreSQL peut refuser les écritures. Libérez de la place. Ne reformatez pas le disque.'
 
       - alert: MemoireVmSaturee
         expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) > 0.90
