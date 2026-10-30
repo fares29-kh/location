@@ -22,7 +22,7 @@ export const OTP_PURPOSES = ['SIGNUP', 'LOGIN', 'PASSWORD_RESET'] as const;
 export const otpPurposeSchema = z.enum(OTP_PURPOSES);
 export type OtpPurpose = z.infer<typeof otpPurposeSchema>;
 
-/** Canal SMS ou WhatsApp des relances (factures). Les codes de compte passent par email. */
+/** Canal SMS ou WhatsApp. Les codes de compte et les relances de facture passent par email. */
 export const OTP_CHANNELS = ['SMS', 'WHATSAPP'] as const;
 export const otpChannelSchema = z.enum(OTP_CHANNELS);
 export type OtpChannel = z.infer<typeof otpChannelSchema>;

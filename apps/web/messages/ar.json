@@ -2100,7 +2100,7 @@
         "noReminder": "لم يُرسل أي تذكير.",
         "remindedAt": "آخر تذكير {date}.",
         "sendReminder": "إرسال تذكير",
-        "reminderSuccess": "تم إرسال تذكير إلى {name} عبر واتساب.",
+        "reminderSuccess": "تم إرسال تذكير إلى {name} عبر البريد الإلكتروني.",
         "reminderTooSoon": "تم إرسال تذكير لهذه الفاتورة خلال الـ 24 ساعة الأخيرة.",
         "print": "طباعة"
       }

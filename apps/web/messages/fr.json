@@ -2100,7 +2100,7 @@
         "noReminder": "Aucune relance envoyée.",
         "remindedAt": "Dernière relance {date}.",
         "sendReminder": "Envoyer une relance",
-        "reminderSuccess": "Relance envoyée à {name} par WhatsApp.",
+        "reminderSuccess": "Relance envoyée à {name} par email.",
         "reminderTooSoon": "Une relance a déjà été envoyée pour cette facture dans les dernières 24 h.",
         "print": "Imprimer"
       }

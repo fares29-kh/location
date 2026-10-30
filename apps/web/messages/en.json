@@ -2100,7 +2100,7 @@
         "noReminder": "No reminder sent.",
         "remindedAt": "Last reminder {date}.",
         "sendReminder": "Send a reminder",
-        "reminderSuccess": "Reminder sent to {name} via WhatsApp.",
+        "reminderSuccess": "Reminder sent to {name} by email.",
         "reminderTooSoon": "A reminder was already sent for this invoice in the last 24 hours.",
         "print": "Print"
       }

@@ -9,7 +9,6 @@ import {
   SUBSCRIPTION_PLAN_DEFINITIONS,
   SUBSCRIPTION_PLANS,
   toDayKey,
-  toE164,
   toMonthKey,
 } from '@drivetn/types';
 import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
@@ -163,18 +162,30 @@ export class AdminBillingService {
     return invoice;
   }
 
-  /** Relance le gérant par WhatsApp (au plus une fois par 24 h et par facture). */
+  /** Relance le gérant par email (au plus une fois par 24 h et par facture). */
   async sendReminder(id: string, actorId: string, ip: string | null): Promise<Invoice> {
     const now = new Date();
     const invoice = await this.prisma.invoice.findUnique({
       where: { id },
-      include: { agency: { select: { whatsappPhone: true, owner: { select: { locale: true } } } } },
+      include: {
+        agency: {
+          select: { email: true, owner: { select: { locale: true, email: true } } },
+        },
+      },
     });
     if (invoice === null) {
       throw new NotFoundException('Facture introuvable.');
     }
     if (invoice.paidAt !== null) {
       throw alreadyPaid();
+    }
+    const email = invoice.agency.email ?? invoice.agency.owner.email;
+    if (email === null) {
+      throw new AppException(
+        HttpStatus.BAD_REQUEST,
+        'BAD_REQUEST',
+        'Cette agence n’a pas d’adresse email.',
+      );
     }
     const updated = await this.prisma.invoice.updateMany({
       where: {
@@ -197,8 +208,8 @@ export class AdminBillingService {
     try {
       await this.messaging.enqueue({
         template: 'invoice_reminder',
-        channel: 'WHATSAPP',
-        to: toE164(invoice.agency.whatsappPhone),
+        channel: 'EMAIL',
+        to: email,
         locale: invoice.agency.owner.locale,
         invoiceNumber: invoice.number,
         totalMillimes: invoice.totalMillimes,

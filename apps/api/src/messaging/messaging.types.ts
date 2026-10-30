@@ -1,4 +1,4 @@
-import type { DeliveryChannel, Locale, OtpChannel, OtpPurpose } from '@drivetn/types';
+import type { DeliveryChannel, Locale, OtpPurpose } from '@drivetn/types';
 
 export const MESSAGING_QUEUE = 'messaging';
 export const SEND_MESSAGE_JOB = 'send';
@@ -23,10 +23,10 @@ export interface OtpMessageJob {
   expiresInMinutes: number;
 }
 
-/** Relance d'une facture d'abonnement impayée, envoyée au gérant de l'agence. */
+/** Relance d'une facture d'abonnement impayée, envoyée par email au gérant de l'agence. */
 export interface InvoiceReminderJob {
   template: 'invoice_reminder';
-  channel: OtpChannel;
+  channel: DeliveryChannel;
   to: string;
   locale: Locale;
   invoiceNumber: string;

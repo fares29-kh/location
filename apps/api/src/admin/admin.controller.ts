@@ -179,7 +179,7 @@ export class AdminController {
 
   @Post('invoices/:id/reminder')
   @RequireAdminPermission('billing.manage')
-  @ApiOperation({ summary: 'Relancer l’agence par WhatsApp' })
+  @ApiOperation({ summary: 'Relancer l’agence par email' })
   sendInvoiceReminder(
     @CurrentUser() user: AuthenticatedUser,
     @Param('id') id: string,

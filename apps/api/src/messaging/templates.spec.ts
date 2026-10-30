@@ -33,8 +33,8 @@ describe('renderMessage', () => {
         const text = renderMessage(
           {
             template: 'invoice_reminder',
-            channel: 'WHATSAPP',
-            to: '+21671000000',
+            channel: 'EMAIL',
+            to: 'agence@example.tn',
             locale,
             invoiceNumber: 'FAC-2026-0042',
             totalMillimes: 118_810,
@@ -54,8 +54,8 @@ describe('renderMessage', () => {
   it('distingue une facture en retard d’une échéance à venir', () => {
     const base = {
       template: 'invoice_reminder',
-      channel: 'WHATSAPP',
-      to: '+21671000000',
+      channel: 'EMAIL',
+      to: 'agence@example.tn',
       locale: 'fr',
       invoiceNumber: 'FAC-2026-0042',
       totalMillimes: 118_810,
@@ -63,6 +63,12 @@ describe('renderMessage', () => {
     } as const;
     expect(renderMessage({ ...base, overdue: false }, 'DriveTN')).toContain('arrive à échéance');
     expect(renderMessage({ ...base, overdue: true }, 'DriveTN')).toContain('reste impayée');
+    expect(renderEmailSubject({ ...base, overdue: false }, 'DriveTN')).toBe(
+      'Facture FAC-2026-0042 à régler avant le 15/09/2026',
+    );
+    expect(renderEmailSubject({ ...base, overdue: true }, 'DriveTN')).toBe(
+      'Facture FAC-2026-0042 impayée depuis le 15/09/2026',
+    );
   });
 
   it('met le code dans le corps de l’email et pas dans l’objet', () => {

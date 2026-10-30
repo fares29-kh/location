@@ -74,12 +74,31 @@ export function renderEmailHtml(job: MessageJob, appName: string): string | unde
   return renderOtpEmailHtml(job, appName);
 }
 
-/** Objet d'un email de code. Le code lui-même n'y figure pas (aperçu de notification). */
+const INVOICE_REMINDER_SUBJECT: Record<'upcoming' | 'overdue', Record<Locale, string>> = {
+  upcoming: {
+    fr: 'Facture {number} à régler avant le {due}',
+    ar: 'الفاتورة {number} مستحقة بتاريخ {due}',
+    en: 'Invoice {number} due on {due}',
+  },
+  overdue: {
+    fr: 'Facture {number} impayée depuis le {due}',
+    ar: 'الفاتورة {number} غير مسددة منذ {due}',
+    en: 'Invoice {number} unpaid since {due}',
+  },
+};
+
+/** Objet d'un email. Le code de vérification n'y figure pas (aperçu de notification). */
 export function renderEmailSubject(job: MessageJob, appName: string): string | undefined {
-  if (job.template !== 'otp' || job.channel !== 'EMAIL') {
+  if (job.channel !== 'EMAIL') {
     return undefined;
   }
-  return fill(OTP_INTRO[job.locale][job.purpose], { app: appName });
+  if (job.template === 'otp') {
+    return fill(OTP_INTRO[job.locale][job.purpose], { app: appName });
+  }
+  return fill(INVOICE_REMINDER_SUBJECT[job.overdue ? 'overdue' : 'upcoming'][job.locale], {
+    number: job.invoiceNumber,
+    due: formatDay(job.dueDate),
+  });
 }
 
 function renderInvoiceReminder(job: InvoiceReminderJob, appName: string): string {
