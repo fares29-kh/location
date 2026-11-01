@@ -26,6 +26,7 @@ import { FilterTabs } from '../filter-tabs';
 import { QueryError } from '../query-states';
 import { HoverHint } from './hover-hint';
 import { type AgencyFormat, useAgencyFormat } from '../use-agency-format';
+import { TrendingUp, TrendingDown, DollarSign, Receipt, Wallet, CalendarCheck } from 'lucide-react';
 
 const GRAINS: readonly ReportGrain[] = ['day', 'week', 'month', 'year', 'all'];
 const PREVIEW_LIMIT = 5;
@@ -361,14 +362,14 @@ function ActivityChart({
   const wide = report.grain === 'day' || report.grain === 'month';
 
   return (
-    <figure className="min-w-0 max-w-full">
-      <figcaption className="mb-2">
-        <HoverHint hint={t('chartHint')} className="text-sm font-medium">
+    <figure className="min-w-0 max-w-full rounded-control border border-border bg-gradient-to-br from-surface to-surface-muted/30 p-6">
+      <figcaption className="mb-6">
+        <HoverHint hint={t('chartHint')} className="text-base font-semibold">
           {t(`chartTitle.${report.grain}`)}
         </HoverHint>
       </figcaption>
       <div className="w-full overflow-x-hidden">
-        <ol className={cn('flex h-48 w-full items-end', wide ? 'gap-px sm:gap-1' : 'gap-1')}>
+        <ol className={cn('flex h-56 w-full items-end', wide ? 'gap-1 sm:gap-2' : 'gap-2')}>
           {report.series.map((point) => {
             const label = pointLabel(report.grain, point.key, format, (hour) =>
               t('hour', { hour }),
@@ -385,20 +386,20 @@ function ActivityChart({
                   <TooltipTrigger asChild>
                     <button
                       type="button"
-                      className="flex h-full w-full cursor-help flex-col justify-end gap-1 border-0 bg-transparent p-0 font-inherit text-inherit focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      className="group flex h-full w-full cursor-help flex-col justify-end gap-2 border-0 bg-transparent p-0 font-inherit text-inherit transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring hover:scale-105"
                     >
                       <span
                         className={cn(
-                          'block w-full',
+                          'relative block w-full overflow-hidden transition-all duration-300',
                           point.revenueMillimes > 0 &&
                             (current
-                              ? 'rounded-t-control bg-primary'
-                              : 'rounded-t-control bg-primary/70'),
+                              ? 'rounded-t-lg bg-gradient-to-t from-primary to-primary/80 shadow-lg shadow-primary/20'
+                              : 'rounded-t-lg bg-gradient-to-t from-primary/60 to-primary/40 group-hover:from-primary/70 group-hover:to-primary/50'),
                         )}
                         style={{
                           height:
                             point.revenueMillimes > 0
-                              ? `${String(Math.max(ratio * 100, 8))}%`
+                              ? `${String(Math.max(ratio * 100, 10))}%`
                               : '0%',
                         }}
                       >
@@ -406,8 +407,10 @@ function ActivityChart({
                       </span>
                       <span
                         className={cn(
-                          'truncate text-center text-[0.625rem] capitalize text-muted-foreground',
-                          current && 'font-semibold text-foreground',
+                          'truncate text-center text-xs font-medium capitalize transition-colors',
+                          current
+                            ? 'text-foreground'
+                            : 'text-muted-foreground group-hover:text-foreground',
                         )}
                         aria-hidden="true"
                       >
@@ -646,19 +649,22 @@ export function ActivityReportCard() {
           }}
         />
         {grain === 'all' ? (
-          <p className="text-sm font-semibold">
-            {reportQuery.data === undefined
-              ? t('grains.all')
-              : t('since', { date: format.date(reportQuery.data.from) })}
-          </p>
+          <div className="rounded-control border border-border bg-surface-muted/50 px-4 py-3">
+            <p className="text-base font-semibold">
+              {reportQuery.data === undefined
+                ? t('grains.all')
+                : t('since', { date: format.date(reportQuery.data.from) })}
+            </p>
+          </div>
         ) : (
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <div className="flex items-center rounded-control border border-border bg-surface">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center rounded-lg border border-border bg-surface shadow-sm">
               <Button
                 type="button"
                 variant="ghost"
                 size="icon-sm"
                 aria-label={t('previous')}
+                className="rounded-s-lg"
                 onClick={() => {
                   setAnchor((current) => shiftAnchor(grain, current, -1));
                 }}
@@ -669,7 +675,7 @@ export function ActivityReportCard() {
                 type="button"
                 variant="ghost"
                 size="sm"
-                className="border-x border-border"
+                className="border-x border-border font-medium"
                 disabled={onPeriod}
                 onClick={() => {
                   setAnchor(today);
@@ -682,6 +688,7 @@ export function ActivityReportCard() {
                 variant="ghost"
                 size="icon-sm"
                 aria-label={t('next')}
+                className="rounded-e-lg"
                 disabled={onPeriod}
                 onClick={() => {
                   setAnchor((current) => shiftAnchor(grain, current, 1));
@@ -690,7 +697,11 @@ export function ActivityReportCard() {
                 <ChevronRight className="rtl:rotate-180" aria-hidden="true" />
               </Button>
             </div>
-            <p className="text-sm font-semibold capitalize">{periodTitle(grain, anchor, format)}</p>
+            <div className="rounded-lg border border-border bg-surface-muted/50 px-4 py-2">
+              <p className="text-base font-semibold capitalize">
+                {periodTitle(grain, anchor, format)}
+              </p>
+            </div>
           </div>
         )}
       </CardHeader>
@@ -718,28 +729,52 @@ function MoneyStat({
   hint,
   value,
   note,
+  icon,
   negative = false,
 }: {
   label: string;
   hint: string;
   value: string;
   note?: string;
+  icon?: React.ReactNode;
   negative?: boolean;
 }) {
+  const showTrend = note !== undefined;
+  const isPositiveTrend = showTrend && note.includes('+');
+  const isNegativeTrend = showTrend && note.includes('−');
+
   return (
-    <div className="rounded-control bg-surface-muted px-4 py-3">
-      <dt className="text-sm font-medium">
-        <HoverHint hint={hint}>{label}</HoverHint>
-      </dt>
-      <dd
-        className={cn(
-          'mt-1 font-heading text-xl font-bold tabular-nums',
-          negative && 'text-danger',
-        )}
-      >
-        {value}
-      </dd>
-      {note === undefined ? null : <dd className="text-xs text-muted-foreground">{note}</dd>}
+    <div className="group relative overflow-hidden rounded-xl border border-border bg-gradient-to-br from-surface to-surface-muted/50 p-5 shadow-sm transition-shadow hover:shadow-md">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0 flex-1">
+          <dt className="mb-3 flex items-center gap-2 text-sm font-medium text-muted-foreground">
+            {icon && <span className="text-primary">{icon}</span>}
+            <HoverHint hint={hint}>{label}</HoverHint>
+          </dt>
+          <dd
+            className={cn(
+              'mb-2 font-heading text-2xl font-bold tabular-nums transition-colors',
+              negative ? 'text-danger' : 'text-foreground',
+            )}
+          >
+            {value}
+          </dd>
+          {note !== undefined && (
+            <dd
+              className={cn(
+                'flex items-center gap-1.5 text-xs font-medium',
+                isPositiveTrend && 'text-success',
+                isNegativeTrend && 'text-danger',
+                !isPositiveTrend && !isNegativeTrend && 'text-muted-foreground',
+              )}
+            >
+              {isPositiveTrend && <TrendingUp className="size-3.5" aria-hidden="true" />}
+              {isNegativeTrend && <TrendingDown className="size-3.5" aria-hidden="true" />}
+              {note}
+            </dd>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
@@ -972,18 +1007,20 @@ function ActivityBody({
 
   return (
     <>
-      <dl className="grid gap-3 sm:grid-cols-3">
+      <dl className="grid gap-4 sm:grid-cols-3">
         <MoneyStat
           label={t('revenue')}
           hint={t('revenueHint')}
           value={format.money(report.revenueMillimes)}
           note={trend(revenueTrend)}
+          icon={<DollarSign className="size-5" />}
         />
         <MoneyStat
           label={t('expenses')}
           hint={t('expensesHint')}
           value={format.money(report.expenseMillimes)}
           note={trend(expenseTrend)}
+          icon={<Receipt className="size-5" />}
         />
         <MoneyStat
           label={t('result')}
@@ -991,16 +1028,23 @@ function ActivityBody({
           value={format.money(result)}
           note={trend(variation(result, previousResult))}
           negative={result < 0}
+          icon={<Wallet className="size-5" />}
         />
       </dl>
-      <dl className="grid gap-3 sm:grid-cols-2">
+      <dl className="grid gap-4 sm:grid-cols-2">
         <MoneyStat
           label={t('departures')}
           hint={t('departuresHint')}
           value={format.integer(report.bookings)}
           note={trend(bookingsTrend)}
+          icon={<CalendarCheck className="size-5" />}
         />
-        <MoneyStat label={t('average')} hint={t('averageHint')} value={format.money(average)} />
+        <MoneyStat
+          label={t('average')}
+          hint={t('averageHint')}
+          value={format.money(average)}
+          icon={<TrendingUp className="size-5" />}
+        />
       </dl>
       <ActivityChart report={report} format={format} anchor={anchor} today={today} />
       <ActivityVehicles report={report} format={format} anchor={anchor} />

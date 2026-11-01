@@ -32,7 +32,7 @@ export function FilterTabs<T extends string>({
       role="group"
       aria-label={label}
       className={cn(
-        'flex min-w-0 gap-1.5 overflow-x-auto pb-1 [scrollbar-width:none] sm:flex-wrap',
+        'flex min-w-0 gap-2 overflow-x-auto pb-1 [scrollbar-width:none] sm:flex-wrap',
         className,
       )}
     >
@@ -47,19 +47,19 @@ export function FilterTabs<T extends string>({
               onValueChange(option.value);
             }}
             className={cn(
-              'inline-flex h-9 shrink-0 items-center gap-2 rounded-full border px-3.5 text-sm font-medium transition-colors',
+              'group relative inline-flex h-10 shrink-0 items-center gap-2 rounded-lg border px-4 text-sm font-semibold transition-all',
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
               selected
-                ? 'border-primary bg-primary text-primary-foreground shadow-sm'
-                : 'border-border bg-surface text-muted-foreground hover:bg-surface-muted hover:text-foreground',
+                ? 'border-primary bg-primary text-primary-foreground shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30'
+                : 'border-border bg-surface text-muted-foreground shadow-sm hover:border-primary/50 hover:bg-surface-muted hover:text-foreground hover:shadow-md',
             )}
           >
             {option.label}
             {option.count !== undefined && (
               <span
                 className={cn(
-                  'min-w-5 rounded-full px-1.5 text-center text-xs tabular-nums',
-                  selected ? 'bg-white/20' : 'bg-surface-muted',
+                  'min-w-5 rounded-md px-2 py-0.5 text-center text-xs font-bold tabular-nums transition-colors',
+                  selected ? 'bg-white/20' : 'bg-surface-muted group-hover:bg-surface',
                 )}
               >
                 {option.count}
