@@ -55,13 +55,27 @@ const PILLAR_ICONS: Record<(typeof PILLARS)[number], LucideIcon> = {
   run: ChartColumn,
 };
 
-/** Points listés sur chaque carte tarifaire (ordre d’affichage). */
-const PLAN_FEATURES = {
+/** Limites et avantages propres à chaque formule. */
+const PLAN_HIGHLIGHTS = {
   STARTER: ['vehicles', 'agency', 'admins', 'essentials'],
   PRO: ['vehicles', 'agency', 'admins', 'advanced'],
   BUSINESS: ['vehicles', 'admins', 'offices', 'premium'],
   LIFETIME: ['once', 'lifetime', 'vehicles', 'admins', 'offices', 'premium'],
 } as const satisfies Record<SubscriptionPlan, readonly string[]>;
+
+/** Fonctionnalités produit incluses dans toutes les formules. */
+const SHARED_FEATURES = [
+  'fleet',
+  'planning',
+  'online',
+  'desk',
+  'payments',
+  'expenses',
+  'stats',
+  'pdf',
+  'reviews',
+  'map',
+] as const;
 
 function priceAmount(millimes: number, locale: Locale): { amount: string; currency: string } {
   const exact = formatMillimes(millimes, locale);
@@ -315,9 +329,12 @@ export async function AgencyWelcome({ locale, clientUrl }: { locale: Locale; cli
                     definition.billingInterval === 'once' ? t('billingOnce') : t('billingYear')
                   }
                   recommended={plan === 'PRO' ? t('recommended') : null}
-                  features={PLAN_FEATURES[plan].map((id) =>
-                    t(`planFeature.${plan}.${id}` as Parameters<typeof t>[0]),
-                  )}
+                  features={[
+                    ...PLAN_HIGHLIGHTS[plan].map((id) =>
+                      t(`planFeature.${plan}.${id}` as Parameters<typeof t>[0]),
+                    ),
+                    ...SHARED_FEATURES.map((id) => t(`feature.${id}`)),
+                  ]}
                   signup={t('signup')}
                 />
               );

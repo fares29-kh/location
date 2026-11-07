@@ -676,6 +676,18 @@
       "billingYear": "/ an",
       "billingOnce": "/ paiement unique",
       "recommended": "Recommandé",
+      "feature": {
+        "fleet": "Fiches, photos et prix des voitures",
+        "planning": "Planning et jours d’entretien",
+        "online": "Réservations en ligne",
+        "desk": "Réservation au comptoir",
+        "payments": "Encaissements sur place, sans paiement en ligne",
+        "expenses": "Dépenses : essence, vidange, entretien",
+        "stats": "Chiffres par jour, semaine, mois, année et total",
+        "pdf": "Rapport à enregistrer en PDF",
+        "reviews": "Avis des clients et vos réponses",
+        "map": "Agence visible dans la recherche et sur la carte"
+      },
       "planFeature": {
         "STARTER": {
           "vehicles": "Jusqu’à 10 voitures",

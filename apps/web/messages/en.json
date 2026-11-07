@@ -676,6 +676,18 @@
       "billingYear": "/ year",
       "billingOnce": "/ one-time payment",
       "recommended": "Recommended",
+      "feature": {
+        "fleet": "Car records, photos and prices",
+        "planning": "Schedule and servicing days",
+        "online": "Online bookings",
+        "desk": "Counter bookings",
+        "payments": "On-site collections, no online payment",
+        "expenses": "Costs: fuel, oil change, servicing",
+        "stats": "Figures by day, week, month, year and all-time",
+        "pdf": "Report you can save as PDF",
+        "reviews": "Client reviews and your replies",
+        "map": "Agency shown in search and on the map"
+      },
       "planFeature": {
         "STARTER": {
           "vehicles": "Up to 10 cars",
