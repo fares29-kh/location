@@ -85,7 +85,7 @@ function Plans({ overview, format }: { overview: BillingOverview; format: Agency
         </h2>
         <p className="text-sm text-muted-foreground">{t('subtitle')}</p>
       </div>
-      <ul className="grid gap-3 sm:grid-cols-3">
+      <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         {overview.plans.map(({ plan, agencies }) => {
           const definition = SUBSCRIPTION_PLAN_DEFINITIONS[plan];
           return (
@@ -98,10 +98,10 @@ function Plans({ overview, format }: { overview: BillingOverview; format: Agency
                   </span>
                 </div>
                 <p className="font-heading text-xl font-bold tabular-nums">
-                  {format.money(definition.monthlyPriceMillimes)}
+                  {format.money(definition.priceMillimes)}
                   <span className="text-sm font-normal text-muted-foreground">
                     {' '}
-                    {t('perMonth')}
+                    {definition.billingInterval === 'once' ? t('once') : t('perYear')}
                   </span>
                 </p>
                 <p className="text-xs text-muted-foreground">

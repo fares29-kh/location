@@ -6,7 +6,7 @@ import {
   type InvoiceList,
   type InvoiceQuery,
   type PaymentMethod,
-  SUBSCRIPTION_PLAN_DEFINITIONS,
+  monthlySubscriptionMillimes,
   SUBSCRIPTION_PLANS,
   toDayKey,
   toMonthKey,
@@ -112,8 +112,7 @@ export class AdminBillingService {
       plans.find((group) => group.plan === plan)?._count._all ?? 0;
     return {
       mrrMillimes: SUBSCRIPTION_PLANS.reduce(
-        (sum, plan) =>
-          sum + agenciesOn(plan) * SUBSCRIPTION_PLAN_DEFINITIONS[plan].monthlyPriceMillimes,
+        (sum, plan) => sum + agenciesOn(plan) * monthlySubscriptionMillimes(plan),
         0,
       ),
       collectedMonthMillimes,

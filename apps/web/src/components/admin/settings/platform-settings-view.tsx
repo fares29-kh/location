@@ -150,7 +150,7 @@ function InvoicePreview({ form }: { form: SettingsForm }) {
   });
   const vatRateBps = parsePercentToBps(vatRate);
   const stamp = parseDinars(fiscalStamp);
-  const subtotal = SUBSCRIPTION_PLAN_DEFINITIONS[PREVIEW_PLAN].monthlyPriceMillimes;
+  const subtotal = SUBSCRIPTION_PLAN_DEFINITIONS[PREVIEW_PLAN].priceMillimes;
 
   return (
     <Card className="lg:sticky lg:top-24">

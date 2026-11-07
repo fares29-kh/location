@@ -285,6 +285,7 @@ enum SubscriptionPlan {
   STARTER
   PRO
   BUSINESS
+  LIFETIME
 }
 
 enum AgencyDocumentKind {

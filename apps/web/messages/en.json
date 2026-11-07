@@ -642,27 +642,12 @@
       },
       "plansEyebrow": "Pricing",
       "closingTitle": "Open your agency workspace",
-      "closingText": "Create the manager account. The agency stays hidden from clients until DriveTN accepts the file. A new agency starts on Essential.",
-      "allFeatures": "Every feature",
-      "difference": "What changes",
-      "includedTitle": "Included in all three plans",
-      "feature": {
-        "account": "1 manager account",
-        "fleet": "Car records, photos and prices",
-        "planning": "Schedule and servicing days",
-        "online": "Online bookings",
-        "desk": "Counter bookings",
-        "payments": "On-site collections, no online payment",
-        "expenses": "Costs: fuel, oil change, servicing",
-        "stats": "Figures by day, week, month, year and all-time",
-        "pdf": "Report you can save as PDF",
-        "reviews": "Client reviews and your replies",
-        "map": "Agency shown in search and on the map"
-      },
+      "closingText": "Create the manager account. The agency stays hidden from clients until DriveTN accepts the file. A new agency starts on Starter.",
       "planRole": {
-        "STARTER": "To start",
-        "PRO": "To grow",
-        "BUSINESS": "Large fleet"
+        "STARTER": "To get started",
+        "PRO": "Recommended plan",
+        "BUSINESS": "For large fleets",
+        "LIFETIME": "Lifetime licence"
       },
       "stepsTitle": "How to open the workspace",
       "steps": {
@@ -684,17 +669,46 @@
         }
       },
       "plansTitle": "The plans",
-      "plansLead": "Prices exclude tax and are billed each month. A new agency starts on Essential, with 14 free days.",
+      "plansLead": "Prices exclude tax and are shown in Tunisian dinars. The first three plans are billed yearly. Lifetime is a one-time payment.",
       "trialEyebrow": "Trial",
       "trialTitle": "14 days to try, without paying",
       "trialText": "When the account is created, the agency has 14 days. It can prepare its fleet and receive requests. After that, if the subscription is not paid, the account is deactivated automatically. It becomes active again once the subscription is paid.",
-      "perMonth": "excluding tax, per month",
-      "unlimited": "No limit on listed cars",
-      "vehicleLimit": "Up to {count, plural, one {# listed car} other {# listed cars}}",
+      "billingYear": "/ year",
+      "billingOnce": "/ one-time payment",
+      "recommended": "Recommended",
+      "planFeature": {
+        "STARTER": {
+          "vehicles": "Up to 10 cars",
+          "agency": "1 agency",
+          "admins": "1 administrator account",
+          "essentials": "Essential car-rental management features"
+        },
+        "PRO": {
+          "vehicles": "Up to 20 cars",
+          "agency": "1 agency",
+          "admins": "Up to 2 administrator accounts",
+          "advanced": "Advanced management features"
+        },
+        "BUSINESS": {
+          "vehicles": "Unlimited cars",
+          "admins": "Unlimited administrator accounts",
+          "offices": "Manage several agency offices",
+          "premium": "All Premium features"
+        },
+        "LIFETIME": {
+          "once": "One-time payment",
+          "lifetime": "Lifetime licence",
+          "vehicles": "Unlimited cars",
+          "admins": "Unlimited administrator accounts",
+          "offices": "Manage several agency offices",
+          "premium": "All Premium features"
+        }
+      },
       "plans": {
-        "STARTER": "Essential",
-        "PRO": "Pro",
-        "BUSINESS": "Business"
+        "STARTER": "Starter",
+        "PRO": "Business",
+        "BUSINESS": "Premium",
+        "LIFETIME": "Lifetime"
       }
     },
     "billing": {
@@ -1768,9 +1782,10 @@
       }
     },
     "plans": {
-      "STARTER": "Essential",
-      "PRO": "Pro",
-      "BUSINESS": "Business"
+      "STARTER": "Starter",
+      "PRO": "Business",
+      "BUSINESS": "Premium",
+      "LIFETIME": "Lifetime"
     },
     "dashboard": {
       "title": "Platform overview",
@@ -1911,7 +1926,7 @@
         "taxId": "Tax ID",
         "subscription": "Subscription",
         "plan": "Plan",
-        "monthlyFee": "Monthly fee excl. tax",
+        "monthlyFee": "Plan price excl. tax",
         "trialEnds": "Trial ends",
         "vehicles": "Vehicles",
         "commissionDefault": "Commission (default)",
@@ -2078,7 +2093,8 @@
         "title": "Subscription plans",
         "subtitle": "Active agencies by plan.",
         "agencies": "{count, plural, one {# agency} other {# agencies}}",
-        "perMonth": "excl. tax / month",
+        "perYear": "excl. tax / year",
+        "once": "excl. tax / one-time",
         "unlimited": "Unlimited vehicles",
         "vehicleLimit": "Up to {count, plural, one {# vehicle} other {# vehicles}}"
       },

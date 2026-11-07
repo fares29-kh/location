@@ -25,20 +25,6 @@ import { getTranslations } from 'next-intl/server';
 import { SectionHeading } from '@/components/home/section-heading';
 import { Link } from '@/i18n/navigation';
 
-const FEATURES = [
-  'account',
-  'fleet',
-  'planning',
-  'online',
-  'desk',
-  'payments',
-  'expenses',
-  'stats',
-  'pdf',
-  'reviews',
-  'map',
-] as const;
-
 const PILLARS = ['find', 'book', 'run'] as const;
 
 const SERVICES = [
@@ -69,6 +55,14 @@ const PILLAR_ICONS: Record<(typeof PILLARS)[number], LucideIcon> = {
   run: ChartColumn,
 };
 
+/** Points listés sur chaque carte tarifaire (ordre d’affichage). */
+const PLAN_FEATURES = {
+  STARTER: ['vehicles', 'agency', 'admins', 'essentials'],
+  PRO: ['vehicles', 'agency', 'admins', 'advanced'],
+  BUSINESS: ['vehicles', 'admins', 'offices', 'premium'],
+  LIFETIME: ['once', 'lifetime', 'vehicles', 'admins', 'offices', 'premium'],
+} as const satisfies Record<SubscriptionPlan, readonly string[]>;
+
 function priceAmount(millimes: number, locale: Locale): { amount: string; currency: string } {
   const exact = formatMillimes(millimes, locale);
   const plain = formatMillimes(millimes, locale, { withCurrency: false });
@@ -83,11 +77,8 @@ function PlanColumn({
   locale,
   name,
   role,
-  perMonth,
-  limit,
-  difference,
-  allFeatures,
-  includedTitle,
+  billing,
+  recommended,
   features,
   signup,
 }: {
@@ -95,15 +86,13 @@ function PlanColumn({
   locale: Locale;
   name: string;
   role: string;
-  perMonth: string;
-  limit: string;
-  difference: string;
-  allFeatures: string;
-  includedTitle: string;
+  billing: string;
+  recommended: string | null;
   features: readonly string[];
   signup: string;
 }) {
-  const price = priceAmount(SUBSCRIPTION_PLAN_DEFINITIONS[plan].monthlyPriceMillimes, locale);
+  const definition = SUBSCRIPTION_PLAN_DEFINITIONS[plan];
+  const price = priceAmount(definition.priceMillimes, locale);
   const highlighted = plan === 'PRO';
 
   return (
@@ -114,26 +103,23 @@ function PlanColumn({
       )}
     >
       <header className="relative bg-zinc-950 px-6 pb-5 pt-6 text-white">
+        {recommended !== null ? (
+          <p className="mb-3 inline-flex rounded-full bg-primary px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-primary-foreground">
+            {recommended}
+          </p>
+        ) : null}
         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-white/60">{role}</p>
         <h3 className="mt-2 font-heading text-2xl font-bold">{name}</h3>
-        <p className="mt-1 text-sm text-white/70">{allFeatures}</p>
       </header>
       <div className={cn('px-6 py-6', highlighted && 'bg-primary-soft/40')}>
         <p className="flex items-end gap-2">
-          <span className="font-heading text-3xl font-extrabold leading-none tabular-nums sm:text-[3.25rem]">
+          <span className="font-heading text-3xl font-extrabold leading-none tabular-nums sm:text-[2.75rem]">
             {price.amount}
           </span>
           <span className="pb-1 text-lg font-semibold">{price.currency}</span>
         </p>
-        <p className="mt-2 text-sm text-muted-foreground">{perMonth}</p>
+        <p className="mt-2 text-sm font-medium text-muted-foreground">{billing}</p>
       </div>
-      <div className="mx-6 rounded-2xl bg-primary-soft px-4 py-3 text-primary-soft-foreground">
-        <p className="text-xs font-semibold uppercase tracking-wide">{difference}</p>
-        <p className="mt-1 font-medium">{limit}</p>
-      </div>
-      <p className="px-6 pt-5 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-        {includedTitle}
-      </p>
       <ul className="grid gap-0 px-6 py-2">
         {features.map((feature) => (
           <li
@@ -156,7 +142,6 @@ function PlanColumn({
 
 export async function AgencyWelcome({ locale, clientUrl }: { locale: Locale; clientUrl: string }) {
   const t = await getTranslations({ locale, namespace: 'agency.welcome' });
-  const features = FEATURES.map((id) => t(`feature.${id}`));
 
   return (
     <div>
@@ -316,7 +301,7 @@ export async function AgencyWelcome({ locale, clientUrl }: { locale: Locale; cli
             title={t('plansTitle')}
             text={t('plansLead')}
           />
-          <div className="grid items-stretch gap-5 lg:grid-cols-3">
+          <div className="grid items-stretch gap-5 md:grid-cols-2 xl:grid-cols-4">
             {SUBSCRIPTION_PLANS.map((plan) => {
               const definition = SUBSCRIPTION_PLAN_DEFINITIONS[plan];
               return (
@@ -326,16 +311,13 @@ export async function AgencyWelcome({ locale, clientUrl }: { locale: Locale; cli
                   locale={locale}
                   name={t(`plans.${plan}`)}
                   role={t(`planRole.${plan}`)}
-                  perMonth={t('perMonth')}
-                  limit={
-                    definition.vehicleLimit === null
-                      ? t('unlimited')
-                      : t('vehicleLimit', { count: definition.vehicleLimit })
+                  billing={
+                    definition.billingInterval === 'once' ? t('billingOnce') : t('billingYear')
                   }
-                  difference={t('difference')}
-                  allFeatures={t('allFeatures')}
-                  includedTitle={t('includedTitle')}
-                  features={features}
+                  recommended={plan === 'PRO' ? t('recommended') : null}
+                  features={PLAN_FEATURES[plan].map((id) =>
+                    t(`planFeature.${plan}.${id}` as Parameters<typeof t>[0]),
+                  )}
                   signup={t('signup')}
                 />
               );

@@ -105,22 +105,40 @@ export type AgencyDocumentKind = (typeof AGENCY_DOCUMENT_KINDS)[number];
 
 // --- Abonnements et facturation -----------------------------------------------------
 
-export const SUBSCRIPTION_PLANS = ['STARTER', 'PRO', 'BUSINESS'] as const;
+export const SUBSCRIPTION_PLANS = ['STARTER', 'PRO', 'BUSINESS', 'LIFETIME'] as const;
 export const subscriptionPlanSchema = z.enum(SUBSCRIPTION_PLANS);
 export type SubscriptionPlan = z.infer<typeof subscriptionPlanSchema>;
 
+/** Facturation annuelle (3 premiers plans) ou paiement unique (Lifetime). */
+export const PLAN_BILLING_INTERVALS = ['year', 'once'] as const;
+export type PlanBillingInterval = (typeof PLAN_BILLING_INTERVALS)[number];
+
 export interface SubscriptionPlanDefinition {
-  /** Abonnement mensuel hors taxes, en millimes. */
-  monthlyPriceMillimes: number;
+  /** Prix catalogue hors taxes, en millimes (annuel ou unique). */
+  priceMillimes: number;
+  billingInterval: PlanBillingInterval;
   /** Nombre maximal de véhicules publiés (`null` = illimité). */
   vehicleLimit: number | null;
 }
 
 export const SUBSCRIPTION_PLAN_DEFINITIONS: Record<SubscriptionPlan, SubscriptionPlanDefinition> = {
-  STARTER: { monthlyPriceMillimes: 49_000, vehicleLimit: 5 },
-  PRO: { monthlyPriceMillimes: 99_000, vehicleLimit: 20 },
-  BUSINESS: { monthlyPriceMillimes: 199_000, vehicleLimit: null },
+  STARTER: { priceMillimes: 490_000, billingInterval: 'year', vehicleLimit: 10 },
+  PRO: { priceMillimes: 690_000, billingInterval: 'year', vehicleLimit: 20 },
+  BUSINESS: { priceMillimes: 1_290_000, billingInterval: 'year', vehicleLimit: null },
+  LIFETIME: { priceMillimes: 4_990_000, billingInterval: 'once', vehicleLimit: null },
 };
+
+/**
+ * Quote-part mensuelle HT utilisée par la facturation récurrente.
+ * Les offres Lifetime ne génèrent pas d'abonnement mensuel.
+ */
+export function monthlySubscriptionMillimes(plan: SubscriptionPlan): number {
+  const definition = SUBSCRIPTION_PLAN_DEFINITIONS[plan];
+  if (definition.billingInterval === 'once') {
+    return 0;
+  }
+  return Math.round(definition.priceMillimes / 12);
+}
 
 /** Durée de l'essai gratuit accordé à la création du compte agence. */
 export const TRIAL_DAYS = 14;
@@ -241,7 +259,7 @@ export function computeInvoiceAmounts({
   vatRateBps: number;
   fiscalStampMillimes: number;
 }): InvoiceAmounts {
-  const subscriptionMillimes = SUBSCRIPTION_PLAN_DEFINITIONS[plan].monthlyPriceMillimes;
+  const subscriptionMillimes = monthlySubscriptionMillimes(plan);
   const commissionMillimes = applyRateBps(revenueMillimes, commissionBps);
   return {
     subscriptionMillimes,

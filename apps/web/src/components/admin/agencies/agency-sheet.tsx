@@ -131,7 +131,7 @@ function Overview({ agency }: { agency: AgencyDetail }) {
       <Section title={t('subscription')}>
         <dl className="grid grid-cols-2 gap-2">
           <Stat label={t('plan')} value={<PlanTag plan={agency.plan} />} />
-          <Stat label={t('monthlyFee')} value={format.money(plan.monthlyPriceMillimes)} />
+          <Stat label={t('monthlyFee')} value={format.money(plan.priceMillimes)} />
           {agency.trialEndsAt !== null && (
             <Stat label={t('trialEnds')} value={format.date(agency.trialEndsAt)} />
           )}

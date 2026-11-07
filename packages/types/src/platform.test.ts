@@ -77,13 +77,13 @@ describe('facturation', () => {
         fiscalStampMillimes: 1000,
       }),
     ).toEqual({
-      subscriptionMillimes: 99_000,
+      subscriptionMillimes: 57_500,
       commissionMillimes: 50_000,
       vatRateBps: 1900,
-      subtotalMillimes: 149_000,
-      vatMillimes: 28_310,
+      subtotalMillimes: 107_500,
+      vatMillimes: 20_425,
       fiscalStampMillimes: 1000,
-      totalMillimes: 178_310,
+      totalMillimes: 128_925,
     });
   });
 

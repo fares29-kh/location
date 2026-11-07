@@ -642,27 +642,12 @@
       },
       "plansEyebrow": "Tarifs",
       "closingTitle": "Ouvrez l’espace de votre agence",
-      "closingText": "Créez le compte gérant. L’agence reste invisible aux clients tant que DriveTN n’a pas accepté le dossier. À l’inscription, la formule est Essentiel.",
-      "allFeatures": "Toutes les fonctionnalités",
-      "difference": "Ce qui change",
-      "includedTitle": "Inclus dans les trois formules",
-      "feature": {
-        "account": "1 compte gérant",
-        "fleet": "Fiches, photos et prix des voitures",
-        "planning": "Planning et jours d’entretien",
-        "online": "Réservations en ligne",
-        "desk": "Réservation au comptoir",
-        "payments": "Encaissements sur place, sans paiement en ligne",
-        "expenses": "Dépenses : essence, vidange, entretien",
-        "stats": "Chiffres par jour, semaine, mois, année et total",
-        "pdf": "Rapport à enregistrer en PDF",
-        "reviews": "Avis des clients et vos réponses",
-        "map": "Agence visible dans la recherche et sur la carte"
-      },
+      "closingText": "Créez le compte gérant. L’agence reste invisible aux clients tant que DriveTN n’a pas accepté le dossier. À l’inscription, la formule est Starter.",
       "planRole": {
         "STARTER": "Pour commencer",
-        "PRO": "Pour grandir",
-        "BUSINESS": "Grand parc"
+        "PRO": "Offre recommandée",
+        "BUSINESS": "Pour les grands parcs",
+        "LIFETIME": "Licence à vie"
       },
       "stepsTitle": "Comment ouvrir l’espace",
       "steps": {
@@ -684,17 +669,46 @@
         }
       },
       "plansTitle": "Les formules",
-      "plansLead": "Prix hors taxes, facturé chaque mois. À l’inscription, l’agence est sur Essentiel, avec 14 jours offerts.",
+      "plansLead": "Prix hors taxes en dinars tunisiens. Les trois premiers plans sont facturés chaque année. Lifetime se règle en un seul paiement.",
       "trialEyebrow": "Essai",
       "trialTitle": "14 jours pour essayer, sans payer",
       "trialText": "À la création du compte, l’agence a 14 jours. Elle peut préparer sa flotte et recevoir des demandes. Passé ce délai, si l’abonnement n’est pas réglé, le compte est désactivé automatiquement. Il redevient actif dès que l’abonnement est payé.",
-      "perMonth": "hors taxes, par mois",
-      "unlimited": "Voitures publiées sans limite",
-      "vehicleLimit": "Jusqu’à {count, plural, one {# voiture publiée} other {# voitures publiées}}",
+      "billingYear": "/ an",
+      "billingOnce": "/ paiement unique",
+      "recommended": "Recommandé",
+      "planFeature": {
+        "STARTER": {
+          "vehicles": "Jusqu’à 10 voitures",
+          "agency": "1 agence",
+          "admins": "1 compte administrateur",
+          "essentials": "Fonctionnalités essentielles de gestion de location"
+        },
+        "PRO": {
+          "vehicles": "Jusqu’à 20 voitures",
+          "agency": "1 agence",
+          "admins": "Jusqu’à 2 comptes administrateurs",
+          "advanced": "Fonctionnalités avancées de gestion"
+        },
+        "BUSINESS": {
+          "vehicles": "Nombre illimité de voitures",
+          "admins": "Nombre illimité de comptes administrateurs",
+          "offices": "Gestion de plusieurs bureaux d’agence",
+          "premium": "Toutes les fonctionnalités Premium"
+        },
+        "LIFETIME": {
+          "once": "Paiement unique",
+          "lifetime": "Licence à vie",
+          "vehicles": "Nombre illimité de voitures",
+          "admins": "Nombre illimité de comptes administrateurs",
+          "offices": "Gestion de plusieurs bureaux d’agence",
+          "premium": "Toutes les fonctionnalités Premium"
+        }
+      },
       "plans": {
-        "STARTER": "Essentiel",
-        "PRO": "Pro",
-        "BUSINESS": "Business"
+        "STARTER": "Starter",
+        "PRO": "Business",
+        "BUSINESS": "Premium",
+        "LIFETIME": "Lifetime"
       }
     },
     "billing": {
@@ -1768,9 +1782,10 @@
       }
     },
     "plans": {
-      "STARTER": "Essentiel",
-      "PRO": "Pro",
-      "BUSINESS": "Business"
+      "STARTER": "Starter",
+      "PRO": "Business",
+      "BUSINESS": "Premium",
+      "LIFETIME": "Lifetime"
     },
     "dashboard": {
       "title": "Vue d’ensemble de la plateforme",
@@ -1911,7 +1926,7 @@
         "taxId": "Matricule fiscal",
         "subscription": "Abonnement",
         "plan": "Formule",
-        "monthlyFee": "Mensualité HT",
+        "monthlyFee": "Tarif HT",
         "trialEnds": "Fin de l’essai",
         "vehicles": "Véhicules",
         "commissionDefault": "Commission (par défaut)",
@@ -2078,7 +2093,8 @@
         "title": "Formules d’abonnement",
         "subtitle": "Répartition des agences actives par formule.",
         "agencies": "{count, plural, one {# agence} other {# agences}}",
-        "perMonth": "HT / mois",
+        "perYear": "HT / an",
+        "once": "HT / paiement unique",
         "unlimited": "Véhicules illimités",
         "vehicleLimit": "Jusqu’à {count, plural, one {# véhicule} other {# véhicules}}"
       },

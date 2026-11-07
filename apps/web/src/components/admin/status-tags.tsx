@@ -101,6 +101,7 @@ const PLAN_TONES: Record<SubscriptionPlan, BadgeTone> = {
   STARTER: 'neutral',
   PRO: 'primary',
   BUSINESS: 'violet',
+  LIFETIME: 'success',
 };
 
 export function PlanTag({ plan }: { plan: SubscriptionPlan }) {
