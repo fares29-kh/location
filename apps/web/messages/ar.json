@@ -1423,6 +1423,14 @@
       "emptyFilteredTitle": "لم يتم العثور على سيارات",
       "emptyFilteredText": "لا توجد سيارة تطابق هذه المعايير.",
       "clearFilters": "إعادة ضبط المرشحات",
+      "planQuota": {
+        "label": "حصة المركبات",
+        "limitReachedTitle": "تم الوصول إلى الحد",
+        "limitReachedText": "لقد وصلت إلى حد المركبات لخطتك. قم بالترقية إلى خطة أعلى لإضافة المزيد من المركبات.",
+        "nearLimitTitle": "اقتراب من الحد",
+        "nearLimitText": "لديك {remaining, plural, one {# فتحة} other {# فتحات}} متبقية. فكر في ترقية خطتك.",
+        "upgrade": "عرض الخطط"
+      },
       "form": {
         "createTitle": "سيارة جديدة",
         "editTitle": "تعديل السيارة",
@@ -2767,7 +2775,10 @@
       "ACCOUNT_SUSPENDED": "هذا الحساب موقوف. اتصل بالدعم.",
       "TOO_MANY_REQUESTS": "محاولات كثيرة. أعد المحاولة بعد {seconds} ث.",
       "FORBIDDEN": "هذه العملية غير مسموح بها في هذا الفضاء.",
-      "UNAUTHORIZED": "انتهت جلستك. سجّل الدخول من جديد."
+      "UNAUTHORIZED": "انتهت جلستك. سجّل الدخول من جديد.",
+      "PLAN_VEHICLE_LIMIT_REACHED": "تم الوصول إلى حد المركبات لخطتك. قم بالترقية لإضافة المزيد.",
+      "PLAN_ADMIN_LIMIT_REACHED": "تم الوصول إلى حد المسؤولين لخطتك. قم بالترقية للحصول على المزيد.",
+      "PLAN_FEATURE_NOT_AVAILABLE": "هذه الميزة غير متوفرة في خطتك الحالية."
     },
     "validation": {
       "generic": "قيمة غير صالحة.",

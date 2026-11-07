@@ -129,6 +129,78 @@ export const SUBSCRIPTION_PLAN_DEFINITIONS: Record<SubscriptionPlan, Subscriptio
 };
 
 /**
+ * Capacités et limites détaillées de chaque plan d'abonnement.
+ * Utilisé pour l'enforcement backend et l'affichage frontend.
+ */
+export interface PlanCapabilities {
+  /** Limite de véhicules actifs (`null` = illimité). */
+  maxVehicles: number | null;
+  /** Limite de comptes administrateurs (`null` = illimité). */
+  maxAdmins: number | null;
+  /** Gestion de plusieurs bureaux/agences. */
+  multipleOffices: boolean;
+  /** Rapports et analyses avancés. */
+  advancedAnalytics: boolean;
+  /** Support prioritaire. */
+  prioritySupport: boolean;
+}
+
+export const PLAN_CAPABILITIES: Record<SubscriptionPlan, PlanCapabilities> = {
+  STARTER: {
+    maxVehicles: 10,
+    maxAdmins: 1,
+    multipleOffices: false,
+    advancedAnalytics: false,
+    prioritySupport: false,
+  },
+  PRO: {
+    maxVehicles: 20,
+    maxAdmins: 2,
+    multipleOffices: false,
+    advancedAnalytics: true,
+    prioritySupport: false,
+  },
+  BUSINESS: {
+    maxVehicles: null,
+    maxAdmins: null,
+    multipleOffices: true,
+    advancedAnalytics: true,
+    prioritySupport: true,
+  },
+  LIFETIME: {
+    maxVehicles: null,
+    maxAdmins: null,
+    multipleOffices: true,
+    advancedAnalytics: true,
+    prioritySupport: true,
+  },
+};
+
+/**
+ * Vérifie si une fonctionnalité est disponible pour un plan donné.
+ */
+export function isPlanFeatureAvailable(
+  plan: SubscriptionPlan,
+  feature: keyof Omit<PlanCapabilities, 'maxVehicles' | 'maxAdmins'>,
+): boolean {
+  return PLAN_CAPABILITIES[plan][feature];
+}
+
+/**
+ * Retourne la limite de véhicules pour un plan (`null` = illimité).
+ */
+export function getPlanVehicleLimit(plan: SubscriptionPlan): number | null {
+  return PLAN_CAPABILITIES[plan].maxVehicles;
+}
+
+/**
+ * Retourne la limite d'administrateurs pour un plan (`null` = illimité).
+ */
+export function getPlanAdminLimit(plan: SubscriptionPlan): number | null {
+  return PLAN_CAPABILITIES[plan].maxAdmins;
+}
+
+/**
  * Quote-part mensuelle HT utilisée par la facturation récurrente.
  * Les offres Lifetime ne génèrent pas d'abonnement mensuel.
  */

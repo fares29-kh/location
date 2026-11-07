@@ -31,6 +31,8 @@ import {
   type PaymentList,
   type PaymentMethod,
   type PaymentQuery,
+  PLAN_CAPABILITIES,
+  type PlanUsage,
   type PlanningData,
   isoWeekday,
   rentalPriceMillimes,
@@ -1000,6 +1002,30 @@ export class AgencyService {
     );
   }
 
+  /** Informations sur le plan actuel et l'utilisation des quotas. */
+  async getPlanUsage(ownerId: string): Promise<PlanUsage> {
+    const agencyId = await this.agencyIdFor(ownerId);
+    const agency = await this.prisma.agency.findUniqueOrThrow({
+      where: { id: agencyId },
+      select: { plan: true },
+    });
+    const capabilities = PLAN_CAPABILITIES[agency.plan];
+    const vehiclesCount = await this.prisma.vehicle.count({ where: { agencyId, deletedAt: null } });
+    // Pour l'instant, chaque agence a un seul propriétaire (ownerId unique).
+    // Quand les multi-admins seront implémentés, ajuster cette requête.
+    const adminsCount = 1;
+    return {
+      plan: agency.plan,
+      vehiclesCount,
+      vehiclesLimit: capabilities.maxVehicles,
+      adminsCount,
+      adminsLimit: capabilities.maxAdmins,
+      multipleOffices: capabilities.multipleOffices,
+      advancedAnalytics: capabilities.advancedAnalytics,
+      prioritySupport: capabilities.prioritySupport,
+    };
+  }
+
   // --- Réservations et encaissements ----------------------------------------------
 
   /**
@@ -1221,6 +1247,28 @@ export class AgencyService {
 
   async createVehicle(ownerId: string, input: VehicleInput): Promise<VehicleView> {
     const agencyId = await this.agencyIdFor(ownerId);
+
+    // Vérifier la limite de véhicules du plan
+    const agency = await this.prisma.agency.findUniqueOrThrow({
+      where: { id: agencyId },
+      select: { plan: true },
+    });
+    const vehicleLimit = PLAN_CAPABILITIES[agency.plan].maxVehicles;
+
+    if (vehicleLimit !== null) {
+      const currentCount = await this.prisma.vehicle.count({
+        where: { agencyId, deletedAt: null },
+      });
+      if (currentCount >= vehicleLimit) {
+        throw new AppException(
+          HttpStatus.FORBIDDEN,
+          'PLAN_VEHICLE_LIMIT_REACHED',
+          `Votre plan ${agency.plan} est limité à ${vehicleLimit} véhicule${vehicleLimit > 1 ? 's' : ''}. Mettez à niveau votre plan pour ajouter plus de véhicules.`,
+          { limit: vehicleLimit, current: currentCount },
+        );
+      }
+    }
+
     const { pickupLocationSlugs, ...data } = await this.catalog.resolveVehicleInput(input);
     const locationIds = await this.pickupLocationIds(pickupLocationSlugs);
     const count = await this.prisma.vehicle.count({ where: { agencyId, deletedAt: null } });

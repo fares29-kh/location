@@ -1423,6 +1423,14 @@
       "emptyFilteredTitle": "No vehicles found",
       "emptyFilteredText": "No vehicle matches these criteria.",
       "clearFilters": "Reset filters",
+      "planQuota": {
+        "label": "Vehicle quota",
+        "limitReachedTitle": "Limit reached",
+        "limitReachedText": "You've reached your plan's vehicle limit. Upgrade to a higher plan to add more vehicles.",
+        "nearLimitTitle": "Approaching limit",
+        "nearLimitText": "You have {remaining, plural, one {# slot} other {# slots}} remaining. Consider upgrading your plan.",
+        "upgrade": "View plans"
+      },
       "form": {
         "createTitle": "New vehicle",
         "editTitle": "Edit vehicle",
@@ -2767,7 +2775,10 @@
       "ACCOUNT_SUSPENDED": "This account is suspended. Contact support.",
       "TOO_MANY_REQUESTS": "Too many attempts. Try again in {seconds} s.",
       "FORBIDDEN": "This action is not allowed on this workspace.",
-      "UNAUTHORIZED": "Your session has expired. Please sign in again."
+      "UNAUTHORIZED": "Your session has expired. Please sign in again.",
+      "PLAN_VEHICLE_LIMIT_REACHED": "Vehicle limit reached for your plan. Upgrade to add more vehicles.",
+      "PLAN_ADMIN_LIMIT_REACHED": "Admin limit reached for your plan. Upgrade to add more admins.",
+      "PLAN_FEATURE_NOT_AVAILABLE": "This feature is not available in your current plan."
     },
     "validation": {
       "generic": "Invalid value.",

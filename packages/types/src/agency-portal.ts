@@ -11,7 +11,7 @@ import {
 } from './booking';
 import { addDays, type DayKey, dayKeyToDate, diffInDays } from './dates';
 import { tunisianPhoneSchema } from './phone';
-import { REVIEW_REPORT_REASONS } from './platform';
+import { REVIEW_REPORT_REASONS, type SubscriptionPlan } from './platform';
 import type { LocalizedText } from './location';
 import {
   type VehicleInput,
@@ -345,6 +345,28 @@ export interface AgencySettings {
   conditions: RentalConditions;
   /** URL publique du logo, `null` sans logo. */
   logoUrl: string | null;
+}
+
+/**
+ * Informations sur le plan d'abonnement et l'utilisation actuelle des quotas.
+ */
+export interface PlanUsage {
+  /** Plan d'abonnement actuel. */
+  plan: SubscriptionPlan;
+  /** Nombre de véhicules actifs. */
+  vehiclesCount: number;
+  /** Limite de véhicules (`null` = illimité). */
+  vehiclesLimit: number | null;
+  /** Nombre d'administrateurs. */
+  adminsCount: number;
+  /** Limite d'administrateurs (`null` = illimité). */
+  adminsLimit: number | null;
+  /** Gestion de plusieurs bureaux/agences. */
+  multipleOffices: boolean;
+  /** Rapports et analyses avancés. */
+  advancedAnalytics: boolean;
+  /** Support prioritaire. */
+  prioritySupport: boolean;
 }
 
 // --- Paramètres de requête (chaînes de l'URL, validées par l'API) -------------------

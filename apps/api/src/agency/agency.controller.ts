@@ -29,6 +29,7 @@ import {
   type PaymentList,
   type PaymentQuery,
   paymentQuerySchema,
+  type PlanUsage,
   type PlanningData,
   type PlanningQuery,
   planningQuerySchema,
@@ -426,6 +427,12 @@ export class AgencyController {
   @ApiOperation({ summary: 'Fiche agence et conditions de location' })
   settings(@CurrentUser() user: AuthenticatedUser): Promise<AgencySettings> {
     return this.agency.getSettings(user.id);
+  }
+
+  @Get('plan')
+  @ApiOperation({ summary: "Plan d'abonnement et utilisation des quotas" })
+  planUsage(@CurrentUser() user: AuthenticatedUser): Promise<PlanUsage> {
+    return this.agency.getPlanUsage(user.id);
   }
 
   @Put('settings/profile')

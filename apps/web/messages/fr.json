@@ -1423,6 +1423,14 @@
       "emptyFilteredTitle": "Aucun véhicule trouvé",
       "emptyFilteredText": "Aucun véhicule ne correspond à ces critères.",
       "clearFilters": "Réinitialiser les filtres",
+      "planQuota": {
+        "label": "Quota de véhicules",
+        "limitReachedTitle": "Limite atteinte",
+        "limitReachedText": "Vous avez atteint la limite de véhicules de votre plan. Passez à un plan supérieur pour ajouter plus de véhicules.",
+        "nearLimitTitle": "Limite bientôt atteinte",
+        "nearLimitText": "Il vous reste {remaining, plural, one {# emplacement} other {# emplacements}}. Pensez à mettre à niveau votre plan.",
+        "upgrade": "Voir les plans"
+      },
       "form": {
         "createTitle": "Nouveau véhicule",
         "editTitle": "Modifier le véhicule",
@@ -2767,7 +2775,10 @@
       "ACCOUNT_SUSPENDED": "Ce compte est suspendu. Contactez le support.",
       "TOO_MANY_REQUESTS": "Trop de tentatives. Réessayez dans {seconds} s.",
       "FORBIDDEN": "Action non autorisée sur cet espace.",
-      "UNAUTHORIZED": "Votre session a expiré. Reconnectez-vous."
+      "UNAUTHORIZED": "Votre session a expiré. Reconnectez-vous.",
+      "PLAN_VEHICLE_LIMIT_REACHED": "Limite de véhicules atteinte pour votre plan. Mettez à niveau pour en ajouter plus.",
+      "PLAN_ADMIN_LIMIT_REACHED": "Limite d'administrateurs atteinte pour votre plan. Passez à un plan supérieur.",
+      "PLAN_FEATURE_NOT_AVAILABLE": "Cette fonctionnalité n'est pas disponible dans votre plan actuel."
     },
     "validation": {
       "generic": "Valeur invalide.",

@@ -28,7 +28,7 @@ import { useCallback, useState } from 'react';
 
 import { useCategoryLabel } from '@/components/vehicle-categories';
 import { Link } from '@/i18n/navigation';
-import { useVehicles } from '@/lib/agency/queries';
+import { usePlanUsage, useVehicles } from '@/lib/agency/queries';
 import type { Vehicle, VehicleView } from '@/lib/agency/types';
 import { vehicleCoverUrl } from '@/lib/agency/vehicle-photos';
 
@@ -42,6 +42,7 @@ import { useUrlState } from '../use-url-state';
 import { matchesVehicleSearch } from '../vehicle-search';
 import { VehicleGuards } from '../vehicle-status-items';
 import { VehicleThumb } from '../vehicle-thumb';
+import { PlanQuota } from './plan-quota';
 import { VehicleFormSheet } from './vehicle-form-sheet';
 
 const FLEET_FILTERS = ['all', 'ACTIVE', 'ON_RENT', 'MAINTENANCE', 'INACTIVE'] as const;
@@ -282,6 +283,7 @@ export function FleetView() {
   const [params, setParams] = useUrlState(URL_DEFAULTS, isValidParam);
   const [sheet, setSheet] = useState<SheetState>({ open: false, vehicle: null, version: 0 });
   const { data, isPending, isError, error, refetch, isFetching } = useVehicles();
+  const { data: planUsage } = usePlanUsage();
   const filter = params.filter as FleetFilter;
 
   const onSearch = useCallback(
@@ -311,6 +313,11 @@ export function FleetView() {
         activeVehicles.length;
   const revenue30d = (data ?? []).reduce((sum, vehicle) => sum + vehicle.revenue30dMillimes, 0);
 
+  const isAtVehicleLimit =
+    planUsage?.vehiclesLimit !== null &&
+    planUsage?.vehiclesLimit !== undefined &&
+    (data?.length ?? 0) >= planUsage.vehiclesLimit;
+
   const openSheet = (vehicle: Vehicle | null) => {
     setSheet((current) => ({ open: true, vehicle, version: current.version + 1 }));
   };
@@ -333,12 +340,15 @@ export function FleetView() {
             onClick={() => {
               openSheet(null);
             }}
+            disabled={isAtVehicleLimit}
           >
             <Plus aria-hidden="true" />
             {t('add')}
           </Button>
         }
       />
+
+      <PlanQuota />
 
       <div className="grid gap-4">
         <SearchField
@@ -375,6 +385,7 @@ export function FleetView() {
               onClick={() => {
                 openSheet(null);
               }}
+              disabled={isAtVehicleLimit}
             >
               <Plus aria-hidden="true" />
               {t('add')}

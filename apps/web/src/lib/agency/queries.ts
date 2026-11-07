@@ -55,6 +55,7 @@ export const agencyKeys = {
   expenseList: (query: ExpenseQuery) => [...agencyKeys.expenses(), query] as const,
   reviews: (query: ReviewQuery) => [...agencyKeys.all, 'reviews', query] as const,
   settings: () => [...agencyKeys.all, 'settings'] as const,
+  plan: () => [...agencyKeys.all, 'plan'] as const,
 };
 
 /** Une action métier touche plusieurs écrans (tableau de bord, planning, clients…) : on rafraîchit tout l'espace. */
@@ -346,4 +347,8 @@ export function useUploadLogo() {
 
 export function useRemoveLogo() {
   return useSettingsMutation<undefined>(() => agencyApi.removeLogo());
+}
+
+export function usePlanUsage() {
+  return useQuery({ queryKey: agencyKeys.plan(), queryFn: () => agencyApi.getPlanUsage() });
 }

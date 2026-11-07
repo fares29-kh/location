@@ -24,6 +24,10 @@ export const ERROR_CODES = [
   // Codes métier des réservations.
   'VEHICLE_UNAVAILABLE',
   'BOOKING_NOT_CANCELLABLE',
+  // Codes métier des limites de plan d'abonnement.
+  'PLAN_VEHICLE_LIMIT_REACHED',
+  'PLAN_ADMIN_LIMIT_REACHED',
+  'PLAN_FEATURE_NOT_AVAILABLE',
 ] as const;
 
 export const errorCodeSchema = z.enum(ERROR_CODES);

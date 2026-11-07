@@ -35,6 +35,7 @@ import type {
   Paginated,
   PaymentList,
   PaymentQuery,
+  PlanUsage,
   PlanningData,
   Review,
   ReviewList,
@@ -88,6 +89,7 @@ export interface AgencyApi {
   reportReview(id: string, reason: ReviewReportInput['reason']): Promise<Review>;
 
   getSettings(): Promise<AgencySettings>;
+  getPlanUsage(): Promise<PlanUsage>;
   updateProfile(input: AgencyProfileInput): Promise<AgencySettings>;
   updateConditions(input: RentalConditions): Promise<AgencySettings>;
   uploadLogo(file: File): Promise<AgencySettings>;
@@ -241,6 +243,7 @@ function createHttpAgencyApi(): AgencyApi {
       }),
 
     getSettings: () => apiFetch('/agency/settings', { schema: shape<AgencySettings>() }),
+    getPlanUsage: () => apiFetch('/agency/plan', { schema: shape<PlanUsage>() }),
     updateProfile: (input) =>
       apiFetch('/agency/settings/profile', {
         method: 'PUT',

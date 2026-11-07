@@ -26,6 +26,7 @@ export {
   type PaymentRecord,
   type PaymentSummaryTotals,
   type PaymentView,
+  type PlanUsage,
   type PlanningBooking,
   type PlanningData,
   REVIEW_FILTERS,
