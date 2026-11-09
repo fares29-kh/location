@@ -937,16 +937,16 @@
         "grains": {
           "day": "Day",
           "week": "Week",
-          "month": "Month",
-          "year": "Year",
+          "month": "Day",
+          "year": "Month",
           "all": "Total"
         },
         "grainHint": {
           "day": "This day: collections hour by hour, the day’s costs, and each car.",
-          "week": "This week, Monday to Sunday: collections, costs, and each car.",
-          "month": "This month: collections for each day, costs, and each car.",
-          "year": "This year: collections for each month, costs, and each car.",
-          "all": "Everything since the agency opened: the total, one bar per year, and each car."
+          "week": "This week: one collection bar per day (Mon → Sun).",
+          "month": "This month: one collection bar per day (1 → 31).",
+          "year": "This year: one collection bar per month (Jan → Dec).",
+          "all": "Since opening: total collections, expenses, result, one bar per year, and each car."
         },
         "since": "Since {date}",
         "previous": "Previous period",
@@ -971,6 +971,13 @@
           "month": "Collections for each day",
           "year": "Collections for each month",
           "all": "Collections for each year"
+        },
+        "chartAxis": {
+          "day": "X axis: hour",
+          "week": "X axis: day of week",
+          "month": "X axis: day of month",
+          "year": "X axis: month",
+          "all": "X axis: year"
         },
         "chartHint": "Each bar is a share of the collections above. No bar means no money was received in that slot.",
         "barLabel": "{label}: {amount} collected",

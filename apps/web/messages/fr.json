@@ -937,16 +937,16 @@
         "grains": {
           "day": "Jour",
           "week": "Semaine",
-          "month": "Mois",
-          "year": "Année",
+          "month": "Jour",
+          "year": "Mois",
           "all": "Total"
         },
         "grainHint": {
           "day": "Cette journée : encaissements heure par heure, dépenses du jour, et chaque voiture.",
-          "week": "Cette semaine, du lundi au dimanche : encaissements, dépenses, et chaque voiture.",
-          "month": "Ce mois : encaissements de chaque jour, dépenses, et chaque voiture.",
-          "year": "Cette année : encaissements de chaque mois, dépenses, et chaque voiture.",
-          "all": "Tout depuis l’ouverture de l’agence : le total, une barre par année, et chaque voiture."
+          "week": "Cette semaine : une barre d’encaissement par jour (lun. → dim.).",
+          "month": "Ce mois : une barre d’encaissement par jour (1 → 31).",
+          "year": "Cette année : une barre d’encaissement par mois (janv. → déc.).",
+          "all": "Depuis l’ouverture : total des encaissements, dépenses, résultat, une barre par année, et chaque voiture."
         },
         "since": "Depuis le {date}",
         "previous": "Période précédente",
@@ -971,6 +971,13 @@
           "month": "Encaissements de chaque jour",
           "year": "Encaissements de chaque mois",
           "all": "Encaissements de chaque année"
+        },
+        "chartAxis": {
+          "day": "Axe X : heure",
+          "week": "Axe X : jour de la semaine",
+          "month": "Axe X : jour du mois",
+          "year": "Axe X : mois",
+          "all": "Axe X : année"
         },
         "chartHint": "Chaque barre est une part des encaissements ci-dessus. Sans barre, aucun argent n’a été reçu sur ce créneau.",
         "barLabel": "{label} : {amount} encaissés",

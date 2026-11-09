@@ -20,7 +20,7 @@ import {
   isoWeekday,
   todayKey,
 } from '@/lib/agency/dates';
-import { useActivityReport, usePlanUsage } from '@/lib/agency/queries';
+import { useActivityReport } from '@/lib/agency/queries';
 
 import { FilterTabs } from '../filter-tabs';
 import { QueryError } from '../query-states';
@@ -28,9 +28,15 @@ import { HoverHint } from './hover-hint';
 import { type AgencyFormat, useAgencyFormat } from '../use-agency-format';
 import { TrendingUp, TrendingDown, DollarSign, Receipt, Wallet, CalendarCheck } from 'lucide-react';
 
-const BASIC_GRAINS: readonly ReportGrain[] = ['day', 'week', 'month'];
-const ADVANCED_GRAINS: readonly ReportGrain[] = ['year', 'all'];
-const GRAINS: readonly ReportGrain[] = [...BASIC_GRAINS, ...ADVANCED_GRAINS];
+/**
+ * Axe X du graphique :
+ * - month → une barre par jour du mois
+ * - week  → une barre par jour de la semaine
+ * - year  → une barre par mois de l'année
+ * - all   → totaux depuis l'ouverture (encaissements, dépenses, résultat)
+ * (l'ancien grain « day » heure par heure est retiré)
+ */
+const GRAINS: readonly ReportGrain[] = ['month', 'week', 'year', 'all'];
 const PREVIEW_LIMIT = 5;
 
 function periodStart(grain: ReportGrain, anchor: DayKey): DayKey {
@@ -161,22 +167,24 @@ function occupancy(report: ActivityReport, millis: number): number {
   return Math.min(1, Math.max(0, millis / span));
 }
 
-function pointLabel(
-  grain: ReportGrain,
-  key: string,
-  format: AgencyFormat,
-  hour: (value: string) => string,
-): string {
-  if (grain === 'day') {
-    return hour(key.padStart(2, '0'));
-  }
+function pointLabel(grain: ReportGrain, key: string, format: AgencyFormat): string {
   if (grain === 'year') {
+    // Axe X = mois (janv., févr., …)
     return format.monthShort(`${key}-15T12:00:00Z`);
+  }
+  if (grain === 'week') {
+    // Axe X = jour de la semaine (lun., mar., …)
+    return format.weekdayShort(dayKeyToDate(key));
+  }
+  if (grain === 'month') {
+    // Axe X = jour du mois (1 … 31)
+    return String(Number(key.slice(8, 10)));
   }
   if (grain === 'all') {
     return key;
   }
-  return format.dayMonth(dayKeyToDate(key));
+  // Ancien grain « day » (heures) : ne plus proposé, repli lisible.
+  return key;
 }
 
 interface ReportCopy {
@@ -361,21 +369,20 @@ function ActivityChart({
 }) {
   const t = useTranslations('agency.dashboard.report');
   const max = Math.max(1, ...report.series.map((point) => point.revenueMillimes));
-  const wide = report.grain === 'day' || report.grain === 'month';
+  const wide = report.grain === 'month' || report.grain === 'year';
 
   return (
     <figure className="min-w-0 max-w-full rounded-control border border-border bg-gradient-to-br from-surface to-surface-muted/30 p-6">
-      <figcaption className="mb-6">
+      <figcaption className="mb-6 grid gap-1">
         <HoverHint hint={t('chartHint')} className="text-base font-semibold">
           {t(`chartTitle.${report.grain}`)}
         </HoverHint>
+        <p className="text-xs text-muted-foreground">{t(`chartAxis.${report.grain}`)}</p>
       </figcaption>
       <div className="w-full overflow-x-hidden">
         <ol className={cn('flex h-56 w-full items-end', wide ? 'gap-1 sm:gap-2' : 'gap-2')}>
           {report.series.map((point) => {
-            const label = pointLabel(report.grain, point.key, format, (hour) =>
-              t('hour', { hour }),
-            );
+            const label = pointLabel(report.grain, point.key, format);
             const current = isCurrentPoint(report, point.key, anchor, today);
             const ratio = point.revenueMillimes / max;
             const description = t('barLabel', {
@@ -490,12 +497,9 @@ export function ActivityReportCard() {
   const locale = useLocale();
   const format = useAgencyFormat();
   const today = todayKey();
-  const { data: planUsage } = usePlanUsage();
-  const advancedAnalytics = planUsage?.advancedAnalytics !== false;
-  const availableGrains = advancedAnalytics ? GRAINS : BASIC_GRAINS;
-  const [grain, setGrain] = useState<ReportGrain>('month');
+  const [grain, setGrain] = useState<ReportGrain>('year');
   const [anchor, setAnchor] = useState<DayKey>(today);
-  const activeGrain = availableGrains.includes(grain) ? grain : 'month';
+  const activeGrain = GRAINS.includes(grain) ? grain : 'year';
   const reportQuery = useActivityReport(activeGrain, anchor);
   const onPeriod =
     reportQuery.data !== undefined && periodIncludesToday(activeGrain, anchor, today);
@@ -541,7 +545,7 @@ export function ActivityReportCard() {
         t('seriesColumns.departures'),
       ],
       series: report.series.map((point) => ({
-        label: pointLabel(report.grain, point.key, format, (hour) => t('hour', { hour })),
+        label: pointLabel(report.grain, point.key, format),
         revenue: format.money(point.revenueMillimes),
         departures: format.integer(point.bookings),
       })),
@@ -645,7 +649,7 @@ export function ActivityReportCard() {
         <FilterTabs
           label={t('periodLabel')}
           value={activeGrain}
-          options={availableGrains.map((value) => ({
+          options={GRAINS.map((value) => ({
             value,
             label: t(`grains.${value}`),
             hint: t(`grainHint.${value}`),

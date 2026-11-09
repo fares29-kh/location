@@ -170,7 +170,7 @@ const reportDay = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, { message: 'INVALID_DA
 
 /** Période du rapport d'activité. `anchor` est un jour de Tunis ; absent : aujourd'hui. */
 export const dashboardReportQuerySchema = z.object({
-  grain: z.enum(REPORT_GRAINS).catch('month'),
+  grain: z.enum(REPORT_GRAINS).catch('year'),
   anchor: reportDay.optional(),
 });
 export type DashboardReportQuery = z.output<typeof dashboardReportQuerySchema>;

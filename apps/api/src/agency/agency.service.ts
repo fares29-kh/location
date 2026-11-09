@@ -641,18 +641,6 @@ export class AgencyService {
       where: { id: agencyId },
       select: { name: true, createdAt: true, plan: true },
     });
-    // Analyses avancées (année / depuis l'ouverture) : Business et plus.
-    if (
-      (query.grain === 'year' || query.grain === 'all') &&
-      !PLAN_CAPABILITIES[agency.plan].advancedAnalytics
-    ) {
-      throw new AppException(
-        HttpStatus.FORBIDDEN,
-        'PLAN_FEATURE_NOT_AVAILABLE',
-        'Les rapports annuels et totaux sont réservés au plan Business et aux formules supérieures.',
-        { feature: 'advancedAnalytics', plan: agency.plan },
-      );
-    }
     const { current, previous, buckets } =
       query.grain === 'all'
         ? allWindows(agency.createdAt, today)
