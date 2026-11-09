@@ -363,6 +363,7 @@ export class AgencyService {
     const owner = await this.prisma.user.findUniqueOrThrow({ where: { id: ownerId } });
     const phone = normalizeTunisianPhone(owner.phone);
     const openedAt = new Date();
+    const plan = owner.preferredPlan ?? 'STARTER';
     try {
       const agency = await this.prisma.agency.create({
         data: {
@@ -373,15 +374,23 @@ export class AgencyService {
           email: owner.email,
           address: '',
           governorateCode: DEFAULT_GOVERNORATE,
+          plan,
           trialEndsAt: trialEnd(openedAt),
         },
         select: { id: true },
       });
+      if (owner.preferredPlan !== null) {
+        await this.prisma.user.update({
+          where: { id: ownerId },
+          data: { preferredPlan: null },
+        });
+      }
       await this.audit.log({
         action: 'agency.created',
         actorId: ownerId,
         entityType: 'agency',
         entityId: agency.id,
+        metadata: { plan },
       });
       await this.invoicing.openTrial(agency.id, openedAt);
       return agency.id;
@@ -630,8 +639,20 @@ export class AgencyService {
     const anchor = query.anchor === undefined || query.anchor > today ? today : query.anchor;
     const agency = await this.prisma.agency.findUniqueOrThrow({
       where: { id: agencyId },
-      select: { name: true, createdAt: true },
+      select: { name: true, createdAt: true, plan: true },
     });
+    // Analyses avancées (année / depuis l'ouverture) : Business et plus.
+    if (
+      (query.grain === 'year' || query.grain === 'all') &&
+      !PLAN_CAPABILITIES[agency.plan].advancedAnalytics
+    ) {
+      throw new AppException(
+        HttpStatus.FORBIDDEN,
+        'PLAN_FEATURE_NOT_AVAILABLE',
+        'Les rapports annuels et totaux sont réservés au plan Business et aux formules supérieures.',
+        { feature: 'advancedAnalytics', plan: agency.plan },
+      );
+    }
     const { current, previous, buckets } =
       query.grain === 'all'
         ? allWindows(agency.createdAt, today)

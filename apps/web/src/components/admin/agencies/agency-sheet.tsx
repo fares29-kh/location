@@ -31,6 +31,7 @@ import { ActivityList } from '../activity';
 import { personName } from '../person';
 import { AgencyStatusTag, InvoiceStatusTag, PlanTag } from '../status-tags';
 import { AgencyDecisions } from './agency-decisions';
+import { AgencyPlanSelect } from './agency-plan-select';
 
 function Stat({ label, value }: { label: string; value: ReactNode }) {
   return (
@@ -253,7 +254,10 @@ function AgencyContent({ agency }: { agency: AgencyDetail }) {
           {agency.statusReason}
         </Alert>
       )}
-      <AgencyDecisions agency={agency} />
+      <div className="grid gap-3">
+        <AgencyDecisions agency={agency} />
+        <AgencyPlanSelect agency={agency} />
+      </div>
       <Tabs defaultValue="overview">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="overview">{t('tabs.overview')}</TabsTrigger>

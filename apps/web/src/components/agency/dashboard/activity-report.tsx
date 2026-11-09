@@ -20,7 +20,7 @@ import {
   isoWeekday,
   todayKey,
 } from '@/lib/agency/dates';
-import { useActivityReport } from '@/lib/agency/queries';
+import { useActivityReport, usePlanUsage } from '@/lib/agency/queries';
 
 import { FilterTabs } from '../filter-tabs';
 import { QueryError } from '../query-states';
@@ -28,7 +28,9 @@ import { HoverHint } from './hover-hint';
 import { type AgencyFormat, useAgencyFormat } from '../use-agency-format';
 import { TrendingUp, TrendingDown, DollarSign, Receipt, Wallet, CalendarCheck } from 'lucide-react';
 
-const GRAINS: readonly ReportGrain[] = ['day', 'week', 'month', 'year', 'all'];
+const BASIC_GRAINS: readonly ReportGrain[] = ['day', 'week', 'month'];
+const ADVANCED_GRAINS: readonly ReportGrain[] = ['year', 'all'];
+const GRAINS: readonly ReportGrain[] = [...BASIC_GRAINS, ...ADVANCED_GRAINS];
 const PREVIEW_LIMIT = 5;
 
 function periodStart(grain: ReportGrain, anchor: DayKey): DayKey {
@@ -488,19 +490,24 @@ export function ActivityReportCard() {
   const locale = useLocale();
   const format = useAgencyFormat();
   const today = todayKey();
+  const { data: planUsage } = usePlanUsage();
+  const advancedAnalytics = planUsage?.advancedAnalytics !== false;
+  const availableGrains = advancedAnalytics ? GRAINS : BASIC_GRAINS;
   const [grain, setGrain] = useState<ReportGrain>('month');
   const [anchor, setAnchor] = useState<DayKey>(today);
-  const reportQuery = useActivityReport(grain, anchor);
-  const onPeriod = reportQuery.data !== undefined && periodIncludesToday(grain, anchor, today);
+  const activeGrain = availableGrains.includes(grain) ? grain : 'month';
+  const reportQuery = useActivityReport(activeGrain, anchor);
+  const onPeriod =
+    reportQuery.data !== undefined && periodIncludesToday(activeGrain, anchor, today);
 
   const download = (report: ActivityReport) => {
     const title =
-      grain === 'all'
+      activeGrain === 'all'
         ? t('since', { date: format.date(report.from) })
-        : periodTitle(grain, anchor, format);
+        : periodTitle(activeGrain, anchor, format);
     const revenueTrend = variation(report.revenueMillimes, report.previousRevenueMillimes);
     const comparison =
-      grain === 'all'
+      activeGrain === 'all'
         ? title
         : revenueTrend === null
           ? t('noComparison')
@@ -510,7 +517,7 @@ export function ActivityReportCard() {
     const copy: ReportCopy = {
       brand: t('brand'),
       documentTitle: t('documentTitle'),
-      fileTitle: t('fileName', { period: periodSlug(grain, anchor) }),
+      fileTitle: t('fileName', { period: periodSlug(activeGrain, anchor) }),
       agencyName: report.agencyName,
       period: title,
       generated: t('generated', { date: format.dateTime(new Date()) }),
@@ -637,8 +644,8 @@ export function ActivityReportCard() {
         </div>
         <FilterTabs
           label={t('periodLabel')}
-          value={grain}
-          options={GRAINS.map((value) => ({
+          value={activeGrain}
+          options={availableGrains.map((value) => ({
             value,
             label: t(`grains.${value}`),
             hint: t(`grainHint.${value}`),
@@ -648,7 +655,7 @@ export function ActivityReportCard() {
             setAnchor(today);
           }}
         />
-        {grain === 'all' ? (
+        {activeGrain === 'all' ? (
           <div className="rounded-control border border-border bg-surface-muted/50 px-4 py-3">
             <p className="text-base font-semibold">
               {reportQuery.data === undefined
@@ -666,7 +673,7 @@ export function ActivityReportCard() {
                 aria-label={t('previous')}
                 className="rounded-s-lg"
                 onClick={() => {
-                  setAnchor((current) => shiftAnchor(grain, current, -1));
+                  setAnchor((current) => shiftAnchor(activeGrain, current, -1));
                 }}
               >
                 <ChevronLeft className="rtl:rotate-180" aria-hidden="true" />
@@ -691,7 +698,7 @@ export function ActivityReportCard() {
                 className="rounded-e-lg"
                 disabled={onPeriod}
                 onClick={() => {
-                  setAnchor((current) => shiftAnchor(grain, current, 1));
+                  setAnchor((current) => shiftAnchor(activeGrain, current, 1));
                 }}
               >
                 <ChevronRight className="rtl:rotate-180" aria-hidden="true" />
@@ -699,7 +706,7 @@ export function ActivityReportCard() {
             </div>
             <div className="rounded-lg border border-border bg-surface-muted/50 px-4 py-2">
               <p className="text-base font-semibold capitalize">
-                {periodTitle(grain, anchor, format)}
+                {periodTitle(activeGrain, anchor, format)}
               </p>
             </div>
           </div>

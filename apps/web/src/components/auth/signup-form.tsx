@@ -1,6 +1,6 @@
 'use client';
 
-import { type SignupInput, signupSchema } from '@drivetn/types';
+import { type SelfServePlan, type SignupInput, signupSchema } from '@drivetn/types';
 import { Alert } from '@drivetn/ui/alert';
 import { Button } from '@drivetn/ui/button';
 import { Field } from '@drivetn/ui/field';
@@ -30,10 +30,13 @@ export function SignupForm({
   portal,
   nextPath,
   siteKey,
+  plan = null,
 }: {
   portal: 'client' | 'agency';
   nextPath: string | null;
   siteKey: string;
+  /** Plan Starter ou Business choisi sur la page d'accueil. */
+  plan?: SelfServePlan | null;
 }) {
   const t = useTranslations('auth');
   const locale = useLocale();
@@ -65,6 +68,7 @@ export function SignupForm({
         ...values,
         locale,
         portal,
+        ...(plan === null || portal !== 'agency' ? {} : { plan }),
         ...(captchaToken === '' ? {} : { captchaToken }),
       });
     },
@@ -120,6 +124,9 @@ export function SignupForm({
     <div className="grid gap-6">
       {portal === 'client' && (
         <Alert title={t('clientAccount.title')}>{t('clientAccount.text')}</Alert>
+      )}
+      {portal === 'agency' && plan !== null && (
+        <Alert tone="info">{t(`signup.planHint.${plan}`)}</Alert>
       )}
       <form
         noValidate

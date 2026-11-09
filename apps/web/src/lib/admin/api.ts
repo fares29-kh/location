@@ -6,6 +6,7 @@ import type {
   AdminVehicleCategory,
   AdminVehicleModel,
   AgencyDecisionInput,
+  AgencyPlanInput,
   DelegationInput,
   DelegationUpdate,
   GovernorateInput,
@@ -61,6 +62,7 @@ export interface AdminApi {
   listAgencies(query: AgencyQuery): Promise<AgencyList>;
   getAgency(id: string): Promise<AgencyDetail>;
   decideAgency(id: string, input: AgencyDecisionInput): Promise<Agency>;
+  setAgencyPlan(id: string, input: AgencyPlanInput): Promise<Agency>;
 
   listUsers(query: UserQuery): Promise<UserList>;
   getUser(id: string): Promise<UserDetail>;
@@ -148,6 +150,7 @@ function createHttpAdminApi(): AdminApi {
     getAgency: (id) =>
       apiFetch(`/admin/agencies/${segment(id)}`, { schema: shape<AgencyDetail>() }),
     decideAgency: (id, input) => post<Agency>(`/admin/agencies/${segment(id)}/decision`, input),
+    setAgencyPlan: (id, input) => put<Agency>(`/admin/agencies/${segment(id)}/plan`, input),
 
     listUsers: (query) =>
       apiFetch(withQuery('/admin/users', { ...query }), { schema: shape<UserList>() }),

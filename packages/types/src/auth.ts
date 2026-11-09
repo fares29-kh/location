@@ -117,20 +117,29 @@ export const otpCodeSchema = z
 /** Jeton reCAPTCHA v2. Absent quand le captcha n'est pas configuré. */
 const captchaTokenSchema = z.string().trim().min(1).max(4096).optional();
 
-export const signupSchema = z.object({
-  firstName: personNameSchema,
-  lastName: personNameSchema,
-  phone: tunisianPhoneSchema,
-  email: requiredEmailSchema,
-  password: passwordSchema,
-  locale: localeSchema.optional(),
-  captchaToken: captchaTokenSchema,
-  /**
-   * Portail du formulaire. « agency » crée un gérant. Absent : le rôle suit le domaine
-   * de la requête (compatibilité).
-   */
-  portal: z.enum(['client', 'agency']).optional(),
-});
+export const signupSchema = z
+  .object({
+    firstName: personNameSchema,
+    lastName: personNameSchema,
+    phone: tunisianPhoneSchema,
+    email: requiredEmailSchema,
+    password: passwordSchema,
+    locale: localeSchema.optional(),
+    captchaToken: captchaTokenSchema,
+    /**
+     * Portail du formulaire. « agency » crée un gérant. Absent : le rôle suit le domaine
+     * de la requête (compatibilité).
+     */
+    portal: z.enum(['client', 'agency']).optional(),
+    /**
+     * Plan choisi sur la page d’accueil (Starter / Business). Ignoré hors inscription agence.
+     */
+    plan: z.enum(['STARTER', 'PRO']).optional(),
+  })
+  .refine((value) => value.plan === undefined || value.portal === 'agency', {
+    message: 'FORBIDDEN',
+    path: ['plan'],
+  });
 export type SignupInput = z.input<typeof signupSchema>;
 export type SignupRequest = z.output<typeof signupSchema>;
 

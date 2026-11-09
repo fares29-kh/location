@@ -1898,6 +1898,13 @@
       "emptyFilteredTitle": "No matching agency",
       "emptyFilteredText": "Change the search or the status filter.",
       "clearFilters": "Reset filters",
+      "plan": {
+        "title": "Change plan",
+        "hint": "Starter (10 cars) or Business (20 cars). Premium and Lifetime are unlimited.",
+        "save": "Save plan",
+        "success": "{name} is now on the {plan} plan.",
+        "error": "The plan could not be updated. Try again."
+      },
       "decisions": {
         "labels": {
           "APPROVE": "Approve agency",
@@ -2397,7 +2404,8 @@
           "approved": "Agency approved",
           "rejected": "Agency rejected",
           "suspended": "Agency suspended",
-          "reactivated": "Agency reactivated"
+          "reactivated": "Agency reactivated",
+          "plan_changed": "Subscription plan changed"
         },
         "user": {
           "suspended": "Account suspended",
@@ -2690,6 +2698,10 @@
       },
       "emailHint": "A confirmation code will be sent to this address.",
       "phoneHint": "Number shared with the agency. The code is not sent by SMS.",
+      "planHint": {
+        "STARTER": "Starter plan: up to 10 cars, 1 administrator.",
+        "PRO": "Business plan: up to 20 cars, up to 2 administrators."
+      },
       "submit": "Create my account",
       "terms": "By creating an account, you accept the platform's terms of use and privacy policy.",
       "hasAccount": "Already have an account?",

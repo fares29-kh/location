@@ -9,6 +9,8 @@ import {
   type AdminNavCounts,
   type AgencyDecisionInput,
   agencyDecisionInputSchema,
+  type AgencyPlanInput,
+  agencyPlanInputSchema,
   type AuditQuery,
   auditQuerySchema,
   type Invoice,
@@ -111,6 +113,18 @@ export class AdminController {
     @Req() request: Request,
   ): Promise<AdminAgency> {
     return this.agencies.decide(id, body, user.id, request.ip ?? null);
+  }
+
+  @Put('agencies/:id/plan')
+  @RequireAdminPermission('billing.manage')
+  @ApiOperation({ summary: "Changer le plan d'abonnement d'une agence" })
+  setAgencyPlan(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id') id: string,
+    @Body(new ZodValidationPipe(agencyPlanInputSchema)) body: AgencyPlanInput,
+    @Req() request: Request,
+  ): Promise<AdminAgency> {
+    return this.agencies.setPlan(id, body, user.id, request.ip ?? null);
   }
 
   // --- Comptes -------------------------------------------------------------------

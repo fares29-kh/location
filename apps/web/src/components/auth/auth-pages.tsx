@@ -81,6 +81,9 @@ export function createSignupPage(portal: SignupPortal) {
     const locale = await resolveLocale(params);
     await redirectIfAuthenticated(portal, locale);
     const t = await getTranslations({ locale, namespace: 'auth' });
+    const planParam = firstParam((await searchParams).plan);
+    const plan =
+      portal === 'agency' && (planParam === 'STARTER' || planParam === 'PRO') ? planParam : null;
     return (
       <AuthPageFrame portal={portal}>
         <AuthCard title={t(`signup.title.${portal}`)} description={t(`signup.subtitle.${portal}`)}>
@@ -88,6 +91,7 @@ export function createSignupPage(portal: SignupPortal) {
             portal={portal}
             nextPath={await nextPathFrom(searchParams)}
             siteKey={getServerEnv().RECAPTCHA_SITE_KEY}
+            plan={plan}
           />
         </AuthCard>
       </AuthPageFrame>

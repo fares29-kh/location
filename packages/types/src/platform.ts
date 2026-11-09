@@ -109,6 +109,14 @@ export const SUBSCRIPTION_PLANS = ['STARTER', 'PRO', 'BUSINESS', 'LIFETIME'] as 
 export const subscriptionPlanSchema = z.enum(SUBSCRIPTION_PLANS);
 export type SubscriptionPlan = z.infer<typeof subscriptionPlanSchema>;
 
+/**
+ * Plans souscriptibles en libre-service depuis la page d’accueil agence.
+ * Starter = STARTER, Business = PRO. Premium et Lifetime sont attribués par l’admin.
+ */
+export const SELF_SERVE_PLANS = ['STARTER', 'PRO'] as const;
+export const selfServePlanSchema = z.enum(SELF_SERVE_PLANS);
+export type SelfServePlan = z.infer<typeof selfServePlanSchema>;
+
 /** Facturation annuelle (3 premiers plans) ou paiement unique (Lifetime). */
 export const PLAN_BILLING_INTERVALS = ['year', 'once'] as const;
 export type PlanBillingInterval = (typeof PLAN_BILLING_INTERVALS)[number];

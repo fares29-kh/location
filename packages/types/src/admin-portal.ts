@@ -8,13 +8,14 @@ import {
   paymentMethodSchema,
   type PaymentStatus,
 } from './booking';
-import type {
-  AgencyDocumentKind,
-  AgencyStatus,
-  InvoiceStatus,
-  ReviewModerationStatus,
-  ReviewReportReason,
-  SubscriptionPlan,
+import {
+  type AgencyDocumentKind,
+  type AgencyStatus,
+  type InvoiceStatus,
+  type ReviewModerationStatus,
+  type ReviewReportReason,
+  type SubscriptionPlan,
+  subscriptionPlanSchema,
 } from './platform';
 
 export const ADMIN_PAGE_SIZE = 10;
@@ -95,6 +96,12 @@ export const adminAgencyQuerySchema = z.object({
   filter: z.enum(ADMIN_AGENCY_FILTERS).catch('all'),
   page: pageSchema,
 }) satisfies z.ZodType<AdminAgencyQuery>;
+
+/** Changement du plan d'abonnement d'une agence par l'administration. */
+export const agencyPlanInputSchema = z.object({
+  plan: subscriptionPlanSchema,
+});
+export type AgencyPlanInput = z.infer<typeof agencyPlanInputSchema>;
 
 export interface AdminAgencyList extends Paginated<AdminAgency> {
   counts: Record<AdminAgencyFilter, number>;
@@ -311,6 +318,7 @@ export const AUDIT_ACTIONS = [
   'agency.rejected',
   'agency.suspended',
   'agency.reactivated',
+  'agency.plan_changed',
   'user.suspended',
   'user.reactivated',
   'booking.created',

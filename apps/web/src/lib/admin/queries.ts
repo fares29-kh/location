@@ -2,6 +2,7 @@
 
 import type {
   AgencyDecisionInput,
+  AgencyPlanInput,
   DelegationInput,
   DelegationUpdate,
   GovernorateInput,
@@ -100,6 +101,15 @@ export function useAgencyDecision() {
   return useMutation({
     mutationFn: ({ id, input }: { id: string; input: AgencyDecisionInput }) =>
       adminApi.decideAgency(id, input),
+    onSettled: () => invalidateAdmin(queryClient),
+  });
+}
+
+export function useSetAgencyPlan() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, input }: { id: string; input: AgencyPlanInput }) =>
+      adminApi.setAgencyPlan(id, input),
     onSettled: () => invalidateAdmin(queryClient),
   });
 }

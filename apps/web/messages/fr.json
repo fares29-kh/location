@@ -1898,6 +1898,13 @@
       "emptyFilteredTitle": "Aucune agence ne correspond",
       "emptyFilteredText": "Modifiez la recherche ou le filtre de statut.",
       "clearFilters": "Réinitialiser les filtres",
+      "plan": {
+        "title": "Changer le plan",
+        "hint": "Starter (10 voitures) ou Business (20 voitures). Premium et Lifetime sont illimités.",
+        "save": "Enregistrer le plan",
+        "success": "{name} est maintenant sur le plan {plan}.",
+        "error": "Le plan n’a pas pu être modifié. Réessayez."
+      },
       "decisions": {
         "labels": {
           "APPROVE": "Valider l’agence",
@@ -2397,7 +2404,8 @@
           "approved": "Agence validée",
           "rejected": "Agence refusée",
           "suspended": "Agence suspendue",
-          "reactivated": "Agence réactivée"
+          "reactivated": "Agence réactivée",
+          "plan_changed": "Plan d’abonnement modifié"
         },
         "user": {
           "suspended": "Compte suspendu",
@@ -2690,6 +2698,10 @@
       },
       "emailHint": "Un code de confirmation sera envoyé à cette adresse.",
       "phoneHint": "Numéro transmis à l'agence. Le code n'est pas envoyé par SMS.",
+      "planHint": {
+        "STARTER": "Formule Starter : jusqu’à 10 voitures, 1 administrateur.",
+        "PRO": "Formule Business : jusqu’à 20 voitures, jusqu’à 2 administrateurs."
+      },
       "submit": "Créer mon compte",
       "terms": "En créant un compte, vous acceptez les conditions d'utilisation et la politique de confidentialité de la plateforme.",
       "hasAccount": "Déjà un compte ?",

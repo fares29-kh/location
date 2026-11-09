@@ -1,6 +1,7 @@
 import {
   formatMillimes,
   type Locale,
+  SELF_SERVE_PLANS,
   type SubscriptionPlan,
   SUBSCRIPTION_PLAN_DEFINITIONS,
   SUBSCRIPTION_PLANS,
@@ -147,7 +148,15 @@ function PlanColumn({
       </ul>
       <div className="mt-auto px-6 pb-6">
         <Button asChild className="w-full" variant={highlighted ? 'primary' : 'secondary'}>
-          <Link href="/signup">{signup}</Link>
+          <Link
+            href={
+              (SELF_SERVE_PLANS as readonly string[]).includes(plan)
+                ? `/signup?plan=${plan}`
+                : '/signup'
+            }
+          >
+            {signup}
+          </Link>
         </Button>
       </div>
     </article>

@@ -6,6 +6,7 @@ import {
   type AdminAgencyQuery,
   type AgencyDecision,
   type AgencyDecisionInput,
+  type AgencyPlanInput,
   applyAgencyDecision,
   type AuditAction,
   getAgencyDecisions,
@@ -187,6 +188,37 @@ export class AdminAgenciesService {
       metadata: { previousStatus: agency.status, ...(reason === null ? {} : { reason }) },
       ip,
     });
+    return this.find(id);
+  }
+
+  /** Attribue le plan d'abonnement (Starter, Business, Premium, Lifetime). */
+  async setPlan(
+    id: string,
+    input: AgencyPlanInput,
+    actorId: string,
+    ip: string | null,
+  ): Promise<AdminAgency> {
+    const agency = await this.prisma.agency.findUnique({
+      where: { id },
+      select: { plan: true },
+    });
+    if (agency === null) {
+      throw new NotFoundException('Agence introuvable.');
+    }
+    if (agency.plan !== input.plan) {
+      await this.prisma.agency.update({
+        where: { id },
+        data: { plan: input.plan },
+      });
+      await this.audit.log({
+        action: 'agency.plan_changed',
+        actorId,
+        entityType: 'agency',
+        entityId: id,
+        metadata: { from: agency.plan, to: input.plan },
+        ip,
+      });
+    }
     return this.find(id);
   }
 
