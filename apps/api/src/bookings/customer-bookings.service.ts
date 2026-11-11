@@ -163,7 +163,9 @@ export class CustomerBookingsService {
           if (
             vehicle?.status !== 'ACTIVE' ||
             vehicle.deletedAt !== null ||
-            vehicle.agency.status !== 'ACTIVE'
+            !vehicle.listedOnSite ||
+            vehicle.agency.status !== 'ACTIVE' ||
+            !vehicle.agency.listedOnSite
           ) {
             throw unavailable();
           }

@@ -87,6 +87,7 @@ const vehicleFormSchema = z
     fuel: fuelTypeSchema,
     seats: z.string(),
     airConditioning: z.boolean(),
+    listedOnSite: z.boolean(),
     dailyRate: amountString(false),
     deposit: amountString(true),
     unlimitedMileage: z.boolean(),
@@ -132,6 +133,7 @@ function toFormValues(
     fuel: vehicle?.fuel ?? 'PETROL',
     seats: String(vehicle?.seats ?? 5),
     airConditioning: vehicle?.airConditioning ?? true,
+    listedOnSite: vehicle?.listedOnSite ?? true,
     dailyRate: vehicle === null ? '' : millimesToDinarInput(vehicle.dailyRateMillimes),
     deposit: vehicle === null ? '' : millimesToDinarInput(vehicle.depositMillimes),
     unlimitedMileage: mileageLimit === null,
@@ -151,6 +153,7 @@ function toInput(values: VehicleFormValues): VehicleInput {
     fuel: values.fuel,
     seats: Number(values.seats),
     airConditioning: values.airConditioning,
+    listedOnSite: values.listedOnSite,
     dailyRateMillimes: parseDinars(values.dailyRate) ?? 0,
     depositMillimes: parseDinars(values.deposit) ?? 0,
     mileageLimitKm: values.unlimitedMileage ? null : Number(values.mileageLimitKm),
@@ -515,6 +518,28 @@ export function VehicleFormSheet({
                     </span>
                     <Switch
                       id={`${id}-ac`}
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </label>
+                )}
+              />
+              <Controller
+                control={form.control}
+                name="listedOnSite"
+                render={({ field }) => (
+                  <label
+                    htmlFor={`${id}-listed`}
+                    className="flex cursor-pointer items-center justify-between gap-4 rounded-control border border-border p-4"
+                  >
+                    <span className="grid gap-0.5">
+                      <span className="text-sm font-medium">{tForm('listedOnSite')}</span>
+                      <span className="text-xs text-muted-foreground">
+                        {tForm('listedOnSiteHint')}
+                      </span>
+                    </span>
+                    <Switch
+                      id={`${id}-listed`}
                       checked={field.value}
                       onCheckedChange={field.onChange}
                     />

@@ -22,6 +22,7 @@ const validVehicle = {
   fuel: 'PETROL',
   seats: 5,
   airConditioning: true,
+  listedOnSite: true,
   dailyRateMillimes: 95_000,
   depositMillimes: 500_000,
   mileageLimitKm: null,

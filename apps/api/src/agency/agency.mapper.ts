@@ -67,6 +67,7 @@ export function toVehicle(row: VehicleRow, publicUrl: (key: string) => string): 
     fuel: row.fuel,
     seats: row.seats,
     airConditioning: row.airConditioning,
+    listedOnSite: row.listedOnSite,
     dailyRateMillimes: row.dailyRateMillimes,
     depositMillimes: row.depositMillimes,
     mileageLimitKm: row.mileageLimitKm,
@@ -264,6 +265,7 @@ export function toSettings(
       minLicenseYears: agency.minLicenseYears,
       freeCancellationHours: agency.freeCancellationHours,
       instantConfirmation: agency.instantConfirmation,
+      listedOnSite: agency.listedOnSite,
       acceptedPaymentMethods: agency.acceptedPaymentMethods,
     },
   };

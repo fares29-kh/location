@@ -40,7 +40,19 @@ import { Textarea } from '@drivetn/ui/textarea';
 import { toast } from '@drivetn/ui/toaster';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
-import { Building2, KeyRound, Mail, MapPin, Phone, Plus, ShieldCheck, X, Zap } from 'lucide-react';
+import {
+  Building2,
+  Eye,
+  EyeOff,
+  KeyRound,
+  Mail,
+  MapPin,
+  Phone,
+  Plus,
+  ShieldCheck,
+  X,
+  Zap,
+} from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useId } from 'react';
 import { Controller, type UseFormReturn, useForm, useWatch } from 'react-hook-form';
@@ -575,6 +587,45 @@ function ConditionsForm({
 
       <Card>
         <CardHeader>
+          <CardTitle>{t('visibilityTitle')}</CardTitle>
+          <CardDescription>{t('visibilityText')}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Controller
+            control={form.control}
+            name="listedOnSite"
+            render={({ field }) => (
+              <label
+                htmlFor={`${id}-listed`}
+                className="flex cursor-pointer items-center justify-between gap-4 rounded-control border border-border p-4"
+              >
+                <span className="flex items-start gap-3">
+                  {field.value ? (
+                    <Eye className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden="true" />
+                  ) : (
+                    <EyeOff
+                      className="mt-0.5 size-4 shrink-0 text-muted-foreground"
+                      aria-hidden="true"
+                    />
+                  )}
+                  <span className="grid gap-0.5">
+                    <span className="text-sm font-medium">{t('listedOnSite')}</span>
+                    <span className="text-xs text-muted-foreground">{t('listedOnSiteHint')}</span>
+                  </span>
+                </span>
+                <Switch
+                  id={`${id}-listed`}
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
+              </label>
+            )}
+          />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
           <CardTitle>{t('paymentTitle')}</CardTitle>
           <CardDescription>{t('paymentText')}</CardDescription>
         </CardHeader>
@@ -729,6 +780,14 @@ function ClientPreview({
           <li className="flex items-center gap-2">
             <Zap className="size-4 text-muted-foreground" aria-hidden="true" />
             {conditions.instantConfirmation ? t('instant') : t('onRequest')}
+          </li>
+          <li className="flex items-center gap-2">
+            {conditions.listedOnSite ? (
+              <Eye className="size-4 text-muted-foreground" aria-hidden="true" />
+            ) : (
+              <EyeOff className="size-4 text-muted-foreground" aria-hidden="true" />
+            )}
+            {conditions.listedOnSite ? t('listed') : t('hidden')}
           </li>
         </ul>
         <div className="grid gap-2 border-t border-border pt-4">

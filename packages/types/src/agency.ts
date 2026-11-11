@@ -84,6 +84,11 @@ export const rentalConditionsSchema = z.object({
     .max(CANCELLATION_HOURS_MAX, { message: 'OUT_OF_RANGE' }),
   /** Confirmation automatique des demandes, sans validation manuelle. */
   instantConfirmation: z.boolean(),
+  /**
+   * Si faux, l’agence et toute sa flotte sont masquées du site client
+   * (réservations comptoir et flotte interne restent disponibles).
+   */
+  listedOnSite: z.boolean(),
   acceptedPaymentMethods: z
     .array(paymentMethodSchema)
     .min(1, { message: 'PAYMENT_METHOD_REQUIRED' }),

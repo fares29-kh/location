@@ -1476,6 +1476,8 @@
         "seats": "Nombre de places",
         "airConditioning": "Climatisation",
         "airConditioningHint": "Équipement très recherché en été.",
+        "listedOnSite": "Visible sur le site client",
+        "listedOnSiteHint": "Désactivé : la voiture reste dans votre flotte et au comptoir, mais n’apparaît pas aux clients en ligne.",
         "dailyRate": "Tarif journalier",
         "perDaySuffix": "DT / j",
         "deposit": "Caution",
@@ -1710,6 +1712,10 @@
         "noFreeCancellation": "Pas d’annulation gratuite",
         "instantConfirmation": "Confirmation instantanée",
         "instantConfirmationHint": "Les demandes sont acceptées automatiquement si le véhicule est libre.",
+        "visibilityTitle": "Visibilité sur le site client",
+        "visibilityText": "Choisissez si votre agence apparaît dans la recherche et l’annuaire clients.",
+        "listedOnSite": "Afficher mon agence aux clients",
+        "listedOnSiteHint": "Désactivé : ni l’agence ni ses voitures n’apparaissent sur le site. Les réservations au comptoir restent possibles.",
         "paymentTitle": "Modes de paiement acceptés",
         "paymentText": "Réglés sur place, à l’agence. Affichés sur votre fiche.",
         "saved": "Conditions de location enregistrées.",
@@ -1731,6 +1737,8 @@
         "freeCancellation": "Annulation gratuite jusqu’à {count, plural, one {# heure} other {# heures}} avant",
         "instant": "Confirmation immédiate",
         "onRequest": "Confirmation par l’agence",
+        "listed": "Visible sur le site client",
+        "hidden": "Masquée du site client",
         "payOnSite": "Paiement sur place",
         "driver": "Conducteur : {age} ans minimum, {years, plural, one {# an} other {# ans}} de permis."
       }

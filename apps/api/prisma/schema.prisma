@@ -336,6 +336,8 @@ model Agency {
   minLicenseYears        Int              @default(2) @map("min_license_years")
   freeCancellationHours  Int              @default(48) @map("free_cancellation_hours")
   instantConfirmation    Boolean          @default(false) @map("instant_confirmation")
+  /// Si faux, l'agence et toute sa flotte sont masquées du site client (hors statut admin).
+  listedOnSite           Boolean          @default(true) @map("listed_on_site")
   acceptedPaymentMethods PaymentMethod[]  @default([CASH]) @map("accepted_payment_methods")
   /// Matricule fiscal (ex. 1234567/A/M/000), vide tant qu'il n'est pas déclaré.
   taxId                  String           @default("") @map("tax_id")
@@ -470,6 +472,8 @@ model Vehicle {
   fuel              FuelType
   seats             Int
   airConditioning   Boolean         @map("air_conditioning")
+  /// Si faux, le véhicule reste en flotte mais n'apparaît pas sur le site client.
+  listedOnSite      Boolean         @default(true) @map("listed_on_site")
   dailyRateMillimes Int             @map("daily_rate_millimes")
   depositMillimes   Int             @map("deposit_millimes")
   /// `null` : kilométrage illimité.

@@ -24,7 +24,7 @@ export class AgencyDirectoryService {
    */
   async list(revealContacts: boolean): Promise<PublicAgency[]> {
     const agencies = await this.prisma.agency.findMany({
-      where: { status: 'ACTIVE' },
+      where: { status: 'ACTIVE', listedOnSite: true },
       select: {
         id: true,
         name: true,
@@ -41,7 +41,7 @@ export class AgencyDirectoryService {
         freeCancellationHours: true,
         governorate: { select: { slug: true } },
         vehicles: {
-          where: { status: 'ACTIVE' },
+          where: { status: 'ACTIVE', listedOnSite: true },
           select: { categoryId: true, dailyRateMillimes: true },
         },
       },
@@ -144,7 +144,7 @@ export class AgencyDirectoryService {
   /** Derniers avis publiés d'une agence active. Le nom de famille est abrégé. */
   async reviews(agencyId: string): Promise<PublicReview[]> {
     const agency = await this.prisma.agency.findFirst({
-      where: { id: agencyId, status: 'ACTIVE' },
+      where: { id: agencyId, status: 'ACTIVE', listedOnSite: true },
       select: { id: true },
     });
     if (agency === null) {

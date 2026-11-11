@@ -262,6 +262,7 @@ describe.skipIf(!e2eEnabled)('Portail agence : cloisonnement (e2e)', () => {
         fuel: 'PETROL',
         seats: 4,
         airConditioning: true,
+        listedOnSite: true,
         dailyRateMillimes: 1000,
         depositMillimes: 0,
         mileageLimitKm: null,

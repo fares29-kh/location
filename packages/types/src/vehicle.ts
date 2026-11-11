@@ -174,6 +174,11 @@ export const vehicleInputSchema = z.object({
     .min(VEHICLE_SEATS_MIN, { message: 'OUT_OF_RANGE' })
     .max(VEHICLE_SEATS_MAX, { message: 'OUT_OF_RANGE' }),
   airConditioning: z.boolean(),
+  /**
+   * Si faux, le véhicule reste en flotte (comptoir, planning) mais n’apparaît pas
+   * sur le site client.
+   */
+  listedOnSite: z.boolean(),
   dailyRateMillimes: z.number().int().positive({ message: 'INVALID_AMOUNT' }),
   depositMillimes: z.number().int().nonnegative({ message: 'INVALID_AMOUNT' }),
   /** `null` : kilométrage illimité. */

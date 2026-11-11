@@ -1476,6 +1476,8 @@
         "seats": "Seats",
         "airConditioning": "Air conditioning",
         "airConditioningHint": "Highly sought after in summer.",
+        "listedOnSite": "Visible on the customer site",
+        "listedOnSiteHint": "Off: the car stays in your fleet and desk bookings, but is hidden from online customers.",
         "dailyRate": "Daily rate",
         "perDaySuffix": "TND / day",
         "deposit": "Deposit",
@@ -1710,6 +1712,10 @@
         "noFreeCancellation": "No free cancellation",
         "instantConfirmation": "Instant confirmation",
         "instantConfirmationHint": "Requests are accepted automatically when the vehicle is free.",
+        "visibilityTitle": "Visibility on the customer site",
+        "visibilityText": "Choose whether your agency appears in customer search and the directory.",
+        "listedOnSite": "Show my agency to customers",
+        "listedOnSiteHint": "Off: neither the agency nor its cars appear on the site. Desk bookings still work.",
         "paymentTitle": "Accepted payment methods",
         "paymentText": "Paid on site at the agency. Shown on your profile.",
         "saved": "Rental terms saved.",
@@ -1731,6 +1737,8 @@
         "freeCancellation": "Free cancellation up to {count, plural, one {# hour} other {# hours}} before",
         "instant": "Instant confirmation",
         "onRequest": "Confirmed by the agency",
+        "listed": "Visible on the customer site",
+        "hidden": "Hidden from the customer site",
         "payOnSite": "Pay on site",
         "driver": "Driver: {age} years or older, {years, plural, one {# year} other {# years}} with a licence."
       }
