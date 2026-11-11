@@ -38,6 +38,7 @@ import { vehicleCoverUrl } from '@/lib/agency/vehicle-photos';
 
 import { VehicleThumb } from '../vehicle-thumb';
 import { BookingActionsBar } from './booking-actions';
+import { PrintRentalContractButton } from './print-rental-contract-button';
 import { RecordPaymentDialog } from './record-payment-dialog';
 
 const KIND_TONES: Record<PaymentKind, BadgeTone> = {
@@ -502,7 +503,12 @@ export function BookingDetailView({ bookingId }: { bookingId: string }) {
           vehicle: `${booking.vehicle.brand} ${booking.vehicle.model}`,
           created: format.relative(booking.createdAt),
         })}
-        actions={<BookingActionsBar booking={booking} />}
+        actions={
+          <>
+            <PrintRentalContractButton booking={booking} />
+            <BookingActionsBar booking={booking} />
+          </>
+        }
       />
 
       {booking.status === 'PENDING' && (
