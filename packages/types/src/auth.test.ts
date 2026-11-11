@@ -96,6 +96,32 @@ describe('signupSchema', () => {
   it('exige le prénom', () => {
     expect(firstMessage(signupSchema.safeParse({ ...valid, firstName: ' ' }))).toBe('REQUIRED');
   });
+
+  it('exige le nom d’agence pour une inscription agence', () => {
+    expect(
+      firstMessage(signupSchema.safeParse({ ...valid, portal: 'agency', agencyName: ' ' })),
+    ).toBe('REQUIRED');
+    expect(
+      signupSchema.parse({
+        ...valid,
+        portal: 'agency',
+        agencyName: ' Location Carthage ',
+        plan: 'STARTER',
+      }).agencyName,
+    ).toBe('Location Carthage');
+  });
+
+  it('accepte une inscription client sans nom d’agence', () => {
+    expect(signupSchema.parse({ ...valid, portal: 'client', agencyName: '' }).agencyName).toBe('');
+  });
+
+  it('refuse un nom d’agence hors inscription agence', () => {
+    expect(
+      firstMessage(
+        signupSchema.safeParse({ ...valid, portal: 'client', agencyName: 'Location Carthage' }),
+      ),
+    ).toBe('FORBIDDEN');
+  });
 });
 
 describe('loginSchema', () => {

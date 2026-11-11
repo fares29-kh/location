@@ -2653,6 +2653,9 @@
     "fields": {
       "firstName": "First name",
       "lastName": "Last name",
+      "ownerFirstName": "Manager first name",
+      "ownerLastName": "Manager last name",
+      "agencyName": "Agency name",
       "phone": "Phone",
       "email": "Email",
       "emailOptional": "Email (optional)",
@@ -2709,8 +2712,9 @@
       },
       "subtitle": {
         "client": "A free account to book without a credit card and track your rentals.",
-        "agency": "Start with your manager account: you will then set up your agency and fleet."
+        "agency": "Enter your agency name and the manager’s name to get started."
       },
+      "agencyNameHint": "This name will appear on your profile and documents.",
       "emailHint": "A confirmation code will be sent to this address.",
       "phoneHint": "Number shared with the agency. The code is not sent by SMS.",
       "planHint": {

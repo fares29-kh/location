@@ -103,6 +103,10 @@ export class AuthService {
     const existing = await this.resolveSignupAccount(phone, input.email);
 
     const preferredPlan = role === 'AGENCY_OWNER' ? (input.plan ?? 'STARTER') : null;
+    const preferredAgencyName =
+      role === 'AGENCY_OWNER' && input.agencyName !== undefined && input.agencyName.length > 0
+        ? input.agencyName
+        : null;
     const data = {
       role,
       firstName: input.firstName,
@@ -113,6 +117,7 @@ export class AuthService {
       passwordHash: await this.passwords.hash(input.password),
       locale: input.locale ?? DEFAULT_LOCALE,
       preferredPlan,
+      preferredAgencyName,
     };
     let user: User;
     try {
@@ -134,7 +139,7 @@ export class AuthService {
       actorId: user.id,
       entityType: 'user',
       entityId: user.id,
-      metadata: { role, plan: preferredPlan },
+      metadata: { role, plan: preferredPlan, agencyName: preferredAgencyName },
       ip: context.ip,
     });
     return this.otp.sendEmail({

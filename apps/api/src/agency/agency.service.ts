@@ -364,11 +364,13 @@ export class AgencyService {
     const phone = normalizeTunisianPhone(owner.phone);
     const openedAt = new Date();
     const plan = owner.preferredPlan ?? 'STARTER';
+    const preferredName = owner.preferredAgencyName?.trim() ?? '';
+    const name = preferredName.length > 0 ? preferredName : `${owner.firstName} ${owner.lastName}`;
     try {
       const agency = await this.prisma.agency.create({
         data: {
           ownerId,
-          name: `${owner.firstName} ${owner.lastName}`,
+          name,
           phone,
           whatsappPhone: phone,
           email: owner.email,
@@ -379,10 +381,10 @@ export class AgencyService {
         },
         select: { id: true },
       });
-      if (owner.preferredPlan !== null) {
+      if (owner.preferredPlan !== null || owner.preferredAgencyName !== null) {
         await this.prisma.user.update({
           where: { id: ownerId },
-          data: { preferredPlan: null },
+          data: { preferredPlan: null, preferredAgencyName: null },
         });
       }
       await this.audit.log({

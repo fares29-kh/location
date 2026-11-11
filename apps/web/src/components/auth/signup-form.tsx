@@ -23,7 +23,14 @@ import { type PendingVerification, PhoneVerification } from './phone-verificatio
 import { applyServerIssues, useAuthMessages } from './use-auth-messages';
 import { useCompleteAuth } from './use-complete-auth';
 
-const SIGNUP_FIELDS = ['firstName', 'lastName', 'phone', 'email', 'password'] as const;
+const SIGNUP_FIELDS = [
+  'agencyName',
+  'firstName',
+  'lastName',
+  'phone',
+  'email',
+  'password',
+] as const;
 
 /** Inscription (client ou gérant d'agence selon le formulaire), puis confirmation de l'email. */
 export function SignupForm({
@@ -46,6 +53,7 @@ export function SignupForm({
   const id = useId();
   const [formError, setFormError] = useState<string | null>(null);
   const [verification, setVerification] = useState<PendingVerification | null>(null);
+  const isAgency = portal === 'agency';
 
   const form = useForm({
     resolver: zodResolver(signupSchema, undefined, { raw: true }),
@@ -55,6 +63,8 @@ export function SignupForm({
       phone: '',
       email: '',
       password: '',
+      portal,
+      agencyName: '',
     },
   });
 
@@ -64,11 +74,14 @@ export function SignupForm({
       if (captchaToken === null) {
         throw new Error('captcha');
       }
+      const agencyName = values.agencyName?.trim() ?? '';
+      const { agencyName: _ignoredAgencyName, ...rest } = values;
       return authApi.signup({
-        ...values,
+        ...rest,
         locale,
         portal,
-        ...(plan === null || portal !== 'agency' ? {} : { plan }),
+        ...(isAgency && agencyName.length > 0 ? { agencyName } : {}),
+        ...(plan === null || !isAgency ? {} : { plan }),
         ...(captchaToken === '' ? {} : { captchaToken }),
       });
     },
@@ -111,6 +124,7 @@ export function SignupForm({
   }
 
   const { errors } = form.formState;
+  const agencyNameError = validationMessage(errors.agencyName?.message);
   const firstNameError = validationMessage(errors.firstName?.message);
   const lastNameError = validationMessage(errors.lastName?.message);
   const phoneError = validationMessage(errors.phone?.message);
@@ -119,15 +133,15 @@ export function SignupForm({
   const passwordHint = t('passwordHint');
   const emailHint = t('signup.emailHint');
   const phoneHint = t('signup.phoneHint');
+  const firstNameLabel = isAgency ? t('fields.ownerFirstName') : t('fields.firstName');
+  const lastNameLabel = isAgency ? t('fields.ownerLastName') : t('fields.lastName');
 
   return (
     <div className="grid gap-6">
       {portal === 'client' && (
         <Alert title={t('clientAccount.title')}>{t('clientAccount.text')}</Alert>
       )}
-      {portal === 'agency' && plan !== null && (
-        <Alert tone="info">{t(`signup.planHint.${plan}`)}</Alert>
-      )}
+      {isAgency && plan !== null && <Alert tone="info">{t(`signup.planHint.${plan}`)}</Alert>}
       <form
         noValidate
         className="grid gap-4"
@@ -138,15 +152,32 @@ export function SignupForm({
         }}
       >
         {formError !== null && <Alert tone="danger">{formError}</Alert>}
+        {isAgency && (
+          <Field
+            id={`${id}-agencyName`}
+            label={t('fields.agencyName')}
+            hint={t('signup.agencyNameHint')}
+            error={agencyNameError}
+          >
+            <Input
+              {...controlProps(`${id}-agencyName`, {
+                error: agencyNameError,
+                hint: t('signup.agencyNameHint'),
+              })}
+              autoComplete="organization"
+              {...form.register('agencyName')}
+            />
+          </Field>
+        )}
         <div className="grid gap-4 sm:grid-cols-2">
-          <Field id={`${id}-firstName`} label={t('fields.firstName')} error={firstNameError}>
+          <Field id={`${id}-firstName`} label={firstNameLabel} error={firstNameError}>
             <Input
               {...controlProps(`${id}-firstName`, { error: firstNameError })}
               autoComplete="given-name"
               {...form.register('firstName')}
             />
           </Field>
-          <Field id={`${id}-lastName`} label={t('fields.lastName')} error={lastNameError}>
+          <Field id={`${id}-lastName`} label={lastNameLabel} error={lastNameError}>
             <Input
               {...controlProps(`${id}-lastName`, { error: lastNameError })}
               autoComplete="family-name"

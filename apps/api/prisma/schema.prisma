@@ -72,6 +72,8 @@ model User {
   statusReason    String?    @map("status_reason")
   /// Plan choisi à l'inscription agence (Starter/Business), consommé à la création de la fiche.
   preferredPlan   SubscriptionPlan? @map("preferred_plan")
+  /// Nom d'agence choisi à l'inscription, consommé à la création de la fiche.
+  preferredAgencyName String? @map("preferred_agency_name")
   createdAt       DateTime   @default(now()) @map("created_at")
   updatedAt       DateTime   @updatedAt @map("updated_at")
   deletedAt       DateTime?  @map("deleted_at")

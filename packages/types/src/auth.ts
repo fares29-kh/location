@@ -135,11 +135,32 @@ export const signupSchema = z
      * Plan choisi sur la page d’accueil (Starter / Business). Ignoré hors inscription agence.
      */
     plan: z.enum(['STARTER', 'PRO']).optional(),
+    /**
+     * Nom commercial de l’agence. Obligatoire à l’inscription agence ; appliqué à la fiche
+     * lors de sa création. Ignoré hors inscription agence.
+     */
+    agencyName: z.string().trim().max(80, { message: 'TOO_LONG' }).optional(),
   })
   .refine((value) => value.plan === undefined || value.portal === 'agency', {
     message: 'FORBIDDEN',
     path: ['plan'],
-  });
+  })
+  .refine(
+    (value) =>
+      value.agencyName === undefined || value.agencyName.length === 0 || value.portal === 'agency',
+    {
+      message: 'FORBIDDEN',
+      path: ['agencyName'],
+    },
+  )
+  .refine(
+    (value) =>
+      value.portal !== 'agency' || (value.agencyName !== undefined && value.agencyName.length > 0),
+    {
+      message: 'REQUIRED',
+      path: ['agencyName'],
+    },
+  );
 export type SignupInput = z.input<typeof signupSchema>;
 export type SignupRequest = z.output<typeof signupSchema>;
 

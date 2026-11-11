@@ -41,6 +41,18 @@ export class SignupDto {
   portal?: 'client' | 'agency';
 
   @ApiPropertyOptional({
+    enum: ['STARTER', 'PRO'],
+    description: 'Plan choisi à l’inscription agence (Starter / Business)',
+  })
+  plan?: 'STARTER' | 'PRO';
+
+  @ApiPropertyOptional({
+    example: 'Location Carthage',
+    description: 'Nom de l’agence (obligatoire si portal = agency)',
+  })
+  agencyName?: string;
+
+  @ApiPropertyOptional({
     description: 'Jeton reCAPTCHA v2, obligatoire si le captcha est configuré',
   })
   captchaToken?: string;
