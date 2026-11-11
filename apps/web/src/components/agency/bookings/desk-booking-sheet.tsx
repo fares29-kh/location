@@ -1,8 +1,10 @@
 'use client';
 
 import {
+  AGENCY_LIST_LIMIT_MAX,
   dayKeyToDate,
   type DeskBookingInput,
+  formatNationalPhone,
   isValidTunisianPhone,
   rangesOverlap,
   rentalPriceMillimes,
@@ -10,6 +12,7 @@ import {
   todayKey,
 } from '@drivetn/types';
 import { Button } from '@drivetn/ui/button';
+import { Combobox } from '@drivetn/ui/combobox';
 import { Field } from '@drivetn/ui/field';
 import { Input } from '@drivetn/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@drivetn/ui/select';
@@ -27,11 +30,13 @@ import { AvailabilityCalendar, lastOccupiedDay } from '@/components/search/avail
 import { useRouter } from '@/i18n/navigation';
 import { ApiError } from '@/lib/api/errors';
 import { useVehicleAvailability } from '@/lib/availability';
-import { useCreateDeskBooking, useVehicles } from '@/lib/agency/queries';
-import type { VehicleView } from '@/lib/agency/types';
+import { useCreateDeskBooking, useCustomers, useVehicles } from '@/lib/agency/queries';
+import type { CustomerView, VehicleView } from '@/lib/agency/types';
 
 import { useAgencyFormat } from '../use-agency-format';
 import { applyFieldIssues, useValidationMessage } from '../use-validation-message';
+
+const NEW_CUSTOMER = '__new__';
 
 const day = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, { message: 'INVALID_DATE' });
 const name = z.string().trim().min(1, { message: 'REQUIRED' }).max(60, { message: 'TOO_LONG' });
@@ -67,6 +72,10 @@ function vehicleLabel(vehicle: VehicleView): string {
     : `${vehicle.brand} ${vehicle.model}`;
 }
 
+function customerLabel(customer: CustomerView): string {
+  return `${customer.firstName} ${customer.lastName} · ${formatNationalPhone(customer.phone)}`;
+}
+
 export function DeskBookingSheet({
   open,
   onOpenChange,
@@ -83,11 +92,27 @@ export function DeskBookingSheet({
   const today = todayKey();
   const schema = useMemo(() => deskFormSchema(today), [today]);
   const vehicles = useVehicles();
+  const customers = useCustomers({ search: '', page: 1, limit: AGENCY_LIST_LIMIT_MAX });
   const create = useCreateDeskBooking();
   const validationMessage = useValidationMessage();
   const [formError, setFormError] = useState<string | null>(null);
   const [overlapWarning, setOverlapWarning] = useState(false);
+  const [customerId, setCustomerId] = useState(NEW_CUSTOMER);
   const activeVehicles = (vehicles.data ?? []).filter((vehicle) => vehicle.status === 'ACTIVE');
+  const knownCustomers = useMemo(() => customers.data?.items ?? [], [customers.data?.items]);
+  const existingCustomer = customerId !== NEW_CUSTOMER;
+
+  const customerOptions = useMemo(
+    () => [
+      { value: NEW_CUSTOMER, label: t('newCustomer'), keywords: t('newCustomerKeywords') },
+      ...knownCustomers.map((customer) => ({
+        value: customer.id,
+        label: customerLabel(customer),
+        keywords: `${customer.phone} ${customer.firstName} ${customer.lastName} ${customer.city}`,
+      })),
+    ],
+    [knownCustomers, t],
+  );
 
   const form = useForm<DeskFormValues>({
     resolver: zodResolver(schema),
@@ -118,11 +143,29 @@ export function DeskBookingSheet({
   const { errors } = form.formState;
   const error = (field: keyof DeskFormValues) => validationMessage(errors[field]?.message);
 
+  const applyCustomer = (id: string) => {
+    setCustomerId(id);
+    if (id === NEW_CUSTOMER) {
+      form.setValue('phone', '');
+      form.setValue('firstName', '');
+      form.setValue('lastName', '');
+      return;
+    }
+    const customer = knownCustomers.find((row) => row.id === id);
+    if (customer === undefined) {
+      return;
+    }
+    form.setValue('phone', customer.phone, { shouldValidate: true });
+    form.setValue('firstName', customer.firstName, { shouldValidate: true });
+    form.setValue('lastName', customer.lastName, { shouldValidate: true });
+  };
+
   const close = (next: boolean) => {
     if (!next) {
       form.reset();
       setFormError(null);
       setOverlapWarning(false);
+      setCustomerId(NEW_CUSTOMER);
     }
     onOpenChange(next);
   };
@@ -308,19 +351,34 @@ export function DeskBookingSheet({
                 )}
               </div>
             )}
+            <Field id={`${id}-customer`} label={t('customer')} hint={t('customerHint')}>
+              <Combobox
+                {...controlProps(`${id}-customer`, { hint: t('customerHint') })}
+                value={customerId}
+                onValueChange={applyCustomer}
+                options={customerOptions}
+                placeholder={t('customerPlaceholder')}
+                searchPlaceholder={t('customerSearch')}
+                emptyText={t('customerEmpty')}
+              />
+            </Field>
             <Field
               id={`${id}-phone`}
               label={t('phone')}
-              hint={t('phoneHint')}
+              hint={existingCustomer ? t('phoneHintExisting') : t('phoneHint')}
               error={error('phone')}
             >
               <Input
-                {...controlProps(`${id}-phone`, { error: error('phone'), hint: t('phoneHint') })}
+                {...controlProps(`${id}-phone`, {
+                  error: error('phone'),
+                  hint: existingCustomer ? t('phoneHintExisting') : t('phoneHint'),
+                })}
                 type="tel"
                 inputMode="tel"
                 autoComplete="tel"
                 dir="ltr"
                 placeholder="20 123 456"
+                readOnly={existingCustomer}
                 {...form.register('phone')}
               />
             </Field>
@@ -329,6 +387,7 @@ export function DeskBookingSheet({
                 <Input
                   {...controlProps(`${id}-first`, { error: error('firstName') })}
                   autoComplete="given-name"
+                  readOnly={existingCustomer}
                   {...form.register('firstName')}
                 />
               </Field>
@@ -336,6 +395,7 @@ export function DeskBookingSheet({
                 <Input
                   {...controlProps(`${id}-last`, { error: error('lastName') })}
                   autoComplete="family-name"
+                  readOnly={existingCustomer}
                   {...form.register('lastName')}
                 />
               </Field>
